@@ -29,7 +29,7 @@ As quatro composições usam o mesmo conteúdo e os mesmos registros. Nenhum dad
 
 ## O que ainda não está ativo
 
-Não há login próprio do Next nem sincronização em nuvem entre dispositivos. Os dados ficam neste navegador; exporte-os para uma cópia externa. O controle de versão local detecta gravações com revisão antiga, mas não é uma garantia de concorrência distribuída. O modelo de dados do servidor está documentado para a próxima implementação.
+Login e sincronização por registro foram implementados nas versões 0.5.0–0.5.1, em ambiente exclusivo. Ainda faltam o primeiro login real do usuário, a ativação da sincronização dos próprios registros e a conferência da transferência entre aparelhos. A importação do histórico original continua pendente. Consulte `docs/NUVEM-TUTOR-0.5.0.md` para evidências e limites dos testes; implementação não equivale a migração concluída.
 
 O tutor conversacional exige uma integração de servidor, credencial e limite de custo. Os 12 laboratórios complementares de outras IAs ainda são o plano curricular; não são aulas já produzidas. A base do Figma documenta fundamentos, não uma biblioteca completa de componentes.
 
@@ -62,7 +62,7 @@ Com Node disponível, rode `npm test`. Os testes usam somente armazenamento em m
 
 ## Próxima etapa de servidor
 
-Definir com o usuário a organização e o ambiente exclusivo do Supabase, verificar o custo e criar o projeto. Não usar o projeto BLESSAINT BUSINESS existente para guardar dados do Lab. Antes da migração, testar isolamento por usuário, conflitos, falha de rede e recuperação em dados fictícios.
+O ambiente exclusivo já foi criado e as verificações de isolamento e concorrência documentadas em `docs/NUVEM-TUTOR-0.5.0.md`. O próximo passo é concluir o primeiro acesso real, ativar a sincronização dos próprios dados com backup e conferir o histórico importado. O banco da BLESSAINT BUSINESS permanece separado.
 
 ## Transferência direta — 0.4.0
 
@@ -93,3 +93,8 @@ Ordem da entrega:
 Privacidade: manuais destinados aos clientes não devem conter acesso ao painel interno do estúdio, resultados financeiros, registros de outros clientes, credenciais ou informações privadas. Para um sistema privado do próprio cliente, explicar apenas o acesso autorizado a esse sistema. A apresentação comercial pode mostrar somente os valores e itens inclusos que forem destinados ao destinatário.
 
 Ao atualizar um projeto, manter o manual coerente com a versão efetivamente entregue. Esta regra complementa a rotina de cadastro no Evolution Lab e não muda as permissões de publicação.
+
+
+## Pendências atuais e prioridades
+
+A ordem de execução e os critérios para considerar cada etapa concluída estão em [Pendências e prioridades](docs/PENDENCIAS-E-PRIORIDADES.md). Documentos de arquitetura anteriores à versão 0.5.0 descrevem fases históricas; para nuvem e tutor, prevalece o registro específico mais recente.
