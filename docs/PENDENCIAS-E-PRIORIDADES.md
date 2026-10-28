@@ -14,6 +14,20 @@ Falta:
 
 Conclusão: fluxos de formulário, revisão e preparação para WhatsApp conferidos; PDFs disponíveis; limites de teste declarados. Envio de mensagens continua sendo confirmado pelo usuário no WhatsApp.
 
+
+### Nova prioridade: visão comercial clicável
+
+Solicitado em 28/10/2026; ainda não implementado.
+
+- Cartões com quantidades clicáveis para listar os clientes correspondentes: prospectando, confirmados, aguardando pagamento, primeira parcela recebida, segunda parcela recebida e mensalistas.
+- Separar fase comercial, recebimentos por cobrança/parcela e contrato de mensalidade: um cliente pode ser confirmado, ter a primeira parcela recebida e também ser mensalista. Não tratar essas categorias como estados mutuamente exclusivos.
+- Primeira e segunda parcelas devem estar vinculadas ao projeto/contrato e aos registros reais de pagamento. Não interpretar uma cobrança genérica como parcela paga.
+- Aguardando pagamento deve mostrar pendências reais; mensalista significa contrato recorrente, não mensalidade quitada.
+- Cada cartão deve abrir a relação filtrada, com cliente, projeto, situação e próxima ação. Contagem derivada dos registros, sem números fictícios fora da demonstração.
+- Recomendação apresentada: painel privado do Studio como central de clientes e financeiro; Evolution Lab como catálogo de projetos e acesso à gestão. A integração de dados privados entre ambos precisa preservar autenticação e evitar duas fontes divergentes. Não copiar detalhes financeiros para páginas públicas.
+- Manter o cadastro de novos prospectos no Lab solicitado na regra permanente, sem presumir que uma integração automática já existe.
+- Entrega desta melhoria exige testes apropriados, publicação, registro no Lab e manual PDF timbrado atualizado.
+
 ## 2. Primeiro acesso, backup e importação do histórico real do Evolution Lab
 
 A implementação de login, sincronização e importação está pronta. O histórico real não foi comprovadamente transferido.
