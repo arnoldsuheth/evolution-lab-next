@@ -1,5 +1,5 @@
-import {SITES,STAGES} from '../data/sites.js';
-import {safeURL} from './core.mjs';
+import {SITES,STAGES} from '../data/sites.js?v=0.2.2';
+import {safeURL} from './core.mjs?v=0.2.2';
 export function mountSites({state,put,esc,btn,render,feedback}){
  let siteEdit=null,prospectEdit=null;
  const values=()=>{const all=new Map(SITES.map(x=>[x.id,x]));for(const[k,v]of Object.entries(state().sites))all.set(k,{id:k,...v});return [...all.values()];};

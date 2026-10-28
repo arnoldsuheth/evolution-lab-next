@@ -1,5 +1,5 @@
-import {EXT_CURSOS,ACORDES} from '../data/catalogo.js';
-import {safeURL} from './core.mjs';
+import {EXT_CURSOS,ACORDES} from '../data/catalogo.js?v=0.2.2';
+import {safeURL} from './core.mjs?v=0.2.2';
 const object=x=>!!x&&typeof x==='object'&&!Array.isArray(x);
 const text=(x,n=500)=>typeof x==='string'?x.slice(0,n):'';
 const num=(x,max=100000)=>Number.isFinite(+x)?Math.min(max,Math.max(0,Math.floor(+x))):0;

@@ -25,3 +25,7 @@ A central Meus cursos reúne as duas trilhas internas, a graduação e os cinco 
 A faculdade recebe destaque no início do painel e na navegação. Atividades pendentes são ordenadas por prazo (vencidos, hoje e futuros, depois sem data). A primeira recebe aproximadamente 80% do tempo do plano, arredondado para cinco minutos; a sugestão de curso livre usa somente o restante. Com a agenda vazia, a primeira sugestão é cadastrar o cronograma real. Os cursos externos, Programação e Claude não recebem data de conclusão nem atraso artificial. O plano é ajustável; não representa uma garantia de que uma atividade será concluída no tempo sugerido. Os prazos pessoais antigos não foram acessados nem importados automaticamente.
 
 A cópia conferida do original pode trazer tópicos, provas e entregas da faculdade, preservando disciplina, conclusão e data das entregas. Notas, médias e aprovações da graduação não são importadas nesta versão.
+
+## Atualização consistente — 0.2.2
+
+As folhas de estilo e o grafo de módulos usam a versão nos endereços para impedir que o navegador combine a página nova com um módulo antigo ainda válido no cache HTTP. O service worker possui cache próprio atualizado e usa revalidação pela rede. Os registros locais não são removidos durante a atualização.

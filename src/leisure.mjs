@@ -1,6 +1,6 @@
-import {EXT_CURSOS,ACORDES,LIVROS_INICIAIS,AE} from '../data/catalogo.js';
-import {safeURL} from './core.mjs';
-import {legacyPreview} from './import-legacy.mjs';
+import {EXT_CURSOS,ACORDES,LIVROS_INICIAIS,AE} from '../data/catalogo.js?v=0.2.2';
+import {safeURL} from './core.mjs?v=0.2.2';
+import {legacyPreview} from './import-legacy.mjs?v=0.2.2';
 export const THEMES=[{id:'original',name:'Original Evoluído',sub:'A identidade dos blocos, com roxo e ciano.',colors:['#10121f','#9d8aff','#6ce5f1'],title:'O seu Lab, com espaço para crescer.'},{id:'neon',name:'Next Neon',sub:'Contraste escuro e verde neon para destacar sua próxima ação.',colors:['#0c1419','#b6ff39','#87e5ee'],title:'Uma ideia hoje. Uma entrega sua.'},{id:'leitura',name:'Leitura',sub:'Fundo claro, tons suaves e espaço para estudar com calma.',colors:['#f5f3ec','#315c43','#365a87'],title:'Abra um livro. Siga uma descoberta.'}];
 export function mountLeisure(ctx){
  const {state,put,esc,btn,render,feedback,download,repository}=ctx;
