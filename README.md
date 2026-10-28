@@ -11,6 +11,14 @@ Nova versão independente do Evolution Lab. O app atual permanece em `arnoldsuhe
 - Competências com estágio e evidência declarados pelo aluno; fila de revisões a partir das tentativas.
 - Registros locais separados por atividade, versões anteriores, recuperação de itens removidos e exportação JSON.
 - Ajuda guiada do Lion baseada na aula; sem se apresentar como uma conversa de IA em tempo real.
+- Meus sites: empresas, clientes, todos os links do catálogo original, edição e arquivamento reversível; oportunidades com próxima ação e prazo.
+- Central Meus cursos com as oito entradas do original.
+- Cinco cursos externos do catálogo original, com módulos, materiais e progresso pessoal.
+- Violão: treinos por dia, meta semanal, acordes e repertório.
+- Biblioteca: cadastro, edição, filtros, favoritos, páginas, notas e citações.
+- Temas Original Evoluído, Next Neon e Leitura, com seleção persistida por navegador.
+- Logo original dos cubos com NEXT em verde neon.
+- Importação local de hobbies e biblioteca com prévia, backup do Next e preservação de registros existentes, incluindo itens removidos.
 - PWA e funcionamento offline após carregar e instalar os recursos.
 
 ## O que ainda não está ativo
@@ -21,7 +29,7 @@ O tutor conversacional exige uma integração de servidor, credencial e limite d
 
 ## Isolamento do Lab atual
 
-O Next usa exclusivamente o prefixo `evolab-next:v1:`. Não lê `ea-state`, `ea-sess`, o cofre do Lab antigo nem seu Gist. Nenhuma nota ou senha foi migrada. O service worker só remove caches com o prefixo próprio `evolab-next-`.
+O Next usa exclusivamente o prefixo `evolab-next:v1:`. Não lê `ea-state`, `ea-sess`, o cofre do Lab antigo nem seu Gist. Nenhuma senha é migrada. Hobbies e biblioteca podem ser importados explicitamente a partir do JSON copiado em Perfil → Cópia de segurança no original. A importação reconhece somente campos permitidos, ignora sessões e preserva registros já existentes. As entregas de programação e Claude não são migradas automaticamente. O service worker só remove caches com o prefixo próprio `evolab-next-`.
 
 As duas aplicações no GitHub Pages ainda compartilham a origem do domínio; os prefixos evitam colisões acidentais, mas não são uma barreira de segurança contra código de mesma origem. Antes de ativar sessões sensíveis no Next, considerar domínio/origem isolados e um modelo de autenticação revisado.
 
@@ -35,6 +43,8 @@ Com Node disponível, rode `npm test`. Os testes usam somente armazenamento em m
 
 - `src/core.mjs`: registros, versões, recuperação, validação de links e planejamento.
 - `src/app.mjs`: navegação e fluxos da primeira versão.
+- `src/leisure.mjs`: hobbies, violão, biblioteca e temas.
+- `src/import-legacy.mjs`: validação e prévia do histórico antigo.
 - `src/classroom.js`: experiência das aulas, com adaptadores separados por trilha.
 - `data/`: conteúdo público das trilhas, sem progresso ou credenciais.
 - `docs/`: decisão de arquitetura, próximos passos e fundamentos visuais.

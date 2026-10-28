@@ -1,0 +1,7 @@
+<svg viewBox="22 20 156 176" xmlns="http://www.w3.org/2000/svg"><defs>
+<linearGradient id="lab-ju-c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6E1DB"/><stop offset="1" stop-color="#E2B5AB"/></linearGradient>
+<linearGradient id="lab-ju-l" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F3DAD3"/><stop offset="1" stop-color="#D9A69C"/></linearGradient></defs>
+<g class="petala esq"><path d="M100 150 C70 132 64 86 88 50 C118 84 124 126 100 150 Z" transform="rotate(-30 100 150)" fill="url(#lab-ju-l)" opacity=".82"/></g>
+<g class="petala dir"><path d="M100 150 C70 132 64 86 88 50 C118 84 124 126 100 150 Z" transform="scale(-1 1) translate(-200 0) rotate(-30 100 150)" fill="url(#lab-ju-l)" opacity=".82"/></g>
+<g class="petala meio"><path d="M100 150 C70 120 72 66 100 26 C128 66 130 120 100 150 Z" fill="url(#lab-ju-c)" opacity=".9"/><path d="M100 146 C96 110 96 70 100 34" fill="none" stroke="#fff" stroke-width="1.2" opacity=".55"/></g>
+<path class="haste" d="M100 150 C98 166 92 180 80 192" fill="none" stroke="#D3A498" stroke-width="2.2" stroke-linecap="round"/></svg>

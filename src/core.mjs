@@ -1,11 +1,11 @@
 export const PREFIX='evolab-next:v1:';
-export const COLLECTIONS=['prog','claude','tasks','projects','skills','reviews','prefs','sessions'];
+export const COLLECTIONS=['prog','claude','tasks','projects','skills','reviews','prefs','sessions','external','books','guitar','songs','sites','prospects'];
 export class ConflictError extends Error{constructor(collection,id){super('Esta atividade mudou em outra aba. Sua tentativa foi preservada para revisão.');this.name='ConflictError';this.collection=collection;this.id=id;}}
 export const clone=x=>JSON.parse(JSON.stringify(x));
 export const safeURL=s=>{try{const u=new URL(String(s));return ['https:','http:'].includes(u.protocol)&&!u.username&&!u.password?u.href:'';}catch{return '';}};
 export function empty(){return Object.fromEntries(COLLECTIONS.map(k=>[k,{}]));}
 export function createRepository(storage,clock=()=>new Date().toISOString()){
- const key=(c,id)=>{if(!COLLECTIONS.includes(c)||!/^[-\w:.]{1,120}$/.test(String(id)))throw Error('Identificador de atividade inválido.');return PREFIX+c+':'+id;};
+ const key=(c,id)=>{if(!COLLECTIONS.includes(c)||(!/^[-\w:.]{1,120}$/.test(String(id))||['__proto__','constructor','prototype'].includes(String(id))))throw Error('Identificador de atividade inválido.');return PREFIX+c+':'+id;};
  function get(c,id){const raw=storage.getItem(key(c,id));if(raw===null)return {version:0,value:null,history:[]};let r;try{r=JSON.parse(raw);}catch{throw Error('Há um registro local ilegível. Exporte uma cópia antes de tentar recuperá-lo.');}if(!Number.isSafeInteger(r.version)||r.version<1||!Object.hasOwn(r,'value'))throw Error('Registro local incompatível. Nenhum dado foi sobrescrito.');return r;}
  function set(c,id,value,expectedVersion){const old=get(c,id);if(old.version!==expectedVersion)throw new ConflictError(c,id);const history=old.value===null?[]:[{version:old.version,updatedAt:old.updatedAt,value:clone(old.value)},...(old.history||[])].slice(0,8);const r={version:old.version+1,updatedAt:clock(),value:clone(value),history};storage.setItem(key(c,id),JSON.stringify(r));return r;}
  function all(){const out=empty();for(let i=0;i<storage.length;i++){const k=storage.key(i);if(!k?.startsWith(PREFIX))continue;const tail=k.slice(PREFIX.length),sep=tail.indexOf(':'),c=tail.slice(0,sep),id=tail.slice(sep+1);if(COLLECTIONS.includes(c)){const r=get(c,id);if(r.value!==null)out[c][id]=clone(r.value);}}return out;}
