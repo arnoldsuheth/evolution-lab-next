@@ -1,5 +1,5 @@
 export const PREFIX='evolab-next:v1:';
-export const COLLECTIONS=['prog','claude','tasks','projects','skills','reviews','prefs','sessions','external','books','guitar','songs','sites','prospects'];
+export const COLLECTIONS=['prog','claude','tasks','projects','skills','reviews','prefs','sessions','external','books','guitar','songs','sites','prospects','subjects','legacy'];
 export class ConflictError extends Error{constructor(collection,id){super('Esta atividade mudou em outra aba. Sua tentativa foi preservada para revisão.');this.name='ConflictError';this.collection=collection;this.id=id;}}
 export const clone=x=>JSON.parse(JSON.stringify(x));
 export const safeURL=s=>{try{const u=new URL(String(s));return ['https:','http:'].includes(u.protocol)&&!u.username&&!u.password?u.href:'';}catch{return '';}};

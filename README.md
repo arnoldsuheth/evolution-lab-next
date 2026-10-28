@@ -35,7 +35,7 @@ O tutor conversacional exige uma integração de servidor, credencial e limite d
 
 ## Isolamento do Lab atual
 
-O Next usa exclusivamente o prefixo `evolab-next:v1:`. Não lê `ea-state`, `ea-sess`, o cofre do Lab antigo nem seu Gist. Nenhuma senha é migrada. Atividades da faculdade, hobbies, biblioteca e oportunidades podem ser importados explicitamente a partir do JSON copiado em Perfil → Cópia de segurança no original. A importação reconhece somente campos permitidos, ignora sessões e preserva registros já existentes. As entregas de programação e Claude não são migradas automaticamente. O service worker só remove caches com o prefixo próprio `evolab-next-`.
+O Next usa exclusivamente o prefixo `evolab-next:v1:`. Não lê `ea-state` nem `ea-sess`. A consulta direta do original só acontece quando solicitada no formulário de importação: abre o cofre com a senha informada, consulta o Gist com GET e descarta as credenciais ao terminar. Não há escrita no original. Nenhuma senha é migrada. Atividades da faculdade, hobbies, biblioteca e oportunidades podem ser importados explicitamente a partir do JSON copiado em Perfil → Cópia de segurança no original. A importação reconhece somente campos permitidos, ignora sessões e preserva registros já existentes. Conclusões, notas e rascunhos antigos de Programação e Claude são preservados em um histórico separado; não são marcados como novas entregas. Disciplinas e notas da faculdade também são reconhecidas. O service worker só remove caches com o prefixo próprio `evolab-next-`.
 
 As duas aplicações no GitHub Pages ainda compartilham a origem do domínio; os prefixos evitam colisões acidentais, mas não são uma barreira de segurança contra código de mesma origem. Antes de ativar sessões sensíveis no Next, considerar domínio/origem isolados e um modelo de autenticação revisado.
 
@@ -63,3 +63,9 @@ Com Node disponível, rode `npm test`. Os testes usam somente armazenamento em m
 ## Próxima etapa de servidor
 
 Definir com o usuário a organização e o ambiente exclusivo do Supabase, verificar o custo e criar o projeto. Não usar o projeto BLESSAINT BUSINESS existente para guardar dados do Lab. Antes da migração, testar isolamento por usuário, conflitos, falha de rede e recuperação em dados fictícios.
+
+## Transferência direta — 0.4.0
+
+A tela Importar pode consultar o original com sua senha, dispensando o botão de cópia. Senha, chave de descriptografia e token não são gravados no Next. A prévia permite conferir disciplinas, atividades, livros, cursos externos, violão, oportunidades e registros históricos de cursos. Um backup criptografado da cópia original pode ser baixado, sem incluir o cofre de credenciais. A importação continua preservando registros que já existem no Next.
+
+A área de faculdade agora mantém disciplinas, período, notas informadas e frequência, além das tarefas com prazo. Não inventa datas, notas, médias oficiais ou aprovação.

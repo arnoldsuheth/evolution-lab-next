@@ -1,4 +1,4 @@
-import {courseDone} from './core.mjs?v=0.3.0';
+import {courseDone} from './core.mjs?v=0.4.0';
 export const INTERFACES=[
  {id:'central',name:'Central tecnológica',tag:'01 / IMERSÃO',theme:'neon',subtitle:'Seu espaço de comando.',description:'Navegação compacta, painéis com profundidade e luz nos pontos de ação.',navigation:'Menu lateral compacto',layout:'Painéis de comando',buttons:'Contorno luminoso',motion:'Luz acompanha o cursor'},
  {id:'modular',name:'Painel modular',tag:'02 / ORGANIZAÇÃO',theme:'leitura',subtitle:'Tudo encontra seu lugar.',description:'Navegação no topo e blocos de tamanhos diferentes para organizar o seu dia.',navigation:'Menu horizontal por áreas',layout:'Blocos com hierarquia',buttons:'Botões sólidos com relevo',motion:'Elevação ao interagir'},
