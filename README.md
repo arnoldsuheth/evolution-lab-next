@@ -69,3 +69,9 @@ Definir com o usuário a organização e o ambiente exclusivo do Supabase, verif
 A tela Importar pode consultar o original com sua senha, dispensando o botão de cópia. Senha, chave de descriptografia e token não são gravados no Next. A prévia permite conferir disciplinas, atividades, livros, cursos externos, violão, oportunidades e registros históricos de cursos. Um backup criptografado da cópia original pode ser baixado, sem incluir o cofre de credenciais. A importação continua preservando registros que já existem no Next.
 
 A área de faculdade agora mantém disciplinas, período, notas informadas e frequência, além das tarefas com prazo. Não inventa datas, notas, médias oficiais ou aprovação.
+
+## Rotina de entrega de projetos
+
+Por orientação do Arnold, registrar cada novo projeto concluído e publicado em **Meus sites**, sem pedir essa inclusão novamente. Adicionar nome, descrição objetiva, status, link de acesso e repositório quando houver. Manter o nível de acesso: um link para sistema privado continua exigindo sua autenticação. Não publicar credenciais nem dados de clientes.
+
+O catálogo público fica em `data/sites.js` e é combinado com registros locais, preservando edições e arquivamentos do usuário. Evitar duplicatas por ID ou URL. Novos projetos devem ganhar IDs próprios para não sobrescrever dados existentes. Confirmar a publicação e o link antes de marcar como concluído.
