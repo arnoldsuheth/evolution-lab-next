@@ -98,3 +98,12 @@ Ao atualizar um projeto, manter o manual coerente com a versão efetivamente ent
 ## Pendências atuais e prioridades
 
 A ordem de execução e os critérios para considerar cada etapa concluída estão em [Pendências e prioridades](docs/PENDENCIAS-E-PRIORIDADES.md). Documentos de arquitetura anteriores à versão 0.5.0 descrevem fases históricas; para nuvem e tutor, prevalece o registro específico mais recente.
+
+
+## Cadastro automático de clientes e oportunidades
+
+Regra solicitada por Arnold em 28/10/2026: toda pessoa ou empresa mencionada na conversa como cliente ou possível cliente do estúdio deve ser incluída no Evolution Lab como **Prospectando**, sem precisar de novo pedido. Conferir registros existentes antes de criar, evitar duplicatas e nunca rebaixar um cliente já confirmado. Pessoas mencionadas fora do contexto comercial não se tornam prospectos.
+
+Usar somente nome e informações efetivamente fornecidas; não presumir contato, contratação, prazo, valor ou pagamento. Uma confirmação posterior atualiza o registro correspondente. Preservar o cadastro em registros privados do usuário: não gravar nomes de prospectos, contatos ou situações financeiras no catálogo público `data/sites.js` nem em arquivos públicos do repositório. Se o acesso necessário ao cadastro privado estiver indisponível, informar a pendência; registrar uma regra não equivale a cadastrar o cliente.
+
+Os projetos concluídos continuam entrando em Meus sites conforme a rotina de entrega. A escolha de onde concentrar a gestão comercial não revoga a solicitação de cadastro dos prospectos no Lab; uma integração futura deve evitar registros divergentes.
