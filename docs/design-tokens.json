@@ -1,0 +1,26 @@
+{
+  "colors": {
+    "bg": "#10151c",
+    "panel": "#19222e",
+    "panel2": "#22303c",
+    "text": "#f0f4f8",
+    "muted": "#b4c1d0",
+    "line": "#344253",
+    "accent": "#d4ed9b",
+    "cyan": "#a1e8ee",
+    "purple": "#cdbbff",
+    "danger": "#ffbebe"
+  },
+  "spacing": {
+    "space-1": 8,
+    "space-2": 12,
+    "space-3": 16,
+    "space-4": 24,
+    "space-5": 32
+  },
+  "radii": {
+    "radius-button": 11,
+    "radius-card": 18,
+    "radius-hero": 23
+  }
+}
