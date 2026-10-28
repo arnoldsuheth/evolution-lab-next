@@ -1,3 +1,7 @@
+# PROJETO PAUSADO / ARQUIVADO
+
+Por decisão de Arnold em 28/10/2026, esta versão está preservada e fora da rotina ativa. Use o [Evolution Lab comum](https://arnoldsuheth.github.io/evolution-lab/). Clientes e financeiro ficam exclusivamente no painel privado do Studio Evolution Tech. As instruções históricas abaixo não autorizam novas gravações nesta versão.
+
 # Evolution Lab Next
 
 Nova versão independente do Evolution Lab. O app atual permanece em `arnoldsuheth/evolution-lab`, preservado no commit `66b63a99e6d0deb48e5e61486377521de0c46c09` e na branch `preservado-2026-10-27-66b63a9`.
