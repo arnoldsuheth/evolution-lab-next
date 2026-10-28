@@ -75,3 +75,21 @@ A área de faculdade agora mantém disciplinas, período, notas informadas e fre
 Por orientação do Arnold, registrar cada novo projeto concluído e publicado em **Meus sites**, sem pedir essa inclusão novamente. Adicionar nome, descrição objetiva, status, link de acesso e repositório quando houver. Manter o nível de acesso: um link para sistema privado continua exigindo sua autenticação. Não publicar credenciais nem dados de clientes.
 
 O catálogo público fica em `data/sites.js` e é combinado com registros locais, preservando edições e arquivamentos do usuário. Evitar duplicatas por ID ou URL. Novos projetos devem ganhar IDs próprios para não sobrescrever dados existentes. Confirmar a publicação e o link antes de marcar como concluído.
+
+
+### Manual de uso obrigatório em PDF
+
+Regra permanente solicitada por Arnold em 28/10/2026 para todos os projetos criados: a entrega só termina com um manual de uso em PDF pronto para encaminhar ao cliente, sem precisar de novo pedido.
+
+Ordem da entrega:
+
+1. Concluir o projeto e executar as verificações apropriadas, relatando limites reais de validação.
+2. Salvar e versionar todos os arquivos e publicar conforme o acesso autorizado. Confirmar o link final.
+3. Registrar ou atualizar o projeto em **Meus sites** no Evolution Lab, preservando o acesso privado quando aplicável e evitando duplicatas.
+4. Criar o manual de uso em PDF da versão entregue, com a logo oficial, o nome **Studio Evolution Tech**, as cores da marca (azul-marinho, azul elétrico e ciano) e apresentação timbrada. Incluir capa com nome do projeto/cliente, data e versão, cabeçalho ou rodapé de marca e páginas numeradas.
+5. O manual deve usar linguagem simples, explicar o acesso, o uso passo a passo das funções realmente disponíveis, tarefas comuns, cuidados com os dados, dúvidas frequentes e contato de suporte. Usar imagens da interface quando ajudarem, com dados fictícios ou anonimizados. Não prometer recursos não implementados.
+6. Renderizar e conferir o PDF, salvar a versão final de forma durável e entregar **o link do projeto e o PDF para download** na resposta final. Relatar qualquer etapa pendente sem marcar a entrega como completa.
+
+Privacidade: manuais destinados aos clientes não devem conter acesso ao painel interno do estúdio, resultados financeiros, registros de outros clientes, credenciais ou informações privadas. Para um sistema privado do próprio cliente, explicar apenas o acesso autorizado a esse sistema. A apresentação comercial pode mostrar somente os valores e itens inclusos que forem destinados ao destinatário.
+
+Ao atualizar um projeto, manter o manual coerente com a versão efetivamente entregue. Esta regra complementa a rotina de cadastro no Evolution Lab e não muda as permissões de publicação.
