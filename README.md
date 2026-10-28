@@ -2,7 +2,13 @@
 
 Nova versão independente do Evolution Lab. O app atual permanece em `arnoldsuheth/evolution-lab`, preservado no commit `66b63a99e6d0deb48e5e61486377521de0c46c09` e na branch `preservado-2026-10-27-66b63a9`.
 
-## O que funciona nesta primeira entrega
+## Interfaces para comparar — 0.3.0
+
+Abra `#interfaces` para comparar Central tecnológica, Painel modular, Academia clara e Jornada de evolução nas mesmas cinco telas: painel, faculdade, aula, biblioteca e sites. Testar aplica o visual temporariamente; Usar esta interface salva apenas a preferência de aparência. É possível cancelar ou voltar às três paletas do visual anterior. Efeitos podem ser desligados e respeitam movimento reduzido.
+
+As quatro composições usam o mesmo conteúdo e os mesmos registros. Nenhum dado pessoal nem progresso é criado ao trocar o visual. A faculdade continua em primeiro lugar. O comparador não conclui a importação pendente do histórico original.
+
+## O que funciona nesta entrega
 
 - Faculdade em destaque no painel e na navegação. Plano de 30, 60 ou 120 minutos com cerca de 80% do tempo para a próxima atividade da faculdade; os cursos livres ficam como sugestão opcional no tempo restante.
 - Modo foco, cronômetro e registro do tempo real da sessão.
