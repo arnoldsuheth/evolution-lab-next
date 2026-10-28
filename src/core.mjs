@@ -16,11 +16,13 @@ export function createRepository(storage,clock=()=>new Date().toISOString()){
  return {get,set,all,versions,inventory,exportData,restore};
 }
 export function studyPlan(state,minutes,now=new Date()){
- const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0'),due=Object.entries(state.tasks).filter(([,t])=>!t.done).sort((a,b)=>(a[1].due||'9999').localeCompare(b[1].due||'9999'));
+ const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+ const due=Object.entries(state.tasks).filter(([,t])=>!t.done).sort((a,b)=>(a[1].due||'9999').localeCompare(b[1].due||'9999'));
  const ids=Object.keys(state.prog).filter(k=>state.prog[k]?.courseV2?.completed),next=Array.from({length:71},(_,i)=>i).find(i=>!ids.includes(String(i)))??0;
- const collegeMinutes=due[0]?Math.min(20,Math.floor(minutes/3)):0;const plan=[];if(due[0])plan.push({type:'fac',title:due[0][1].title,href:'#faculdade',minutes:collegeMinutes,context:due[0][1].due&&due[0][1].due<today?'Prazo informado já passou':'Tarefa cadastrada por você'});
- plan.push({type:'prog',title:'Continuar Programação · aula '+(next+1),href:'#prog-'+next,minutes:Math.max(10,minutes-collegeMinutes-(minutes>=60?10:0)),context:'Entender, praticar e registrar uma entrega'});
- if(minutes>=60)plan.push({type:'review',title:'Revisar um erro ou conceito recente',href:'#revisoes',minutes:10,context:'Uma nova tentativa, com resultado conferido'});
+ const plan=[];let free=minutes;
+ if(due[0]){const t=due[0][1],college=Math.min(minutes,Math.ceil(minutes*.8/5)*5);free-=college;plan.push({type:'fac',title:t.title,href:'#faculdade',minutes:college,context:(t.subject?t.subject+' · ':'')+(t.due?(t.due<today?'Prazo informado já passou: ':t.due===today?'Prazo informado é hoje: ':'Próximo prazo: ')+t.due.split('-').reverse().join('/'):'Faculdade primeiro · prazo ainda não informado')});}
+ else if(!Object.keys(state.tasks).length){const setup=Math.min(15,minutes);free-=setup;plan.push({type:'setup',title:'Organizar meu cronograma da faculdade',href:'#faculdade',minutes:setup,context:'Cadastre as atividades e os prazos reais; nenhuma entrega foi inventada'});}
+ if(free>0)plan.push({type:'prog',title:'Tempo livre · Programação · aula '+(next+1),href:'#prog-'+next,minutes:free,context:'Sugestão opcional para o tempo restante · curso sem prazo de conclusão'});
  return plan;
 }
 export function courseDone(s,key){return Object.values(s[key]||{}).filter(r=>r?.courseV2?.completed).length;}

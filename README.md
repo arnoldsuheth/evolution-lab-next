@@ -4,7 +4,7 @@ Nova versão independente do Evolution Lab. O app atual permanece em `arnoldsuhe
 
 ## O que funciona nesta primeira entrega
 
-- Painel com planejamento de 30, 60 ou 120 minutos, usando atividades realmente cadastradas.
+- Faculdade em destaque no painel e na navegação. Plano de 30, 60 ou 120 minutos com cerca de 80% do tempo para a próxima atividade da faculdade; os cursos livres ficam como sugestão opcional no tempo restante.
 - Modo foco, cronômetro e registro do tempo real da sessão.
 - 71 aulas de programação e 52 aulas existentes de Claude organizadas em oito etapas, com prática, pistas, avaliação e entrega.
 - Cadastro, edição e conclusão de atividades da faculdade; projetos com código, demonstração e explicação.
@@ -18,7 +18,7 @@ Nova versão independente do Evolution Lab. O app atual permanece em `arnoldsuhe
 - Biblioteca: cadastro, edição, filtros, favoritos, páginas, notas e citações.
 - Temas Original Evoluído, Next Neon e Leitura, com seleção persistida por navegador.
 - Logo original dos cubos com NEXT em verde neon.
-- Importação local de hobbies e biblioteca com prévia, backup do Next e preservação de registros existentes, incluindo itens removidos.
+- Importação local de atividades e prazos da faculdade, hobbies, biblioteca e prospecção com prévia, backup do Next e preservação de registros existentes, incluindo itens removidos.
 - PWA e funcionamento offline após carregar e instalar os recursos.
 
 ## O que ainda não está ativo
@@ -29,7 +29,7 @@ O tutor conversacional exige uma integração de servidor, credencial e limite d
 
 ## Isolamento do Lab atual
 
-O Next usa exclusivamente o prefixo `evolab-next:v1:`. Não lê `ea-state`, `ea-sess`, o cofre do Lab antigo nem seu Gist. Nenhuma senha é migrada. Hobbies e biblioteca podem ser importados explicitamente a partir do JSON copiado em Perfil → Cópia de segurança no original. A importação reconhece somente campos permitidos, ignora sessões e preserva registros já existentes. As entregas de programação e Claude não são migradas automaticamente. O service worker só remove caches com o prefixo próprio `evolab-next-`.
+O Next usa exclusivamente o prefixo `evolab-next:v1:`. Não lê `ea-state`, `ea-sess`, o cofre do Lab antigo nem seu Gist. Nenhuma senha é migrada. Atividades da faculdade, hobbies, biblioteca e oportunidades podem ser importados explicitamente a partir do JSON copiado em Perfil → Cópia de segurança no original. A importação reconhece somente campos permitidos, ignora sessões e preserva registros já existentes. As entregas de programação e Claude não são migradas automaticamente. O service worker só remove caches com o prefixo próprio `evolab-next-`.
 
 As duas aplicações no GitHub Pages ainda compartilham a origem do domínio; os prefixos evitam colisões acidentais, mas não são uma barreira de segurança contra código de mesma origem. Antes de ativar sessões sensíveis no Next, considerar domínio/origem isolados e um modelo de autenticação revisado.
 
