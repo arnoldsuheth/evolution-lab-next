@@ -46,3 +46,9 @@ test('local edits during a remote fetch are preserved',async()=>{
  const cloud=createCloud({storage:local,repository,fetcher:async(url)=>{const p=new URL(url).pathname;const data=p==='/auth/v1/token'?{access_token:'fake',expires_in:3600,user:{id:'user-a'}}:p==='/auth/v1/user'?{id:'user-a'}: [{collection:'tasks',record_id:'t',revision:2,value:{title:'remote'}}];if(p==='/rest/v1/next_records')repository.set('tasks','t',{title:'typing'},1);return new Response(JSON.stringify(data));}});
  await cloud.login('a','b');await cloud.sync({activate:true});assert.equal(repository.get('tasks','t').value.title,'typing');assert.equal(cloud.state().conflicts.length,1);
 });
+test('confirmation callback verifies the user before exposing account identity',async()=>{
+ const f=fixture(),a=f.device();assert.equal(a.cloud.consumeCallback('#biblioteca'),false);
+ assert.equal(a.cloud.consumeCallback('#access_token=fake&refresh_token=fake-refresh&expires_in=3600'),true);
+ assert.equal(a.cloud.state().user,null);await a.cloud.initialize();assert.equal(a.cloud.state().user.id,'user-a');
+ const b=f.device();assert.equal(b.cloud.consumeCallback('#error=expired'),true);assert.equal(b.cloud.state().user,null);
+});

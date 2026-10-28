@@ -1,15 +1,15 @@
-import {createCloud} from './cloud.mjs?v=0.5.0';
-import {mountCloudUI} from './cloud-ui.mjs?v=0.5.0';
-import {mountFaculty} from './faculty-records.mjs?v=0.5.0';
-import {mountInterfaces} from './interfaces.mjs?v=0.5.0';
-import {mountSites} from './sites.mjs?v=0.5.0';
-import {mountLeisure} from './leisure.mjs?v=0.5.0';
-import programming from '../data/programacao.js?v=0.5.0';
-import claudeSource from '../data/claude.js?v=0.5.0';
-import config from '../config.js?v=0.5.0';
-import {PREFIX,COLLECTIONS,clone,createRepository,safeURL,studyPlan,courseDone,nextReview} from './core.mjs?v=0.5.0';
+import {createCloud} from './cloud.mjs?v=0.5.1';
+import {mountCloudUI} from './cloud-ui.mjs?v=0.5.1';
+import {mountFaculty} from './faculty-records.mjs?v=0.5.1';
+import {mountInterfaces} from './interfaces.mjs?v=0.5.1';
+import {mountSites} from './sites.mjs?v=0.5.1';
+import {mountLeisure} from './leisure.mjs?v=0.5.1';
+import programming from '../data/programacao.js?v=0.5.1';
+import claudeSource from '../data/claude.js?v=0.5.1';
+import config from '../config.js?v=0.5.1';
+import {PREFIX,COLLECTIONS,clone,createRepository,safeURL,studyPlan,courseDone,nextReview} from './core.mjs?v=0.5.1';
 window.EVO_COURSE_DATA=programming;
-await import('./classroom.js?v=0.5.0');
+await import('./classroom.js?v=0.5.1');
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const plain=h=>new DOMParser().parseFromString(h,'text/html').body.textContent.trim();
 const claude={...programming,title:'Claude · IA aplicada',lessons:claudeSource.map((x,id)=>({id,sourceId:x.id,track:'ia',title:x.titulo,theory:x.intro,deep:'Nesta aula, separe o que a ferramenta respondeu do que você conferiu. Compare a saída com o pedido, registre os limites e tente uma situação diferente usando suas palavras.',sections:x.secoes,explain:x.dica,file:'Conversa de estudo e registro da sua entrega',environment:'Sua ferramenta de IA e material de estudo autorizado. Recursos variam conforme conta e plano.',setup:'Leia o pedido de referência, prepare dados fictícios e confira se sua conta oferece o recurso. Se não oferecer, registre a limitação e pratique o planejamento com os materiais da aula. Não é necessário contratar um serviço para registrar essa diferença.',milestone:'Uma tarefa executada e conferida por você, com o pedido, resultado e limitações registrados.',reference:'https://platform.claude.com/docs/en/intro',mode:'external',snippet:true,phase:x.nivel-1,before:id?claudeSource[id-1].titulo:'Fundamentos de IA e objetivos do curso',minutes:x.min,tasks:x.missao||['Executar uma tarefa demonstrativa','Conferir o resultado e registrar limites'],code:'CONTEXTO: estou estudando '+x.titulo+'.\nTAREFA: '+(x.missao?.[0]||'Explique o conceito com um exemplo verificável.')+'\nCRITÉRIOS: identifique o que foi observado, o que é hipótese e como conferir.\nFORMATO: exemplo curto, passos e verificações.\nREGISTRO: não afirme acesso, envio ou gravação que não ocorreram.',expected:'Pedido, saída real e conferência registrados. Você consegue explicar uma decisão e uma limitação do exercício.',bug:'Uma resposta fluente pode ter fatos, fontes ou resultados incorretos. Confira no material original ou na execução; registre o que não conseguiu verificar.',challenge:'Aplique o conceito de '+x.titulo+' em outra tarefa da BLESSAINT ou do Studio. Escreva os critérios antes, tente sem o pedido pronto e registre uma falha ou limite que encontrou.',quiz:x.quiz.map(q=>({question:q[0],options:q[1],answer:q[2],explanation:q[3]}))}))};
@@ -18,6 +18,7 @@ try{repository=createRepository(localStorage);model=repository.all();versions=re
 let cloudTimer,lastLesson=null;
 const cloud=createCloud({storage:repository?localStorage:{getItem:()=>null,setItem:()=>{throw Error('Armazenamento local indisponível.');},removeItem:()=>{}},repository,onChange:()=>{status(cloud.state().message);externalPending=true;if(['ajustes','tutor'].includes(route())&&!document.activeElement?.matches('input,textarea,select')){reloadModel();render();}}});
 const cloudUI=mountCloudUI({cloud,esc,render,feedback,download,repository:()=>repository});
+if(cloud.consumeCallback(location.hash))history.replaceState(null,'',location.pathname+location.search+'#ajustes');
 const prefs=()=>model.prefs.general||{};
 function feedback(text){$('#toast').textContent=text;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').textContent='',4500);}
 function status(text='Salvo neste aparelho · nuvem inativa'){$('#save-status').textContent=text;}

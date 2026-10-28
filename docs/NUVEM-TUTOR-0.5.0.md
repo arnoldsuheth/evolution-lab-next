@@ -3,7 +3,7 @@
 ## Entregue
 
 - Projeto exclusivo `evolution-lab-next`, região São Paulo, referência `mgqwzaizkllkqqqbbcna`. Nenhuma alteração no banco existente da BLESSAINT.
-- Login por e-mail e senha e criação de conta com confirmação por e-mail. A configuração de retorno do login no painel ainda precisa ser finalizada; o conector não oferece essa configuração e o painel pede autenticação.
+- Login por e-mail e senha e criação de conta com confirmação por e-mail. Retorno do login configurado no painel para https://arnoldsuheth.github.io/evolution-lab-next/. A confirmação de e-mail é validada com o servidor; o token é removido do endereço e não aparece nas telas.
 - Sincronização local primeiro, por registro, com revisão conferida no servidor antes de gravar. A primeira ativação baixa um backup local. Alterações simultâneas preservam as duas versões e exigem escolha explícita. A troca de conta bloqueia o envio de registros vinculados à conta anterior.
 - Todos os 16 tipos de registro do Next entram na sincronização, incluindo disciplinas, hobbies, livros e sites. A sincronização não lê o Lab original.
 - Tabelas com RLS, acesso por proprietário e ausência de acesso anônimo. A chave pública do Supabase pode estar no frontend; a chave da OpenAI nunca está no código público.
@@ -13,7 +13,7 @@
 
 ## Evidências
 
-31 testes Node passaram: regressões locais/importação, dois dispositivos simulados, conflitos, exclusões, conta diferente, alteração durante consulta e tratamento do tutor sem chave, sem sessão, origem recusada, cota e payload mínimo.
+32 testes Node passaram: regressões locais/importação, dois dispositivos simulados, conflitos, exclusões, conta diferente, alteração durante consulta e tratamento do tutor sem chave, sem sessão, origem recusada, cota e payload mínimo.
 
 Teste no Postgres real, dentro de transação revertida: duas identidades fictícias, isolamento por RLS, tentativa de escrita em outra conta recusada, comparação de revisão, dez reservas e recusa da décima primeira, tentativa de zerar cota recusada. Após rollback: zero usuários e registros de teste.
 
@@ -23,10 +23,12 @@ O advisor de desempenho não encontrou avisos. O advisor de segurança trouxe ap
 
 ## Pendências reais
 
-1. Autenticar o painel Supabase para finalizar o retorno do login e confirmar a entrega do e-mail.
+1. Confirmar a entrega de e-mail e o primeiro login real do usuário; o endereço de retorno já foi configurado no painel.
 2. Instalar a chave como segredo de servidor e verificar uma resposta real antes de habilitar o tutor no frontend. Nenhuma resposta real da OpenAI foi produzida nesta entrega.
 3. Usuário criar/entrar em sua conta do Next e ativar a sincronização dos próprios registros. Não há dados pessoais transferidos na nuvem por esta entrega.
 4. Desbloquear e concluir a importação do Lab original, conferindo o resultado real. Não confundir o código de importação pronto com a transferência concluída.
 5. Teste físico no iPhone e aprofundamento adicional dos cursos.
 
 O código publicado e os ZIPs de fonte não incluem `.env.local`, credenciais, sessão ou progresso pessoal.
+
+A correção 0.5.1 acrescenta o tratamento do retorno da confirmação de e-mail e a conferência da identidade no servidor antes de mostrar a conta.

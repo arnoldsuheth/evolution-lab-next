@@ -1,4 +1,4 @@
-import {COLLECTIONS,clone} from './core.mjs?v=0.5.0';
+import {COLLECTIONS,clone} from './core.mjs?v=0.5.1';
 export const CLOUD={url:'https://mgqwzaizkllkqqqbbcna.supabase.co',key:'sb_publishable_nBJrSlD-qcQg26UIhVCWkQ_d9_fZCPc'};
 const PREFIX='evolab-next:cloud:',same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 export function decision(local,remote,base){
@@ -71,5 +71,13 @@ export function createCloud({storage,repository,fetcher=fetch,onChange=()=>{}}){
   conflicts.splice(index,1);notify();await sync();
  }
  async function tutor(question,lesson){return request('/functions/v1/lion-tutor',{method:'POST',body:{question,lesson}});}
- return {state,login,initialize,logout,sync,resolveConflict,tutor};
+ function consumeCallback(fragment){
+  const p=new URLSearchParams(fragment.replace(/^#/,''));
+  if(!p.has('access_token')&&!p.has('error'))return false;
+  const access=p.get('access_token'),refresh=p.get('refresh_token'),seconds=Number(p.get('expires_in'));
+  if(access&&refresh&&access.length<12000&&refresh.length<12000&&seconds>0&&seconds<=86400){session={access_token:access,refresh_token:refresh,expires_at:Math.floor(Date.now()/1000)+seconds};persist();message='Confirmando sua conta…';}
+  else message='O link expirou ou não pôde ser confirmado. Entre com sua conta ou solicite um novo link.';
+  return true;
+ }
+ return {state,login,initialize,logout,sync,resolveConflict,tutor,consumeCallback};
 }
