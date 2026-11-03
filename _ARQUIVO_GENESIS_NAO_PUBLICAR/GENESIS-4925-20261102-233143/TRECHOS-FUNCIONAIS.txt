@@ -1,0 +1,374 @@
+﻿ARQUIVO: App.tsx | TERMO: importarCursosLegados | OCORRENCIAS: 2
+ 1893:   const [trilha, setTrilha] = useState<Trilha>('programacao')
+ 1894: 
+ 1895:   // GENESIS-497-CURSOS
+ 1896:   const [avisoLegado, setAvisoLegado] = useState('')
+ 1897: 
+ 1898:   function importarCursosLegados() {
+ 1899:     const formatoValido = legado.cursos.every(item =>
+ 1900:       typeof item.id === 'string' &&
+ 1901:       typeof item.titulo === 'string' &&
+ 1902:       typeof item.plataforma === 'string' &&
+ 1903:       ['faculdade','programacao','claude','design','hobby'].includes(item.trilha) &&
+ 1904:       Array.isArray(item.modulos) &&
+ 1905:       item.modulos.every(modulo =>
+ 1906:         typeof modulo.id === 'string' &&
+---
+ 1962:       </header>
+ 1963: 
+ 1964:       <section className="glass-surface genesis497-import">
+ 1965:         <strong>ACERVO ORIGINAL — EVOLUTION LAB</strong>
+ 1966:         <p>Sete cursos disponíveis. A importação não substitui seus cursos atuais.</p>
+ 1967:         <button type="button" className="holo-btn" onClick={importarCursosLegados}>
+ 1968:           IMPORTAR CURSOS ANTIGOS
+ 1969:         </button>
+ 1970:         {avisoLegado && <p role="status">{avisoLegado}</p>}
+ 1971:       </section>
+ 1972:       {/* GENESIS-4910-HISTORICO */}
+ 1973:       <section className="glass-surface genesis4910-acervo">
+ 1974:         <div className="genesis4910-heading">
+ 1975:           <div>
+---
+ARQUIVO: App.tsx | TERMO: importarBibliotecaOriginal | OCORRENCIAS: 2
+ 2227:     setItens(lista => [...lista, { ...rascunho, id: novoId() } as RegistroLocal])
+ 2228:     setRascunho(Object.fromEntries(campos.map(c => [c.nome, c.opcoes?.[0] ?? ''])))
+ 2229:   }
+ 2230: 
+ 2231:   // GENESIS-4914-BIBLIOTECA
+ 2232:   function importarBibliotecaOriginal() {
+ 2233:     if (chave !== 'evolution-biblioteca-v1') return
+ 2234: 
+ 2235:     const existentes = new Set(
+ 2236:       itens.map(item => item.titulo.trim().toLocaleLowerCase('pt-BR'))
+ 2237:     )
+ 2238:     const ids = new Set(itens.map(item => item.id))
+ 2239: 
+ 2240:     const novos: RegistroLocal[] = []
+---
+ 2336:             </p>
+ 2337:           </div>
+ 2338:           <button
+ 2339:             type="button"
+ 2340:             className="holo-btn"
+ 2341:             onClick={importarBibliotecaOriginal}
+ 2342:           >
+ 2343:             IMPORTAR MATERIAIS ANTIGOS
+ 2344:           </button>
+ 2345:         </section>
+ 2346:       )}
+ 2347: 
+ 2348:       <div className="glass-surface col-search">
+ 2349:         <label>Buscar
+---
+ARQUIVO: App.tsx | TERMO: moverHistorico | OCORRENCIAS: 3
+ 2783:     }
+ 2784:     setMenuOpen(false)
+ 2785:     setPainelAberto(null)
+ 2786:   }
+ 2787: 
+ 2788:   function moverHistorico(delta: number) {
+ 2789:     const indice = indiceHistorico + delta
+ 2790:     if (indice < 0 || indice >= historicoPaginas.length) return
+ 2791: 
+ 2792:     setIndiceHistorico(indice)
+ 2793:     setPage(historicoPaginas[indice])
+ 2794:     setPainel(lerPainel())
+ 2795:     setMenuOpen(false)
+ 2796:     setPainelAberto(null)
+---
+ 2877:         </div>
+ 2878:       </aside>
+ 2879: 
+ 2880:       <nav className="genesis497-nav" aria-label="Navegação rápida">
+ 2881:         <button type="button" onClick={() => navigate('Central')} aria-label="Início" title="Início">⌂</button>
+ 2882:         <button type="button" onClick={() => moverHistorico(-1)} disabled={indiceHistorico === 0} aria-label="Voltar" title="Voltar">←</button>
+ 2883:         <button type="button" onClick={() => moverHistorico(1)} disabled={indiceHistorico >= historicoPaginas.length - 1} aria-label="Prosseguir" title="Prosseguir">→</button>
+ 2884:       </nav>
+ 2885:       <div className="main-area">
+ 2886:         <header className="toolbar glass-surface">
+ 2887:           <div className="toolbar-heading">
+ 2888:             <button
+ 2889:               className="glass-button menu-toggle"
+ 2890:               aria-label="Alternar menu"
+---
+ 2878:       </aside>
+ 2879: 
+ 2880:       <nav className="genesis497-nav" aria-label="Navegação rápida">
+ 2881:         <button type="button" onClick={() => navigate('Central')} aria-label="Início" title="Início">⌂</button>
+ 2882:         <button type="button" onClick={() => moverHistorico(-1)} disabled={indiceHistorico === 0} aria-label="Voltar" title="Voltar">←</button>
+ 2883:         <button type="button" onClick={() => moverHistorico(1)} disabled={indiceHistorico >= historicoPaginas.length - 1} aria-label="Prosseguir" title="Prosseguir">→</button>
+ 2884:       </nav>
+ 2885:       <div className="main-area">
+ 2886:         <header className="toolbar glass-surface">
+ 2887:           <div className="toolbar-heading">
+ 2888:             <button
+ 2889:               className="glass-button menu-toggle"
+ 2890:               aria-label="Alternar menu"
+ 2891:               onClick={() => setMenuOpen(value => !value)}
+---
+ARQUIVO: App.tsx | TERMO: genesis497-nav | OCORRENCIAS: 1
+ 2875:           <span className="eyebrow">LION SYSTEM</span>
+ 2876:           <p>Seu espaço de aprendizado e evolução.</p>
+ 2877:         </div>
+ 2878:       </aside>
+ 2879: 
+ 2880:       <nav className="genesis497-nav" aria-label="Navegação rápida">
+ 2881:         <button type="button" onClick={() => navigate('Central')} aria-label="Início" title="Início">⌂</button>
+ 2882:         <button type="button" onClick={() => moverHistorico(-1)} disabled={indiceHistorico === 0} aria-label="Voltar" title="Voltar">←</button>
+ 2883:         <button type="button" onClick={() => moverHistorico(1)} disabled={indiceHistorico >= historicoPaginas.length - 1} aria-label="Prosseguir" title="Prosseguir">→</button>
+ 2884:       </nav>
+ 2885:       <div className="main-area">
+ 2886:         <header className="toolbar glass-surface">
+ 2887:           <div className="toolbar-heading">
+ 2888:             <button
+---
+ARQUIVO: App.tsx | TERMO: genesis497-panel | OCORRENCIAS: 1
+ 1507:                       '--r': aneis[p.anel].r,
+ 1508:                       '--dur': `${aneis[p.anel].dur}s`,
+ 1509:                       '--a': p.angulo,
+ 1510:                     } as CSSProperties}
+ 1511:                   >
+ 1512:                     <button type="button" className="gx-panel genesis497-panel" onClick={() => onNavigate(destinosPainel[p.rotulo])} aria-label={`Abrir ${p.rotulo}`}>
+ 1513:                       <div className="gx-panel-face">
+ 1514:                         <small>{p.rotulo}</small>
+ 1515:                         <b>{p.valor}</b>
+ 1516:                         <i /><i /><i />
+ 1517:                       </div>
+ 1518:                     </button>
+ 1519:                   </div>
+ 1520:                 ))}
+---
+ARQUIVO: App.tsx | TERMO: genesis497-energy | OCORRENCIAS: 1
+ 1433:             <time dateTime={agora.toISOString()}>
+ 1434:               {agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+ 1435:             </time>
+ 1436:           </p>
+ 1437:         </div>
+ 1438:         <button type="button" className="gx-xp genesis497-energy" onClick={() => onNavigate('Conquistas')} aria-label={`Abrir evolução do nível ${painel.nivel}`}>
+ 1439:           <div className="gx-xp-head">
+ 1440:             <strong>NÍVEL {painel.nivel}</strong>
+ 1441:             <span>{painel.xp} / {painel.xpProximo} XP</span>
+ 1442:           </div>
+ 1443:           <div className="gx-bar"><i style={{ width: `${pctXp}%` }} /></div>
+ 1444:           <small>{energiaLion}% da faixa atual · {energiaRestante} XP restantes · {proximaForma ? `Próxima forma: ${proximaForma.nome}` : 'Evolução contínua'}</small>
+ 1445:         </button>
+ 1446:       </section>
+---
+ARQUIVO: App.tsx | TERMO: gx-lion | OCORRENCIAS: 2
+ 1519:                   </div>
+ 1520:                 ))}
+ 1521:               </div>
+ 1522:               <button
+ 1523:                 type="button"
+ 1524:                 className="gx-lion"
+ 1525:                 aria-label="Interagir com o Lion Core"
+ 1526:                 onClick={() => {
+ 1527:                   setMensagem(mensagemDoLion(painel))
+ 1528:                   onLion()
+ 1529:                 }}
+ 1530:               >
+ 1531:                 <LionCrystal burst={burst} calm={calm} />
+ 1532:                 <span className="genesis42-energy-ring" aria-hidden="true" />
+---
+ 1557:                   </span>
+ 1558:                 </button>
+ 1559:               ))}
+ 1560:             </div>
+ 1561:           </div>
+ 1562:           <p className="gx-lion-message" role="status">
+ 1563:             <span>✧</span> {mensagem}
+ 1564:           </p>
+ 1565:         </section>
+ 1566: 
+ 1567:         <aside className="gx-side">
+ 1568:           <section className="glass-surface gx-card gx-detail" style={{ '--accent': trilha.cor } as CSSProperties}>
+ 1569:             <span className="eyebrow">TRILHA SELECIONADA</span>
+ 1570:             <h3>{trilha.titulo}</h3>
+---
+ARQUIVO: App.css | TERMO: importarCursosLegados | OCORRENCIAS: 0
+ARQUIVO: App.css | TERMO: importarBibliotecaOriginal | OCORRENCIAS: 0
+ARQUIVO: App.css | TERMO: moverHistorico | OCORRENCIAS: 0
+ARQUIVO: App.css | TERMO: genesis497-nav | OCORRENCIAS: 26
+ 3191: .genesis497-panel:hover .gx-panel-face {
+ 3192:   border-color: #9ceaff;
+ 3193:   box-shadow: 0 0 25px #4bcaff88;
+ 3194: }
+ 3195: 
+ 3196: .genesis497-nav {
+ 3197:   position: fixed;
+ 3198:   z-index: 1000;
+ 3199:   bottom: max(16px,env(safe-area-inset-bottom));
+ 3200:   left: 50%;
+ 3201:   transform: translateX(-50%);
+ 3202:   display: flex;
+ 3203:   gap: 10px;
+ 3204:   padding: 9px;
+---
+ 3208:   backdrop-filter: blur(20px);
+ 3209:   -webkit-backdrop-filter: blur(20px);
+ 3210:   box-shadow: 0 12px 35px #0008;
+ 3211: }
+ 3212: 
+ 3213: .genesis497-nav button {
+ 3214:   width: 48px;
+ 3215:   height: 48px;
+ 3216:   border: 1px solid #83d4ff66;
+ 3217:   border-radius: 50%;
+ 3218:   background: #257dc033;
+ 3219:   color: #e4f9ff;
+ 3220:   font-size: 25px;
+ 3221:   cursor: pointer;
+---
+ 3219:   color: #e4f9ff;
+ 3220:   font-size: 25px;
+ 3221:   cursor: pointer;
+ 3222: }
+ 3223: 
+ 3224: .genesis497-nav button:disabled {
+ 3225:   opacity: .3;
+ 3226:   cursor: not-allowed;
+ 3227: }
+ 3228: 
+ 3229: .main-area {
+ 3230:   padding-bottom: 110px;
+ 3231: }
+ 3232: 
+---
+ARQUIVO: App.css | TERMO: genesis497-panel | OCORRENCIAS: 8
+ 3171:   background: linear-gradient(90deg,#147dff,#40caff,#a8f5ff);
+ 3172:   box-shadow: 0 0 17px #4acaff88;
+ 3173:   transition: width .7s ease;
+ 3174: }
+ 3175: 
+ 3176: .genesis497-panel {
+ 3177:   cursor: pointer;
+ 3178:   padding: 0;
+ 3179:   color: inherit;
+ 3180:   font: inherit;
+ 3181:   text-align: left;
+ 3182:   background: transparent;
+ 3183:   border: 0;
+ 3184: }
+---
+ 3181:   text-align: left;
+ 3182:   background: transparent;
+ 3183:   border: 0;
+ 3184: }
+ 3185: 
+ 3186: .genesis497-panel:focus-visible {
+ 3187:   outline: 2px solid #9beaff;
+ 3188:   outline-offset: 7px;
+ 3189: }
+ 3190: 
+ 3191: .genesis497-panel:hover .gx-panel-face {
+ 3192:   border-color: #9ceaff;
+ 3193:   box-shadow: 0 0 25px #4bcaff88;
+ 3194: }
+---
+ 3186: .genesis497-panel:focus-visible {
+ 3187:   outline: 2px solid #9beaff;
+ 3188:   outline-offset: 7px;
+ 3189: }
+ 3190: 
+ 3191: .genesis497-panel:hover .gx-panel-face {
+ 3192:   border-color: #9ceaff;
+ 3193:   box-shadow: 0 0 25px #4bcaff88;
+ 3194: }
+ 3195: 
+ 3196: .genesis497-nav {
+ 3197:   position: fixed;
+ 3198:   z-index: 1000;
+ 3199:   bottom: max(16px,env(safe-area-inset-bottom));
+---
+ARQUIVO: App.css | TERMO: genesis497-energy | OCORRENCIAS: 19
+ 3146:   flex-direction: column;
+ 3147:   align-items: flex-start;
+ 3148:   gap: 12px;
+ 3149: }
+ 3150: 
+ 3151: .genesis497-energy {
+ 3152:   flex: 1 1 400px;
+ 3153:   width: min(100%,650px);
+ 3154:   padding: 17px 22px;
+ 3155:   border: 1px solid #6bcaff55;
+ 3156:   border-radius: 18px;
+ 3157:   color: inherit;
+ 3158:   font: inherit;
+ 3159:   text-align: left;
+---
+ 3159:   text-align: left;
+ 3160:   cursor: pointer;
+ 3161:   background: linear-gradient(110deg,#144e8055,#081a36bb);
+ 3162: }
+ 3163: 
+ 3164: .genesis497-energy .gx-bar {
+ 3165:   height: 14px;
+ 3166:   overflow: hidden;
+ 3167:   border-radius: 99px;
+ 3168: }
+ 3169: 
+ 3170: .genesis497-energy .gx-bar i {
+ 3171:   background: linear-gradient(90deg,#147dff,#40caff,#a8f5ff);
+ 3172:   box-shadow: 0 0 17px #4acaff88;
+---
+ 3165:   height: 14px;
+ 3166:   overflow: hidden;
+ 3167:   border-radius: 99px;
+ 3168: }
+ 3169: 
+ 3170: .genesis497-energy .gx-bar i {
+ 3171:   background: linear-gradient(90deg,#147dff,#40caff,#a8f5ff);
+ 3172:   box-shadow: 0 0 17px #4acaff88;
+ 3173:   transition: width .7s ease;
+ 3174: }
+ 3175: 
+ 3176: .genesis497-panel {
+ 3177:   cursor: pointer;
+ 3178:   padding: 0;
+---
+ARQUIVO: App.css | TERMO: gx-lion | OCORRENCIAS: 24
+ 1838: }
+ 1839: .holo-btn:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 #ffffff55, 0 0 18px #39ff1455, 0 8px 18px #0007; }
+ 1840: .holo-btn:active { transform: translateY(1px) scale(.98); }
+ 1841: .ghost-btn { border: 1px solid var(--border); background: transparent; }
+ 1842: .ghost-btn:hover { background: #c5e7ff1a; }
+ 1843: .holo-btn:focus-visible, .ghost-btn:focus-visible, .gx-node:focus-visible, .gx-lion:focus-visible,
+ 1844: .asc-tabs button:focus-visible, .gx-quick button:focus-visible, .file-btn:focus-within {
+ 1845:   outline: 3px solid #fff; outline-offset: 3px;
+ 1846: }
+ 1847: .file-btn { display:inline-flex; align-items:center; position:relative; }
+ 1848: .file-btn input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; }
+ 1849: 
+ 1850: .floating-panel { position:absolute; right:22px; top:92px; z-index:40; width:min(380px, calc(100% - 44px)); padding:18px; display:grid; gap:12px; }
+ 1851: .floating-panel ul { margin:0; padding-left:18px; display:grid; gap:6px; }
+---
+ 1916: .gx-panel-face i:nth-of-type(2) { width:70%; }
+ 1917: .gx-panel-face i:nth-of-type(3) { width:45%; }
+ 1918: @keyframes gxSpin { to { transform: rotateZ(360deg); } }
+ 1919: @keyframes gxCounter { from { transform: rotateZ(0deg) rotateX(-68deg); } to { transform: rotateZ(-360deg) rotateX(-68deg); } }
+ 1920: 
+ 1921: .gx-lion { position:absolute; left:calc(-130 * var(--u)); top:calc(-130 * var(--u)); width:calc(260 * var(--u)); height:calc(260 * var(--u));
+ 1922:   min-width:170px; min-height:170px; margin:0; padding:0; border:0; background:transparent; cursor:pointer; border-radius:50%;
+ 1923:   transform: translate(calc(var(--pointer-x, 0) * -8px), calc(var(--pointer-y, 0) * -8px)); }
+ 1924: .gx-lion .lion-3d-container { width:100%; height:100%; }
+ 1925: .gx-core-label { position:absolute; left:-60px; width:120px; top:calc(130 * var(--u) + 14px); text-align:center; font-size:11px; letter-spacing:.3em; color:#a9dcff; }
+ 1926: 
+ 1927: .gx-nodes button { position:absolute; }
+ 1928: .gx-node { width:calc(250 * var(--u)); min-width:190px; display:grid; grid-template-columns:auto 1fr; gap:6px 10px; align-items:center; text-align:left;
+ 1929:   padding:12px 14px; font:inherit; color:#f0f7ff; cursor:pointer; border-radius:16px; border:1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+---
+ 1919: @keyframes gxCounter { from { transform: rotateZ(0deg) rotateX(-68deg); } to { transform: rotateZ(-360deg) rotateX(-68deg); } }
+ 1920: 
+ 1921: .gx-lion { position:absolute; left:calc(-130 * var(--u)); top:calc(-130 * var(--u)); width:calc(260 * var(--u)); height:calc(260 * var(--u));
+ 1922:   min-width:170px; min-height:170px; margin:0; padding:0; border:0; background:transparent; cursor:pointer; border-radius:50%;
+ 1923:   transform: translate(calc(var(--pointer-x, 0) * -8px), calc(var(--pointer-y, 0) * -8px)); }
+ 1924: .gx-lion .lion-3d-container { width:100%; height:100%; }
+ 1925: .gx-core-label { position:absolute; left:-60px; width:120px; top:calc(130 * var(--u) + 14px); text-align:center; font-size:11px; letter-spacing:.3em; color:#a9dcff; }
+ 1926: 
+ 1927: .gx-nodes button { position:absolute; }
+ 1928: .gx-node { width:calc(250 * var(--u)); min-width:190px; display:grid; grid-template-columns:auto 1fr; gap:6px 10px; align-items:center; text-align:left;
+ 1929:   padding:12px 14px; font:inherit; color:#f0f7ff; cursor:pointer; border-radius:16px; border:1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+ 1930:   background: linear-gradient(150deg, #123a7a99, #070f24dd); box-shadow: 0 10px 30px #0008, inset 0 1px 0 #ffffff22;
+ 1931:   transition: transform .25s, box-shadow .25s, border-color .25s; transform: translate(-50%, -50%); }
+ 1932: .gx-node:hover, .gx-node.selected { box-shadow: 0 0 28px color-mix(in srgb, var(--accent) 60%, transparent), 0 10px 30px #0008; border-color: var(--accent); }
+---

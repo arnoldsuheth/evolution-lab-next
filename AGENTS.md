@@ -98,3 +98,81 @@ testes completos e autorizacao explicita.
 - Preservar o Evolution Lab original.
 - Substituir o Next antigo no GitHub apenas após uma versão funcional e conferida.
 - Não publicar nem enviar alterações externas sem autorização para a operação.
+
+<!-- EVOLUTION-DEV-START -->
+# EVOLUTION DEV - REGRA GERAL DA EQUIPE
+
+Esta politica se aplica a todos os projetos da equipe.
+
+## Hierarquia
+
+1. USUARIO - Diretor dos projetos.
+   Define objetivos, aprova propostas e autoriza execucoes.
+
+2. CHATGPT - Arquiteto e desenvolvedor principal.
+   Planeja, escreve codigo, prepara scripts PowerShell,
+   revisa resultados e propoe melhorias.
+
+3. POWERSHELL - Executor local.
+   Executa os scripts apresentados pelo ChatGPT
+   somente depois da autorizacao do usuario.
+
+4. COPILOT - Analista auxiliar.
+   Inspeciona codigo, identifica problemas e produz
+   relatorios tecnicos. Nao deve assumir o desenvolvimento
+   ou consumir creditos sem autorizacao.
+
+5. CLAUDE / CLAUDE CODE - Analistas auxiliares.
+   Podem revisar, auditar, sugerir arquitetura e diagnosticar.
+   Nao devem modificar arquivos, usar agentes, executar
+   comandos ou assumir implementacoes sem autorizacao.
+
+## Regras obrigatorias
+
+- Primeiro apresentar a proposta, depois obter autorizacao.
+- Priorizar ChatGPT + PowerShell como fluxo padrao.
+- Nao delegar programacao a outros agentes automaticamente.
+- Economizar tokens, creditos, chamadas e ferramentas.
+- Nao abrir Work sem autorizacao expressa.
+- Nao criar pastas, backups ou copias desnecessarias.
+- Trabalhar nos arquivos existentes sempre que adequado.
+- Preservar codigo aprovado, configuracoes e dados.
+- Nao executar git reset, restore, commit ou push
+  sem autorizacao especifica.
+- Nunca publicar sites, aplicativos ou conteudos
+  sem aprovacao previa.
+- Realizar testes e verificar o build.
+- Apresentar resultados e erros com transparencia.
+- Diferenciar funcionalidades implementadas de planejadas.
+- Nao afirmar que uma integracao funciona sem teste real.
+- Nao fazer alteracoes silenciosas.
+- Respeitar o escopo autorizado para cada tarefa.
+
+## Processo padrao
+
+USUARIO SOLICITA
+    |
+CHATGPT ANALISA E PROJETA
+    |
+AGENTE AUXILIAR ANALISA (SE AUTORIZADO)
+    |
+CHATGPT PREPARA SCRIPT POWERSHELL
+    |
+USUARIO AUTORIZA
+    |
+POWERSHELL EXECUTA
+    |
+CHATGPT REVISA O RESULTADO
+    |
+USUARIO APROVA A ENTREGA
+
+## Observacao
+
+Esta politica nao impede solicitacoes diretas e pontuais
+do usuario para Claude, Copilot ou Work desenvolverem.
+Essas excecoes precisam de autorizacao explicita.
+
+Uma autorizacao pontual nao altera a regra geral.
+<!-- EVOLUTION-DEV-END -->
+
+

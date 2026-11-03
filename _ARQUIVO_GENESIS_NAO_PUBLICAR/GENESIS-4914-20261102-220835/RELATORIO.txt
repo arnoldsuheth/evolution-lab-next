@@ -1,0 +1,47 @@
+﻿EVOLUTION LAB NEXT - GENESIS 4.9.14
+Status: APLICADO - LINT E BUILD APROVADOS
+ESLint: 0
+Build: 0
+Erro: 
+
+Biblioteca antiga: 2 materiais
+Progresso analisado: 12 registros
+
+CONFERENCIA:
+CONFERIDO: legado-arte / modulo 0 / 1 de 1
+CONFERIDO: legado-arte / modulo 1 / 1 de 1
+CONFERIDO: legado-arte / modulo 2 / 4 de 7
+CONFERIDO: legado-criadores / modulo 0 / 1 de 7
+CONFERIDO: legado-criadores / modulo 1 / 19 de 77
+CONFERIDO: legado-criadores / modulo 2 / 11 de 48
+CONFERIDO: legado-criadores / modulo 5 / 1 de 15
+CONFERIDO: legado-criadores / modulo 12 / 1 de 1
+CONFERIDO: legado-criadores / modulo 13 / 1 de 1
+CONFERIDO: legado-criadores / modulo 14 / 1 de 1
+CONFERIDO: legado-violao / modulo 1 / 8 de 12
+CONFERIDO: legado-ls3 / modulo 0 / 1 de 1
+
+Backup: C:\Users\asuhe\Desktop\GENESIS-4914-20261102-220835
+
+BUILD:
+transforming...
+âœ“ 20 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.66 kB â”‚ gzip:   0.37 kB
+dist/assets/index-B5PhmU5a.css   73.45 kB â”‚ gzip:  16.09 kB
+dist/assets/index-Fv01x7nC.js   909.59 kB â”‚ gzip: 235.74 kB
+
+[32mâœ“ built in 306ms[39m
+
+ERROS:
+
+[33m[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+
+
+Nenhum progresso pessoal alterado pelo script.
+Nenhum commit, push ou deploy realizado.

@@ -1,0 +1,451 @@
+=== ORGANIZACAO EVOLUTION LAB NEXT ===
+Pasta oficial: C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo
+
+=== PROJETO PRINCIPAL ===
+Central Genesis : PRESENTE
+Lion 3D : PRESENTE
+Equipe Techno Pro : PRESENTE
+Prompts retrateis : PRESENTE
+Genesis 4.7 : PRESENTE
+Backup : PRESENTE
+
+=== PASTAS DE BACKUP ===
+
+PASTA: C:\Users\asuhe\Desktop\Backup-VSCode
+Arquivos encontrados: 1
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 1
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: settings.json
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-49-20261102-210049
+Arquivos encontrados: 35
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 35
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: RELATORIO-GENESIS.txt
+  AUSENTE NO PROJETO: PROJETO\.gitignore
+  AUSENTE NO PROJETO: PROJETO\AGENTS.md
+  AUSENTE NO PROJETO: PROJETO\eslint.config.js
+  AUSENTE NO PROJETO: PROJETO\index.html
+  AUSENTE NO PROJETO: PROJETO\Novo(a) Documento de Texto.txt
+  AUSENTE NO PROJETO: PROJETO\package-lock.json
+  AUSENTE NO PROJETO: PROJETO\package.json
+  AUSENTE NO PROJETO: PROJETO\README.md
+  AUSENTE NO PROJETO: PROJETO\tsconfig.app.json
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-49-20261102-210125
+Arquivos encontrados: 35
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 35
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: RELATORIO-GENESIS.txt
+  AUSENTE NO PROJETO: PROJETO\.gitignore
+  AUSENTE NO PROJETO: PROJETO\AGENTS.md
+  AUSENTE NO PROJETO: PROJETO\eslint.config.js
+  AUSENTE NO PROJETO: PROJETO\index.html
+  AUSENTE NO PROJETO: PROJETO\Novo(a) Documento de Texto.txt
+  AUSENTE NO PROJETO: PROJETO\package-lock.json
+  AUSENTE NO PROJETO: PROJETO\package.json
+  AUSENTE NO PROJETO: PROJETO\README.md
+  AUSENTE NO PROJETO: PROJETO\tsconfig.app.json
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-491-INSPECAO
+Arquivos encontrados: 6
+Identicos ao projeto: 2
+Diferentes: 2
+Ausentes no projeto: 2
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: ASSETS.txt
+  AUSENTE NO PROJETO: COMPONENTES.txt
+  CONTEUDO DIFERENTE: src\App.css
+  CONTEUDO DIFERENTE: src\App.tsx
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-4910-20261102-215947
+Arquivos encontrados: 7
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 7
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: App.css
+  AUSENTE NO PROJETO: App.tsx
+  AUSENTE NO PROJETO: build-err.txt
+  AUSENTE NO PROJETO: build-out.txt
+  AUSENTE NO PROJETO: lint-err.txt
+  AUSENTE NO PROJETO: lint-out.txt
+  AUSENTE NO PROJETO: RELATORIO.txt
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-4911-20261102-220114
+Arquivos encontrados: 7
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 7
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: App.css
+  AUSENTE NO PROJETO: App.tsx
+  AUSENTE NO PROJETO: build-err.txt
+  AUSENTE NO PROJETO: build-out.txt
+  AUSENTE NO PROJETO: lint-err.txt
+  AUSENTE NO PROJETO: lint-out.txt
+  AUSENTE NO PROJETO: RELATORIO.txt
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-4912-20261102-220339
+Arquivos encontrados: 7
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 7
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: App.css
+  AUSENTE NO PROJETO: App.tsx
+  AUSENTE NO PROJETO: build-err.txt
+  AUSENTE NO PROJETO: build-out.txt
+  AUSENTE NO PROJETO: lint-err.txt
+  AUSENTE NO PROJETO: lint-out.txt
+  AUSENTE NO PROJETO: RELATORIO.txt
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-4913-20261102-220616
+Arquivos encontrados: 7
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 7
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: ACERVO.txt
+  AUSENTE NO PROJETO: App.css
+  AUSENTE NO PROJETO: build-err.txt
+  AUSENTE NO PROJETO: build-out.txt
+  AUSENTE NO PROJETO: lint-err.txt
+  AUSENTE NO PROJETO: lint-out.txt
+  AUSENTE NO PROJETO: RELATORIO.txt
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-4914-20261102-220835
+Arquivos encontrados: 8
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 8
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: App.css
+  AUSENTE NO PROJETO: App.tsx
+  AUSENTE NO PROJETO: build-err.txt
+  AUSENTE NO PROJETO: build-out.txt
+  AUSENTE NO PROJETO: lint-err.txt
+  AUSENTE NO PROJETO: lint-out.txt
+  AUSENTE NO PROJETO: PROGRESSO-CONFERENCIA.txt
+  AUSENTE NO PROJETO: RELATORIO.txt
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-4915-20261102-221037
+Arquivos encontrados: 7
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 7
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: build-err.txt
+  AUSENTE NO PROJETO: build-out.txt
+  AUSENTE NO PROJETO: lint-err.txt
+  AUSENTE NO PROJETO: lint-out.txt
+  AUSENTE NO PROJETO: preview-err.txt
+  AUSENTE NO PROJETO: preview-out.txt
+  AUSENTE NO PROJETO: PROGRESSO-ORIGINAL.csv
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-4915-CAPTURAS
+Arquivos encontrados: 38
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 38
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: perfil-DESKTOP\CrashpadMetrics-active.pma
+  AUSENTE NO PROJETO: perfil-DESKTOP\Last Version
+  AUSENTE NO PROJETO: perfil-DESKTOP\Local State
+  AUSENTE NO PROJETO: perfil-DESKTOP\Variations
+  AUSENTE NO PROJETO: perfil-DESKTOP\VariationsSafeSeedV2
+  AUSENTE NO PROJETO: perfil-DESKTOP\VariationsSeedV2
+  AUSENTE NO PROJETO: perfil-DESKTOP\Crashpad\metadata
+  AUSENTE NO PROJETO: perfil-DESKTOP\Crashpad\settings.dat
+  AUSENTE NO PROJETO: perfil-DESKTOP\Default\Affiliation Database
+  AUSENTE NO PROJETO: perfil-DESKTOP\Default\Affiliation Database-journal
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-4917-20261102-222100
+Arquivos encontrados: 1
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 1
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: RELATORIO.txt
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-4918-20261102-230324
+Arquivos encontrados: 1
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 1
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: RELATORIO.txt
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-4919-20261102-230448
+Arquivos encontrados: 538
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 538
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: CELULAR-err.txt
+  AUSENTE NO PROJETO: CELULAR-out.txt
+  AUSENTE NO PROJETO: CELULAR.png
+  AUSENTE NO PROJETO: DESKTOP-err.txt
+  AUSENTE NO PROJETO: DESKTOP-out.txt
+  AUSENTE NO PROJETO: DESKTOP.png
+  AUSENTE NO PROJETO: GENESIS-TELAS.zip
+  AUSENTE NO PROJETO: RELATORIO.txt
+  AUSENTE NO PROJETO: servidor-err.txt
+  AUSENTE NO PROJETO: servidor-out.txt
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-492-MIGRACAO
+Arquivos encontrados: 38
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 38
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: BRANCHES-GITHUB.txt
+  AUSENTE NO PROJETO: GIT-STATUS.txt
+  AUSENTE NO PROJETO: IDENTIDADE-VISUAL.txt
+  AUSENTE NO PROJETO: PROJETOS-LOCAIS.txt
+  AUSENTE NO PROJETO: SNAPSHOT\.gitignore
+  AUSENTE NO PROJETO: SNAPSHOT\AGENTS.md
+  AUSENTE NO PROJETO: SNAPSHOT\eslint.config.js
+  AUSENTE NO PROJETO: SNAPSHOT\index.html
+  AUSENTE NO PROJETO: SNAPSHOT\Novo(a) Documento de Texto.txt
+  AUSENTE NO PROJETO: SNAPSHOT\package-lock.json
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-4920-20261102-230641
+Arquivos encontrados: 7
+Identicos ao projeto: 0
+Diferentes: 1
+Ausentes no projeto: 6
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: ASSETS.txt
+  AUSENTE NO PROJETO: build-err.txt
+  AUSENTE NO PROJETO: build-out.txt
+  AUSENTE NO PROJETO: lint-err.txt
+  AUSENTE NO PROJETO: lint-out.txt
+  AUSENTE NO PROJETO: RELATORIO.txt
+  CONTEUDO DIFERENTE: vite.config.ts
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-4921-20261102-230842
+Arquivos encontrados: 4
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 4
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: preview-err.txt
+  AUSENTE NO PROJETO: preview-out.txt
+  AUSENTE NO PROJETO: RELATORIO.txt
+  AUSENTE NO PROJETO: VERIFICACOES.csv
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-4922-20261102-231021
+Arquivos encontrados: 2
+Identicos ao projeto: 1
+Diferentes: 0
+Ausentes no projeto: 1
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: RELATORIO.txt
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-4923-20261102-231149
+Arquivos encontrados: 393
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 393
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: CELULAR-err.txt
+  AUSENTE NO PROJETO: CELULAR-out.txt
+  AUSENTE NO PROJETO: CELULAR.png
+  AUSENTE NO PROJETO: DESKTOP-err.txt
+  AUSENTE NO PROJETO: DESKTOP-out.txt
+  AUSENTE NO PROJETO: DESKTOP.png
+  AUSENTE NO PROJETO: RELATORIO.txt
+  AUSENTE NO PROJETO: server-err.txt
+  AUSENTE NO PROJETO: server-out.txt
+  AUSENTE NO PROJETO: perfil-CELULAR\CrashpadMetrics-active.pma
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-4924-20261102-233022
+Arquivos encontrados: 3
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 3
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: RELATORIO.txt
+  AUSENTE NO PROJETO: SIMULACAO-IMPORTACAO.json
+  AUSENTE NO PROJETO: VERIFICACOES.csv
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-4925-20261102-233143
+Arquivos encontrados: 186
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 186
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: BOTOES-RENDERIZADOS.csv
+  AUSENTE NO PROJETO: chrome-err.txt
+  AUSENTE NO PROJETO: DOM-RENDERIZADO.html
+  AUSENTE NO PROJETO: RELATORIO.txt
+  AUSENTE NO PROJETO: server-err.txt
+  AUSENTE NO PROJETO: server-out.txt
+  AUSENTE NO PROJETO: TRECHOS-FUNCIONAIS.txt
+  AUSENTE NO PROJETO: chrome-isolado\CrashpadMetrics-active.pma
+  AUSENTE NO PROJETO: chrome-isolado\Last Version
+  AUSENTE NO PROJETO: chrome-isolado\Local State
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-4925-20261102-233708
+Arquivos encontrados: 186
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 186
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: BOTOES-RENDERIZADOS.csv
+  AUSENTE NO PROJETO: chrome-err.txt
+  AUSENTE NO PROJETO: DOM-RENDERIZADO.html
+  AUSENTE NO PROJETO: RELATORIO.txt
+  AUSENTE NO PROJETO: server-err.txt
+  AUSENTE NO PROJETO: server-out.txt
+  AUSENTE NO PROJETO: TRECHOS-FUNCIONAIS.txt
+  AUSENTE NO PROJETO: chrome-isolado\CrashpadMetrics-active.pma
+  AUSENTE NO PROJETO: chrome-isolado\Last Version
+  AUSENTE NO PROJETO: chrome-isolado\Local State
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-493-BACKUP-20261102-213224
+Arquivos encontrados: 2
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 2
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: App.css
+  AUSENTE NO PROJETO: App.tsx
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-493-BLOCO2-20261102-213854
+Arquivos encontrados: 3
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 3
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: App.css
+  AUSENTE NO PROJETO: App.tsx
+  AUSENTE NO PROJETO: RESULTADO.txt
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-494-20261102-214208
+Arquivos encontrados: 3
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 3
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: App.css
+  AUSENTE NO PROJETO: App.tsx
+  AUSENTE NO PROJETO: RELATORIO.txt
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-496-20261102-214549
+Arquivos encontrados: 3
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 3
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: App.css
+  AUSENTE NO PROJETO: App.tsx
+  AUSENTE NO PROJETO: RELATORIO.txt
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-497-20261102-215243
+Arquivos encontrados: 7
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 7
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: App.css
+  AUSENTE NO PROJETO: App.tsx
+  AUSENTE NO PROJETO: build-err.txt
+  AUSENTE NO PROJETO: build-out.txt
+  AUSENTE NO PROJETO: lint-err.txt
+  AUSENTE NO PROJETO: lint-out.txt
+  AUSENTE NO PROJETO: RELATORIO.txt
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-498-20261102-215624
+Arquivos encontrados: 7
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 7
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: App.css
+  AUSENTE NO PROJETO: App.tsx
+  AUSENTE NO PROJETO: build-err.txt
+  AUSENTE NO PROJETO: build-out.txt
+  AUSENTE NO PROJETO: lint-err.txt
+  AUSENTE NO PROJETO: lint-out.txt
+  AUSENTE NO PROJETO: RELATORIO.txt
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+PASTA: C:\Users\asuhe\Desktop\GENESIS-499-20261102-215744
+Arquivos encontrados: 9
+Identicos ao projeto: 0
+Diferentes: 0
+Ausentes no projeto: 9
+Erros de comparacao: 0
+  AUSENTE NO PROJETO: App.css
+  AUSENTE NO PROJETO: BIBLIOTECA-PARA-REVISAO.json
+  AUSENTE NO PROJETO: build-err.txt
+  AUSENTE NO PROJETO: build-out.txt
+  AUSENTE NO PROJETO: CURSOS-ANTIGOS.txt
+  AUSENTE NO PROJETO: lint-err.txt
+  AUSENTE NO PROJETO: lint-out.txt
+  AUSENTE NO PROJETO: PROGRESSO-PARA-REVISAO.json
+  AUSENTE NO PROJETO: RELATORIO.txt
+STATUS: NAO EXCLUIR - pode conter arquivos importantes.
+
+=== ARQUIVOS ZIP RELACIONADOS ===
+ZIP PARA REVISAO: C:\Users\asuhe\Desktop\GENESIS-491-INSPECAO.zip
+ZIP PARA REVISAO: C:\Users\asuhe\Desktop\GENESIS-492-CODIGO-ATUAL.zip
+ZIP PARA REVISAO: C:\Users\asuhe\Desktop\GENESIS-492-RELATORIOS.zip
+
+=== GIT ===
+ M AGENTS.md
+ M eslint.config.js
+ M index.html
+ M package-lock.json
+ M package.json
+ M src/App.css
+ M src/App.tsx
+ M src/index.css
+ M vite.config.ts
+?? .github/
+?? "Novo(a) Documento de Texto.txt"
+?? public/manifest.webmanifest
+?? public/marca/
+?? src/dados/
+
+=== CONCLUSAO ===
+Arquivos do projeto: NAO MODIFICADOS
+Backups: NAO EXCLUIDOS
+Pastas: NAO MOVIDAS
+Git commit/push: NAO EXECUTADOS
+=== FIM ===

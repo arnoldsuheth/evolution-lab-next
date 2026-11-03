@@ -1,0 +1,11 @@
+
+FullName                                                            Length
+--------                                                            ------
+C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\public\favicon.svg     9522
+C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\public\icons.svg       5031
+C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\assets\hero.png   13057
+C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\assets\react.svg   4126
+C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\assets\vite.svg    8709
+
+
+

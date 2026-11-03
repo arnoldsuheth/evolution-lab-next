@@ -1,0 +1,37 @@
+﻿EVOLUTION LAB NEXT - GENESIS 4.9.13
+Status: APLICADO - LINT E BUILD APROVADOS
+ESLint: 0
+Build: 0
+Erro: 
+
+Cursos antigos: 7
+Registros historicos: 12
+Materiais biblioteca: 2
+Inconsistencias: 0
+
+
+Backup: C:\Users\asuhe\Desktop\GENESIS-4913-20261102-220616
+
+BUILD:
+[36mvite v8.3.5 [32mbuilding client environment for production...[36m[39m
+transforming...
+âœ“ 20 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.66 kB â”‚ gzip:   0.37 kB
+dist/assets/index-Cb1etevH.css   73.01 kB â”‚ gzip:  16.02 kB
+dist/assets/index-DcnYhWYD.js   908.23 kB â”‚ gzip: 235.38 kB
+
+[32mâœ“ built in 337ms[39m
+
+ERROS:
+
+[33m[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+
+
+Nenhum dado academico modificado.
+Nenhum commit, push ou deploy executado.

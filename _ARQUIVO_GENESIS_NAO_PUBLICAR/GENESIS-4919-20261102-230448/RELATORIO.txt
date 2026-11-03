@@ -1,0 +1,30 @@
+﻿EVOLUTION LAB NEXT - GENESIS 4.9.19
+
+Status: VERIFICACAO CONCLUIDA
+Porta temporaria: 50617
+Capturas: 3/3
+
+
+Tela    Gerada  Bytes Codigo
+----    ------  ----- ------
+DESKTOP   True 940747      0
+TABLET    True 615113      0
+CELULAR   True 271571      0
+
+
+
+
+ACERVO:
+Cursos: 7
+Historico: 12
+Biblioteca: 2
+
+PROBLEMAS:
+
+
+Pasta: C:\Users\asuhe\Desktop\GENESIS-4919-20261102-230448
+ZIP de telas: C:\Users\asuhe\Desktop\GENESIS-4919-20261102-230448\GENESIS-TELAS.zip
+
+Nenhum arquivo-fonte alterado.
+Nenhum progresso modificado.
+Nenhum commit, push ou deploy realizado.

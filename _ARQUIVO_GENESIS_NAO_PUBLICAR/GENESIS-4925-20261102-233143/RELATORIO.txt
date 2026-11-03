@@ -1,0 +1,52 @@
+﻿EVOLUTION LAB NEXT - GENESIS 4.9.25
+
+STATUS: DIAGNOSTICO CONCLUIDO
+Porta temporaria: 56902
+Chrome ExitCode: 0
+DOM: 10555 bytes
+Botoes renderizados: 35
+
+BOTOES ENCONTRADOS:
+
+Texto                                                                        AriaLabel                 Desabilitado
+-----                                                                        ---------                 ------------
+◈ Central Genesis Command ›                                                                                   False
+▦ Faculdade Prioridade acadêmica ›                                                                            False
+△ Ascensão Árvore de trilhas ›                                                                                False
+⌘ Cursos Aprendizado complementar ›                                                                           False
+▤ Biblioteca Conhecimento reunido ›                                                                           False
+◇ Projetos Sites e aplicativos ›                                                                              False
+✧ Conquistas Sua jornada ›                                                                                    False
+◇ Equipe Techno Pro ›                                                                                         False
+⌂                                                                            Início                           False
+←                                                                            Voltar                            True
+→                                                                            Prosseguir                        True
+☰                                                                            Alternar menu                    False
+🔔 0                                                                         Notificações (0)                 False
+⚙                                                                            Configurações                    False
+MODO FOCO                                                                                                     False
+FACULDADE ↗                                                                                                   False
+NÍVEL 1 0 / 40 XP 0% da faixa atual · 40 XP restantes · Próxima forma: PULSO Abrir evolução do nível 1        False
+ABRIR FACULDADE ↗                                                                                             False
+TEMPO REGISTRADO 0h 00m                                                      Abrir TEMPO REGISTRADO           False
+TAREFAS 0/0                                                                  Abrir TAREFAS                    False
+AGENDA 0 pend.                                                               Abrir AGENDA                     False
+COMPETÊNCIAS 0                                                               Abrir COMPETÊNCIAS               False
+ESTÁCIO · LEITURA 2%                                                         Abrir ESTÁCIO · LEITURA          False
+XP MOTIVACIONAL 0                                                            Abrir XP MOTIVACIONAL            False
+✧                                                                            Interagir com o Lion Core        False
+
+
+
+
+PROBLEMAS:
+
+
+ARQUIVOS:
+C:\Users\asuhe\Desktop\GENESIS-4925-20261102-233143\DOM-RENDERIZADO.html
+C:\Users\asuhe\Desktop\GENESIS-4925-20261102-233143\BOTOES-RENDERIZADOS.csv
+C:\Users\asuhe\Desktop\GENESIS-4925-20261102-233143\TRECHOS-FUNCIONAIS.txt
+
+Codigo-fonte: nao alterado
+Dados academicos: nao alterados
+GitHub: nao publicado

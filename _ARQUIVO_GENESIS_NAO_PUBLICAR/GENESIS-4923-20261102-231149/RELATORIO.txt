@@ -1,0 +1,26 @@
+﻿GENESIS 4.9.23
+Status: VALIDACAO CONCLUIDA
+
+VERIFICACOES:
+Base relativa preservada
+Recurso local: ./assets/index-CR6LpGDF.js
+Recurso local: ./assets/react-core-Db-_YT-E.js
+Recurso local: ./assets/lion-3d-xRvvFc9g.js
+Recurso local: ./assets/index-B5PhmU5a.css
+Servidor HTTP operacional
+HTTP OK: ./assets/index-CR6LpGDF.js
+HTTP OK: ./assets/react-core-Db-_YT-E.js
+HTTP OK: ./assets/lion-3d-xRvvFc9g.js
+HTTP OK: ./assets/index-B5PhmU5a.css
+
+CAPTURAS:
+DESKTOP: OK
+CELULAR: OK
+
+PROBLEMAS:
+
+
+Pasta: C:\Users\asuhe\Desktop\GENESIS-4923-20261102-231149
+GitHub Pages: nao publicado
+Codigo-fonte: nao alterado
+Dados academicos: nao alterados

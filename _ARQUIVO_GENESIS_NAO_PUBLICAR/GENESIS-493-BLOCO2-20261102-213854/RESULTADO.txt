@@ -1,0 +1,5 @@
+﻿GENESIS 4.9.3 - BLOCO 2
+RESULTADO: NAO APLICADO
+MOTIVO: Trecho nao encontrado: rotulo: 
+Backup: C:\Users\asuhe\Desktop\GENESIS-493-BLOCO2-20261102-213854
+

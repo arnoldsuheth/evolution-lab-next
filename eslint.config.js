@@ -6,7 +6,11 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // GENESIS: ignorar backups historicos na analise
+  {
+    ignores: ['_ARQUIVO_GENESIS_NAO_PUBLICAR/**'],
+  },
+  globalIgnores(['dist', '.backups/**']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

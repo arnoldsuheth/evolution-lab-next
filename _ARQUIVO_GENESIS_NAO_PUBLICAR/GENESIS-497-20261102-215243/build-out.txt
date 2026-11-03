@@ -1,0 +1,14 @@
+
+> evolution-lab-next-novo@0.0.0 build
+> tsc -b && vite build
+
+[36mvite v8.3.5 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 20 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.66 kB │ gzip:   0.37 kB
+dist/assets/index-xEo8ti7m.css   64.47 kB │ gzip:  14.83 kB
+dist/assets/index-BX_LPr7t.js   906.15 kB │ gzip: 234.93 kB
+
+[32m✓ built in 312ms[39m

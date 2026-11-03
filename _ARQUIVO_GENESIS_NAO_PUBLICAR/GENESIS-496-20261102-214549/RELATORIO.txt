@@ -1,0 +1,17 @@
+﻿GENESIS 4.9.6
+STATUS: REVERTIDO - ARQUIVOS RESTAURADOS
+ESLint: NAO EXECUTADO
+Build: NAO EXECUTADO
+Erro: Trecho incompatível (2 ocorrencias):   const [titulo, setTitulo] = useState('')
+
+Backup: C:\Users\asuhe\Desktop\GENESIS-496-20261102-214549
+
+===== ESLINT =====
+
+
+
+===== BUILD =====
+
+
+
+Nenhum commit, push ou deploy executado.

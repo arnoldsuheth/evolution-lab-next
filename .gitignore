@@ -22,3 +22,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Genesis Preview - seguranca
+node_modules/
+dist/
+coverage/
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+.vercel/

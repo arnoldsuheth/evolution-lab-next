@@ -1,0 +1,41 @@
+﻿EVOLUTION LAB NEXT - GENESIS 4.9.24
+
+Status: AUDITORIA ISOLADA CONCLUIDA
+Verificacoes aprovadas: 17
+Verificacoes reprovadas: 0
+
+
+Teste                         Resultado Detalhe                                   
+-----                         --------- -------                                   
+Quantidade de cursos          OK        7                                         
+IDs de cursos unicos          OK        7 IDs distintos                           
+Estrutura academica           OK        111 modulos; 754 itens; 0 falhas          
+Simulacao sem duplicatas      OK        2 registros esperados: 2                  
+Preservacao ficticia          OK        Registro de teste mantido                 
+Historico consistente         OK        12/12 registros                           
+Biblioteca preservada         OK        2 materiais no arquivo legado             
+Manifest legivel              OK        Evolution Lab NEXT                        
+Icones PWA                    OK        4 encontrados; 0 pendentes                
+Controle: Inicio              OK        Verificacao estatica; clique real pendente
+Controle: Voltar              OK        Verificacao estatica; clique real pendente
+Controle: Prosseguir          OK        Verificacao estatica; clique real pendente
+Controle: Importar cursos     OK        Verificacao estatica; clique real pendente
+Controle: Importar Biblioteca OK        Verificacao estatica; clique real pendente
+Controle: Indicadores         OK        Verificacao estatica; clique real pendente
+Controle: Energia             OK        Verificacao estatica; clique real pendente
+Controle: Lion                OK        Verificacao estatica; clique real pendente
+
+
+
+
+OBSERVACOES:
+Atividades historicas registradas: 50
+Contagens historicas nao identificam aulas individuais.
+PWA: verificar instalacao real no celular.
+Presenca de controles no codigo nao comprova navegacao funcional.
+
+Pasta: C:\Users\asuhe\Desktop\GENESIS-4924-20261102-233022
+
+Dados reais: nao modificados
+Codigo-fonte: nao modificado
+GitHub: nenhum commit, push ou deploy

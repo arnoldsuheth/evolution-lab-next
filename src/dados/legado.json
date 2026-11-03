@@ -1,0 +1,5378 @@
+{
+ "origem": "github.com/arnoldsuheth/evolution-lab (leitura)",
+ "geradoEm": "2026-11-03",
+ "cursos": [
+  {
+   "id": "legado-claude",
+   "titulo": "Claude · Curso Evolution Lab",
+   "plataforma": "Evolution Lab (antigo)",
+   "trilha": "claude",
+   "modulos": [
+    {
+     "id": "legado-claude-n1",
+     "titulo": "Nível 1",
+     "itens": [
+      {
+       "id": "legado-claude-a1",
+       "titulo": "O que é o Claude",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-a2",
+       "titulo": "Modelos e produtos",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-a3",
+       "titulo": "Prompts que funcionam",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-f1",
+       "titulo": "Fluência em IA: os 4 Ds",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-r1",
+       "titulo": "Revisão do nível 1",
+       "tipo": "Exercício",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-claude-n2",
+     "titulo": "Nível 2",
+     "itens": [
+      {
+       "id": "legado-claude-a4",
+       "titulo": "Arquivos, imagens e dados",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-a5",
+       "titulo": "Projetos e memória",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-a6",
+       "titulo": "Artefatos: criando coisas",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-a7",
+       "titulo": "Pesquisa e fontes",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-r2",
+       "titulo": "Revisão do nível 2",
+       "tipo": "Exercício",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-claude-n3",
+     "titulo": "Nível 3",
+     "itens": [
+      {
+       "id": "legado-claude-a8",
+       "titulo": "Conectores e MCP",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-a9",
+       "titulo": "Agentes",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-a10",
+       "titulo": "Navegador e computador",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-a11",
+       "titulo": "Skills, plugins e tarefas agendadas",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-r3",
+       "titulo": "Revisão do nível 3",
+       "tipo": "Exercício",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-claude-n4",
+     "titulo": "Nível 4",
+     "itens": [
+      {
+       "id": "legado-claude-a12",
+       "titulo": "Claude Code",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-a13",
+       "titulo": "A API do Claude",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-a14",
+       "titulo": "Agentes próprios",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-a15",
+       "titulo": "Prompts profissionais",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-a16",
+       "titulo": "Segurança, ética e carreira",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-r4",
+       "titulo": "Revisão do nível 4",
+       "tipo": "Exercício",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-claude-n5",
+     "titulo": "Nível 5",
+     "itens": [
+      {
+       "id": "legado-claude-k1",
+       "titulo": "Cowork 1 · O que é e para que serve",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-k2",
+       "titulo": "Cowork 2 · Pastas e segurança",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-k3",
+       "titulo": "Cowork 3 · Pedidos que viram entregas",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-k4",
+       "titulo": "Cowork 4 · Planilhas, documentos e apresentações",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-k5",
+       "titulo": "Cowork 5 · Memória, projetos e rotina",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-d1",
+       "titulo": "Design 1 · O que o Claude Design cria",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-d2",
+       "titulo": "Design 2 · Briefing e referências",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-d3",
+       "titulo": "Design 3 · Design system da marca",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-d4",
+       "titulo": "Design 4 · Slides, telas e artes",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-d5",
+       "titulo": "Design 5 · Do design ao código e cuidados",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-s1",
+       "titulo": "Skills 1 · Anatomia de uma skill",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-s2",
+       "titulo": "Skills 2 · Descrições que disparam",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-s3",
+       "titulo": "Skills 3 · Passos, exemplos e arquivos de apoio",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-s4",
+       "titulo": "Skills 4 · Encadear skills",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-s5",
+       "titulo": "Skills 5 · Testar, melhorar e compartilhar",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-g1",
+       "titulo": "Agentes 24h 1 · Autonomia com controle",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-g2",
+       "titulo": "Agentes 24h 2 · Agendar e repetir",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-g3",
+       "titulo": "Agentes 24h 3 · Guardrails e aprovação",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-g4",
+       "titulo": "Agentes 24h 4 · Monitorar, custos e relatórios",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-g5",
+       "titulo": "Agentes 24h 5 · Subagentes e fluxos multiagente",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-r5",
+       "titulo": "Revisão do nível 5",
+       "tipo": "Exercício",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-claude-n6",
+     "titulo": "Nível 6",
+     "itens": [
+      {
+       "id": "legado-claude-m1",
+       "titulo": "Marketing 1 · Público e posicionamento",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-m2",
+       "titulo": "Marketing 2 · Calendário de conteúdo",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-m3",
+       "titulo": "Marketing 3 · Legendas, roteiros e anúncios",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-m4",
+       "titulo": "Marketing 4 · Atendimento e vendas pelo WhatsApp",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-m5",
+       "titulo": "Marketing 5 · Métricas e melhoria contínua",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-x1",
+       "titulo": "Apps e sites 1 · Da ideia ao escopo",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-x2",
+       "titulo": "Apps e sites 2 · Telas e fluxos",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-x3",
+       "titulo": "Apps e sites 3 · Construindo com o Claude Code",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-x4",
+       "titulo": "Apps e sites 4 · Testar, corrigir e publicar",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-x5",
+       "titulo": "Apps e sites 5 · Projetos para clientes",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-c1",
+       "titulo": "Conteúdo 1 · Ideias e pesquisa",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-c2",
+       "titulo": "Conteúdo 2 · Roteiros e textos",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-c3",
+       "titulo": "Conteúdo 3 · Imagens, vídeos e design",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-c4",
+       "titulo": "Conteúdo 4 · Calendário, rotina e produção em lote",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-c5",
+       "titulo": "Conteúdo 5 · Ética, direitos e confiança",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-r6",
+       "titulo": "Revisão do nível 6",
+       "tipo": "Exercício",
+       "feito": false
+      },
+      {
+       "id": "legado-claude-pf",
+       "titulo": "Prova final",
+       "tipo": "Atividade",
+       "feito": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "legado-programacao",
+   "titulo": "Evolution Tech · Da primeira página à aplicação completa",
+   "plataforma": "Evolution Lab (antigo)",
+   "trilha": "programacao",
+   "modulos": [
+    {
+     "id": "legado-prog-f0",
+     "titulo": "HTML e fundamentos",
+     "itens": [
+      {
+       "id": "legado-prog-0",
+       "titulo": "Como a web funciona, VS Code, Live Server, 1º index.html",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-1",
+       "titulo": "Anatomia do HTML: tags, elementos, atributos, head e body",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-2",
+       "titulo": "Textos: títulos h1–h6, parágrafos, strong, em, br, comentários",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-3",
+       "titulo": "Links: <a>, links internos e externos, página Sobre",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-4",
+       "titulo": "Imagens: <img>, src, alt, pasta img, formatos + revisão do site v1",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-5",
+       "titulo": "Listas e HTML semântico: ul, ol, header, nav, main, footer",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-6",
+       "titulo": "Página de produtos: article, figure, figcaption (cards)",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-7",
+       "titulo": "Formulários: form, input, label, textarea, button",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-8",
+       "titulo": "Revisão + projeto: páginas completas, validador W3C, DevTools",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-prog-f1",
+     "titulo": "CSS e experiência móvel",
+     "itens": [
+      {
+       "id": "legado-prog-9",
+       "titulo": "O que é CSS, style.css separado, seletores (tag, classe, id)",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-10",
+       "titulo": "Cores (hex, rgb), paleta da BLESSAINT, variáveis CSS",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-11",
+       "titulo": "Tipografia: Google Fonts (Montserrat), tamanhos, unidades",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-12",
+       "titulo": "Box model: margin, border, padding, width, box-sizing",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-13",
+       "titulo": "Backgrounds: imagens de fundo, banner, object-fit",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-14",
+       "titulo": ":hover, :focus, combinadores, cascata e especificidade",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-15",
+       "titulo": "Display e position: relative, absolute, fixed, sticky",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-16",
+       "titulo": "Revisão + projeto: identidade visual em todas as páginas",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-17",
+       "titulo": "Flexbox 1: container, direção, justify-content, align-items",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-18",
+       "titulo": "Flexbox 2: wrap, gap, flex-grow + menu de navegação",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-19",
+       "titulo": "Grid 1: colunas, linhas, unidade fr",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-20",
+       "titulo": "Grid 2: vitrine de produtos em grade",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-21",
+       "titulo": "Responsividade: viewport, mobile first, media queries",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-22",
+       "titulo": "Imagens responsivas + menu no celular",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-23",
+       "titulo": "Transições e animações: transition, transform, keyframes",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-24",
+       "titulo": "Revisão + projeto: site completo testado no celular",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-prog-f2",
+     "titulo": "Git e primeira publicação",
+     "itens": [
+      {
+       "id": "legado-prog-25",
+       "titulo": "Terminal no Windows: cd, dir, mkdir + instalar o Git",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-26",
+       "titulo": "Git: init, status, add, commit, log",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-27",
+       "titulo": "GitHub: conta, repositório, push e README",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-28",
+       "titulo": "GitHub Pages: BLESSAINT no ar + branches",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-prog-f3",
+     "titulo": "Lógica com JavaScript",
+     "itens": [
+      {
+       "id": "legado-prog-29",
+       "titulo": "Introdução ao JS: script.js, console, console.log",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-30",
+       "titulo": "Variáveis e tipos: let, const, string, number, boolean",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-31",
+       "titulo": "Operadores: aritméticos, comparação e lógicos",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-32",
+       "titulo": "Condicionais: if, else if, else, switch",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-33",
+       "titulo": "Laços de repetição: for e while",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-34",
+       "titulo": "Funções: parâmetros, retorno, arrow functions",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-35",
+       "titulo": "Arrays: criar, acessar, push, pop, percorrer",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-36",
+       "titulo": "Objetos + lista de produtos da BLESSAINT em código",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-37",
+       "titulo": "Métodos de array: forEach, map, filter, find",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-38",
+       "titulo": "Algoritmos clássicos: maior valor, média, contagem",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-39",
+       "titulo": "Revisão + exercícios de lógica no estilo da faculdade",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-prog-f4",
+     "titulo": "BLESSAINT interativa",
+     "itens": [
+      {
+       "id": "legado-prog-40",
+       "titulo": "DOM: querySelector, alterar textos e estilos",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-41",
+       "titulo": "Eventos: click e addEventListener",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-42",
+       "titulo": "Menu mobile funcionando com classList.toggle",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-43",
+       "titulo": "Vitrine gerada por JS a partir da lista de produtos",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-44",
+       "titulo": "Filtro de produtos por categoria",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-45",
+       "titulo": "Modal: abrir os detalhes do produto",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-46",
+       "titulo": "Validação do formulário de contato com JS",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-47",
+       "titulo": "localStorage: salvando dados no navegador",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-48",
+       "titulo": "Carrinho simulado 1: adicionar itens",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-49",
+       "titulo": "Carrinho simulado 2: remover itens, total e salvar",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-50",
+       "titulo": "Revisão final + publicar BLESSAINT versão 1.0",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-prog-f5",
+     "titulo": "Dados e arquitetura",
+     "itens": [
+      {
+       "id": "legado-prog-51",
+       "titulo": "JSON e contratos de dados",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-52",
+       "titulo": "HTTP e catálogo remoto",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-53",
+       "titulo": "Assincronismo e cancelamento",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-54",
+       "titulo": "Módulos e arquitetura JavaScript",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-prog-f6",
+     "titulo": "TypeScript e React",
+     "itens": [
+      {
+       "id": "legado-prog-55",
+       "titulo": "TypeScript e tipos de domínio",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-56",
+       "titulo": "React: componentes e propriedades",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-57",
+       "titulo": "React: estado e carrinho",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-58",
+       "titulo": "React: efeitos e integração",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-prog-f7",
+     "titulo": "Servidor e banco de dados",
+     "itens": [
+      {
+       "id": "legado-prog-59",
+       "titulo": "Node.js: seu primeiro servidor",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-60",
+       "titulo": "API: contratos e validação",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-61",
+       "titulo": "SQL: persistência e restrições",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-62",
+       "titulo": "Relacionamentos e variantes",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-63",
+       "titulo": "Banco conectado e transações",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-prog-f8",
+     "titulo": "Identidade, segurança e testes",
+     "itens": [
+      {
+       "id": "legado-prog-64",
+       "titulo": "Autenticação e autorização",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-65",
+       "titulo": "Segurança nas fronteiras",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-66",
+       "titulo": "Testes de lógica e regressões",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-67",
+       "titulo": "Testes de integração e jornada",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-prog-f9",
+     "titulo": "Entrega e autonomia",
+     "itens": [
+      {
+       "id": "legado-prog-68",
+       "titulo": "Deploy, ambientes e recuperação",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-69",
+       "titulo": "Auditoria e manutenção",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-prog-70",
+       "titulo": "Projeto final: demonstrar autonomia",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "legado-arte",
+   "titulo": "Arte de Elite",
+   "plataforma": "Kiwify",
+   "trilha": "hobby",
+   "categoria": "Arte",
+   "descricao": "Desenho realista, do esboço à pintura",
+   "url": "https://www.artedeelite.com/",
+   "modulos": [
+    {
+     "id": "legado-arte-m0",
+     "titulo": "Boas-vindas",
+     "itens": [
+      {
+       "id": "legado-arte-0-0",
+       "titulo": "Seja bem-vindo(a)",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/b269c02a-7ee8-4340-81bb-2588faeabea5/37d0571a-4274-4c4e-805b-a12efaab6358"
+      }
+     ]
+    },
+    {
+     "id": "legado-arte-m1",
+     "titulo": "Módulo 0 · Grupo de Alunos",
+     "itens": [
+      {
+       "id": "legado-arte-1-0",
+       "titulo": "Grupo de alunos",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/958ef54e-0cba-4cdb-aea3-63f10701f681/b9890d24-cd11-47bf-a785-ef4cdd3f7265"
+      }
+     ]
+    },
+    {
+     "id": "legado-arte-m2",
+     "titulo": "Módulo 1 · Como Desenhar · Aula em Tempo Real",
+     "itens": [
+      {
+       "id": "legado-arte-2-0",
+       "titulo": "Aula 1 · Introdução e Primeiros Passos",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/767504d8-cc68-4ea9-a09f-2bdc3ae7cd09/52a93dd0-dc5a-4161-a7f0-009ee8369c86"
+      },
+      {
+       "id": "legado-arte-2-1",
+       "titulo": "Aula 2 · Desvendando o APP",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/767504d8-cc68-4ea9-a09f-2bdc3ae7cd09/84a739d3-bf08-4b39-8802-fcb30c06ec15"
+      },
+      {
+       "id": "legado-arte-2-2",
+       "titulo": "Aula 3 · Aplicando a Técnica no Papel",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/767504d8-cc68-4ea9-a09f-2bdc3ae7cd09/47c78ec2-cee1-4193-98e0-82c542db1234"
+      },
+      {
+       "id": "legado-arte-2-3",
+       "titulo": "Aula 4 · Considerações e Dicas Extras",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/767504d8-cc68-4ea9-a09f-2bdc3ae7cd09/285b9df9-6970-4ad6-90ac-54608f0632f5"
+      },
+      {
+       "id": "legado-arte-2-4",
+       "titulo": "Aula 5 · Nova Função do APP: Esboço com Guias",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/767504d8-cc68-4ea9-a09f-2bdc3ae7cd09/5e592299-4cb0-46b2-a58e-c74f1fa282e1"
+      },
+      {
+       "id": "legado-arte-2-5",
+       "titulo": "Aula 6 · Esboço com Guias no Papel",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/767504d8-cc68-4ea9-a09f-2bdc3ae7cd09/b47bac13-2aed-4bf1-9f74-053db7cf919d"
+      },
+      {
+       "id": "legado-arte-2-6",
+       "titulo": "Aula antiga · Esboço Completa",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/767504d8-cc68-4ea9-a09f-2bdc3ae7cd09/c8b245d3-e74b-480d-9d1f-cce718da35b8"
+      }
+     ]
+    },
+    {
+     "id": "legado-arte-m3",
+     "titulo": "Módulo 2 · Aprimore sua Line Art",
+     "itens": [
+      {
+       "id": "legado-arte-3-0",
+       "titulo": "Parte 1",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/db1d4b59-3bfe-413a-9e6b-12ed546d8066/c1e1d2cd-a87a-4113-870b-77c3554d9abc"
+      },
+      {
+       "id": "legado-arte-3-1",
+       "titulo": "Parte 2",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/db1d4b59-3bfe-413a-9e6b-12ed546d8066/ab802b6f-8a9d-4b61-aa0c-12e8690e01aa"
+      }
+     ]
+    },
+    {
+     "id": "legado-arte-m4",
+     "titulo": "Módulo 3 · Tutorial Completo de Pintura",
+     "itens": [
+      {
+       "id": "legado-arte-4-0",
+       "titulo": "Parte 1 · Introdução e materiais",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/44d43cdf-86f5-4e4a-b6b1-297c1c73278f/b5d1c2b0-3bf6-4d52-958f-0d77190488cc"
+      },
+      {
+       "id": "legado-arte-4-1",
+       "titulo": "Parte 2 · Pintura da pele e técnicas",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/44d43cdf-86f5-4e4a-b6b1-297c1c73278f/564d0b3b-7e43-4d09-b67a-2eb2dbbaddff"
+      },
+      {
+       "id": "legado-arte-4-2",
+       "titulo": "Parte 3 · Traje e fundo",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/44d43cdf-86f5-4e4a-b6b1-297c1c73278f/3794f5e7-1942-4795-ac6c-e1dabd903925"
+      },
+      {
+       "id": "legado-arte-4-3",
+       "titulo": "Aula 4 · Pintura completa Omni-man (lápis Supersoft)",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/44d43cdf-86f5-4e4a-b6b1-297c1c73278f/ba678578-1c9a-44de-904a-cc0c17f2f85a"
+      },
+      {
+       "id": "legado-arte-4-4",
+       "titulo": "Aula 5 · Pintura completa Flash Reverso",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/44d43cdf-86f5-4e4a-b6b1-297c1c73278f/e4c45ad4-0856-4b7f-a1fc-50137f375a8a"
+      }
+     ]
+    },
+    {
+     "id": "legado-arte-m5",
+     "titulo": "Módulo 4 · Bico de Pena",
+     "itens": [
+      {
+       "id": "legado-arte-5-0",
+       "titulo": "Bico de pena",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/b71c7cde-6856-478d-9ee7-bd2670f528f8/a47267aa-70c9-4572-9359-c790110afd21"
+      }
+     ]
+    },
+    {
+     "id": "legado-arte-m6",
+     "titulo": "Módulo 5 · Caneta Bic",
+     "itens": [
+      {
+       "id": "legado-arte-6-0",
+       "titulo": "Caneta Bic",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/ebb272d4-c0f3-4de8-9cb5-b60419cde3e5/175e1c32-4427-4258-914e-c4165dd2eee8"
+      }
+     ]
+    },
+    {
+     "id": "legado-arte-m7",
+     "titulo": "Módulo 6 · Carvão",
+     "itens": [
+      {
+       "id": "legado-arte-7-0",
+       "titulo": "Carvão",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/1d3c73c2-af1c-445a-a18f-9c6aee76433b/7d68aeef-7983-4cf5-81ef-c86916921963"
+      }
+     ]
+    },
+    {
+     "id": "legado-arte-m8",
+     "titulo": "Módulo 7 · Desenhos em Tempo Real",
+     "itens": [
+      {
+       "id": "legado-arte-8-0",
+       "titulo": "Musashi",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/f1d179a7-1860-4297-a41f-1617800b8493/7b325691-4751-47b1-86ca-b04ad35288b1"
+      },
+      {
+       "id": "legado-arte-8-1",
+       "titulo": "Shenji",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/f1d179a7-1860-4297-a41f-1617800b8493/0c697f3a-a807-4d8a-98ba-29f73e5b3f57"
+      },
+      {
+       "id": "legado-arte-8-2",
+       "titulo": "Guts",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/f1d179a7-1860-4297-a41f-1617800b8493/0baf4a72-724d-4599-a1c7-90454f8330f8"
+      },
+      {
+       "id": "legado-arte-8-3",
+       "titulo": "Barragan",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/f1d179a7-1860-4297-a41f-1617800b8493/e7bd967b-59ca-4351-8657-d7a8e3290a98"
+      },
+      {
+       "id": "legado-arte-8-4",
+       "titulo": "Batman que ri",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/f1d179a7-1860-4297-a41f-1617800b8493/3522c46d-a1fd-48ea-9a34-fe0a198a837e"
+      },
+      {
+       "id": "legado-arte-8-5",
+       "titulo": "Toji",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/f1d179a7-1860-4297-a41f-1617800b8493/44007d8a-cdd8-4f42-a460-d525f13ca157"
+      }
+     ]
+    },
+    {
+     "id": "legado-arte-m9",
+     "titulo": "Módulo 8 · E-book Arte de Elite",
+     "itens": [
+      {
+       "id": "legado-arte-9-0",
+       "titulo": "E-book",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/27caa1de-f7a6-4286-9081-3be268697bbb/7aa5be84-62f8-410b-b6c2-b8ee81ae5951"
+      }
+     ]
+    },
+    {
+     "id": "legado-arte-m10",
+     "titulo": "Módulo 9 · Caneta de 10 Cores",
+     "itens": [
+      {
+       "id": "legado-arte-10-0",
+       "titulo": "Caneta de 10 cores",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/a7a614d0-2270-4a8e-8866-cec20dadec9b/bbdf841f-2636-4d61-9415-71e5c14e9657"
+      }
+     ]
+    },
+    {
+     "id": "legado-arte-m11",
+     "titulo": "Super bônus · Grafite com a Talita",
+     "itens": [
+      {
+       "id": "legado-arte-11-0",
+       "titulo": "Grafite com a Talita",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/f4ec4da1-ce49-45e0-94f1-efd7bfb1ec0c/c130f2b3-9bb0-452b-9372-fc26b82441db"
+      }
+     ]
+    },
+    {
+     "id": "legado-arte-m12",
+     "titulo": "Bônus · E-book TikTok",
+     "itens": [
+      {
+       "id": "legado-arte-12-0",
+       "titulo": "E-book TikTok",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/554f8d67-a678-4286-86b4-3859e8a64f50/594e912a-3c7d-4e90-8483-bae6cffa0248"
+      }
+     ]
+    },
+    {
+     "id": "legado-arte-m13",
+     "titulo": "Bônus · E-book YouTube",
+     "itens": [
+      {
+       "id": "legado-arte-13-0",
+       "titulo": "E-book YouTube",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/e3ddbe50-6a1f-4ae3-89e0-ecfb110fcf2a/a18eadc3-37eb-4dd6-bf64-276597bd7c2f"
+      }
+     ]
+    },
+    {
+     "id": "legado-arte-m14",
+     "titulo": "Bônus · Como tirar e editar fotos das artes",
+     "itens": [
+      {
+       "id": "legado-arte-14-0",
+       "titulo": "Fotos das artes",
+       "tipo": "Aula",
+       "feito": false,
+       "url": "https://www.artedeelite.com/9ea45ea4-4819-4c05-8020-2ee96a76a509/90cf0c2c-31fe-476e-9f85-761cec4d0cde/6fd797a3-caeb-4945-a718-93b6267fc27f"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "legado-criadores",
+   "titulo": "Academia de Criadores Premium",
+   "plataforma": "Hotmart",
+   "trilha": "design",
+   "categoria": "Design",
+   "descricao": "Photoshop e Illustrator do básico ao avançado",
+   "url": "https://hotmart.com/pt-br/club/academia-de-criadores/products/820613",
+   "modulos": [
+    {
+     "id": "legado-criadores-m0",
+     "titulo": "Bem-vindo · orientações",
+     "itens": [
+      {
+       "id": "legado-criadores-0-0",
+       "titulo": "Aula 1 de 7",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-0-1",
+       "titulo": "Aula 2 de 7",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-0-2",
+       "titulo": "Aula 3 de 7",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-0-3",
+       "titulo": "Aula 4 de 7",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-0-4",
+       "titulo": "Aula 5 de 7",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-0-5",
+       "titulo": "Aula 6 de 7",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-0-6",
+       "titulo": "Aula 7 de 7",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-criadores-m1",
+     "titulo": "Photoshop do básico ao avançado",
+     "itens": [
+      {
+       "id": "legado-criadores-1-0",
+       "titulo": "Aula 1 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-1",
+       "titulo": "Aula 2 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-2",
+       "titulo": "Aula 3 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-3",
+       "titulo": "Aula 4 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-4",
+       "titulo": "Aula 5 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-5",
+       "titulo": "Aula 6 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-6",
+       "titulo": "Aula 7 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-7",
+       "titulo": "Aula 8 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-8",
+       "titulo": "Aula 9 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-9",
+       "titulo": "Aula 10 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-10",
+       "titulo": "Aula 11 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-11",
+       "titulo": "Aula 12 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-12",
+       "titulo": "Aula 13 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-13",
+       "titulo": "Aula 14 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-14",
+       "titulo": "Aula 15 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-15",
+       "titulo": "Aula 16 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-16",
+       "titulo": "Aula 17 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-17",
+       "titulo": "Aula 18 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-18",
+       "titulo": "Aula 19 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-19",
+       "titulo": "Aula 20 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-20",
+       "titulo": "Aula 21 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-21",
+       "titulo": "Aula 22 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-22",
+       "titulo": "Aula 23 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-23",
+       "titulo": "Aula 24 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-24",
+       "titulo": "Aula 25 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-25",
+       "titulo": "Aula 26 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-26",
+       "titulo": "Aula 27 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-27",
+       "titulo": "Aula 28 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-28",
+       "titulo": "Aula 29 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-29",
+       "titulo": "Aula 30 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-30",
+       "titulo": "Aula 31 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-31",
+       "titulo": "Aula 32 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-32",
+       "titulo": "Aula 33 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-33",
+       "titulo": "Aula 34 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-34",
+       "titulo": "Aula 35 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-35",
+       "titulo": "Aula 36 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-36",
+       "titulo": "Aula 37 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-37",
+       "titulo": "Aula 38 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-38",
+       "titulo": "Aula 39 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-39",
+       "titulo": "Aula 40 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-40",
+       "titulo": "Aula 41 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-41",
+       "titulo": "Aula 42 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-42",
+       "titulo": "Aula 43 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-43",
+       "titulo": "Aula 44 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-44",
+       "titulo": "Aula 45 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-45",
+       "titulo": "Aula 46 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-46",
+       "titulo": "Aula 47 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-47",
+       "titulo": "Aula 48 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-48",
+       "titulo": "Aula 49 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-49",
+       "titulo": "Aula 50 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-50",
+       "titulo": "Aula 51 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-51",
+       "titulo": "Aula 52 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-52",
+       "titulo": "Aula 53 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-53",
+       "titulo": "Aula 54 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-54",
+       "titulo": "Aula 55 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-55",
+       "titulo": "Aula 56 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-56",
+       "titulo": "Aula 57 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-57",
+       "titulo": "Aula 58 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-58",
+       "titulo": "Aula 59 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-59",
+       "titulo": "Aula 60 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-60",
+       "titulo": "Aula 61 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-61",
+       "titulo": "Aula 62 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-62",
+       "titulo": "Aula 63 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-63",
+       "titulo": "Aula 64 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-64",
+       "titulo": "Aula 65 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-65",
+       "titulo": "Aula 66 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-66",
+       "titulo": "Aula 67 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-67",
+       "titulo": "Aula 68 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-68",
+       "titulo": "Aula 69 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-69",
+       "titulo": "Aula 70 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-70",
+       "titulo": "Aula 71 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-71",
+       "titulo": "Aula 72 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-72",
+       "titulo": "Aula 73 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-73",
+       "titulo": "Aula 74 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-74",
+       "titulo": "Aula 75 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-75",
+       "titulo": "Aula 76 de 77",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-1-76",
+       "titulo": "Aula 77 de 77",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-criadores-m2",
+     "titulo": "Illustrator do básico ao avançado",
+     "itens": [
+      {
+       "id": "legado-criadores-2-0",
+       "titulo": "Aula 1 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-1",
+       "titulo": "Aula 2 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-2",
+       "titulo": "Aula 3 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-3",
+       "titulo": "Aula 4 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-4",
+       "titulo": "Aula 5 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-5",
+       "titulo": "Aula 6 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-6",
+       "titulo": "Aula 7 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-7",
+       "titulo": "Aula 8 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-8",
+       "titulo": "Aula 9 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-9",
+       "titulo": "Aula 10 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-10",
+       "titulo": "Aula 11 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-11",
+       "titulo": "Aula 12 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-12",
+       "titulo": "Aula 13 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-13",
+       "titulo": "Aula 14 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-14",
+       "titulo": "Aula 15 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-15",
+       "titulo": "Aula 16 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-16",
+       "titulo": "Aula 17 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-17",
+       "titulo": "Aula 18 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-18",
+       "titulo": "Aula 19 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-19",
+       "titulo": "Aula 20 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-20",
+       "titulo": "Aula 21 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-21",
+       "titulo": "Aula 22 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-22",
+       "titulo": "Aula 23 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-23",
+       "titulo": "Aula 24 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-24",
+       "titulo": "Aula 25 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-25",
+       "titulo": "Aula 26 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-26",
+       "titulo": "Aula 27 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-27",
+       "titulo": "Aula 28 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-28",
+       "titulo": "Aula 29 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-29",
+       "titulo": "Aula 30 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-30",
+       "titulo": "Aula 31 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-31",
+       "titulo": "Aula 32 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-32",
+       "titulo": "Aula 33 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-33",
+       "titulo": "Aula 34 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-34",
+       "titulo": "Aula 35 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-35",
+       "titulo": "Aula 36 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-36",
+       "titulo": "Aula 37 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-37",
+       "titulo": "Aula 38 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-38",
+       "titulo": "Aula 39 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-39",
+       "titulo": "Aula 40 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-40",
+       "titulo": "Aula 41 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-41",
+       "titulo": "Aula 42 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-42",
+       "titulo": "Aula 43 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-43",
+       "titulo": "Aula 44 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-44",
+       "titulo": "Aula 45 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-45",
+       "titulo": "Aula 46 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-46",
+       "titulo": "Aula 47 de 48",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-2-47",
+       "titulo": "Aula 48 de 48",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-criadores-m3",
+     "titulo": "Criação de logotipos com Illustrator",
+     "itens": [
+      {
+       "id": "legado-criadores-3-0",
+       "titulo": "Aula 1 de 20",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-3-1",
+       "titulo": "Aula 2 de 20",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-3-2",
+       "titulo": "Aula 3 de 20",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-3-3",
+       "titulo": "Aula 4 de 20",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-3-4",
+       "titulo": "Aula 5 de 20",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-3-5",
+       "titulo": "Aula 6 de 20",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-3-6",
+       "titulo": "Aula 7 de 20",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-3-7",
+       "titulo": "Aula 8 de 20",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-3-8",
+       "titulo": "Aula 9 de 20",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-3-9",
+       "titulo": "Aula 10 de 20",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-3-10",
+       "titulo": "Aula 11 de 20",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-3-11",
+       "titulo": "Aula 12 de 20",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-3-12",
+       "titulo": "Aula 13 de 20",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-3-13",
+       "titulo": "Aula 14 de 20",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-3-14",
+       "titulo": "Aula 15 de 20",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-3-15",
+       "titulo": "Aula 16 de 20",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-3-16",
+       "titulo": "Aula 17 de 20",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-3-17",
+       "titulo": "Aula 18 de 20",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-3-18",
+       "titulo": "Aula 19 de 20",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-3-19",
+       "titulo": "Aula 20 de 20",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-criadores-m4",
+     "titulo": "Social media · criação de conteúdo",
+     "itens": [
+      {
+       "id": "legado-criadores-4-0",
+       "titulo": "Aula 1 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-1",
+       "titulo": "Aula 2 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-2",
+       "titulo": "Aula 3 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-3",
+       "titulo": "Aula 4 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-4",
+       "titulo": "Aula 5 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-5",
+       "titulo": "Aula 6 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-6",
+       "titulo": "Aula 7 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-7",
+       "titulo": "Aula 8 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-8",
+       "titulo": "Aula 9 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-9",
+       "titulo": "Aula 10 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-10",
+       "titulo": "Aula 11 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-11",
+       "titulo": "Aula 12 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-12",
+       "titulo": "Aula 13 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-13",
+       "titulo": "Aula 14 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-14",
+       "titulo": "Aula 15 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-15",
+       "titulo": "Aula 16 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-16",
+       "titulo": "Aula 17 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-17",
+       "titulo": "Aula 18 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-18",
+       "titulo": "Aula 19 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-19",
+       "titulo": "Aula 20 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-20",
+       "titulo": "Aula 21 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-21",
+       "titulo": "Aula 22 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-22",
+       "titulo": "Aula 23 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-23",
+       "titulo": "Aula 24 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-24",
+       "titulo": "Aula 25 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-25",
+       "titulo": "Aula 26 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-26",
+       "titulo": "Aula 27 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-27",
+       "titulo": "Aula 28 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-28",
+       "titulo": "Aula 29 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-29",
+       "titulo": "Aula 30 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-30",
+       "titulo": "Aula 31 de 32",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-4-31",
+       "titulo": "Aula 32 de 32",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-criadores-m5",
+     "titulo": "Design para social media com Photoshop",
+     "itens": [
+      {
+       "id": "legado-criadores-5-0",
+       "titulo": "Aula 1 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-5-1",
+       "titulo": "Aula 2 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-5-2",
+       "titulo": "Aula 3 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-5-3",
+       "titulo": "Aula 4 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-5-4",
+       "titulo": "Aula 5 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-5-5",
+       "titulo": "Aula 6 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-5-6",
+       "titulo": "Aula 7 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-5-7",
+       "titulo": "Aula 8 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-5-8",
+       "titulo": "Aula 9 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-5-9",
+       "titulo": "Aula 10 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-5-10",
+       "titulo": "Aula 11 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-5-11",
+       "titulo": "Aula 12 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-5-12",
+       "titulo": "Aula 13 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-5-13",
+       "titulo": "Aula 14 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-5-14",
+       "titulo": "Aula 15 de 15",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-criadores-m6",
+     "titulo": "Manipulação de imagem avançada",
+     "itens": [
+      {
+       "id": "legado-criadores-6-0",
+       "titulo": "Aula 1 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-6-1",
+       "titulo": "Aula 2 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-6-2",
+       "titulo": "Aula 3 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-6-3",
+       "titulo": "Aula 4 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-6-4",
+       "titulo": "Aula 5 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-6-5",
+       "titulo": "Aula 6 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-6-6",
+       "titulo": "Aula 7 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-6-7",
+       "titulo": "Aula 8 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-6-8",
+       "titulo": "Aula 9 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-6-9",
+       "titulo": "Aula 10 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-6-10",
+       "titulo": "Aula 11 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-6-11",
+       "titulo": "Aula 12 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-6-12",
+       "titulo": "Aula 13 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-6-13",
+       "titulo": "Aula 14 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-6-14",
+       "titulo": "Aula 15 de 15",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-criadores-m7",
+     "titulo": "Prospecção de clientes e precificação",
+     "itens": [
+      {
+       "id": "legado-criadores-7-0",
+       "titulo": "Aula 1 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-7-1",
+       "titulo": "Aula 2 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-7-2",
+       "titulo": "Aula 3 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-7-3",
+       "titulo": "Aula 4 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-7-4",
+       "titulo": "Aula 5 de 5",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-criadores-m8",
+     "titulo": "Efeitos de texto no Photoshop",
+     "itens": [
+      {
+       "id": "legado-criadores-8-0",
+       "titulo": "Aula 1 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-8-1",
+       "titulo": "Aula 2 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-8-2",
+       "titulo": "Aula 3 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-8-3",
+       "titulo": "Aula 4 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-8-4",
+       "titulo": "Aula 5 de 5",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-criadores-m9",
+     "titulo": "YouTube · conteúdos exclusivos",
+     "itens": [
+      {
+       "id": "legado-criadores-9-0",
+       "titulo": "Aula 1 de 7",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-9-1",
+       "titulo": "Aula 2 de 7",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-9-2",
+       "titulo": "Aula 3 de 7",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-9-3",
+       "titulo": "Aula 4 de 7",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-9-4",
+       "titulo": "Aula 5 de 7",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-9-5",
+       "titulo": "Aula 6 de 7",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-9-6",
+       "titulo": "Aula 7 de 7",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-criadores-m10",
+     "titulo": "Caixa de ferramentas para criadores",
+     "itens": [
+      {
+       "id": "legado-criadores-10-0",
+       "titulo": "Aula 1 de 7",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-10-1",
+       "titulo": "Aula 2 de 7",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-10-2",
+       "titulo": "Aula 3 de 7",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-10-3",
+       "titulo": "Aula 4 de 7",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-10-4",
+       "titulo": "Aula 5 de 7",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-10-5",
+       "titulo": "Aula 6 de 7",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-10-6",
+       "titulo": "Aula 7 de 7",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-criadores-m11",
+     "titulo": "Bônus · Carrosséis que vendem",
+     "itens": [
+      {
+       "id": "legado-criadores-11-0",
+       "titulo": "Aula 1 de 16",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-11-1",
+       "titulo": "Aula 2 de 16",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-11-2",
+       "titulo": "Aula 3 de 16",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-11-3",
+       "titulo": "Aula 4 de 16",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-11-4",
+       "titulo": "Aula 5 de 16",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-11-5",
+       "titulo": "Aula 6 de 16",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-11-6",
+       "titulo": "Aula 7 de 16",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-11-7",
+       "titulo": "Aula 8 de 16",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-11-8",
+       "titulo": "Aula 9 de 16",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-11-9",
+       "titulo": "Aula 10 de 16",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-11-10",
+       "titulo": "Aula 11 de 16",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-11-11",
+       "titulo": "Aula 12 de 16",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-11-12",
+       "titulo": "Aula 13 de 16",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-11-13",
+       "titulo": "Aula 14 de 16",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-11-14",
+       "titulo": "Aula 15 de 16",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-11-15",
+       "titulo": "Aula 16 de 16",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-criadores-m12",
+     "titulo": "Bônus · Pack de vetores, ícones e emojis",
+     "itens": [
+      {
+       "id": "legado-criadores-12-0",
+       "titulo": "Aula 1 de 1",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-criadores-m13",
+     "titulo": "Bônus · Pack de mockups",
+     "itens": [
+      {
+       "id": "legado-criadores-13-0",
+       "titulo": "Aula 1 de 1",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-criadores-m14",
+     "titulo": "Bônus · Mega-pack",
+     "itens": [
+      {
+       "id": "legado-criadores-14-0",
+       "titulo": "Aula 1 de 1",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-criadores-m15",
+     "titulo": "Bônus · Photoshop versão legado",
+     "itens": [
+      {
+       "id": "legado-criadores-15-0",
+       "titulo": "Aula 1 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-1",
+       "titulo": "Aula 2 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-2",
+       "titulo": "Aula 3 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-3",
+       "titulo": "Aula 4 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-4",
+       "titulo": "Aula 5 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-5",
+       "titulo": "Aula 6 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-6",
+       "titulo": "Aula 7 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-7",
+       "titulo": "Aula 8 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-8",
+       "titulo": "Aula 9 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-9",
+       "titulo": "Aula 10 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-10",
+       "titulo": "Aula 11 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-11",
+       "titulo": "Aula 12 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-12",
+       "titulo": "Aula 13 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-13",
+       "titulo": "Aula 14 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-14",
+       "titulo": "Aula 15 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-15",
+       "titulo": "Aula 16 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-16",
+       "titulo": "Aula 17 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-17",
+       "titulo": "Aula 18 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-18",
+       "titulo": "Aula 19 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-19",
+       "titulo": "Aula 20 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-20",
+       "titulo": "Aula 21 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-21",
+       "titulo": "Aula 22 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-22",
+       "titulo": "Aula 23 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-23",
+       "titulo": "Aula 24 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-24",
+       "titulo": "Aula 25 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-25",
+       "titulo": "Aula 26 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-26",
+       "titulo": "Aula 27 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-27",
+       "titulo": "Aula 28 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-28",
+       "titulo": "Aula 29 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-29",
+       "titulo": "Aula 30 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-30",
+       "titulo": "Aula 31 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-31",
+       "titulo": "Aula 32 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-32",
+       "titulo": "Aula 33 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-33",
+       "titulo": "Aula 34 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-34",
+       "titulo": "Aula 35 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-35",
+       "titulo": "Aula 36 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-36",
+       "titulo": "Aula 37 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-37",
+       "titulo": "Aula 38 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-38",
+       "titulo": "Aula 39 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-39",
+       "titulo": "Aula 40 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-40",
+       "titulo": "Aula 41 de 42",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-criadores-15-41",
+       "titulo": "Aula 42 de 42",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "legado-violao",
+   "titulo": "Violão Academy",
+   "plataforma": "Hotmart",
+   "trilha": "hobby",
+   "categoria": "Música",
+   "descricao": "Do zero ao fingerstyle",
+   "url": "https://hotmart.com/pt-br/club/aulas-de-violao-do-zero-ao-fingerstyle-2026/products/7023464",
+   "modulos": [
+    {
+     "id": "legado-violao-m0",
+     "titulo": "Boas-vindas",
+     "itens": [
+      {
+       "id": "legado-violao-0-0",
+       "titulo": "Aula 1 de 6",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-0-1",
+       "titulo": "Aula 2 de 6",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-0-2",
+       "titulo": "Aula 3 de 6",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-0-3",
+       "titulo": "Aula 4 de 6",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-0-4",
+       "titulo": "Aula 5 de 6",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-0-5",
+       "titulo": "Aula 6 de 6",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m1",
+     "titulo": "Começando do zero! Pra valer!",
+     "itens": [
+      {
+       "id": "legado-violao-1-0",
+       "titulo": "Aula 1 de 12",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-1-1",
+       "titulo": "Aula 2 de 12",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-1-2",
+       "titulo": "Aula 3 de 12",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-1-3",
+       "titulo": "Aula 4 de 12",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-1-4",
+       "titulo": "Aula 5 de 12",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-1-5",
+       "titulo": "Aula 6 de 12",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-1-6",
+       "titulo": "Aula 7 de 12",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-1-7",
+       "titulo": "Aula 8 de 12",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-1-8",
+       "titulo": "Aula 9 de 12",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-1-9",
+       "titulo": "Aula 10 de 12",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-1-10",
+       "titulo": "Aula 11 de 12",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-1-11",
+       "titulo": "Aula 12 de 12",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m2",
+     "titulo": "Primeiros movimentos",
+     "itens": [
+      {
+       "id": "legado-violao-2-0",
+       "titulo": "Aula 1 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-2-1",
+       "titulo": "Aula 2 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-2-2",
+       "titulo": "Aula 3 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-2-3",
+       "titulo": "Aula 4 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-2-4",
+       "titulo": "Aula 5 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-2-5",
+       "titulo": "Aula 6 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-2-6",
+       "titulo": "Aula 7 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-2-7",
+       "titulo": "Aula 8 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-2-8",
+       "titulo": "Aula 9 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-2-9",
+       "titulo": "Aula 10 de 10",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m3",
+     "titulo": "Batida 2 + exercícios + músicas",
+     "itens": [
+      {
+       "id": "legado-violao-3-0",
+       "titulo": "Aula 1 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-3-1",
+       "titulo": "Aula 2 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-3-2",
+       "titulo": "Aula 3 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-3-3",
+       "titulo": "Aula 4 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-3-4",
+       "titulo": "Aula 5 de 5",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m4",
+     "titulo": "Bônus · 37 mil cifras",
+     "itens": [
+      {
+       "id": "legado-violao-4-0",
+       "titulo": "Aula 1 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-4-1",
+       "titulo": "Aula 2 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-4-2",
+       "titulo": "Aula 3 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-4-3",
+       "titulo": "Aula 4 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-4-4",
+       "titulo": "Aula 5 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-4-5",
+       "titulo": "Aula 6 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-4-6",
+       "titulo": "Aula 7 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-4-7",
+       "titulo": "Aula 8 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-4-8",
+       "titulo": "Aula 9 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-4-9",
+       "titulo": "Aula 10 de 10",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m5",
+     "titulo": "Bônus · 5.000 playbacks",
+     "itens": [
+      {
+       "id": "legado-violao-5-0",
+       "titulo": "Aula 1 de 1",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m6",
+     "titulo": "Bônus · 150.000 tablaturas e partituras",
+     "itens": [
+      {
+       "id": "legado-violao-6-0",
+       "titulo": "Aula 1 de 1",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m7",
+     "titulo": "Essencial para continuar",
+     "itens": [
+      {
+       "id": "legado-violao-7-0",
+       "titulo": "Aula 1 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-7-1",
+       "titulo": "Aula 2 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-7-2",
+       "titulo": "Aula 3 de 3",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m8",
+     "titulo": "Batida 3 + exercícios + músicas",
+     "itens": [
+      {
+       "id": "legado-violao-8-0",
+       "titulo": "Aula 1 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-8-1",
+       "titulo": "Aula 2 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-8-2",
+       "titulo": "Aula 3 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-8-3",
+       "titulo": "Aula 4 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-8-4",
+       "titulo": "Aula 5 de 5",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m9",
+     "titulo": "Batida 4 + exercícios + músicas",
+     "itens": [
+      {
+       "id": "legado-violao-9-0",
+       "titulo": "Aula 1 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-9-1",
+       "titulo": "Aula 2 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-9-2",
+       "titulo": "Aula 3 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-9-3",
+       "titulo": "Aula 4 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-9-4",
+       "titulo": "Aula 5 de 5",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m10",
+     "titulo": "Palheta nos batidos",
+     "itens": [
+      {
+       "id": "legado-violao-10-0",
+       "titulo": "Aula 1 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-10-1",
+       "titulo": "Aula 2 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-10-2",
+       "titulo": "Aula 3 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-10-3",
+       "titulo": "Aula 4 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-10-4",
+       "titulo": "Aula 5 de 5",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m11",
+     "titulo": "Dedilhado + exercícios + músicas",
+     "itens": [
+      {
+       "id": "legado-violao-11-0",
+       "titulo": "Aula 1 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-11-1",
+       "titulo": "Aula 2 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-11-2",
+       "titulo": "Aula 3 de 3",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m12",
+     "titulo": "Sistema CAGED",
+     "itens": [
+      {
+       "id": "legado-violao-12-0",
+       "titulo": "Aula 1 de 9",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-12-1",
+       "titulo": "Aula 2 de 9",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-12-2",
+       "titulo": "Aula 3 de 9",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-12-3",
+       "titulo": "Aula 4 de 9",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-12-4",
+       "titulo": "Aula 5 de 9",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-12-5",
+       "titulo": "Aula 6 de 9",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-12-6",
+       "titulo": "Aula 7 de 9",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-12-7",
+       "titulo": "Aula 8 de 9",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-12-8",
+       "titulo": "Aula 9 de 9",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m13",
+     "titulo": "Batida 5 + exercícios + músicas",
+     "itens": [
+      {
+       "id": "legado-violao-13-0",
+       "titulo": "Aula 1 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-13-1",
+       "titulo": "Aula 2 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-13-2",
+       "titulo": "Aula 3 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-13-3",
+       "titulo": "Aula 4 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-13-4",
+       "titulo": "Aula 5 de 5",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m14",
+     "titulo": "Batida 6 + exercícios + músicas",
+     "itens": [
+      {
+       "id": "legado-violao-14-0",
+       "titulo": "Aula 1 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-14-1",
+       "titulo": "Aula 2 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-14-2",
+       "titulo": "Aula 3 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-14-3",
+       "titulo": "Aula 4 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-14-4",
+       "titulo": "Aula 5 de 5",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m15",
+     "titulo": "Formação dos acordes",
+     "itens": [
+      {
+       "id": "legado-violao-15-0",
+       "titulo": "Aula 1 de 2",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-15-1",
+       "titulo": "Aula 2 de 2",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m16",
+     "titulo": "Batida 7 + exercícios + músicas",
+     "itens": [
+      {
+       "id": "legado-violao-16-0",
+       "titulo": "Aula 1 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-16-1",
+       "titulo": "Aula 2 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-16-2",
+       "titulo": "Aula 3 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-16-3",
+       "titulo": "Aula 4 de 4",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m17",
+     "titulo": "Dedilhado 2 + exercícios + músicas",
+     "itens": [
+      {
+       "id": "legado-violao-17-0",
+       "titulo": "Aula 1 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-17-1",
+       "titulo": "Aula 2 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-17-2",
+       "titulo": "Aula 3 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-17-3",
+       "titulo": "Aula 4 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-17-4",
+       "titulo": "Aula 5 de 5",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m18",
+     "titulo": "Harmonia · campo harmônico",
+     "itens": [
+      {
+       "id": "legado-violao-18-0",
+       "titulo": "Aula 1 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-18-1",
+       "titulo": "Aula 2 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-18-2",
+       "titulo": "Aula 3 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-18-3",
+       "titulo": "Aula 4 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-18-4",
+       "titulo": "Aula 5 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-18-5",
+       "titulo": "Aula 6 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-18-6",
+       "titulo": "Aula 7 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-18-7",
+       "titulo": "Aula 8 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-18-8",
+       "titulo": "Aula 9 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-18-9",
+       "titulo": "Aula 10 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-18-10",
+       "titulo": "Aula 11 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-18-11",
+       "titulo": "Aula 12 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-18-12",
+       "titulo": "Aula 13 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-18-13",
+       "titulo": "Aula 14 de 15",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-18-14",
+       "titulo": "Aula 15 de 15",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m19",
+     "titulo": "Inversões, linha de baixo e rearmonização",
+     "itens": [
+      {
+       "id": "legado-violao-19-0",
+       "titulo": "Aula 1 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-19-1",
+       "titulo": "Aula 2 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-19-2",
+       "titulo": "Aula 3 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-19-3",
+       "titulo": "Aula 4 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-19-4",
+       "titulo": "Aula 5 de 5",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m20",
+     "titulo": "Batida 8 + exercícios + músicas",
+     "itens": [
+      {
+       "id": "legado-violao-20-0",
+       "titulo": "Aula 1 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-20-1",
+       "titulo": "Aula 2 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-20-2",
+       "titulo": "Aula 3 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-20-3",
+       "titulo": "Aula 4 de 4",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m21",
+     "titulo": "Batida 9 + exercícios + músicas",
+     "itens": [
+      {
+       "id": "legado-violao-21-0",
+       "titulo": "Aula 1 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-21-1",
+       "titulo": "Aula 2 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-21-2",
+       "titulo": "Aula 3 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-21-3",
+       "titulo": "Aula 4 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-21-4",
+       "titulo": "Aula 5 de 5",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m22",
+     "titulo": "Escalas completas",
+     "itens": [
+      {
+       "id": "legado-violao-22-0",
+       "titulo": "Aula 1 de 9",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-22-1",
+       "titulo": "Aula 2 de 9",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-22-2",
+       "titulo": "Aula 3 de 9",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-22-3",
+       "titulo": "Aula 4 de 9",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-22-4",
+       "titulo": "Aula 5 de 9",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-22-5",
+       "titulo": "Aula 6 de 9",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-22-6",
+       "titulo": "Aula 7 de 9",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-22-7",
+       "titulo": "Aula 8 de 9",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-22-8",
+       "titulo": "Aula 9 de 9",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m23",
+     "titulo": "Solos e riffs",
+     "itens": [
+      {
+       "id": "legado-violao-23-0",
+       "titulo": "Aula 1 de 6",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-23-1",
+       "titulo": "Aula 2 de 6",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-23-2",
+       "titulo": "Aula 3 de 6",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-23-3",
+       "titulo": "Aula 4 de 6",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-23-4",
+       "titulo": "Aula 5 de 6",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-23-5",
+       "titulo": "Aula 6 de 6",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m24",
+     "titulo": "Bônus #1 · músicas gospel",
+     "itens": [
+      {
+       "id": "legado-violao-24-0",
+       "titulo": "Aula 1 de 19",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-24-1",
+       "titulo": "Aula 2 de 19",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-24-2",
+       "titulo": "Aula 3 de 19",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-24-3",
+       "titulo": "Aula 4 de 19",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-24-4",
+       "titulo": "Aula 5 de 19",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-24-5",
+       "titulo": "Aula 6 de 19",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-24-6",
+       "titulo": "Aula 7 de 19",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-24-7",
+       "titulo": "Aula 8 de 19",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-24-8",
+       "titulo": "Aula 9 de 19",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-24-9",
+       "titulo": "Aula 10 de 19",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-24-10",
+       "titulo": "Aula 11 de 19",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-24-11",
+       "titulo": "Aula 12 de 19",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-24-12",
+       "titulo": "Aula 13 de 19",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-24-13",
+       "titulo": "Aula 14 de 19",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-24-14",
+       "titulo": "Aula 15 de 19",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-24-15",
+       "titulo": "Aula 16 de 19",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-24-16",
+       "titulo": "Aula 17 de 19",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-24-17",
+       "titulo": "Aula 18 de 19",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-24-18",
+       "titulo": "Aula 19 de 19",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m25",
+     "titulo": "Bônus #2 · músicas diversas",
+     "itens": [
+      {
+       "id": "legado-violao-25-0",
+       "titulo": "Aula 1 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-25-1",
+       "titulo": "Aula 2 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-25-2",
+       "titulo": "Aula 3 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-25-3",
+       "titulo": "Aula 4 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-25-4",
+       "titulo": "Aula 5 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-25-5",
+       "titulo": "Aula 6 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-25-6",
+       "titulo": "Aula 7 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-25-7",
+       "titulo": "Aula 8 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-25-8",
+       "titulo": "Aula 9 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-25-9",
+       "titulo": "Aula 10 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-25-10",
+       "titulo": "Aula 11 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-25-11",
+       "titulo": "Aula 12 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-25-12",
+       "titulo": "Aula 13 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-25-13",
+       "titulo": "Aula 14 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-25-14",
+       "titulo": "Aula 15 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-25-15",
+       "titulo": "Aula 16 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-25-16",
+       "titulo": "Aula 17 de 17",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m26",
+     "titulo": "Bônus #3 · afinações alternativas",
+     "itens": [
+      {
+       "id": "legado-violao-26-0",
+       "titulo": "Aula 1 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-26-1",
+       "titulo": "Aula 2 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-26-2",
+       "titulo": "Aula 3 de 3",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m27",
+     "titulo": "Mestres do dedilhado",
+     "itens": [
+      {
+       "id": "legado-violao-27-0",
+       "titulo": "Aula 1 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-27-1",
+       "titulo": "Aula 2 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-27-2",
+       "titulo": "Aula 3 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-27-3",
+       "titulo": "Aula 4 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-27-4",
+       "titulo": "Aula 5 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-27-5",
+       "titulo": "Aula 6 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-27-6",
+       "titulo": "Aula 7 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-27-7",
+       "titulo": "Aula 8 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-27-8",
+       "titulo": "Aula 9 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-27-9",
+       "titulo": "Aula 10 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-27-10",
+       "titulo": "Aula 11 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-27-11",
+       "titulo": "Aula 12 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-27-12",
+       "titulo": "Aula 13 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-27-13",
+       "titulo": "Aula 14 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-27-14",
+       "titulo": "Aula 15 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-27-15",
+       "titulo": "Aula 16 de 17",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-27-16",
+       "titulo": "Aula 17 de 17",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m28",
+     "titulo": "Mestres do dedilhado (polegar)",
+     "itens": [
+      {
+       "id": "legado-violao-28-0",
+       "titulo": "Aula 1 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-28-1",
+       "titulo": "Aula 2 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-28-2",
+       "titulo": "Aula 3 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-28-3",
+       "titulo": "Aula 4 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-28-4",
+       "titulo": "Aula 5 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-28-5",
+       "titulo": "Aula 6 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-28-6",
+       "titulo": "Aula 7 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-28-7",
+       "titulo": "Aula 8 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-28-8",
+       "titulo": "Aula 9 de 10",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-28-9",
+       "titulo": "Aula 10 de 10",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m29",
+     "titulo": "Percussão (caixa)",
+     "itens": [
+      {
+       "id": "legado-violao-29-0",
+       "titulo": "Aula 1 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-29-1",
+       "titulo": "Aula 2 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-29-2",
+       "titulo": "Aula 3 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-29-3",
+       "titulo": "Aula 4 de 4",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m30",
+     "titulo": "Percussão (bumbo)",
+     "itens": [
+      {
+       "id": "legado-violao-30-0",
+       "titulo": "Aula 1 de 2",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-30-1",
+       "titulo": "Aula 2 de 2",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m31",
+     "titulo": "Arranjos fingerstyle na prática",
+     "itens": [
+      {
+       "id": "legado-violao-31-0",
+       "titulo": "Aula 1 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-31-1",
+       "titulo": "Aula 2 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-31-2",
+       "titulo": "Aula 3 de 3",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m32",
+     "titulo": "A magia dos harmônicos",
+     "itens": [
+      {
+       "id": "legado-violao-32-0",
+       "titulo": "Aula 1 de 2",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-32-1",
+       "titulo": "Aula 2 de 2",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m33",
+     "titulo": "Música · Espírito Santo",
+     "itens": [
+      {
+       "id": "legado-violao-33-0",
+       "titulo": "Aula 1 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-33-1",
+       "titulo": "Aula 2 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-33-2",
+       "titulo": "Aula 3 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-33-3",
+       "titulo": "Aula 4 de 5",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-33-4",
+       "titulo": "Aula 5 de 5",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m34",
+     "titulo": "Música · Quando Eu Chorar",
+     "itens": [
+      {
+       "id": "legado-violao-34-0",
+       "titulo": "Aula 1 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-34-1",
+       "titulo": "Aula 2 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-34-2",
+       "titulo": "Aula 3 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-34-3",
+       "titulo": "Aula 4 de 4",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m35",
+     "titulo": "Música · Espelhos Mágicos",
+     "itens": [
+      {
+       "id": "legado-violao-35-0",
+       "titulo": "Aula 1 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-35-1",
+       "titulo": "Aula 2 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-35-2",
+       "titulo": "Aula 3 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-35-3",
+       "titulo": "Aula 4 de 4",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m36",
+     "titulo": "Música · Abro Mão",
+     "itens": [
+      {
+       "id": "legado-violao-36-0",
+       "titulo": "Aula 1 de 1",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m37",
+     "titulo": "Música · Amazing Grace",
+     "itens": [
+      {
+       "id": "legado-violao-37-0",
+       "titulo": "Aula 1 de 1",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m38",
+     "titulo": "Música · Deus de Promessas",
+     "itens": [
+      {
+       "id": "legado-violao-38-0",
+       "titulo": "Aula 1 de 1",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m39",
+     "titulo": "Música · Olha pra Mim",
+     "itens": [
+      {
+       "id": "legado-violao-39-0",
+       "titulo": "Aula 1 de 1",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m40",
+     "titulo": "Música · Lindo Momento",
+     "itens": [
+      {
+       "id": "legado-violao-40-0",
+       "titulo": "Aula 1 de 1",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m41",
+     "titulo": "Música · Sobre as Águas",
+     "itens": [
+      {
+       "id": "legado-violao-41-0",
+       "titulo": "Aula 1 de 1",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m42",
+     "titulo": "Música · Tua Graça me Basta",
+     "itens": [
+      {
+       "id": "legado-violao-42-0",
+       "titulo": "Aula 1 de 1",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m43",
+     "titulo": "Música · O Maior Vilão Sou Eu",
+     "itens": [
+      {
+       "id": "legado-violao-43-0",
+       "titulo": "Aula 1 de 1",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m44",
+     "titulo": "Música · Hallelujah",
+     "itens": [
+      {
+       "id": "legado-violao-44-0",
+       "titulo": "Aula 1 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-44-1",
+       "titulo": "Aula 2 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-44-2",
+       "titulo": "Aula 3 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-44-3",
+       "titulo": "Aula 4 de 4",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m45",
+     "titulo": "Música · Acalma o Meu Coração",
+     "itens": [
+      {
+       "id": "legado-violao-45-0",
+       "titulo": "Aula 1 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-45-1",
+       "titulo": "Aula 2 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-45-2",
+       "titulo": "Aula 3 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-45-3",
+       "titulo": "Aula 4 de 4",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m46",
+     "titulo": "Música · Jó",
+     "itens": [
+      {
+       "id": "legado-violao-46-0",
+       "titulo": "Aula 1 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-46-1",
+       "titulo": "Aula 2 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-46-2",
+       "titulo": "Aula 3 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-46-3",
+       "titulo": "Aula 4 de 4",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m47",
+     "titulo": "Música · Quero Conhecer Jesus",
+     "itens": [
+      {
+       "id": "legado-violao-47-0",
+       "titulo": "Aula 1 de 2",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-47-1",
+       "titulo": "Aula 2 de 2",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m48",
+     "titulo": "Música · Chora Israel",
+     "itens": [
+      {
+       "id": "legado-violao-48-0",
+       "titulo": "Aula 1 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-48-1",
+       "titulo": "Aula 2 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-48-2",
+       "titulo": "Aula 3 de 3",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m49",
+     "titulo": "Música · Yeshua",
+     "itens": [
+      {
+       "id": "legado-violao-49-0",
+       "titulo": "Aula 1 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-49-1",
+       "titulo": "Aula 2 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-49-2",
+       "titulo": "Aula 3 de 4",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-49-3",
+       "titulo": "Aula 4 de 4",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m50",
+     "titulo": "Música · Ousado Amor",
+     "itens": [
+      {
+       "id": "legado-violao-50-0",
+       "titulo": "Aula 1 de 2",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-50-1",
+       "titulo": "Aula 2 de 2",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m51",
+     "titulo": "Música · Quando Ele Vem",
+     "itens": [
+      {
+       "id": "legado-violao-51-0",
+       "titulo": "Aula 1 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-51-1",
+       "titulo": "Aula 2 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-51-2",
+       "titulo": "Aula 3 de 3",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m52",
+     "titulo": "Música · Ninguém Explica Deus",
+     "itens": [
+      {
+       "id": "legado-violao-52-0",
+       "titulo": "Aula 1 de 2",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-52-1",
+       "titulo": "Aula 2 de 2",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m53",
+     "titulo": "Música · Lugar Secreto",
+     "itens": [
+      {
+       "id": "legado-violao-53-0",
+       "titulo": "Aula 1 de 2",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-53-1",
+       "titulo": "Aula 2 de 2",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m54",
+     "titulo": "Música · Atos 2",
+     "itens": [
+      {
+       "id": "legado-violao-54-0",
+       "titulo": "Aula 1 de 2",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-54-1",
+       "titulo": "Aula 2 de 2",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m55",
+     "titulo": "Música · A Casa é Sua",
+     "itens": [
+      {
+       "id": "legado-violao-55-0",
+       "titulo": "Aula 1 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-55-1",
+       "titulo": "Aula 2 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-55-2",
+       "titulo": "Aula 3 de 3",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m56",
+     "titulo": "Música · Raridade",
+     "itens": [
+      {
+       "id": "legado-violao-56-0",
+       "titulo": "Aula 1 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-56-1",
+       "titulo": "Aula 2 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-56-2",
+       "titulo": "Aula 3 de 3",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m57",
+     "titulo": "Música · Lindo És",
+     "itens": [
+      {
+       "id": "legado-violao-57-0",
+       "titulo": "Aula 1 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-57-1",
+       "titulo": "Aula 2 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-57-2",
+       "titulo": "Aula 3 de 3",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m58",
+     "titulo": "Música · Oceans",
+     "itens": [
+      {
+       "id": "legado-violao-58-0",
+       "titulo": "Aula 1 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-58-1",
+       "titulo": "Aula 2 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-58-2",
+       "titulo": "Aula 3 de 3",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m59",
+     "titulo": "Música · Vem com Josué Lutar em Jericó",
+     "itens": [
+      {
+       "id": "legado-violao-59-0",
+       "titulo": "Aula 1 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-59-1",
+       "titulo": "Aula 2 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-59-2",
+       "titulo": "Aula 3 de 3",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m60",
+     "titulo": "Música · Perfect",
+     "itens": [
+      {
+       "id": "legado-violao-60-0",
+       "titulo": "Aula 1 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-60-1",
+       "titulo": "Aula 2 de 3",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-60-2",
+       "titulo": "Aula 3 de 3",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    },
+    {
+     "id": "legado-violao-m61",
+     "titulo": "Música · Numb",
+     "itens": [
+      {
+       "id": "legado-violao-61-0",
+       "titulo": "Aula 1 de 2",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-violao-61-1",
+       "titulo": "Aula 2 de 2",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "legado-ls1",
+   "titulo": "Louvor Simplificado · Básico",
+   "plataforma": "Kiwify",
+   "trilha": "hobby",
+   "categoria": "Música",
+   "descricao": "Apostilas de cifras simplificadas",
+   "url": "https://dashboard.kiwify.com/course/premium/c2b3d72f-cd63-4814-afc9-29276761737c",
+   "modulos": [
+    {
+     "id": "legado-ls1-m0",
+     "titulo": "Seção 1",
+     "itens": [
+      {
+       "id": "legado-ls1-0-0",
+       "titulo": "Seja bem-vindo · comunicado e suporte",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-ls1-0-1",
+       "titulo": "100 louvores sem pestana (apostila)",
+       "tipo": "Aula",
+       "feito": false
+      },
+      {
+       "id": "legado-ls1-0-2",
+       "titulo": "+200 louvores com cifras simplificadas (apostila)",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "legado-ls3",
+   "titulo": "Louvor Simplificado · Vol. 3",
+   "plataforma": "Kiwify",
+   "trilha": "hobby",
+   "categoria": "Música",
+   "descricao": "Apostila em PDF",
+   "url": "https://dashboard.kiwify.com/course/a70ad2a6-4dfa-4e6e-a593-309909767e46",
+   "modulos": [
+    {
+     "id": "legado-ls3-m0",
+     "titulo": "Material",
+     "itens": [
+      {
+       "id": "legado-ls3-0-0",
+       "titulo": "Apostila LS Vol. 3 (PDF)",
+       "tipo": "Aula",
+       "feito": false
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "progresso": [
+  {
+   "curso": "legado-arte",
+   "modulo": 0,
+   "feitas": 1
+  },
+  {
+   "curso": "legado-arte",
+   "modulo": 1,
+   "feitas": 1
+  },
+  {
+   "curso": "legado-arte",
+   "modulo": 2,
+   "feitas": 4
+  },
+  {
+   "curso": "legado-criadores",
+   "modulo": 0,
+   "feitas": 1
+  },
+  {
+   "curso": "legado-criadores",
+   "modulo": 1,
+   "feitas": 19
+  },
+  {
+   "curso": "legado-criadores",
+   "modulo": 2,
+   "feitas": 11
+  },
+  {
+   "curso": "legado-criadores",
+   "modulo": 5,
+   "feitas": 1
+  },
+  {
+   "curso": "legado-criadores",
+   "modulo": 12,
+   "feitas": 1
+  },
+  {
+   "curso": "legado-criadores",
+   "modulo": 13,
+   "feitas": 1
+  },
+  {
+   "curso": "legado-criadores",
+   "modulo": 14,
+   "feitas": 1
+  },
+  {
+   "curso": "legado-violao",
+   "modulo": 1,
+   "feitas": 8
+  },
+  {
+   "curso": "legado-ls3",
+   "modulo": 0,
+   "feitas": 1
+  }
+ ],
+ "biblioteca": [
+  {
+   "id": "legado-livro-forja",
+   "titulo": "Forja da Mente",
+   "autor": "Gonçalves",
+   "tema": "Automotivação estoica",
+   "status": "quero",
+   "origem": "Hotmart · e-book + 2 bônus"
+  },
+  {
+   "id": "legado-livro-ebook-ae",
+   "titulo": "E-book Arte de Elite",
+   "autor": "Arte de Elite",
+   "tema": "Desenho",
+   "status": "quero",
+   "origem": "Kiwify · do curso Arte de Elite"
+  }
+ ]
+}

@@ -1,0 +1,489 @@
+﻿
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 549
+Line       : /* Lion Core: levitacao e movimento mais sofisticados */
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 693
+Line       : /* LION CORE 3D - IMMERSIVE 1.4 */
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 695
+Line       : .lion-3d-container {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 704
+Line       : .lion-3d-container canvas {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 713
+Line       : .lion-fallback {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 723
+Line       : .lion-webgl-unavailable .lion-fallback {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 727
+Line       : .lion-3d-container:not(:has(canvas)) .lion-fallback {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 736
+Line       :   .lion-3d-container {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 745
+Line       : .lion-interaction {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 758
+Line       : .lion-interaction:hover {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 762
+Line       : .lion-interaction:active {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 766
+Line       : .lion-interaction:focus-visible {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 771
+Line       : .lion-3d-container {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 793
+Line       : /* Mensagem contextual do Lion */
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 794
+Line       : .lion-message {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 807
+Line       :   animation: lionMessageIn .4s ease both;
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 810
+Line       : .lion-message p {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 818
+Line       : .lion-message-icon {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 823
+Line       : .lion-message button {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 975
+Line       :   .lion-3d-container {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 999
+Line       :   .lion-message {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 1004
+Line       : @keyframes lionMessageIn {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 1018
+Line       :   .lion-message,
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 1019
+Line       :   .lion-interaction {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 1627
+Line       : .planner-lion {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 1638
+Line       : .planner-lion > span {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 1643
+Line       : .planner-lion p {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 1739
+Line       : .nx3-lion-stage {height:350px;position:relative;display:grid;place-items:center;min-width:0}
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 1747
+Line       : .nx3-lion-model {position:absolute;inset:3% 0 16%;display:grid;place-items:center}
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 1748
+Line       : .nx3-lion-model canvas {max-width:100%;max-height:100%}
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 1749
+Line       : .nx3-lion-label {position:absolute;bottom:0;display:grid;gap:6px;text-align:center}
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 1750
+Line       : .nx3-lion-label strong {font-size:12px;letter-spacing:3px}
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 1751
+Line       : .nx3-lion-label small {font-size:9px;color:#95bedb;letter-spacing:1px}
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 1814
+Line       :   .nx3-lion-stage {height:295px}
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 1843
+Line       : .holo-btn:focus-visible, .ghost-btn:focus-visible, .gx-node:focus-visible, .gx-lion:focus-visible,
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 1921
+Line       : .gx-lion { position:absolute; left:calc(-130 * var(--u)); top:calc(-130 * var(--u)); width:calc(260 * var(--u)); height:calc(260 * var(--u));
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 1924
+Line       : .gx-lion .lion-3d-container { width:100%; height:100%; }
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 1943
+Line       : .gx-lion-message { position:absolute; left:16px; right:16px; bottom:12px; margin:0; padding:10px 14px; border-radius:12px; background:#050b17dd; border:1px solid var(--border); font-size:14px; z-index:3; }
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 1944
+Line       : .gx-lion-message span { color: var(--cyan); }
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 1951
+Line       : .asc-lion { width:150px; height:150px; }
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 2021
+Line       :   .gx-core > .gx-plane, .gx-core > .gx-lion, .gx-core > .gx-core-label { left:50%; top:50%; }
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 2022
+Line       :   .gx-lion { left:calc(-100px); top:-100px; width:200px; height:200px; min-width:0; min-height:0; }
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 2027
+Line       :   .gx-lion-message { position:relative; inset:auto; margin:0 12px 12px; }
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 2416
+Line       : /* Lapidacao da Central sem substituir o menu ou Lion. */
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 2513
+Line       : /* Celular: HUD participa do fluxo, sem cobrir o Lion. */
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 2567
+Line       : /* Refinamentos sem substituir o menu ou o Lion 3D. */
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 2582
+Line       : .genesis44-home .gx-lion {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 2588
+Line       : .genesis44-home .gx-lion::after {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 2607
+Line       : .genesis44-return-burst .gx-lion::after {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 2778
+Line       :   .genesis44-return-burst .gx-lion::after {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 2784
+Line       : .gx-lion::after,
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 2786
+Line       : .gx-lion::after {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 2966
+Line       : .gx-stage .gx-lion {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 2973
+Line       : .gx-stage .gx-lion:hover {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 3104
+Line       :   .gx-stage .gx-lion,
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 3110
+Line       : .motion-off .gx-stage .gx-lion,
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.css
+LineNumber : 3111
+Line       : .fx-off .gx-stage .gx-lion {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 21
+Line       : function LionCrystal({ burst = 0, calm = false }: { burst?: number; calm?: boolean }) {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 55
+Line       :       host.classList.add('lion-webgl-unavailable')
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 256
+Line       :       className="lion-3d-container"
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 259
+Line       :       aria-label="Lion Core: cristal tridimensional"
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 261
+Line       :       <span className="lion-fallback" aria-hidden="true">✧</span>
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 396
+Line       :     const conteudo = localStorage.getItem(chave)
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 397
+Line       :     return conteudo ? JSON.parse(conteudo) as T : inicial
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 451
+Line       :       localStorage.setItem('evolution-agenda-v2', JSON.stringify(eventos))
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 452
+Line       :       localStorage.setItem('evolution-plano-v2', JSON.stringify(plano))
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 541
+Line       :     ? `Lion: você tem ${atrasados.length} atividade(s) com data vencida. Confira as prioridades.`
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 543
+Line       :       ? `Lion: sua próxima atividade é "${proximos[0].titulo}", prevista para ${proximos[0].data.split('-').reverse().join('/')}.`
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 544
+Line       :       : 'Lion: nenhuma avaliação ou atividade futura foi cadastrada. Consulte o calendário oficial da Estácio.'
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 778
+Line       :           <span className="eyebrow">LION / ASSISTENTE DE ESTUDOS</span>
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 780
+Line       :           <div className="planner-lion">
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 786
+Line       :             navegador. O Lion ainda não consulta o portal da Estácio automaticamente.
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 814
+Line       :       localStorage.setItem(
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 816
+Line       :         JSON.stringify(tarefas)
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 818
+Line       :       localStorage.setItem(
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 820
+Line       :         JSON.stringify(sessoes)
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1169
+Line       :         localStorage.setItem(chave, JSON.stringify(novo))
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1313
+Line       : function mensagemDoLion(painel: Painel, trilha?: TrilhaInfo) {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1334
+Line       :   painel, selecionado, onSelect, onNavigate, onOpenTrilha, burst, calm, onLion,
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1343
+Line       :   onLion: () => void
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1346
+Line       :   const [mensagem, setMensagem] = useState(() => mensagemDoLion(painel))
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1363
+Line       :   const fasesLion = [
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1367
+Line       :     { nivel: 10, nome: 'LION CORE' },
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1369
+Line       :     { nivel: 25, nome: 'LION CORE PRIME' },
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1372
+Line       :   const faseLion = [...fasesLion]
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1374
+Line       :     .find(fase => painel.nivel >= fase.nivel) ?? fasesLion[0]
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1376
+Line       :   const energiaLion = Math.min(
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1381
+Line       :   const intensidadeLion = Math.min(
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1386
+Line       :   const proximaForma = fasesLion.find(
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1408
+Line       :     setMensagem(mensagemDoLion(painel, trilhas.find(t => t.id === id)))
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1472
+Line       :                 <strong>{energiaLion}%</strong>
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1474
+Line       :                   <i style={{ width: `${energiaLion}%` }} />
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1500
+Line       :                   '--energy': `${energiaLion}%`,
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1501
+Line       :                   '--intensity': intensidadeLion,
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1534
+Line       :                 className="gx-lion"
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1535
+Line       :                 aria-label="Interagir com o Lion Core"
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1537
+Line       :                   setMensagem(mensagemDoLion(painel))
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1538
+Line       :                   onLion()
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1541
+Line       :                 <LionCrystal burst={burst} calm={calm} />
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1547
+Line       :               <span className="gx-core-label">{faseLion.nome} · NÍVEL {painel.nivel}</span>
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1572
+Line       :           <p className="gx-lion-message" role="status">
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 1680
+Line       :           <div className="asc-lion"><LionCrystal burst={burst} calm={calm} /></div>
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 2205
+Line       :   for (let i = 0; i < localStorage.length; i++) {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 2206
+Line       :     const chave = localStorage.key(i)
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 2207
+Line       :     if (chave?.startsWith('evolution-')) dados[chave] = localStorage.getItem(chave) ?? ''
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 2209
+Line       :   const conteudo = JSON.stringify(
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 2216
+Line       :   link.download = `evolution-lab-backup-${new Date().toISOString().slice(0, 10)}.json`
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 2222
+Line       : async function importarDados(arquivo: File): Promise<string> {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 2229
+Line       :     leitura = JSON.parse(await arquivo.text())
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 2271
+Line       :       dado = JSON.parse(valor)
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 2322
+Line       :       anteriores.set(chave, localStorage.getItem(chave))
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 2326
+Line       :       localStorage.setItem(chave, valor)
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 2334
+Line       :           localStorage.removeItem(chave)
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 2336
+Line       :           localStorage.setItem(chave, valor)
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 2365
+Line       :   { nome: 'RENATO', funcao: 'Especialista em Automacao',
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 2378
+Line       :   RENATO: 'Analise PowerShell, scripts, integracoes, automacoes, verificacoes e formas seguras de executar processos.'
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 2422
+Line       :     'Preserve o menu aprovado, o nucleo Lion e os dados academicos.',
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 2436
+Line       :   async function copiarPrompt(nome: string, prompt: string) {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 2662
+Line       :           <span className="eyebrow">LION SYSTEM</span>
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 2730
+Line       :                   onChange={async event => {
+
+Path       : C:\Users\asuhe\Desktop\Evolution-Lab-Next-Novo\src\App.tsx
+LineNumber : 2752
+Line       :             onLion={celebrar}
+
+
+
+

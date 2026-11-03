@@ -1,0 +1,18 @@
+﻿[
+    {
+        "id":  "legado-livro-forja",
+        "titulo":  "Forja da Mente",
+        "autor":  "Gonçalves",
+        "tema":  "Automotivação estoica",
+        "status":  "quero",
+        "origem":  "Hotmart · e-book + 2 bônus"
+    },
+    {
+        "id":  "legado-livro-ebook-ae",
+        "titulo":  "E-book Arte de Elite",
+        "autor":  "Arte de Elite",
+        "tema":  "Desenho",
+        "status":  "quero",
+        "origem":  "Kiwify · do curso Arte de Elite"
+    }
+]

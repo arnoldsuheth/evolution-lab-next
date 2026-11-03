@@ -1,0 +1,404 @@
+﻿[
+    {
+        "id":  "registro-ficticio-001",
+        "titulo":  "Teste de preservacao"
+    },
+    {
+        "id":  "legado-claude",
+        "titulo":  "Claude · Curso Evolution Lab",
+        "plataforma":  "Evolution Lab (antigo)",
+        "trilha":  "claude",
+        "modulos":  [
+                        {
+                            "id":  "legado-claude-n1",
+                            "titulo":  "Nível 1",
+                            "itens":  [
+                                          {
+                                              "id":  "legado-claude-a1",
+                                              "titulo":  "O que é o Claude",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-a2",
+                                              "titulo":  "Modelos e produtos",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-a3",
+                                              "titulo":  "Prompts que funcionam",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-f1",
+                                              "titulo":  "Fluência em IA: os 4 Ds",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-r1",
+                                              "titulo":  "Revisão do nível 1",
+                                              "tipo":  "Exercício",
+                                              "feito":  false
+                                          }
+                                      ]
+                        },
+                        {
+                            "id":  "legado-claude-n2",
+                            "titulo":  "Nível 2",
+                            "itens":  [
+                                          {
+                                              "id":  "legado-claude-a4",
+                                              "titulo":  "Arquivos, imagens e dados",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-a5",
+                                              "titulo":  "Projetos e memória",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-a6",
+                                              "titulo":  "Artefatos: criando coisas",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-a7",
+                                              "titulo":  "Pesquisa e fontes",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-r2",
+                                              "titulo":  "Revisão do nível 2",
+                                              "tipo":  "Exercício",
+                                              "feito":  false
+                                          }
+                                      ]
+                        },
+                        {
+                            "id":  "legado-claude-n3",
+                            "titulo":  "Nível 3",
+                            "itens":  [
+                                          {
+                                              "id":  "legado-claude-a8",
+                                              "titulo":  "Conectores e MCP",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-a9",
+                                              "titulo":  "Agentes",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-a10",
+                                              "titulo":  "Navegador e computador",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-a11",
+                                              "titulo":  "Skills, plugins e tarefas agendadas",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-r3",
+                                              "titulo":  "Revisão do nível 3",
+                                              "tipo":  "Exercício",
+                                              "feito":  false
+                                          }
+                                      ]
+                        },
+                        {
+                            "id":  "legado-claude-n4",
+                            "titulo":  "Nível 4",
+                            "itens":  [
+                                          {
+                                              "id":  "legado-claude-a12",
+                                              "titulo":  "Claude Code",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-a13",
+                                              "titulo":  "A API do Claude",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-a14",
+                                              "titulo":  "Agentes próprios",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-a15",
+                                              "titulo":  "Prompts profissionais",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-a16",
+                                              "titulo":  "Segurança, ética e carreira",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-r4",
+                                              "titulo":  "Revisão do nível 4",
+                                              "tipo":  "Exercício",
+                                              "feito":  false
+                                          }
+                                      ]
+                        },
+                        {
+                            "id":  "legado-claude-n5",
+                            "titulo":  "Nível 5",
+                            "itens":  [
+                                          {
+                                              "id":  "legado-claude-k1",
+                                              "titulo":  "Cowork 1 · O que é e para que serve",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-k2",
+                                              "titulo":  "Cowork 2 · Pastas e segurança",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-k3",
+                                              "titulo":  "Cowork 3 · Pedidos que viram entregas",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-k4",
+                                              "titulo":  "Cowork 4 · Planilhas, documentos e apresentações",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-k5",
+                                              "titulo":  "Cowork 5 · Memória, projetos e rotina",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-d1",
+                                              "titulo":  "Design 1 · O que o Claude Design cria",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-d2",
+                                              "titulo":  "Design 2 · Briefing e referências",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-d3",
+                                              "titulo":  "Design 3 · Design system da marca",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-d4",
+                                              "titulo":  "Design 4 · Slides, telas e artes",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-d5",
+                                              "titulo":  "Design 5 · Do design ao código e cuidados",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-s1",
+                                              "titulo":  "Skills 1 · Anatomia de uma skill",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-s2",
+                                              "titulo":  "Skills 2 · Descrições que disparam",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-s3",
+                                              "titulo":  "Skills 3 · Passos, exemplos e arquivos de apoio",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-s4",
+                                              "titulo":  "Skills 4 · Encadear skills",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-s5",
+                                              "titulo":  "Skills 5 · Testar, melhorar e compartilhar",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-g1",
+                                              "titulo":  "Agentes 24h 1 · Autonomia com controle",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-g2",
+                                              "titulo":  "Agentes 24h 2 · Agendar e repetir",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-g3",
+                                              "titulo":  "Agentes 24h 3 · Guardrails e aprovação",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-g4",
+                                              "titulo":  "Agentes 24h 4 · Monitorar, custos e relatórios",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-g5",
+                                              "titulo":  "Agentes 24h 5 · Subagentes e fluxos multiagente",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-r5",
+                                              "titulo":  "Revisão do nível 5",
+                                              "tipo":  "Exercício",
+                                              "feito":  false
+                                          }
+                                      ]
+                        },
+                        {
+                            "id":  "legado-claude-n6",
+                            "titulo":  "Nível 6",
+                            "itens":  [
+                                          {
+                                              "id":  "legado-claude-m1",
+                                              "titulo":  "Marketing 1 · Público e posicionamento",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-m2",
+                                              "titulo":  "Marketing 2 · Calendário de conteúdo",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-m3",
+                                              "titulo":  "Marketing 3 · Legendas, roteiros e anúncios",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-m4",
+                                              "titulo":  "Marketing 4 · Atendimento e vendas pelo WhatsApp",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-m5",
+                                              "titulo":  "Marketing 5 · Métricas e melhoria contínua",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-x1",
+                                              "titulo":  "Apps e sites 1 · Da ideia ao escopo",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-x2",
+                                              "titulo":  "Apps e sites 2 · Telas e fluxos",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-x3",
+                                              "titulo":  "Apps e sites 3 · Construindo com o Claude Code",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-x4",
+                                              "titulo":  "Apps e sites 4 · Testar, corrigir e publicar",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-x5",
+                                              "titulo":  "Apps e sites 5 · Projetos para clientes",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-c1",
+                                              "titulo":  "Conteúdo 1 · Ideias e pesquisa",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-c2",
+                                              "titulo":  "Conteúdo 2 · Roteiros e textos",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-c3",
+                                              "titulo":  "Conteúdo 3 · Imagens, vídeos e design",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-c4",
+                                              "titulo":  "Conteúdo 4 · Calendário, rotina e produção em lote",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-c5",
+                                              "titulo":  "Conteúdo 5 · Ética, direitos e confiança",
+                                              "tipo":  "Aula",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-r6",
+                                              "titulo":  "Revisão do nível 6",
+                                              "tipo":  "Exercício",
+                                              "feito":  false
+                                          },
+                                          {
+                                              "id":  "legado-claude-pf",
+                                              "titulo":  "Prova final",
+                                              "tipo":  "Atividade",
+                                              "feito":  false
+                                          }
+                                      ]
+                        }
+                    ]
+    }
+]
