@@ -3,6 +3,7 @@ import * as THREE from 'three'
 // GENESIS-55-REACTOR-3D
 import NexusPipes3D from './NexusPipes3D'
 import NeuralUniverse from './NeuralUniverse'
+import LegacyHistoryBridge from './LegacyHistoryBridge'
 import './App.css'
 import legado from './dados/legado.json'
 
@@ -2131,6 +2132,7 @@ function CursosPage({ onCelebrar }: { onCelebrar: () => void }) {
         </div>
       </header>
 
+      <LegacyHistoryBridge />
       <section className="glass-surface genesis497-import">
         <strong>ACERVO ORIGINAL — EVOLUTION LAB</strong>
         <p>Sete cursos disponíveis. A importação não substitui seus cursos atuais.</p>
