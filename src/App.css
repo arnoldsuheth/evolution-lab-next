@@ -5190,3 +5190,218 @@ button:focus-visible { outline: 2px solid #eaf7ff; outline-offset: 3px; }
     padding: 13px;
   }
 }
+/* GENESIS-64-RPG */
+.genesis64 {
+  padding: clamp(18px,3vw,30px);
+  margin-bottom: 22px;
+  border: 1px solid rgba(106,177,255,.3);
+  border-radius: 22px;
+  background:
+    radial-gradient(ellipse at top right,
+      rgba(102,67,218,.17),transparent 45%),
+    linear-gradient(145deg,
+      rgba(7,19,44,.96),rgba(10,15,35,.96));
+  color: #edf6ff;
+}
+.genesis64 h2 { margin: 8px 0; font-size: clamp(23px,3vw,32px); }
+.genesis64 h3 { margin: 0 0 15px; font-size: 19px; }
+.genesis64 p { line-height: 1.6; color: #9fb3d4; }
+.genesis64-head { margin-bottom: 21px; }
+.genesis64-head p { max-width: 740px; margin: 7px 0; }
+.genesis64-cards {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 12px;
+}
+.genesis64-cards article {
+  min-width: 0;
+  display: grid;
+  gap: 11px;
+  padding: 17px;
+  border: 1px solid rgba(101,163,255,.24);
+  border-radius: 15px;
+  background: rgba(11,31,65,.67);
+}
+.genesis64-cards small { color: #a8bee0; }
+.genesis64-cards strong {
+  font-size: clamp(17px,2.3vw,26px);
+  color: #cdeaff;
+  overflow-wrap: anywhere;
+}
+.genesis64-cards span {
+  color: #9cadd1;
+  font-size: 11px;
+}
+.genesis64-note { font-size: 12px; }
+.genesis64-columns {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  align-items: start;
+  gap: 14px;
+  margin: 18px 0;
+}
+.genesis64-panel {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid rgba(133,108,255,.3);
+  border-radius: 16px;
+  background: rgba(12,24,55,.6);
+}
+.genesis64-medals {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 9px;
+}
+.genesis64-medals>div {
+  display: flex;
+  align-items: start;
+  gap: 10px;
+  padding: 13px;
+  border-radius: 10px;
+  border: 1px solid rgba(97,171,255,.18);
+}
+.genesis64-medals .locked { opacity: .46; }
+.genesis64-medals .won {
+  background: rgba(65,122,196,.12);
+  border-color: rgba(81,221,255,.4);
+}
+.genesis64-medals span {
+  color: #87ddff;
+  font-size: 22px;
+}
+.genesis64-medals strong,
+.genesis64-tree strong {
+  display: block;
+  font-size: 12px;
+}
+.genesis64-medals small,
+.genesis64-tree small {
+  display: block;
+  margin-top: 5px;
+  color: #91aed3;
+  font-size: 10px;
+  line-height: 1.4;
+}
+.genesis64-tree {
+  max-height: 390px;
+  overflow-y: auto;
+}
+.genesis64-tree>div {
+  display: flex;
+  gap: 12px;
+  padding: 11px 8px;
+  border-bottom: 1px solid rgba(105,166,242,.14);
+}
+.genesis64-tree>div>span {
+  color: #81caff;
+  font-size: 20px;
+}
+.genesis64-tree .complete>span { color: #64e9c9; }
+.genesis64-arena { margin-top: 14px; }
+.genesis64-tabs {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 9px;
+  margin: 17px 0;
+}
+.genesis64-tabs button {
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid rgba(114,157,255,.27);
+  border-radius: 11px;
+  background: rgba(9,24,49,.8);
+  color: #e8efff;
+  text-align: left;
+}
+.genesis64-tabs button.active {
+  border-color: #9a8cff;
+  box-shadow: inset 0 0 16px rgba(113,78,255,.18);
+}
+.genesis64-tabs small {
+  display: block;
+  margin-top: 7px;
+  color: #a5b5d3;
+}
+.genesis64-question {
+  padding: 18px;
+  border-radius: 13px;
+  border: 1px solid rgba(96,154,255,.23);
+  background: rgba(7,16,36,.64);
+}
+.genesis64-question-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #a0badc;
+  font-size: 12px;
+}
+.genesis64-question h4 {
+  font-size: 18px;
+  margin: 18px 0;
+}
+.genesis64-options {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 10px;
+}
+.genesis64-options button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(95,158,238,.28);
+  border-radius: 10px;
+  background: rgba(16,35,68,.67);
+  color: #edf5ff;
+  text-align: left;
+}
+.genesis64-options button span {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 25px;
+  height: 25px;
+  border-radius: 7px;
+  background: rgba(109,98,241,.21);
+}
+.genesis64-options button.correct {
+  border-color: #61e7bf;
+  background: rgba(25,102,83,.3);
+}
+.genesis64-options button.wrong {
+  border-color: #ff8f97;
+  background: rgba(128,41,63,.3);
+}
+.genesis64-feedback,
+.genesis64-result {
+  margin-top: 16px;
+  padding: 17px;
+  border-radius: 12px;
+  background: rgba(87,63,164,.16);
+  border: 1px solid rgba(154,113,255,.29);
+}
+.genesis64-feedback button,
+.genesis64-result button {
+  margin-top: 9px;
+  padding: 12px 17px;
+  border: 1px solid #8d9fff;
+  border-radius: 10px;
+  background: rgba(101,75,201,.27);
+  color: white;
+  font-weight: 700;
+}
+@media(max-width:850px) {
+  .genesis64-cards {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+  .genesis64-columns,
+  .genesis64-tabs,
+  .genesis64-options {
+    grid-template-columns: 1fr;
+  }
+}
+@media(max-width:420px) {
+  .genesis64-medals {
+    grid-template-columns: 1fr;
+  }
+}

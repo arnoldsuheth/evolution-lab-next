@@ -5,6 +5,7 @@ import NexusPipes3D from './NexusPipes3D'
 import NeuralUniverse from './NeuralUniverse'
 import LegacyHistoryBridge from './LegacyHistoryBridge'
 import AcademicReactor from './AcademicReactor'
+import GenesisRPG from './GenesisRPG'
 import './App.css'
 import legado from './dados/legado.json'
 
@@ -1966,6 +1967,15 @@ function ConquistasPage({ painel, onNavigate }: { painel: Painel; onNavigate: (p
         </div>
       </header>
 
+      {/* GENESIS-64-RPG */}
+      <GenesisRPG
+        painel={painel}
+        cursos={lerDadosAcademicos<Curso[]>(
+          'evolution-cursos-v1',
+          legado.cursos as unknown as Curso[],
+          ehLista
+        )}
+      />
       <div className="cnq-grid">
         <section className="glass-surface gx-card">
           <span className="eyebrow">1 · PROGRESSO ACADÊMICO</span>
