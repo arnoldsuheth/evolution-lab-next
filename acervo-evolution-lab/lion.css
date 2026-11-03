@@ -1,0 +1,69 @@
+#lion-companion{font:14px/1.5 Inter,system-ui,sans-serif;color:#E6E8EE;position:relative;z-index:65}#lion-companion [hidden]{display:none!important}#lion-companion *{box-sizing:border-box}#lion-companion button,#lion-companion select{font:inherit}#lion-companion button{cursor:pointer}#lion-anchor{position:fixed;right:20px;bottom:24px;width:90px;height:108px;z-index:67}#lion-icon{position:relative;display:flex;align-items:center;justify-content:center;background:none;border:0;width:90px;height:108px;padding:0;touch-action:none;cursor:grab;filter:drop-shadow(0 0 9px #A78BFA55)}#lion-icon:active{cursor:grabbing}#lion-icon img{width:90px;height:100px;object-fit:contain;pointer-events:none;animation:lion-idle 5s ease-in-out infinite}#lion-icon::after{content:'Lion';position:absolute;bottom:0;font:10px ui-monospace,monospace;color:#BBF7FF;letter-spacing:1px;background:#10283DEB;border:1px solid #7CEBFF55;border-radius:5px;padding:0 8px}#lion-icon.talking img{animation:lion-talk .7s ease-in-out 3}#lion-balloon{position:fixed;z-index:68;width:min(290px,calc(100vw - 24px));padding:14px 36px 14px 14px;border:1px solid #86E9FF88;border-radius:14px 14px 5px 14px;background:linear-gradient(125deg,#112C3EF5,#291B44F0);color:#E6E8EE;box-shadow:0 0 22px #22D3EE1A;backdrop-filter:blur(16px);font-size:13px}#lion-balloon strong{display:block;color:#C9F8FF;font-size:12px;margin-bottom:5px}#lion-balloon p{margin:0}#lion-balloon button{position:absolute;right:5px;top:5px;width:30px;height:30px;border:0;color:#B7C8DD;background:none;font-size:20px}#lion-panel{position:fixed;right:24px;bottom:142px;z-index:68;width:min(380px,calc(100vw - 32px));max-height:calc(100dvh - 115px);overflow:auto;border:1px solid #86E9FF88;border-radius:9px 22px 9px 22px;background:linear-gradient(140deg,#4AD8FF1C,#171C31ED 38%,#351D48E8);backdrop-filter:blur(20px);box-shadow:inset 1px 1px #D1FFFF55,5px 5px 0 #22D3EE14,10px 10px 0 #A78BFA16,0 15px 60px #0008;color:#E6E8EE}#lion-panel>canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.25}#lion-panel .lion-front{position:relative;z-index:1}#lion-panel header{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#47D9FF0D;border-bottom:1px solid #7EE9FF33}#lion-panel header img{width:42px;height:46px;object-fit:contain}#lion-panel header strong{display:block;font-size:15px;color:#CFFAFF}#lion-panel header small{display:block;color:#B4C7DD;font-size:11px}#lion-panel header button{margin-left:auto;width:40px;height:40px;color:#B6CBE2;background:none;border:0;font-size:23px}#lion-panel .lion-body{padding:16px}#lion-date{font:11px ui-monospace,monospace;color:#8EEBFF;margin:0 0 12px}#lion-advice{font-size:13px;color:#E6E8EE;background:#1D2D4566;border:1px solid #B9A0FF44;border-radius:10px;padding:12px;margin:0 0 12px}#lion-panel .lion-actions{display:flex;gap:8px;flex-wrap:wrap}#lion-panel .lion-actions button{flex:1;min-height:42px;padding:8px;border:1px solid #7CEBFF55;border-radius:8px;background:#1E355066;color:#D8F9FF;font-size:12px}#lion-panel .lion-actions button:first-child{background:linear-gradient(105deg,#A585FF,#63E0F3);color:#0A1425;font-weight:700;border:0}#lion-panel details{margin-top:16px;font-size:12px;color:#B7C8DD}#lion-panel summary{cursor:pointer;color:#D8E6F7;padding:6px 0}#lion-panel .lion-settings{display:grid;gap:12px;padding-top:10px}#lion-panel label{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px}#lion-panel select{padding:7px;border:1px solid #3D4C67;border-radius:7px;background:#121C2F;color:#E6E8EE;max-width:145px}#lion-panel input{accent-color:#22D3EE;width:18px;height:18px}#lion-panel .lion-note{font-size:11px;color:#AFC1D9;margin:14px 0 0}#lion-companion :focus-visible{outline:2px solid #22D3EE;outline-offset:3px}#lion-companion.lion-still img{animation:none!important}@keyframes lion-idle{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-5px) rotate(1deg)}}@keyframes lion-talk{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}@media(max-width:860px){#lion-anchor{right:12px;bottom:calc(84px + env(safe-area-inset-bottom,0px));width:76px;height:94px}#lion-icon{width:76px;height:94px}#lion-icon img{width:76px;height:86px}#lion-panel{right:16px;bottom:calc(185px + env(safe-area-inset-bottom,0px));max-height:calc(100dvh - 205px)}}@media(prefers-reduced-motion:reduce){#lion-icon img{animation:none!important}}
+#lion-panel header{touch-action:none;cursor:grab}#lion-panel header:active{cursor:grabbing}
+
+/* Toque, rotação e áreas seguras de celulares e tablets. */
+#lion-companion{--lion-safe-top:env(safe-area-inset-top,0px)}
+#lion-panel{overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;max-width:calc(100vw - 24px);isolation:isolate}
+#lion-panel header{position:sticky;top:0;z-index:2;background:#16243AF5}
+#lion-panel header button{flex-shrink:0;width:44px;min-height:44px}
+#lion-panel .lion-actions button{min-height:44px}
+#lion-panel summary{min-height:44px;align-content:center}
+#lion-panel label{min-height:44px}
+#lion-panel input{flex-shrink:0;width:22px;height:22px}
+#lion-balloon{overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-right:46px;max-width:calc(100vw - 24px)}
+#lion-balloon button{width:40px;height:40px;top:0;right:0}
+@media(max-width:860px){#lion-panel{right:max(12px,env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));width:min(380px,calc(100vw - 24px));max-height:calc(100dvh - 108px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}#lion-anchor{right:max(12px,env(safe-area-inset-right,0px))}#lion-panel header small{font-size:12px}#lion-panel .lion-note{font-size:12px;line-height:1.6}#lion-panel .lion-body{padding:14px}#lion-panel .lion-actions button{min-width:70px}}
+@media(max-width:360px){#lion-panel header{padding:9px 10px}#lion-panel header strong{font-size:14px}#lion-panel header small{font-size:11px}#lion-panel .lion-actions{gap:6px}#lion-panel .lion-actions button{font-size:12px;padding:8px 6px}#lion-panel .lion-body{padding:12px}}
+
+/* Lion mais vivo: levitação, energia e reações a cada resposta. */
+#lion-icon{isolation:isolate;--lion-aura:#A78BFA;--lion-spark:#67E8F9}
+#lion-icon img{position:relative;z-index:1;transform-origin:50% 70%;animation:lion-hover 2.8s ease-in-out infinite;filter:drop-shadow(0 4px 8px #0005)}
+#lion-icon::before{content:'';position:absolute;inset:17% 6% 9%;z-index:0;pointer-events:none;border-radius:50%;background:radial-gradient(ellipse,var(--lion-aura),transparent 68%);opacity:.32;filter:blur(7px);animation:lion-energy 2.8s ease-in-out infinite}
+#lion-icon::after{z-index:3}
+#lion-icon .lion-orbit{position:absolute;z-index:2;inset:10px 4px 14px;pointer-events:none;border:1px solid #A78BFA40;border-radius:50%;transform:rotate(-20deg);animation:lion-orbit 6s linear infinite}
+#lion-icon .lion-orbit::before,#lion-icon .lion-orbit::after{content:'';position:absolute;width:4px;height:4px;top:12%;left:12%;border-radius:50%;background:var(--lion-spark);box-shadow:0 0 7px var(--lion-spark)}
+#lion-icon .lion-orbit::after{top:auto;left:auto;right:12%;bottom:12%;width:3px;height:3px;background:#C4B5FD}
+#lion-icon.talking img{animation:lion-chat .65s ease-in-out 5}
+#lion-icon.lion-react-hello img{animation:lion-hello .9s ease-in-out 2}
+#lion-icon.lion-react-ok{--lion-aura:#34D399;--lion-spark:#6EE7B7}
+#lion-icon.lion-react-ok img{animation:lion-cheer .85s ease-in-out 2}
+#lion-icon.lion-react-bad{--lion-aura:#F87171;--lion-spark:#FDA4AF}
+#lion-icon.lion-react-bad img{animation:lion-oops .7s ease-in-out 2}
+#lion-panel .lion-actions button{background:linear-gradient(150deg,#FFFFFF14,transparent 55%),#1E355066;box-shadow:inset 0 1px 0 #FFFFFF25;transition:box-shadow .2s,filter .2s}
+#lion-panel .lion-actions button:first-child{background:linear-gradient(150deg,#FFFFFF44,transparent 55%),linear-gradient(105deg,#A585FF,#63E0F3)}
+#lion-panel .lion-actions button:active{filter:brightness(1.2);box-shadow:inset 0 1px 0 #FFFFFF55,0 0 15px #67E8F933}
+#lion-companion.lion-still *,#lion-companion.lion-suspended *{animation:none!important}
+@keyframes lion-hover{0%,100%{transform:translateY(0) rotate(-4deg)}25%{transform:translate(3px,-7px) rotate(1deg)}50%{transform:translateY(-12px) rotate(4deg)}75%{transform:translate(-3px,-6px) rotate(-1deg)}}
+@keyframes lion-energy{0%,100%{opacity:.24;transform:scale(.85)}50%{opacity:.45;transform:scale(1.12)}}
+@keyframes lion-orbit{from{transform:rotate(-20deg)}to{transform:rotate(340deg)}}
+@keyframes lion-chat{0%,100%{transform:translateY(-2px) rotate(-3deg)}50%{transform:translateY(-12px) rotate(4deg)}}
+@keyframes lion-hello{0%,100%{transform:translateY(-3px) rotate(0)}30%{transform:translateY(-12px) rotate(-10deg)}65%{transform:translateY(-8px) rotate(10deg)}}
+@keyframes lion-cheer{0%,100%{transform:translateY(-3px) rotate(-3deg)}35%{transform:translateY(-19px) rotate(9deg) scale(1.06)}65%{transform:translateY(-6px) rotate(-6deg)}}
+@keyframes lion-oops{0%,100%{transform:translateY(-3px) rotate(0)}25%{transform:translate(-5px,-5px) rotate(-8deg)}65%{transform:translate(5px,-4px) rotate(8deg)}}
+@media(prefers-reduced-motion:reduce){#lion-companion *{animation:none!important}#lion-icon::before{opacity:.24}}
+
+/* Preferências ampliadas */
+#lion-panel .lion-settings label{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#lion-panel .lion-settings select{max-width:170px}
+.lion-row{display:flex;gap:10px;flex-wrap:wrap}.lion-row label{flex:1;min-width:120px}
+.lion-test{min-height:44px;padding:8px 12px;border:1px solid #7CEBFF55;border-radius:8px;background:#1E355066;color:#D8F9FF}
+#lion-panel .lion-actions button[data-lion-action=help]{flex:1 1 100%}
+
+/* Lion Tamagotchi */
+#lion-panel header .lion-mood{margin-left:auto;padding:5px 10px;border-radius:999px;font:700 11px ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;border:1px solid;white-space:nowrap}
+#lion-panel header .lion-mood+button{margin-left:0}
+.lion-mood[data-mood=feliz]{color:#6EE7B7;border-color:#34D39988;background:#10B98122}.lion-mood[data-mood=fome]{color:#FCD34D;border-color:#F59E0B88;background:#F59E0B1F}.lion-mood[data-mood=sono]{color:#A5B4FC;border-color:#818CF888;background:#6366F122}
+#lion-icon .lion-dot{position:absolute;z-index:4;top:6px;right:8px;width:15px;height:15px;border-radius:50%;border:2px solid #0B0E14;background:#34D399;box-shadow:0 0 8px currentColor;color:#34D399}
+#lion-icon[data-mood=fome] .lion-dot{background:#F59E0B;color:#F59E0B;animation:lion-dotp 1.2s ease-in-out infinite}#lion-icon[data-mood=sono] .lion-dot{background:#818CF8;color:#818CF8}
+@keyframes lion-dotp{50%{transform:scale(1.3)}}
+.pet-bars{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin:0 0 12px}
+.pet-bar{display:grid;gap:5px}.pet-bar .pl{display:flex;justify-content:space-between;font:11px ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:#9AA9BF}.pet-bar .pl b{color:#EEF2FA}
+.pet-bar .pt{height:12px;border-radius:7px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid rgba(255,255,255,.08)}.pet-bar .pf{height:100%;border-radius:7px;background:var(--c);box-shadow:0 0 12px var(--c);transition:width .5s}
+.pet-bar.low .pf{animation:lion-dotp 1.2s ease-in-out infinite;transform-origin:left}
+.pet-ration{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:0 0 8px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02))}
+.pet-ration>span{font-size:20px}.pet-pel{display:flex;gap:5px;align-items:center}.pet-pel i{width:18px;height:18px;border-radius:50% 50% 50% 8px;background:linear-gradient(135deg,#FCD34D,#F59E0B);box-shadow:0 0 8px #F59E0B88;transform:rotate(-20deg)}.pet-pel i.e{background:rgba(255,255,255,.1);box-shadow:none}.pet-pel em{font:700 11px ui-monospace,monospace;color:#FCD34D;font-style:normal}
+.pet-ration small{margin-left:auto;color:#9AA9BF;font-size:11px;text-align:right;line-height:1.3}
+.pet-earn{margin:0 0 12px;font-size:12px;color:#A7F3D0;min-height:1.2em}
+#lion-panel .pet-actions button{display:flex;flex-direction:column;gap:2px;flex:1 1 calc(50% - 8px);min-height:52px}#lion-panel .pet-actions button small{font:400 10px ui-monospace,monospace;color:#B4C7DD}
+#lion-panel .pet-actions button:first-child small{color:#0b2a3a}
+#lion-panel .lion-actions+.lion-actions{margin-top:9px}
