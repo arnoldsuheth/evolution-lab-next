@@ -1521,6 +1521,16 @@ function GenesisHome({
         </aside>
 
         <section className="gx-stage glass-surface" aria-label="Mapa de evolução">
+{/* GENESIS-60-ACERVO-ORIGINAL */}
+<a
+  href="/acervo-evolution-lab/index.html"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="genesis60-acervo-link"
+  title="Abrir uma copia preservada do Evolution Lab original"
+>
+  ◈ ACERVO ORIGINAL
+</a>
 <NeuralUniverse painel={painel} onNavigate={onNavigate} />
           <NexusPipes3D
             progresso={[

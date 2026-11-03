@@ -1,0 +1,12 @@
+{
+    "versao":  "Genesis 6.0",
+    "origem":  "arnoldsuheth/evolution-lab",
+    "destino":  "/acervo-evolution-lab/index.html",
+    "arquivosCopiados":  81,
+    "linksEncontrados":  [
+                             "https://fonts.googleapis.com",
+                             "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800\u0026family=JetBrains+Mono:wght@400;500;600\u0026family=Pixelify+Sans:wght@500;700\u0026display=swap",
+                             "https://fonts.gstatic.com"
+                         ],
+    "observacao":  "Inventario do codigo. Dados exclusivos do navegador nao incluidos."
+}

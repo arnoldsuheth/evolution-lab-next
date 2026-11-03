@@ -4822,3 +4822,26 @@ button:focus-visible { outline: 2px solid #eaf7ff; outline-offset: 3px; }
     transition: none;
   }
 }
+/* GENESIS-60-ACERVO-ORIGINAL */
+.gx-stage > .genesis60-acervo-link {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 80;
+  padding: 9px 13px;
+  border: 1px solid rgba(104, 207, 255, .48);
+  border-radius: 11px;
+  color: #c4edff;
+  background: rgba(5, 16, 39, .86);
+  box-shadow: 0 0 18px rgba(56, 153, 255, .16);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+}
+.gx-stage > .genesis60-acervo-link:hover {
+  color: white;
+  border-color: #c69aff;
+  box-shadow: 0 0 20px rgba(169, 88, 255, .4);
+}
