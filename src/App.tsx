@@ -4,6 +4,7 @@ import * as THREE from 'three'
 import NexusPipes3D from './NexusPipes3D'
 import NeuralUniverse from './NeuralUniverse'
 import LegacyHistoryBridge from './LegacyHistoryBridge'
+import AcademicReactor from './AcademicReactor'
 import './App.css'
 import legado from './dados/legado.json'
 
@@ -1245,7 +1246,10 @@ function lerPainel(): Painel {
   const tarefas = registros(lerDadosAcademicos<unknown>('evolution-faculdade-tarefas-v1', []))
   const sessoes = registros(lerDadosAcademicos<unknown>('evolution-faculdade-sessoes-v1', []))
   const agenda = registros(lerDadosAcademicos<unknown>('evolution-agenda-v2', []))
-  const cursos = registros(lerDadosAcademicos<unknown>('evolution-cursos-v1', []))
+  const cursos = registros(lerDadosAcademicos<unknown>(
+    'evolution-cursos-v1',
+    legado.cursos
+  ))
   const projetos = registros(lerDadosAcademicos<unknown>('evolution-projetos-v1', []))
   const biblioteca = registros(lerDadosAcademicos<unknown>('evolution-biblioteca-v1', []))
   const bruto = lerDadosAcademicos<unknown>('evolution-ascensao-v1', {})
@@ -2133,6 +2137,8 @@ function CursosPage({ onCelebrar }: { onCelebrar: () => void }) {
       </header>
 
       <LegacyHistoryBridge />
+      {/* GENESIS-63-MOTOR-ACADEMICO */}
+      <AcademicReactor cursos={cursos} />
       <section className="glass-surface genesis497-import">
         <strong>ACERVO ORIGINAL — EVOLUTION LAB</strong>
         <p>Sete cursos disponíveis. A importação não substitui seus cursos atuais.</p>
@@ -2233,7 +2239,11 @@ function CursosPage({ onCelebrar }: { onCelebrar: () => void }) {
         const feitos = itens.filter(i => i.feito).length
         const pct = itens.length ? Math.round(feitos / itens.length * 100) : 0
         return (
-          <section key={curso.id} className="glass-surface col-card">
+          <section
+            id={`genesis-curso-${curso.id}`}
+            key={curso.id}
+            className="glass-surface col-card"
+          >
             <div className="col-card-head">
               <div>
                 <h3>{curso.titulo}</h3>

@@ -4845,3 +4845,348 @@ button:focus-visible { outline: 2px solid #eaf7ff; outline-offset: 3px; }
   border-color: #c69aff;
   box-shadow: 0 0 20px rgba(169, 88, 255, .4);
 }
+/* GENESIS-63-MOTOR-ACADEMICO */
+
+.genesis63-reactor {
+  padding: clamp(18px, 3vw, 30px);
+  overflow: hidden;
+  color: #eaf4ff;
+  background:
+    radial-gradient(
+      ellipse at 95% 0%,
+      rgba(122, 58, 230, .2),
+      transparent 40%
+    ),
+    linear-gradient(145deg,#081630,#0b1027) !important;
+  border: 1px solid rgba(89,172,255,.28);
+  border-radius: 22px;
+}
+
+.genesis63-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 25px;
+}
+
+.genesis63-heading h2 {
+  margin: 8px 0;
+  font-size: clamp(21px, 3vw, 31px);
+}
+
+.genesis63-heading p {
+  color: #a6b8da;
+  max-width: 660px;
+}
+
+.genesis63-status {
+  color: #9ee9ff;
+  border: 1px solid rgba(85,222,255,.4);
+  background: rgba(15,91,130,.17);
+  border-radius: 30px;
+  padding: 10px 15px;
+  font-size: 11px;
+  letter-spacing: .08em;
+  font-weight: 800;
+}
+
+.genesis63-metrics {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 12px;
+}
+
+.genesis63-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 17px;
+  border-radius: 15px;
+  background: rgba(14,33,68,.7);
+  border: 1px solid rgba(92,164,255,.2);
+}
+
+.genesis63-metric small {
+  color: #a0b7dd;
+  font-size: 11px;
+}
+
+.genesis63-metric strong {
+  font-size: clamp(22px,3vw,31px);
+  color: #d3eeff;
+}
+
+.genesis63-global {
+  padding: 20px;
+  margin-top: 14px;
+  border: 1px solid rgba(139,84,255,.27);
+  background: rgba(80,38,145,.1);
+  border-radius: 15px;
+}
+
+.genesis63-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.genesis63-global > small {
+  color: #a7b7d5;
+}
+
+.genesis63-bar {
+  width: 100%;
+  height: 8px;
+  margin-bottom: 9px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: rgba(117,157,230,.16);
+}
+
+.genesis63-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,#43d8ff,#8061ff,#cf76ff
+  );
+  box-shadow: 0 0 15px rgba(171,90,255,.7);
+}
+
+.genesis63-tools {
+  display: grid;
+  grid-template-columns: 1fr 230px;
+  gap: 12px;
+  margin: 24px 0 15px;
+}
+
+.genesis63-tools label {
+  display: grid;
+  gap: 7px;
+  color: #b9cae9;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.genesis63-tools input,
+.genesis63-tools select {
+  width: 100%;
+  background: #09142c;
+  color: #edf7ff;
+  border: 1px solid rgba(95,171,255,.38);
+  border-radius: 11px;
+  padding: 12px;
+  font: inherit;
+}
+
+.genesis63-courses {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  align-items: start;
+  gap: 13px;
+}
+
+.genesis63-course {
+  min-width: 0;
+  border: 1px solid rgba(85,154,251,.25);
+  border-radius: 16px;
+  background: rgba(8,22,47,.76);
+  overflow: hidden;
+}
+
+.genesis63-course[open] {
+  border-color: rgba(155,101,255,.57);
+  box-shadow: 0 0 25px rgba(120,70,255,.13);
+}
+
+.genesis63-course summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  list-style: none;
+  cursor: pointer;
+}
+
+.genesis63-course summary::-webkit-details-marker {
+  display: none;
+}
+
+.genesis63-course-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  color: #c9b0ff;
+  font-size: 23px;
+  border: 1px solid rgba(121,108,255,.34);
+  background: rgba(100,77,198,.12);
+}
+
+.genesis63-course-name {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  flex: 1;
+}
+
+.genesis63-course-name strong {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.genesis63-course-name small {
+  font-size: 11px;
+  color: #9eb6d8;
+}
+
+.genesis63-course-progress {
+  color: #c5a8ff;
+  font-size: 16px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.genesis63-course-body {
+  padding: 0 16px 17px;
+}
+
+.genesis63-course-body small {
+  color: #9ab5d8;
+}
+
+.genesis63-module {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(114,164,225,.13);
+}
+
+.genesis63-module-orb {
+  width: 31px;
+  height: 31px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(115,200,255,.5);
+  border-radius: 50%;
+  color: #9de5ff;
+  background: rgba(19,77,130,.23);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.genesis63-module-content {
+  display: grid;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+}
+
+.genesis63-module-content strong {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.genesis63-module-content small {
+  font-size: 10px;
+}
+
+.genesis63-done,
+.genesis63-pending {
+  flex-shrink: 0;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.genesis63-done {
+  color: #62eccf;
+}
+
+.genesis63-pending {
+  color: #8d9db9;
+}
+
+.genesis63-open {
+  display: block;
+  margin-top: 15px;
+  padding: 12px;
+  border: 1px solid rgba(97,191,255,.4);
+  border-radius: 10px;
+  color: #dcf7ff;
+  text-align: center;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.genesis63-open:hover {
+  background: rgba(52,139,221,.2);
+}
+
+.genesis63-memory {
+  display: grid;
+  gap: 13px;
+  padding: 19px;
+  margin-top: 18px;
+  border-radius: 15px;
+  border: 1px solid rgba(140,96,235,.3);
+  background: rgba(41,24,88,.15);
+}
+
+.genesis63-memory p {
+  color: #9db3d9;
+  margin: 7px 0 0;
+  font-size: 12px;
+}
+
+.genesis63-memory-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.genesis63-memory-stats span {
+  padding: 8px 11px;
+  border-radius: 9px;
+  border: 1px solid rgba(125,141,230,.28);
+  font-size: 11px;
+}
+
+.genesis63-refresh {
+  width: fit-content;
+  padding: 10px 13px;
+  border: 1px solid rgba(151,116,255,.5);
+  border-radius: 10px;
+  background: rgba(116,67,215,.16);
+  color: #eedbff;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+[id^="genesis-curso-"] {
+  scroll-margin-top: 100px;
+}
+
+@media (max-width: 850px) {
+  .genesis63-metrics {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+
+  .genesis63-tools,
+  .genesis63-courses {
+    grid-template-columns: 1fr;
+  }
+
+  .genesis63-course summary {
+    padding: 13px;
+  }
+}
