@@ -2049,7 +2049,15 @@ function NovoTexto({
 }
 
 function CursosPage({ onCelebrar }: { onCelebrar: () => void }) {
-  const [cursos, setCursos] = useArmazenado<Curso[]>('evolution-cursos-v1', [], ehLista)
+  // GENESIS-61-ACERVO-INTEGRADO
+  // Os cursos originais sao a base somente quando nao
+  // existe uma lista salva neste navegador.
+  // Registros preexistentes nunca sao substituidos.
+  const [cursos, setCursos] = useArmazenado<Curso[]>(
+    'evolution-cursos-v1',
+    legado.cursos as unknown as Curso[],
+    ehLista
+  )
   const [titulo, setTitulo] = useState('')
   const [plataforma, setPlataforma] = useState('')
   const [trilha, setTrilha] = useState<Trilha>('programacao')
