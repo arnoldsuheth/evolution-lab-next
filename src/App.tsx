@@ -6,18 +6,21 @@ import NeuralUniverse from './NeuralUniverse'
 import LegacyHistoryBridge from './LegacyHistoryBridge'
 import AcademicReactor from './AcademicReactor'
 import GenesisRPG from './GenesisRPG'
+import GenesisAcademy from './GenesisAcademy'
 import './App.css'
 import legado from './dados/legado.json'
 
 type Page =
   | 'Central' | 'Faculdade' | 'Ascensão' | 'Cursos'
   | 'Biblioteca' | 'Projetos' | 'Conquistas' | 'Equipe'
+  | 'Academia'
 
 const navigation: { name: Page; icon: string; detail: string }[] = [
   { name: 'Central', icon: '◈', detail: 'Genesis Command' },
   { name: 'Faculdade', icon: '▦', detail: 'Prioridade acadêmica' },
   { name: 'Ascensão', icon: '△', detail: 'Árvore de trilhas' },
   { name: 'Cursos', icon: '⌘', detail: 'Aprendizado complementar' },
+  { name: 'Academia', icon: '✧', detail: 'Escola Evolution Lab completa' },
   { name: 'Biblioteca', icon: '▤', detail: 'Conhecimento reunido' },
   { name: 'Projetos', icon: '◇', detail: 'Sites e aplicativos' },
   { name: 'Conquistas', icon: '✧', detail: 'Sua jornada' },
@@ -3201,6 +3204,8 @@ function App() {
           />
         ) : page === 'Cursos' ? (
           <CursosPage key="cursos" onCelebrar={celebrar} />
+        ) : page === 'Academia' ? (
+          <GenesisAcademy key="academia" />
         ) : page === 'Equipe' ? (
           <EquipePage />
         ) : page === 'Projetos' ? (
