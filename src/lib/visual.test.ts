@@ -1,0 +1,13 @@
+import { test } from 'node:test';
+import { strict as assert } from 'node:assert';
+import { RACE_SKIN,RACE_FORM,skinColor,HAIR_NAMES,BEARD_NAMES } from './visual';
+import { skinGeometry } from './skinGeometry';
+import { freshSave,migrateSave } from './game';
+test('todas as raças têm oito tons válidos e peles próprias',()=>{for(const palette of Object.values(RACE_SKIN)){assert.equal(palette.length,8);assert.equal(new Set(palette).size,8);for(const color of palette)assert.match(color,/^#[a-f0-9]{6}$/i);}assert.notDeepEqual(RACE_SKIN.orc,RACE_SKIN.human);assert.notDeepEqual(RACE_SKIN.gnome,RACE_SKIN.human);});
+test('orcs usam verdes e gnomos cinzas azulados em todos os tons',()=>{for(const c of RACE_SKIN.orc){const [r,g,b]=[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));assert.ok(g>r&&g>b);}for(const c of RACE_SKIN.gnome){const [r,g,b]=[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));assert.ok(b>=g&&g>=r);}});
+test('cores inválidas são contidas sem ler fora da paleta',()=>{assert.equal(skinColor('orc',999),RACE_SKIN.orc[7]);assert.equal(skinColor('gnome',NaN),RACE_SKIN.gnome[1]);assert.equal(skinColor('human',-2),RACE_SKIN.human[0]);});
+test('silhuetas têm assinaturas faciais e corporais distintas',()=>{assert.ok(RACE_FORM.orc.jaw>RACE_FORM.human.jaw);assert.ok(RACE_FORM.elf.ear>RACE_FORM.human.ear);assert.ok(RACE_FORM.gnome.head[0]>RACE_FORM.human.head[0]);assert.ok(RACE_FORM.dwarf.height<RACE_FORM.human.height);});
+test('seis estilos de cabelo e barba têm nomes próprios',()=>{assert.equal(new Set(HAIR_NAMES).size,6);assert.equal(new Set(BEARD_NAMES).size,6);});
+test('degradê é geometria com cores diferentes no topo e na base',()=>{const g=skinGeometry(RACE_SKIN.orc[1]);const p=g.getAttribute('position'),c=g.getAttribute('color');assert.equal(p.count,c.count);let top=0,bottom=0;for(let i=0;i<p.count;i++){if(p.getY(i)>p.getY(top))top=i;if(p.getY(i)<p.getY(bottom))bottom=i;}assert.ok(c.getY(top)>c.getY(bottom));g.dispose();});
+test('geometrias não compartilham cores mutáveis entre personagens',()=>{const a=skinGeometry('#64834b'),b=skinGeometry('#6d82aa');const before=b.getAttribute('color').getX(0);a.getAttribute('color').setX(0,0);assert.equal(b.getAttribute('color').getX(0),before);a.dispose();b.dispose();});
+test('aprimoramento visual preserva campos do save',()=>{const s=freshSave();s.hero.xp=500;s.hero.gold=84;s.hero.inventory=['axe','shield'];s.look.skin=7;s.education.completed=['variables'];const copy=JSON.stringify(s);skinColor(s.hero.race,s.look.skin);assert.equal(JSON.stringify(s),copy);assert.deepEqual(migrateSave(s),s);});

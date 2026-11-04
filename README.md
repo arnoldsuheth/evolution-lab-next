@@ -1,6 +1,6 @@
 # LION’S CAVE RPG PROGRAMADOR
 
-## 1.3.1 · Expedição Aurora
+## 1.3.2 · Expedição Aurora
 
 RPG individual 3D com criação de personagem compartilhada com o mundo, cinco raças e seis classes oficiais. Personagens novos usam roupas remendadas. O aprendizado é persistido separadamente da aventura.
 
@@ -46,3 +46,9 @@ Oito missões executáveis cobrem variáveis, operações, decisões, laços, fu
 Desenvolvimento: `work/lions-cave-131`; checks também executam nessa branch. Produção: `interface-nexus`, cujo push publica após verificações. Backup da revisão anterior: `backup/lions-cave-before-131-20261104`. Publicação desta entrega foi expressamente autorizada pelo proprietário na conversa.
 
 Não há serviços pagos, chaves de API, IA remota ou dependências adicionadas nesta versão.
+
+### Aprimoramento visual 1.3.2
+
+Paletas de oito tons por raça: Orc verde, Gnomo cinza-azulado, e tons humanos, anões e élficos próprios. A pele usa degradê por cores de vértice. Perfis raciais distinguem silhueta, mandíbula, orelhas, olhos e cabeça; cabelo e barba têm seis estilos com formas diferentes. Pip mantém pele verde como goblin. A câmera do criador enquadra raças menores mais de perto. Casas recebem bandeiras, lanternas e barris; flores usam instâncias e vaga-lumes aparecem à noite no perfil de qualidade apropriado. Botões têm relevo, foco e resposta ao toque revisados.
+
+O formato do save não mudou. Os índices escolhidos de aparência são mantidos, e a cor correspondente passa a seguir a paleta racial. XP, ouro, itens, missões e educação não são alterados por este ajuste. Os testes incluem compatibilidade do estado e isolamento das cores entre personagens. A renderização em GPU e o desempenho em iPhone físico ainda precisam de homologação.

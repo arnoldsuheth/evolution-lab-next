@@ -4,6 +4,8 @@ import { Html, OrbitControls } from "@react-three/drei";
 import { Component, Suspense, useEffect, useRef, useState, type ReactNode, type ComponentRef, type RefObject } from "react";
 import * as THREE from "three";
 import Character from "./Character";
+import WorldDetails, { HouseDetails } from "./WorldDetails";
+import { CLASSES } from "@/lib/game";
 import { useGame } from "@/lib/store";
 import { BUILDINGS, TREES, findPath, walkable } from "@/lib/navigation";
 import { NPCS_LIVE, type NpcId, type Look, type ClassId } from "@/lib/game";
@@ -23,6 +25,7 @@ function Tree({ x, z, size = 1 }: { x: number; z: number; size?: number }) {
 }
 function House({ x, z, index }: { x: number; z: number; index: number }) {
   return <group position={[x, 0, z]} rotation={[0, index % 2 ? -0.12 : 0.1, 0]}>
+    <HouseDetails index={index} />
     <mesh position={[0, 0.3, 0]} receiveShadow><boxGeometry args={[5.3, 0.65, 5]} /><meshStandardMaterial color="#77786d" flatShading /></mesh>
     <mesh position={[0, 1.9, 0]} castShadow receiveShadow><boxGeometry args={[4.7, 3.2, 4.5]} /><meshStandardMaterial color={["#b1a187", "#b4a18a", "#c0b29a", "#a99b81"][index]} roughness={1} /></mesh>
     <mesh position={[0, 4.1, 0]} rotation={[0, Math.PI / 4, 0]} castShadow><coneGeometry args={[4.05, 2.8, 4]} /><meshStandardMaterial color={index % 2 ? "#495d65" : "#70534d"} flatShading /></mesh>
@@ -48,7 +51,7 @@ function Npc({ npc, interact, player }: { npc: typeof NPCS_LIVE[number]; interac
   const root = useRef<THREE.Group>(null); const reduced = useGame(s => s.settings.reduceMotion);
   useFrame(state => { if (!root.current) return; const close = Math.hypot(player.current.x - npc.x, player.current.z - npc.z) < 5; root.current.rotation.y = close ? Math.atan2(player.current.x - npc.x, player.current.z - npc.z) : Math.sin(state.clock.elapsedTime * 0.15 + npc.x) * 0.3; if (!reduced && npc.id === "pip" && !close) root.current.position.x = Math.sin(state.clock.elapsedTime * 0.45) * 0.5; });
   return <group position={[npc.x, 0, npc.z]} onClick={e => { if (e.delta < 6 && e.button === 0) { e.stopPropagation(); interact(npc.id); } }}>
-    {npc.id === "lion" ? <Crystal /> : <group ref={root} position={[0, 0, 0]}><Character classId={npc.classId} look={{ ...DEFAULT_LOOK, skin: npc.id === "pip" ? 5 : 1, beard: npc.id === "eldrin" ? 5 : npc.id === "pip" ? 0 : 3, hairColor: npc.id === "eldrin" ? 4 : 2, cloth: npc.id === "eldrin" ? 4 : 0 }} equipped={["tunic"]} animated={!reduced} /></group>}
+    {npc.id === "lion" ? <Crystal /> : <group ref={root} position={[0, 0, 0]}><Character classId={npc.classId} skinOverride={npc.id === "pip" ? "#7d9858" : undefined} look={{ ...DEFAULT_LOOK, skin: npc.id === "pip" ? 5 : 1, beard: npc.id === "eldrin" ? 5 : npc.id === "pip" ? 0 : 3, hairColor: npc.id === "eldrin" ? 4 : 2, cloth: npc.id === "eldrin" ? 4 : 0 }} equipped={["tunic"]} animated={!reduced} /></group>}
     <Html position={[0, npc.id === "lion" ? 3.2 : 3.1, 0]} center distanceFactor={14} style={{ pointerEvents: "none" }}><div className="npc-label"><span className="quest-diamond">◆</span><strong>{npc.name}</strong><small>{npc.title}</small></div></Html>
   </group>;
 }
@@ -62,13 +65,14 @@ function Enemy({ elite, onClick }: { elite?: boolean; onClick: () => void }) {
 function Scene({ paused, interact, report }: { paused: boolean; interact: (id: NpcId) => void; report: (text: string) => void }) {
   const controls = useRef<ComponentRef<typeof OrbitControls>>(null); const heroRoot = useRef<THREE.Group>(null);
   const hero = useGame(s => s.hero); const look = useGame(s => s.look); const education = useGame(s => s.education.completed); const reduced = useGame(s => s.settings.reduceMotion);
+  const low = useGame(s => s.settings.quality === "low");
   const forest = education.includes("variables"); const mines = education.includes("conditions");
   const player = useRef(new THREE.Vector3(hero.position[0], 0, hero.position[1])); // Position belongs to the simulation; save checkpoints do not recreate it.
   const path = useRef<[number, number][]>([]); const pending = useRef<NpcId | null>(null); const keys = useRef(new Set<string>()); const checkpoint = useRef(0); const wasWalking = useRef(false); const [walking, setWalking] = useState(false);
   const camera = useThree(s => s.camera); const temp = useRef(new THREE.Vector3()); const offset = useRef(new THREE.Vector3());
   const pausedRef = useRef(paused); useEffect(() => { pausedRef.current = paused; }, [paused]);
   const [light, setLight] = useState(0.8);
-  useEffect(() => { const update = () => { const h = Number(new Intl.DateTimeFormat("en", { timeZone: "America/Sao_Paulo", hour: "numeric", hourCycle: "h23" }).format(new Date())); setLight(Math.max(0.22, Math.sin((h - 6) / 12 * Math.PI))); }; update(); const id = setInterval(update, 60000); return () => clearInterval(id); }, []);
+  useEffect(() => { const update = () => { const parts = new Intl.DateTimeFormat("en", { timeZone: "America/Sao_Paulo", hour: "numeric", minute: "numeric", hourCycle: "h23" }).formatToParts(new Date()); const h = Number(parts.find(p => p.type === "hour")?.value ?? 12) + Number(parts.find(p => p.type === "minute")?.value ?? 0)/60; setLight(Math.max(0.22, Math.sin((h - 6) / 12 * Math.PI))); }; update(); const id = setInterval(update, 60000); return () => clearInterval(id); }, []);
   useEffect(() => {
     if (Math.hypot(player.current.x - hero.position[0], player.current.z - hero.position[1]) > 6 || hero.dead) { player.current.set(hero.position[0], 0, hero.position[1]); path.current = []; }
   }, [hero.position, hero.dead, player]);
@@ -105,15 +109,16 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
     if (checkpoint.current > 0.7) { checkpoint.current = 0; const p = useGame.getState().hero.position; if (Math.hypot(p[0] - player.current.x, p[1] - player.current.z) > 0.05) useGame.getState().move([player.current.x, player.current.z]); }
   });
   const groundClick = (e: ThreeEvent<MouseEvent>) => { if (e.button !== 0 || e.delta > 6 || paused) return; e.stopPropagation(); pending.current = null; travel(e.point.x, e.point.z); };
-  const sky = light > 0.5 ? "#b4c6c0" : "#26374a";
+  const sky = new THREE.Color("#26374a").lerp(new THREE.Color("#b4c6c0"),Math.max(0,Math.min(1,(light-0.22)/0.78))).getStyle();
   return <>
     <color attach="background" args={[sky]} /><fog attach="fog" args={[sky, 26, 66]} />
-    <ambientLight intensity={0.6 + light * 0.7} /><hemisphereLight args={["#cbdedc", "#5c6250", 1.3]} />
-    <directionalLight position={[12, 22, 8]} intensity={0.6 + light * 1.8} color="#ffe5bb" castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-22} shadow-camera-right={22} shadow-camera-top={20} shadow-camera-bottom={-25} shadow-bias={-0.001} />
+    <ambientLight intensity={0.45 + light * 0.35} /><hemisphereLight args={["#d1e0de", "#59624d", 0.9]} />
+    <directionalLight position={[12, 22, 8]} intensity={0.6 + light * 1.5} color="#ffe5bb" castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-22} shadow-camera-right={22} shadow-camera-top={20} shadow-camera-bottom={-25} shadow-bias={-0.001} />
     <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow onClick={groundClick}><planeGeometry args={[150, 150]} /><meshStandardMaterial color="#657a59" roughness={1} /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.014, -4]} onClick={groundClick} receiveShadow><planeGeometry args={[4.8, 48]} /><meshStandardMaterial color="#a8997c" /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.018, 0]} onClick={groundClick} receiveShadow><circleGeometry args={[5.8, 32]} /><meshStandardMaterial color="#a5a18a" /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[11, 0.025, -16]} onClick={groundClick}><planeGeometry args={[25, 3]} /><meshStandardMaterial color="#8e8b76" /></mesh>
+    <WorldDetails night={light<0.4} low={low} reduced={reduced} />
     {BUILDINGS.map((b, i) => <House key={i} x={b.x} z={b.z} index={i} />)}
     {TREES.map((t, i) => <Tree key={i} {...t} />)}
     {[-1, 1].flatMap(side => [0, 1, 2, 3, 4].map(i => <Tree key={`${side}-${i}`} x={side * (17 + i % 2 * 3)} z={10 - i * 6} size={0.9 + i * 0.11} />))}
@@ -140,8 +145,17 @@ export default function GameWorld(props: { paused: boolean; interact: (id: NpcId
 function Turntable({ classId, look, equipped, rotate }: { classId: ClassId; look: Look; equipped: string[]; rotate: boolean }) {
   const group = useRef<THREE.Group>(null);
   useFrame((_, dt) => { if (group.current && rotate) group.current.rotation.y += dt * 0.24; });
-  return <group ref={group}><Character classId={classId} look={look} equipped={equipped} preview /></group>;
+  const reduced = useGame(s => s.settings.reduceMotion);
+  return <group ref={group}><Character classId={classId} look={look} equipped={equipped} preview animated={!reduced} /></group>;
+}
+function PreviewCamera({ classId }: { classId: ClassId }) {
+  const camera = useThree(s => s.camera);
+  const controls = useRef<ComponentRef<typeof OrbitControls>>(null);
+  const race = CLASSES[classId].race;
+  const target = race==='gnome'?0.9:race==='dwarf'?1.0:1.25;
+  useEffect(()=>{camera.position.set(0,target+0.3,race==='gnome'?3.8:race==='dwarf'?4.4:5.4);controls.current?.target.set(0,target,0);controls.current?.update();},[camera,race,target]);
+  return <OrbitControls ref={controls} target={[0,target,0]} enablePan={false} minDistance={1.8} maxDistance={7} minPolarAngle={0.3} maxPolarAngle={1.65} />;
 }
 export function CreatorStage({ classId, look, equipped, rotate }: { classId: ClassId; look: Look; equipped: string[]; rotate: boolean }) {
-  return <WorldBoundary><Canvas shadows dpr={[1, 1.5]} camera={{ position: [0, 1.7, 5.4], fov: 36 }} gl={{ antialias: true }}><color attach="background" args={["#121b23"]} /><fog attach="fog" args={["#121b23", 8, 18]} /><ambientLight intensity={1.1} /><hemisphereLight args={["#c8dce4", "#504130", 1.8]} /><directionalLight position={[3, 5, 4]} intensity={2.5} color="#ffdfb0" castShadow /><directionalLight position={[-4, 3, -3]} intensity={2} color="#849ecb" /><Turntable classId={classId} look={look} equipped={equipped} rotate={rotate} /><mesh position={[0, -0.18, 0]} receiveShadow><cylinderGeometry args={[1.15, 1.35, 0.26, 32]} /><meshStandardMaterial color="#354047" metalness={0.3} roughness={0.6} /></mesh><OrbitControls target={[0, 1.2, 0]} enablePan={false} minDistance={1.8} maxDistance={7} minPolarAngle={0.3} maxPolarAngle={1.65} /></Canvas></WorldBoundary>;
+  return <WorldBoundary><Canvas shadows dpr={[1, 1.5]} camera={{ position: [0, 1.7, 5.4], fov: 36 }} gl={{ antialias: true }}><color attach="background" args={["#121b23"]} /><fog attach="fog" args={["#121b23", 8, 18]} /><ambientLight intensity={1.1} /><hemisphereLight args={["#c8dce4", "#504130", 1.8]} /><directionalLight position={[3, 5, 4]} intensity={2.1} color="#f3e9da" castShadow /><directionalLight position={[-4, 3, -3]} intensity={1.15} color="#94b3d1" /><Turntable classId={classId} look={look} equipped={equipped} rotate={rotate} /><mesh position={[0, -0.18, 0]} receiveShadow><cylinderGeometry args={[1.15, 1.35, 0.26, 32]} /><meshStandardMaterial color="#354047" metalness={0.3} roughness={0.6} /></mesh><PreviewCamera classId={classId} /></Canvas></WorldBoundary>;
 }

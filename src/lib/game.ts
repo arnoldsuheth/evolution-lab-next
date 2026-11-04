@@ -1,6 +1,6 @@
 import { runProgram, type Value } from "./program";
 
-export const RELEASE = "1.3.1";
+export const RELEASE = "1.3.2";
 export type Race = "human" | "orc" | "dwarf" | "elf" | "gnome";
 export type ClassId = "paladin" | "warrior" | "hunter" | "engineer" | "mage" | "hacker";
 export type NpcId = "borin" | "eldrin" | "pip" | "lion";
