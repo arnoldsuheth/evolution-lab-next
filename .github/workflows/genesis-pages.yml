@@ -1,0 +1,62 @@
+name: Genesis Reborn - GitHub Pages
+
+on:
+  push:
+    branches: ["interface-nexus"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: genesis-reborn-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Testar regras
+        run: npx tsx --test src/lib/*.test.ts
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build estatico
+        env:
+          GITHUB_PAGES: "true"
+        run: npm run build
+
+      - name: Preparar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload do site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publicar
+        id: deployment
+        uses: actions/deploy-pages@v4
