@@ -17,3 +17,4 @@ test('globais e código dinâmico são bloqueados',()=>{for (const code of ['fet
 test('bloqueia acesso computado ao protótipo',()=>assert.throws(()=>runProgram('const x = {}; const y = x["con" + "structor"];'),/bloqueada/));
 test('limita tamanho da entrada e console',()=>{assert.throws(()=>runProgram(' '.repeat(12001)),/limite/);assert.throws(()=>runProgram('for (let i=0; i<101; i++) { console.log(i); }'),/100 linhas/);});
 test('programas inválidos geram feedback',()=>{assert.equal(evaluateLesson('variables','let nivel = ;').passed,false);assert.equal(evaluateLesson('not-a-lesson','').passed,false);assert.throws(()=>runProgram('const a = 1 / 0;'),/zero/);});
+test('const impede nova atribuição e let permite mudança',()=>{assert.throws(()=>runProgram('const a=1; a=2;'),/constante/);assert.equal(runProgram('let a=1; a=2;').variables.a,2);});

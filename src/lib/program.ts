@@ -2,7 +2,7 @@
 export type Value = number | string | boolean | null | Value[] | { [key: string]: Value };
 type Token = { text: string; kind: string };
 type Expr = { kind: string; value?: Value; name?: string; op?: string; args?: Expr[]; left?: Expr; right?: Expr; keys?: string[] };
-type Stmt = { kind: string; name?: string; expr?: Expr; body?: Stmt[]; other?: Stmt[]; init?: Stmt; step?: Stmt; params?: string[] };
+type Stmt = { kind: string; name?: string; expr?: Expr; body?: Stmt[]; other?: Stmt[]; init?: Stmt; step?: Stmt; params?: string[]; mutable?: boolean };
 const forbidden = new Set(["__proto__", "prototype", "constructor", "window", "document", "globalThis", "fetch", "eval", "Function", "localStorage", "import", "new"]);
 
 function lex(code: string): Token[] {
@@ -35,8 +35,9 @@ class Parser {
   all(end = "EOF"): Stmt[] { const result: Stmt[] = []; while (this.peek() !== end && this.peek() !== "EOF") result.push(this.statement()); return result; }
   statement(): Stmt {
     if (this.is(";")) return { kind: "empty" };
+    const keyword = this.peek();
     if (this.is("let") || this.is("const")) {
-      const name = this.name(); this.expect("="); const expr = this.expr(); this.is(";"); return { kind: "var", name, expr };
+      const name = this.name(); this.expect("="); const expr = this.expr(); this.is(";"); return { kind: "var", name, expr, mutable: keyword === "let" };
     }
     if (this.is("function")) {
       const name = this.name(); this.expect("("); const params: string[] = [];
@@ -99,6 +100,7 @@ class Parser {
 export function runProgram(code: string): { variables: Record<string, Value>; output: string[]; steps: number } {
   const ast = new Parser(code).all();
   const variables: Record<string, Value> = Object.create(null);
+  const constants = new WeakMap<Record<string, Value>, Set<string>>();
   const functions = new Map<string, Stmt>(); const output: string[] = [];
   let steps = 0; let depth = 0;
   function tick() { if (++steps > 8000) throw new Error("Limite de execução atingido. Verifique se seu laço consegue terminar."); }
@@ -154,7 +156,9 @@ export function runProgram(code: string): { variables: Record<string, Value>; ou
       tick();
       if (s.kind === "var" || s.kind === "assign") {
         if (s.kind === "assign" && !Object.hasOwn(env, s.name!)) throw new Error(`Declare “${s.name}” antes de atribuir.`);
+        if (s.kind === "assign" && constants.get(env)?.has(s.name!)) throw new Error(`A constante “${s.name}” não pode receber outro valor.`);
         env[s.name!] = value(s.expr!, env);
+        if (s.kind === "var" && !s.mutable) { const names = constants.get(env) ?? new Set<string>(); names.add(s.name!); constants.set(env, names); }
       } else if (s.kind === "function") functions.set(s.name!, s);
       else if (s.kind === "return") return { value: value(s.expr!, env) };
       else if (s.kind === "expr") value(s.expr!, env);

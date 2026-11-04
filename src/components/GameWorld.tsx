@@ -47,13 +47,13 @@ function Crystal({ small = false }: { small?: boolean }) {
 function Npc({ npc, interact, player }: { npc: typeof NPCS_LIVE[number]; interact: (id: NpcId) => void; player: RefObject<THREE.Vector3> }) {
   const root = useRef<THREE.Group>(null); const reduced = useGame(s => s.settings.reduceMotion);
   useFrame(state => { if (!root.current) return; const close = Math.hypot(player.current.x - npc.x, player.current.z - npc.z) < 5; root.current.rotation.y = close ? Math.atan2(player.current.x - npc.x, player.current.z - npc.z) : Math.sin(state.clock.elapsedTime * 0.15 + npc.x) * 0.3; if (!reduced && npc.id === "pip" && !close) root.current.position.x = Math.sin(state.clock.elapsedTime * 0.45) * 0.5; });
-  return <group position={[npc.x, 0, npc.z]} onPointerUp={e => { if (e.delta < 6 && e.button === 0) { e.stopPropagation(); interact(npc.id); } }}>
+  return <group position={[npc.x, 0, npc.z]} onClick={e => { if (e.delta < 6 && e.button === 0) { e.stopPropagation(); interact(npc.id); } }}>
     {npc.id === "lion" ? <Crystal /> : <group ref={root} position={[0, 0, 0]}><Character classId={npc.classId} look={{ ...DEFAULT_LOOK, skin: npc.id === "pip" ? 5 : 1, beard: npc.id === "eldrin" ? 5 : npc.id === "pip" ? 0 : 3, hairColor: npc.id === "eldrin" ? 4 : 2, cloth: npc.id === "eldrin" ? 4 : 0 }} equipped={["tunic"]} animated={!reduced} /></group>}
     <Html position={[0, npc.id === "lion" ? 3.2 : 3.1, 0]} center distanceFactor={14} style={{ pointerEvents: "none" }}><div className="npc-label"><span className="quest-diamond">◆</span><strong>{npc.name}</strong><small>{npc.title}</small></div></Html>
   </group>;
 }
 function Enemy({ elite, onClick }: { elite?: boolean; onClick: () => void }) {
-  return <group position={elite ? [22, 0, -16] : [3.5, 0, -19]} onPointerUp={e => { if (e.delta < 6 && e.button === 0) { e.stopPropagation(); onClick(); } }} scale={elite ? 1.35 : 1}>
+  return <group position={elite ? [22, 0, -16] : [3.5, 0, -19]} onClick={e => { if (e.delta < 6 && e.button === 0) { e.stopPropagation(); onClick(); } }} scale={elite ? 1.35 : 1}>
     <Stone position={[0, 1, 0]} size={1.05} color="#5d666d" /><Stone position={[0, 2.1, 0]} size={0.6} color="#787985" />
     {[-1, 1].map(s => <group key={s}><Stone position={[s * 0.9, 1, 0]} size={0.5} /><Stone position={[s * 0.45, 0.25, 0]} size={0.45} /><mesh position={[s * 0.2, 2.2, 0.45]}><boxGeometry args={[0.13, 0.1, 0.05]} /><meshBasicMaterial color={elite ? "#eb7758" : "#bda1f4"} /></mesh></group>)}
     <Html position={[0, 3, 0]} center distanceFactor={14} style={{ pointerEvents: "none" }}><span className="enemy-label">{elite ? "◆ Guardião das Duas Portas" : "◇ Sentinela Esquecida"}</span></Html>
@@ -104,16 +104,16 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
     checkpoint.current += dt;
     if (checkpoint.current > 0.7) { checkpoint.current = 0; const p = useGame.getState().hero.position; if (Math.hypot(p[0] - player.current.x, p[1] - player.current.z) > 0.05) useGame.getState().move([player.current.x, player.current.z]); }
   });
-  const groundClick = (e: ThreeEvent<PointerEvent>) => { if (e.button !== 0 || e.delta > 6 || paused) return; e.stopPropagation(); pending.current = null; travel(e.point.x, e.point.z); };
+  const groundClick = (e: ThreeEvent<MouseEvent>) => { if (e.button !== 0 || e.delta > 6 || paused) return; e.stopPropagation(); pending.current = null; travel(e.point.x, e.point.z); };
   const sky = light > 0.5 ? "#b4c6c0" : "#26374a";
   return <>
     <color attach="background" args={[sky]} /><fog attach="fog" args={[sky, 26, 66]} />
     <ambientLight intensity={0.6 + light * 0.7} /><hemisphereLight args={["#cbdedc", "#5c6250", 1.3]} />
     <directionalLight position={[12, 22, 8]} intensity={0.6 + light * 1.8} color="#ffe5bb" castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-22} shadow-camera-right={22} shadow-camera-top={20} shadow-camera-bottom={-25} shadow-bias={-0.001} />
-    <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow onPointerUp={groundClick}><planeGeometry args={[150, 150]} /><meshStandardMaterial color="#657a59" roughness={1} /></mesh>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.014, -4]} onPointerUp={groundClick} receiveShadow><planeGeometry args={[4.8, 48]} /><meshStandardMaterial color="#a8997c" /></mesh>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.018, 0]} onPointerUp={groundClick} receiveShadow><circleGeometry args={[5.8, 32]} /><meshStandardMaterial color="#a5a18a" /></mesh>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[11, 0.025, -16]} onPointerUp={groundClick}><planeGeometry args={[25, 3]} /><meshStandardMaterial color="#8e8b76" /></mesh>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow onClick={groundClick}><planeGeometry args={[150, 150]} /><meshStandardMaterial color="#657a59" roughness={1} /></mesh>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.014, -4]} onClick={groundClick} receiveShadow><planeGeometry args={[4.8, 48]} /><meshStandardMaterial color="#a8997c" /></mesh>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.018, 0]} onClick={groundClick} receiveShadow><circleGeometry args={[5.8, 32]} /><meshStandardMaterial color="#a5a18a" /></mesh>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[11, 0.025, -16]} onClick={groundClick}><planeGeometry args={[25, 3]} /><meshStandardMaterial color="#8e8b76" /></mesh>
     {BUILDINGS.map((b, i) => <House key={i} x={b.x} z={b.z} index={i} />)}
     {TREES.map((t, i) => <Tree key={i} {...t} />)}
     {[-1, 1].flatMap(side => [0, 1, 2, 3, 4].map(i => <Tree key={`${side}-${i}`} x={side * (17 + i % 2 * 3)} z={10 - i * 6} size={0.9 + i * 0.11} />))}
@@ -124,6 +124,7 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
     {NPCS_LIVE.map(npc => <Npc key={npc.id} npc={npc} interact={npcClick} player={player} />)}
     <Enemy onClick={() => { if (player.current.z < -13) useGame.getState().startEncounter(); else report("Aproxime-se da sentinela pela trilha da floresta."); }} />
     <Enemy elite onClick={() => useGame.getState().startEncounter(true)} />
+    {education.includes("loops") && [-1, 1].flatMap(side => [0, 1, 2, 3].map(i => <group key={`lamp-${side}-${i}`} position={[side * 2.8, 0, -14 - i * 3]}><mesh position={[0, 0.7, 0]}><cylinderGeometry args={[0.06, 0.1, 1.4, 6]} /><meshStandardMaterial color="#564a3a" /></mesh><mesh position={[0, 1.5, 0]}><octahedronGeometry args={[0.19]} /><meshStandardMaterial color="#edce8b" emissive="#d4ac57" emissiveIntensity={1.4} /></mesh></group>))}
     {!forest && <group position={[0, 0, -12]}><mesh position={[0, 1.5, 0]}><boxGeometry args={[5, 3, 0.15]} /><meshStandardMaterial color="#a7b8d7" emissive="#756eaa" emissiveIntensity={0.4} transparent opacity={0.3} /></mesh><Html position={[0, 3.8, 0]} center><span className="gate-label">A primeira runa abre a floresta</span></Html></group>}
     {!mines && <mesh position={[15, 1.3, -16]}><boxGeometry args={[0.2, 2.6, 6]} /><meshStandardMaterial color="#b8a3cf" transparent opacity={0.25} /></mesh>}
     <group ref={heroRoot} position={[hero.position[0], 0, hero.position[1]]}><Character classId={hero.classId} look={look} equipped={hero.equipped} walking={walking} animated={!reduced} />
@@ -134,7 +135,7 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
 }
 export default function GameWorld(props: { paused: boolean; interact: (id: NpcId) => void; report: (text: string) => void }) {
   const quality = useGame(s => s.settings.quality);
-  return <WorldBoundary><Canvas shadows={quality !== "low"} dpr={quality === "high" ? [1, 1.75] : [1, 1.25]} camera={{ position: [8, 10, 16], fov: 46 }} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} fallback={<div className="world-fallback">Seu navegador não disponibilizou o WebGL. Os painéis continuam disponíveis.</div>}><Suspense fallback={null}><Scene {...props} /></Suspense></Canvas></WorldBoundary>;
+  return <WorldBoundary><Canvas frameloop={props.paused ? "demand" : "always"} shadows={quality !== "low"} dpr={quality === "high" ? [1, 1.75] : [1, 1.25]} camera={{ position: [8, 10, 16], fov: 46 }} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} fallback={<div className="world-fallback">Seu navegador não disponibilizou o WebGL. Os painéis continuam disponíveis.</div>}><Suspense fallback={null}><Scene {...props} /></Suspense></Canvas></WorldBoundary>;
 }
 function Turntable({ classId, look, equipped, rotate }: { classId: ClassId; look: Look; equipped: string[]; rotate: boolean }) {
   const group = useRef<THREE.Group>(null);
