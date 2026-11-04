@@ -2,11 +2,12 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { CLASSES, ITEMS, HAIR, EYES, type ClassId, type Look } from "@/lib/game";
+import { CLASSES, ITEMS, HAIR, EYES, type ClassId, type Look, type Race } from "@/lib/game";
 
 import { RACE_FORM, skinColor } from "@/lib/visual";
 import EquipmentVisual, { rarityTone } from "./EquipmentVisual";
 import { activeEquipment } from "@/lib/equipment";
+import { BODY_TRAITS, FACE_TRAITS, NOSE_TRAITS } from "@/lib/characterTraits";
 import { bodyGeometry } from "@/lib/bodyGeometry";
 import { skinGeometry } from "@/lib/skinGeometry";
 
@@ -23,13 +24,14 @@ function SkinPart({ position = [0,0,0], scale = [1,1,1], color, shape = "sphere"
   useEffect(() => () => geometry.dispose(), [geometry]);
   return <mesh position={position} scale={scale} rotation={rotation} geometry={geometry} castShadow receiveShadow><meshStandardMaterial vertexColors roughness={0.94} metalness={0} /></mesh>;
 }
-export default function Character({ classId, look, equipped = [], walking = false, animated = true, preview = false, skinOverride, level=1 }: { classId: ClassId; look: Look; equipped?: string[]; walking?: boolean; animated?: boolean; preview?: boolean; skinOverride?: string; level?: number }) {
+export default function Character({ classId, look, equipped = [], walking = false, animated = true, preview = false, skinOverride, level=1, race: selectedRace }: { classId: ClassId; look: Look; equipped?: string[]; walking?: boolean; animated?: boolean; preview?: boolean; skinOverride?: string; level?: number; race?: Race }) {
   const root = useRef<THREE.Group>(null); const left = useRef<THREE.Group>(null); const right = useRef<THREE.Group>(null); const armL = useRef<THREE.Group>(null); const armR = useRef<THREE.Group>(null);
   const phase = useRef(0);
-  const race = CLASSES[classId].race;
+  const race = selectedRace ?? CLASSES[classId].race;
+  const physique=BODY_TRAITS[look.body]??BODY_TRAITS[1],face=FACE_TRAITS[look.face]??FACE_TRAITS[0],nose=NOSE_TRAITS[look.nose]??NOSE_TRAITS[0];
   const form = RACE_FORM[race];
-  const body = 0.82 + look.body * 0.08;
-  const scale: V3 = [form.width, form.height, form.depth];
+  const body = 1;
+  const scale: V3 = [form.width, form.height*physique.height, form.depth];
   const skin = skinOverride ?? skinColor(race, look.skin); const hair = HAIR[look.hairColor] ?? HAIR[0];
   const head = useRef<THREE.Group>(null);
   const cloth = ["#796553", "#555e66", "#79534e", "#53654c", "#665972", "#8d7d62"][look.cloth];
@@ -50,27 +52,31 @@ export default function Character({ classId, look, equipped = [], walking = fals
     if (root.current) root.current.position.y = walking ? Math.abs(Math.sin(phase.current)) * 0.045 : Math.sin(phase.current) * 0.013;
   });
   return <group ref={root} scale={[scale[0] * body, scale[1], scale[2] * body]}>
-    <Part position={[0, 1.05, 0]} scale={[1.02, 1.08, 0.64]} color={torso} shape="torso" />
+    <Part position={[0, 1.05, 0]} scale={[1.02,1.08,0.64]} color={torso} shape={`torso-${look.body}`} />
     {!dressed && <><Part position={[0.26, 1.1, 0.3]} scale={[0.22, 0.29, 0.035]} color="#b09a7d" shape="box" rotation={[0, 0, 0.15]} /><Part position={[-0.29, 0.82, 0.3]} scale={[0.2, 0.16, 0.035]} color="#514535" shape="box" /></>}
-    <Part position={[0, 0.77, 0]} scale={[1.02, 0.13, 0.7]} color="#40352a" shape="cylinder" />
+    <Part position={[0, 0.77, 0]} scale={[1.02*physique.waist,0.13,0.7]} color="#40352a" shape="cylinder" />
     <Part position={[0, 0.77, 0.35]} scale={[0.15, 0.15, 0.05]} color="#b49b68" shape="box" metal />
     <SkinPart position={[0,1.61,0]} scale={[0.32,0.28,0.33]} color={skin} shape="cylinder" />
     <group ref={head} position={[0,1.96,0]} scale={form.head.map(v=>v*(race==='gnome'?0.98:race==='dwarf'?0.86:0.78)) as V3}>
-      <SkinPart scale={[0.65+look.face*0.032,0.87-look.face*0.028,0.65]} color={skin} />
-      <SkinPart position={[0,-0.19,race==='orc'?0.15:0.04]} scale={[0.55*form.jaw,0.3,0.5]} color={skin} shape="sphere" />
+      <SkinPart scale={[0.7,0.85,0.65]} color={skin} shape={`head-${look.face}`} />
+      <SkinPart position={[0,-0.19,race==='orc'?0.15:0.04]} scale={[0.55*form.jaw*face.jaw,0.3*face.chin,0.5]} color={skin} shape="sphere" />
       {[-1,1].map(side => <group key={side}>
         <SkinPart position={[side*0.38,0,0]} scale={race==='elf'?[0.42,0.15,0.17]:race==='gnome'?[0.22,0.29,0.16]:[0.13*form.ear,0.23,0.16]} color={skin} shape={race==='elf'?'cone':'sphere'} rotation={[0,0,side*(race==='elf'?-1.03:0.3)]} />
         <Part position={[side*0.14,0.06,0.293]} scale={[0.125*form.eye,0.07*form.eye,0.065]} color="#e9e7d6" />
         <Part position={[side*0.14,0.06,0.328]} scale={[0.061*form.eye,0.063*form.eye,0.035]} color={EYES[look.eyes]} />
         <Part position={[side*0.14,0.06,0.347]} scale={[0.027,0.045,0.015]} color="#1a252a" />
         <Part position={[side*0.125,0.09,0.352]} scale={[0.023,0.023,0.012]} color="#f3ead4" />
-        <Part position={[side*0.14,0.17,0.3]} scale={[0.22,race==='orc'?0.075+look.brows*0.008:0.03+look.brows*0.007,0.06]} color={hair} rotation={[0,0,side*(look.brows-2)*0.08]} />
+        <Part position={[side*0.14,0.17,0.3]} scale={[look.brows===4?.18:.23,race==='orc'?.08:look.brows===2?.075:look.brows===4?.024:.045,0.06]} color={hair} rotation={[0,0,side*([0,.25,-.06,-.3,.1,.18][look.brows]??0)]} />
         {race==='orc' && <Part position={[side*0.2,-0.12,0.43]} scale={[0.12,0.28+look.face*0.008,0.12]} color="#e0d6b9" shape="cone" rotation={[0,0,side*-0.18]} />}
         {race==='elf' && <Part position={[side*0.23,-0.09,0.22]} scale={[0.17,0.13,0.13]} color={skin} />}
       </group>)}
-      {[-1,1].map(side=><SkinPart key={`cheek-${side}`} position={[side*0.21,-0.06,0.2]} scale={[0.24,0.22,0.19]} color={skin} />)}
+      {[-1,1].map(side=><SkinPart key={`cheek-${side}`} position={[side*0.21,-0.06,0.2]} scale={[0.24*face.cheeks,0.22,0.19]} color={skin} />)}
       <SkinPart position={[0,-0.22,0.28]} scale={[0.23,0.06,0.1]} color={skin} />
-      <SkinPart position={[0,-0.035,race==='orc'?0.39:0.34]} scale={[0.13+look.nose*0.025+(race==='gnome'?0.08:0),0.15+look.nose*0.012,0.17+look.nose*0.02]} color={skin} />
+      <group position={[0,-0.02,0]} rotation={[nose.tilt,0,0]}>
+        <SkinPart position={[0,0.02,race==='orc'?0.36:0.3]} scale={[nose.width,nose.bridge,nose.depth]} color={skin} />
+        <SkinPart position={[0,-0.065,nose.tip+(race==='gnome'?.055:0)]} scale={[nose.width*(race==='gnome'?1.35:1),.11,nose.depth]} color={skin} />
+        {[-1,1].map(side=><SkinPart key={side} position={[side*nose.width*.38,-.095,nose.tip-.025]} scale={[nose.width*.55,.07,.09]} color={skin} />)}
+      </group>
       <Part position={[0,-0.18,race==='orc'?0.4:0.29]} scale={[0.25*form.jaw,0.035,0.07]} color={race==='orc'?'#314432':race==='gnome'?'#54637e':'#86594d'} />
       {look.hair>0 && <>
         <Part position={[0,0.27,-0.035]} scale={[0.76,0.27,0.69]} color={hair} />
@@ -90,7 +96,7 @@ export default function Character({ classId, look, equipped = [], walking = fals
       {look.accessory>0 && <Part position={[0.42,-0.1+look.accessory*0.015,0]} scale={[0.09,0.14+look.accessory*0.015,0.08]} color={look.accessory%2?'#c6ab6d':'#97aeb3'} metal />}
     {headgear && <><Part position={[0,0.29,0]} scale={[0.81,0.35,0.74]} color="#8c969d" shape="cylinder" metal /><Part position={[0,0.32,0]} scale={[0.12,0.46,0.5]} color={accent} shape="box" /></>}
     </group>
-    {([-1, 1] as const).map(side => <group key={side} ref={side === -1 ? armL : armR} position={[side * 0.58, 1.42, 0]}>
+    {([-1, 1] as const).map(side => <group key={side} ref={side === -1 ? armL : armR} position={[side * 0.58*physique.shoulders, 1.42, 0]} scale={[physique.arms,1,1]}>
       <Part position={[0,-0.12,0]} scale={[0.37,0.43,0.39]} color={torso} shape="capsule" rotation={[0,0,side*0.1]} />
       <SkinPart position={[0,-0.36,0.015]} scale={[0.29,0.31,0.3]} color={skin} />
       <SkinPart position={[0,-0.46,0.01]} scale={[0.27,0.31,0.27]} color={skin} />
@@ -100,7 +106,7 @@ export default function Character({ classId, look, equipped = [], walking = fals
       {side===-1&&offhand&&<group position={[-0.1,-0.55,0.1]}><EquipmentVisual visual={offhand.visual} tone={rarityTone(offhand.rarity)} small={offhand.visual==='dagger'} /></group>}
       {side===1&&weapon&&<group position={[0,-0.65,0.05]}><EquipmentVisual visual={weapon.visual} tone={rarityTone(weapon.rarity)} /></group>}
     </group>)}
-    {([-1, 1] as const).map(side => <group key={side} position={[side * 0.24, 0.73, 0]} ref={side === -1 ? left : right}>
+    {([-1, 1] as const).map(side => <group key={side} position={[side * physique.stance, 0.73, 0]} scale={[physique.legs,1,1]} ref={side === -1 ? left : right}>
       <Part position={[0,-0.17,0]} scale={[0.4,0.46,0.41]} color={legs?rarityTone(legs.rarity):"#564c40"} shape="capsule" />
       <Part position={[0,-0.43,0.015]} scale={[0.3,0.38,0.32]} color={legs?rarityTone(legs.rarity):"#615545"} shape="capsule" />
       <Part position={[0, -0.61, 0.09]} scale={[0.36, 0.24, 0.5]} color={boots?rarityTone(boots.rarity):"#3f352d"} shape="box" />

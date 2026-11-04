@@ -5,11 +5,16 @@ import { Component, Suspense, useEffect, useRef, useState, type ReactNode, type 
 import * as THREE from "three";
 import Character from "./Character";
 import WorldDetails, { HouseDetails } from "./WorldDetails";
+import {REGIONS} from "@/lib/campaign";
+import CampaignWorld from "./CampaignWorld";
+import { questMarker } from "@/lib/journey";
+import ExplorationEncounters from "./ExplorationEncounters";
+import TerrainSurface from "./TerrainSurface";
 import { activeEquipment } from "@/lib/equipment";
 import { CLASSES, ITEMS } from "@/lib/game";
 import { useGame } from "@/lib/store";
 import { BUILDINGS, TREES, findPath, walkable } from "@/lib/navigation";
-import { NPCS_LIVE, type NpcId, type Look, type ClassId } from "@/lib/game";
+import { NPCS_LIVE, type NpcId, type Look, type ClassId, type Race } from "@/lib/game";
 
 export class WorldBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
@@ -21,7 +26,7 @@ function Stone({ position, size = 1, color = "#777e79" }: { position: [number, n
 function Tree({ x, z, size = 1 }: { x: number; z: number; size?: number }) {
   return <group position={[x, 0, z]} scale={size}>
     <mesh position={[0, 1.6, 0]} castShadow><cylinderGeometry args={[0.16, 0.38, 3.2, 7]} /><meshStandardMaterial color="#64503e" flatShading /></mesh>
-    {[0, 1, 2].map(i => <mesh key={i} position={[0, 2.5 + i * 0.95, 0]} castShadow><coneGeometry args={[2 - i * 0.43, 2.7, 7]} /><meshStandardMaterial color={["#314d43", "#426b50", "#5a805b"][i]} flatShading /></mesh>)}
+    {[0, 1, 2].map(i => <mesh key={i} position={[Math.sin(i*2)*.35,2.6+i*.8,Math.cos(i*2)*.25]} scale={[1,.8,1]} castShadow><icosahedronGeometry args={[1.65-i*.3,1]} /><meshStandardMaterial color={["#314d43", "#426b50", "#5a805b"][i]} flatShading /></mesh>)}
   </group>;
 }
 function House({ x, z, index }: { x: number; z: number; index: number }) {
@@ -49,34 +54,27 @@ function Crystal({ small = false }: { small?: boolean }) {
   </group>;
 }
 function Npc({ npc, interact, player }: { npc: typeof NPCS_LIVE[number]; interact: (id: NpcId) => void; player: RefObject<THREE.Vector3> }) {
-  const root = useRef<THREE.Group>(null); const reduced = useGame(s => s.settings.reduceMotion);
+  const root = useRef<THREE.Group>(null); const questHero=useGame(s=>s.hero),questEducation=useGame(s=>s.education); const marker=npc.id==="eldrin"?questMarker(questHero,questEducation,"main"):""; const reduced = useGame(s => s.settings.reduceMotion);
   useFrame(state => { if (!root.current) return; const close = Math.hypot(player.current.x - npc.x, player.current.z - npc.z) < 5; root.current.rotation.y = close ? Math.atan2(player.current.x - npc.x, player.current.z - npc.z) : Math.sin(state.clock.elapsedTime * 0.15 + npc.x) * 0.3; if (!reduced && npc.id === "pip" && !close) root.current.position.x = Math.sin(state.clock.elapsedTime * 0.45) * 0.5; });
   return <group position={[npc.x, 0, npc.z]} onClick={e => { if (e.delta < 6 && e.button === 0) { e.stopPropagation(); interact(npc.id); } }}>
     {npc.id === "lion" ? <Crystal /> : <group ref={root} position={[0, 0, 0]}><Character classId={npc.classId} skinOverride={npc.id === "pip" ? "#7d9858" : undefined} look={{ ...DEFAULT_LOOK, skin: npc.id === "pip" ? 5 : 1, beard: npc.id === "eldrin" ? 5 : npc.id === "pip" ? 0 : 3, hairColor: npc.id === "eldrin" ? 4 : 2, cloth: npc.id === "eldrin" ? 4 : 0 }} equipped={["tunic"]} animated={!reduced} /></group>}
-    <Html zIndexRange={[8, 0]} position={[0, npc.id === "lion" ? 3.2 : 3.1, 0]} center distanceFactor={14} style={{ pointerEvents: "none" }}><div className="npc-label"><span className="quest-diamond">◆</span><strong>{npc.name}</strong><small>{npc.title}</small></div></Html>
-  </group>;
-}
-function Enemy({ elite, onClick }: { elite?: boolean; onClick: () => void }) {
-  return <group position={elite ? [22, 0, -16] : [3.5, 0, -19]} onClick={e => { if (e.delta < 6 && e.button === 0) { e.stopPropagation(); onClick(); } }} scale={elite ? 1.35 : 1}>
-    <Stone position={[0, 1, 0]} size={1.05} color="#5d666d" /><Stone position={[0, 2.1, 0]} size={0.6} color="#787985" />
-    {[-1, 1].map(s => <group key={s}><Stone position={[s * 0.9, 1, 0]} size={0.5} /><Stone position={[s * 0.45, 0.25, 0]} size={0.45} /><mesh position={[s * 0.2, 2.2, 0.45]}><boxGeometry args={[0.13, 0.1, 0.05]} /><meshBasicMaterial color={elite ? "#eb7758" : "#bda1f4"} /></mesh></group>)}
-    <Html zIndexRange={[8, 0]} position={[0, 3, 0]} center distanceFactor={14} style={{ pointerEvents: "none" }}><span className="enemy-label">{elite ? "◆ Guardião das Duas Portas" : "◇ Sentinela Esquecida"}</span></Html>
+    <Html zIndexRange={[8, 0]} position={[0, npc.id === "lion" ? 3.2 : 3.1, 0]} center distanceFactor={14} style={{ pointerEvents: "none" }}><div className="npc-label"><span className="quest-marker main-quest">{marker}</span><strong>{npc.name}</strong><small>{npc.title}</small></div></Html>
   </group>;
 }
 function Scene({ paused, interact, report }: { paused: boolean; interact: (id: NpcId) => void; report: (text: string) => void }) {
   const controls = useRef<ComponentRef<typeof OrbitControls>>(null); const heroRoot = useRef<THREE.Group>(null);
   const hero = useGame(s => s.hero); const look = useGame(s => s.look); const education = useGame(s => s.education.completed); const reduced = useGame(s => s.settings.reduceMotion);
   const low = useGame(s => s.settings.quality === "low");
-  const forest = education.includes("variables"); const mines = education.includes("conditions");
-  const player = useRef(new THREE.Vector3(hero.position[0], 0, hero.position[1])); // Position belongs to the simulation; save checkpoints do not recreate it.
+  const forest = hero.region!=="aurora"||education.includes("variables"); const mines = hero.region!=="aurora"||education.includes("conditions")&&hero.defeatedBosses.includes("boss-forest");
+  const lastRegion=useRef(hero.region); const player = useRef(new THREE.Vector3(hero.position[0], 0, hero.position[1])); // Position belongs to the simulation; save checkpoints do not recreate it.
   const path = useRef<[number, number][]>([]); const pending = useRef<NpcId | null>(null); const keys = useRef(new Set<string>()); const checkpoint = useRef(0); const wasWalking = useRef(false); const [walking, setWalking] = useState(false);
   const camera = useThree(s => s.camera); const temp = useRef(new THREE.Vector3()); const offset = useRef(new THREE.Vector3());
   const pausedRef = useRef(paused); useEffect(() => { pausedRef.current = paused; }, [paused]);
   const [light, setLight] = useState(0.8);
   useEffect(() => { const update = () => { const parts = new Intl.DateTimeFormat("en", { timeZone: "America/Sao_Paulo", hour: "numeric", minute: "numeric", hourCycle: "h23" }).formatToParts(new Date()); const h = Number(parts.find(p => p.type === "hour")?.value ?? 12) + Number(parts.find(p => p.type === "minute")?.value ?? 0)/60; setLight(Math.max(0.22, Math.sin((h - 6) / 12 * Math.PI))); }; update(); const id = setInterval(update, 60000); return () => clearInterval(id); }, []);
   useEffect(() => {
-    if (Math.hypot(player.current.x - hero.position[0], player.current.z - hero.position[1]) > 6 || hero.dead) { player.current.set(hero.position[0], 0, hero.position[1]); path.current = []; }
-  }, [hero.position, hero.dead, player]);
+    if (Math.hypot(player.current.x - hero.position[0], player.current.z - hero.position[1]) > 6 || hero.dead || lastRegion.current!==hero.region) { player.current.set(hero.position[0], 0, hero.position[1]); path.current = [];lastRegion.current=hero.region; }
+  }, [hero.position, hero.dead, hero.region, player]);
   useEffect(() => {
     const down = (e: KeyboardEvent) => { if (pausedRef.current || /INPUT|TEXTAREA|SELECT/.test((e.target as HTMLElement)?.tagName)) return; const k = e.key.toLowerCase(); if (["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright", "e"].includes(k)) { e.preventDefault(); keys.current.add(k); } };
     const up = (e: KeyboardEvent) => keys.current.delete(e.key.toLowerCase()); const blur = () => keys.current.clear();
@@ -84,7 +82,7 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
     return () => { window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); window.removeEventListener("blur", blur); };
   }, []);
   function travel(x: number, z: number) {
-    path.current = findPath([player.current.x, player.current.z], [x, z], forest, mines);
+    path.current = findPath([player.current.x, player.current.z], [x, z], forest, mines,hero.region);
     if (!path.current.length) report(z < -12 && !forest ? "Conclua a primeira runa com Eldrin para abrir a floresta." : x > 15 && !mines ? "Resolva A comporta das decisões para abrir as minas." : "Escolha um ponto livre no caminho.");
   }
   function npcClick(id: NpcId) {
@@ -97,7 +95,7 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
     const dt = Math.min(delta, 0.05); let moving = false;
     if (!paused && !hero.dead && !useGame.getState().encounter) {
       const k = keys.current; const x = Number(k.has("d") || k.has("arrowright")) - Number(k.has("a") || k.has("arrowleft")); const z = Number(k.has("s") || k.has("arrowdown")) - Number(k.has("w") || k.has("arrowup"));
-      if (x || z) { path.current = []; pending.current = null; temp.current.set(x, 0, z).normalize().multiplyScalar(dt * 4.5); if (walkable(player.current.x + temp.current.x, player.current.z, forest, mines)) player.current.x += temp.current.x; if (walkable(player.current.x, player.current.z + temp.current.z, forest, mines)) player.current.z += temp.current.z; moving = true; }
+      if (x || z) { path.current = []; pending.current = null; temp.current.set(x, 0, z).normalize().multiplyScalar(dt * 4.5); if (walkable(player.current.x + temp.current.x, player.current.z, forest, mines,hero.region)) player.current.x += temp.current.x; if (walkable(player.current.x, player.current.z + temp.current.z, forest, mines,hero.region)) player.current.z += temp.current.z; moving = true; }
       else if (path.current.length) { const p = path.current[0]; temp.current.set(p[0] - player.current.x, 0, p[1] - player.current.z); if (temp.current.length() < 0.14) path.current.shift(); else { const step = Math.min(temp.current.length(), dt * 4.5); temp.current.normalize().multiplyScalar(step); player.current.add(temp.current); moving = true; } }
       if (heroRoot.current && moving) heroRoot.current.rotation.y = Math.atan2(temp.current.x, temp.current.z);
       if (pending.current) { const npc = NPCS_LIVE.find(n => n.id === pending.current)!; if (Math.hypot(player.current.x - npc.x, player.current.z - npc.z) < 3.2) { path.current = []; const id = pending.current; pending.current = null; interact(id); } }
@@ -112,14 +110,14 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
   const groundClick = (e: ThreeEvent<MouseEvent>) => { if (e.button !== 0 || e.delta > 6 || paused) return; e.stopPropagation(); pending.current = null; travel(e.point.x, e.point.z); };
   const sky = new THREE.Color("#26374a").lerp(new THREE.Color("#b4c6c0"),Math.max(0,Math.min(1,(light-0.22)/0.78))).getStyle();
   return <>
-    <color attach="background" args={[sky]} /><fog attach="fog" args={[sky, 26, 66]} />
-    <ambientLight intensity={0.45 + light * 0.35} /><hemisphereLight args={["#d1e0de", "#59624d", 0.9]} />
+    <color attach="background" args={[sky]} /><fog attach="fog" args={[sky,38,88]} />
+    <ambientLight intensity={0.48 + light * 0.52} /><hemisphereLight args={["#d1e0de", "#59624d", 1.15]} />
     <directionalLight position={[12, 22, 8]} intensity={0.6 + light * 1.5} color="#ffe5bb" castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-22} shadow-camera-right={22} shadow-camera-top={20} shadow-camera-bottom={-25} shadow-bias={-0.001} />
-    <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow onClick={groundClick}><planeGeometry args={[150, 150]} /><meshStandardMaterial color="#657a59" roughness={1} /></mesh>
+    <TerrainSurface onClick={groundClick} color={REGIONS[hero.region].color}/><CampaignWorld paused={paused}/>{hero.region==="aurora"&&<>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.014, -4]} onClick={groundClick} receiveShadow><planeGeometry args={[4.8, 48]} /><meshStandardMaterial color="#a8997c" /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.018, 0]} onClick={groundClick} receiveShadow><circleGeometry args={[5.8, 32]} /><meshStandardMaterial color="#a5a18a" /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[11, 0.025, -16]} onClick={groundClick}><planeGeometry args={[25, 3]} /><meshStandardMaterial color="#8e8b76" /></mesh>
-    <WorldDetails night={light<0.4} low={low} reduced={reduced} />
+    <ExplorationEncounters paused={paused} interact={()=>interact("traveler")} report={report} /><WorldDetails night={light<0.4} low={low} reduced={reduced} />
     {BUILDINGS.map((b, i) => <House key={i} x={b.x} z={b.z} index={i} />)}
     {TREES.map((t, i) => <Tree key={i} {...t} />)}
     {[-1, 1].flatMap(side => [0, 1, 2, 3, 4].map(i => <Tree key={`${side}-${i}`} x={side * (17 + i % 2 * 3)} z={10 - i * 6} size={0.9 + i * 0.11} />))}
@@ -128,34 +126,32 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
     <Stone position={[22, 0.5, -20]} size={3} color="#77767d" />
     {[0, 1, 2, 3, 4].map(i => <mesh key={i} position={[21 + Math.cos(i * 2) * 2, 1 + i * 0.2, -20 + Math.sin(i * 2) * 1.3]} scale={[0.45, 1.2, 0.45]}><octahedronGeometry /><meshStandardMaterial color="#b19fca" emissive="#66527e" emissiveIntensity={0.5} /></mesh>)}
     {NPCS_LIVE.map(npc => <Npc key={npc.id} npc={npc} interact={npcClick} player={player} />)}
-    <Enemy onClick={() => { if (player.current.z < -13) useGame.getState().startEncounter(); else report("Aproxime-se da sentinela pela trilha da floresta."); }} />
-    <Enemy elite onClick={() => useGame.getState().startEncounter(true)} />
+
     {education.includes("loops") && [-1, 1].flatMap(side => [0, 1, 2, 3].map(i => <group key={`lamp-${side}-${i}`} position={[side * 2.8, 0, -14 - i * 3]}><mesh position={[0, 0.7, 0]}><cylinderGeometry args={[0.06, 0.1, 1.4, 6]} /><meshStandardMaterial color="#564a3a" /></mesh><mesh position={[0, 1.5, 0]}><octahedronGeometry args={[0.19]} /><meshStandardMaterial color="#edce8b" emissive="#d4ac57" emissiveIntensity={1.4} /></mesh></group>))}
     {!forest && <group position={[0, 0, -12]}><mesh position={[0, 1.5, 0]}><boxGeometry args={[5, 3, 0.15]} /><meshStandardMaterial color="#a7b8d7" emissive="#756eaa" emissiveIntensity={0.4} transparent opacity={0.3} /></mesh><Html zIndexRange={[8, 0]} position={[0, 3.8, 0]} center><span className="gate-label">A primeira runa abre a floresta</span></Html></group>}
     {!mines && <mesh position={[15, 1.3, -16]}><boxGeometry args={[0.2, 2.6, 6]} /><meshStandardMaterial color="#b8a3cf" transparent opacity={0.25} /></mesh>}
-    <group ref={heroRoot} position={[hero.position[0], 0, hero.position[1]]}><Character classId={hero.classId} look={look} equipped={activeEquipment(hero,ITEMS).map(i=>i.id)} level={hero.level} walking={walking} animated={!reduced} />
+    </>}
+    <group ref={heroRoot} position={[hero.position[0], 0, hero.position[1]]}><Character race={hero.race} classId={hero.classId} look={look} equipped={activeEquipment(hero,ITEMS).map(i=>i.id)} level={hero.level} walking={walking} animated={!reduced} />
       {hero.classId === "hunter" && activeEquipment(hero,ITEMS).some(i=>i.category==="weapon") && <group position={[-1.3, 0, 0.5]}><mesh position={[0, 0.45, 0]}><boxGeometry args={[0.4, 0.55, 0.9]} /><meshStandardMaterial color="#b6a88a" /></mesh><mesh position={[0, 0.75, 0.5]}><coneGeometry args={[0.24, 0.65, 4]} /><meshStandardMaterial color="#d3c9af" /></mesh></group>}
     </group>
-    <OrbitControls ref={controls} enablePan={false} enabled={!paused} enableDamping={!reduced} dampingFactor={0.08} minDistance={5} maxDistance={22} minPolarAngle={0.3} maxPolarAngle={1.35} mouseButtons={{ LEFT: undefined, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE }} touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }} />
+    <OrbitControls ref={controls} enablePan={false} enabled={!paused} enableDamping={!reduced} dampingFactor={0.08} minZoom={24} maxZoom={65} minPolarAngle={0.84} maxPolarAngle={0.84} mouseButtons={{ LEFT: undefined, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE }} touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }} />
   </>;
 }
 export default function GameWorld(props: { paused: boolean; interact: (id: NpcId) => void; report: (text: string) => void }) {
   const quality = useGame(s => s.settings.quality);
-  return <WorldBoundary><Canvas frameloop={props.paused ? "demand" : "always"} shadows={quality !== "low"} dpr={quality === "high" ? [1, 1.75] : [1, 1.25]} camera={{ position: [8, 10, 16], fov: 46 }} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} fallback={<div className="world-fallback">Seu navegador não disponibilizou o WebGL. Os painéis continuam disponíveis.</div>}><Suspense fallback={null}><Scene {...props} /></Suspense></Canvas></WorldBoundary>;
+  return <WorldBoundary><Canvas frameloop={props.paused ? "demand" : "always"} orthographic shadows={quality !== "low"} dpr={quality === "high" ? [1, 1.75] : [1, 1.25]} camera={{ position: [14, 18, 14], zoom: 42, near:.1, far:180 }} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} fallback={<div className="world-fallback">Seu navegador não disponibilizou o WebGL. Os painéis continuam disponíveis.</div>}><Suspense fallback={null}><Scene {...props} /></Suspense></Canvas></WorldBoundary>;
 }
-function CharacterPreview({ classId, look, equipped, level }: { classId: ClassId; look: Look; equipped: string[]; level: number }) {
-  const reduced = useGame(s => s.settings.reduceMotion);
-  return <Character classId={classId} look={look} equipped={equipped} level={level} preview animated={!reduced} />;
+function CharacterPreview({ classId, race, look, equipped, level }: { classId: ClassId; race: Race; look: Look; equipped: string[]; level: number }) {
+  return <Character classId={classId} race={race} look={look} equipped={equipped} level={level} preview animated={false} />;
 }
-function PreviewCamera({ classId, view }: { classId: ClassId; view: "body"|"face"|"back" }) {
+function PreviewCamera({ race }: { race: Race }) {
   const camera = useThree(s => s.camera);
   const controls = useRef<ComponentRef<typeof OrbitControls>>(null);
-  const race = CLASSES[classId].race;
   const height = {human:1.1,orc:1.14,dwarf:0.82,elf:1.2,gnome:0.69}[race];
-  const target = (view === 'face' ? 1.96 : 1.17) * height;
-  useEffect(()=>{const distance = (view === 'face' ? 2.15 : 4.9) * height; camera.position.set(0,target+0.08,view==='back'?-distance:distance); controls.current?.target.set(0,target,0);controls.current?.update();},[camera,height,target,view]);
-  return <OrbitControls ref={controls} target={[0,target,0]} enablePan={false} autoRotate={false} enableDamping={false} minDistance={0.85} maxDistance={7} minPolarAngle={0.3} maxPolarAngle={1.65} />;
+  const target=1.18*height, distance=4.75*height;
+  useEffect(()=>{camera.position.set(0,target+.08,distance);controls.current?.target.set(0,target,0);controls.current?.update();},[camera,target,distance]);
+  return <OrbitControls ref={controls} target={[0,target,0]} enablePan={false} enableZoom={false} autoRotate={false} enableDamping={false} minDistance={distance} maxDistance={distance} minPolarAngle={Math.PI/2-.035} maxPolarAngle={Math.PI/2-.035} touches={{ONE:THREE.TOUCH.ROTATE}} />;
 }
-export function CreatorStage({ classId, look, equipped, level=1, view="body" }: { classId: ClassId; look: Look; equipped: string[]; level?: number; view?: "body"|"face"|"back" }) {
-  return <WorldBoundary><Canvas shadows dpr={[1, 1.5]} camera={{ position: [0, 1.7, 5.4], fov: 36 }} gl={{ antialias: true }}><color attach="background" args={["#121b23"]} /><fog attach="fog" args={["#121b23", 8, 18]} /><ambientLight intensity={1.1} /><hemisphereLight args={["#c8dce4", "#504130", 1.8]} /><directionalLight position={[3, 5, 4]} intensity={2.1} color="#f3e9da" castShadow /><directionalLight position={[-4, 3, -3]} intensity={1.15} color="#94b3d1" /><CharacterPreview classId={classId} look={look} equipped={equipped} level={level} /><mesh position={[0, -0.18, 0]} receiveShadow><cylinderGeometry args={[1.15, 1.35, 0.26, 32]} /><meshStandardMaterial color="#354047" metalness={0.3} roughness={0.6} /></mesh><PreviewCamera classId={classId} view={view} /></Canvas></WorldBoundary>;
+export function CreatorStage({ classId, race=CLASSES[classId].race, look, equipped, level=1 }: { classId: ClassId; race?: Race; look: Look; equipped: string[]; level?: number }) {
+  return <WorldBoundary><Canvas shadows dpr={[1, 1.5]} camera={{ position: [0, 1.7, 5.4], fov: 36 }} gl={{ antialias: true }}><color attach="background" args={["#121b23"]} /><ambientLight intensity={1.1} /><hemisphereLight args={["#c8dce4", "#504130", 1.8]} /><directionalLight position={[3, 5, 4]} intensity={2.1} color="#f3e9da" castShadow /><directionalLight position={[-4, 3, -3]} intensity={1.15} color="#94b3d1" /><CharacterPreview classId={classId} race={race} look={look} equipped={equipped} level={level} /><mesh position={[0, -0.18, 0]} receiveShadow><cylinderGeometry args={[1.15, 1.35, 0.26, 32]} /><meshStandardMaterial color="#354047" metalness={0.3} roughness={0.6} /></mesh><PreviewCamera race={race} /></Canvas></WorldBoundary>;
 }

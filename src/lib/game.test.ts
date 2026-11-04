@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { migrateSave, freshSave, CLASSES, RACES, stats } from './game';
 import { findPath, walkable, BUILDINGS } from './navigation';
-test('configuração oficial tem cinco raças e seis classes',()=>{assert.equal(Object.keys(RACES).length,5);assert.equal(Object.keys(CLASSES).length,6);assert.equal(CLASSES.warrior.race,'orc');assert.equal(CLASSES.hacker.race,'gnome');assert.equal(CLASSES.mage.race,'elf');});
+test('configuração oficial tem cinco raças preservadas e nove classes',()=>{assert.equal(Object.keys(RACES).length,5);assert.equal(Object.keys(CLASSES).length,9);assert.equal(CLASSES.warrior.race,'orc');assert.equal(CLASSES.hacker.race,'gnome');assert.equal(CLASSES.mage.race,'elf');});
 test('novo personagem começa sem equipamentos e sem ouro',()=>{const s=freshSave();assert.deepEqual(s.hero.inventory,[]);assert.deepEqual(s.hero.equipped,[]);assert.equal(s.hero.gold,0);assert.equal(s.hero.created,false);});
 test('migração preserva XP ouro itens missão e aparência anteriores',()=>{const old={hero:{name:'Arnold',xp:700,gold:99,level:8,inventory:['axe','antigo'],equipped:['axe'],missionComplete:true},appearance:{armor:'red',beard:'silver'}};const s=migrateSave(old);assert.equal(s.hero.xp,700);assert.equal(s.hero.gold,99);assert.equal(s.hero.level,8);assert.deepEqual(s.hero.inventory,['axe','antigo']);assert.equal(s.look.cloth,2);assert.equal(s.look.hairColor,4);assert.ok(s.education.completed.includes('variables'));assert.deepEqual(s.legacy.originalSave,old);});
 test('migração repetida é idempotente e conserva originais',()=>{const first=migrateSave({hero:{xp:100,gold:70,inventory:['axe']},appearance:{beard:'copper'}});assert.deepEqual(migrateSave(first),first);});

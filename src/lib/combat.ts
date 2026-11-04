@@ -2,7 +2,7 @@ import { ITEMS,stats, type HeroData } from './game';
 import { activeEquipment } from './equipment';
 import { bandFor,LEVEL_BANDS } from './catalogue';
 import { SKILLS,effectiveSkillRank } from './skills';
-export interface EnemyState{id:string;name:string;hp:number;maxHp:number;power:number;reward:number;elite:boolean;level?:number;bleed?:{damage:number;turns:number}}
+export interface EnemyState{id:string;name:string;hp:number;maxHp:number;power:number;reward:number;elite:boolean;level?:number;monsterId?:string;bossId?:string;bleed?:{damage:number;turns:number}}
 export function resolveCombat(hero:HeroData,enemy:EnemyState,options:{skillId?:string;starter?:boolean;attackBuff?:number;defenseBuff?:number}={}){
  const st=stats(hero),skill=options.skillId?SKILLS[options.skillId]:undefined;const rank=skill?effectiveSkillRank(hero,skill.id):1;
  if(options.skillId&&(!skill||skill.classId!==hero.classId||skill.kind!=='active'||!rank||hero.level<skill.minLevel))return{hero,enemy,error:'Habilidade indisponível',won:false,dead:false,damage:0,received:0};
@@ -15,7 +15,7 @@ export function resolveCombat(hero:HeroData,enemy:EnemyState,options:{skillId?:s
  const damage=Math.max(0,Math.round(power*(skill?skill.damage*scale:options.starter?1.8:1)+pet+dot));
  const hp=Math.max(0,enemy.hp-damage);
  const next={...hero,[resource]:hero[resource]-cost};
- const heal=skill?Math.round(st.maxHp*skill.heal*scale):options.starter&&hero.classId==='paladin'?8:0;
+ const heal=skill?Math.round(st.maxHp*skill.heal*scale):options.starter&&['paladin','prophet','shaman'].includes(hero.classId)?Math.round(st.maxHp*(hero.classId==='paladin'?.07:.24)):0;
  const steal=Math.floor(damage*st.lifesteal/100);
  const raw=Math.max(3,Math.round(enemy.power-st.defense*.5-(options.defenseBuff??0)-(options.starter&&hero.classId==='hacker'?6:0)));
  const received=hp===0||skill?.stun?0:Math.max(0,Math.round(raw*(1-(skill?.guard??0))));
@@ -27,7 +27,7 @@ export function resolveCombat(hero:HeroData,enemy:EnemyState,options:{skillId?:s
 export function battleRewards(hero:HeroData,enemy:EnemyState){
  const level=enemy.level??hero.level;const tier=bandFor(level),band=LEVEL_BANDS[tier];const drops:string[]=[];
  for(const kind of ['ore','wood','leather','cloth','crystal','parts']){const count=kind==='ore'||kind==='crystal'?enemy.elite?3:1:((hero.kills+tier)%3===0?1:0);for(let i=0;i<count;i++)drops.push(`mat-${kind}-${band}`);}
- if(enemy.elite||hero.kills%4===3){const pool=Object.values(ITEMS).filter(i=>i.minLevel<=level&&i.minLevel>=band&&i.source!=='trophy'&&i.category!=='material'&&i.slot!=='consumable'&&(!i.classId||i.classId===hero.classId)&&(!i.classes||i.classes.includes(hero.classId)));if(pool.length)drops.push(pool[hero.kills%pool.length].id);}
+ if(enemy.elite||hero.kills%4===3){const pool=Object.values(ITEMS).filter(i=>i.minLevel<=level&&i.minLevel>=band&&i.source!=='trophy'&&i.source!=='chest'&&i.category!=='material'&&i.slot!=='consumable'&&(!i.classId||i.classId===hero.classId)&&(!i.classes||i.classes.includes(hero.classId)));if(pool.length)drops.push(pool[hero.kills%pool.length].id);}
  if(enemy.elite)drops.push(`trophy-${Math.min(7,Math.floor((level-1)/7))}`);
  const penalty=level<hero.level-5?.2:1;
  return{xp:Math.max(1,Math.round((25+level*18)*(enemy.elite?2.2:1)*penalty)),gold:Math.max(1,Math.round((8+level*3)*(enemy.elite?2:1)*penalty)),fragments:enemy.elite?3:1,drops};

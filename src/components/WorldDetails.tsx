@@ -47,7 +47,7 @@ function Fireflies({ reduced }: { reduced: boolean }) {
 }
 export default function WorldDetails({ night, low, reduced }: { night: boolean; low: boolean; reduced: boolean }) {
   return <group><Flowers low={low}/>{night&&!low&&<Fireflies reduced={reduced}/>}
-    <group position={[-3.7,0,-10]}><mesh position={[0,0.75,0]}><cylinderGeometry args={[0.06,0.1,1.5,6]}/><meshStandardMaterial color="#5e4c39"/></mesh><mesh position={[0,1.38,0]}><boxGeometry args={[1.3,0.45,0.12]}/><meshStandardMaterial color="#7b6547"/></mesh><Html position={[0,1.45,0.1]} center distanceFactor={18} style={{pointerEvents:'none'}}><span className="trail-sign">FLORESTA ↑</span></Html></group>
-    <group position={[14,0,-18]}><mesh position={[0,0.8,0]}><cylinderGeometry args={[0.07,0.1,1.6,6]}/><meshStandardMaterial color="#5e4c39"/></mesh><mesh position={[0,1.45,0]}><boxGeometry args={[1.5,0.45,0.14]}/><meshStandardMaterial color="#6b6053"/></mesh><Html position={[0,1.45,0.1]} center distanceFactor={18} style={{pointerEvents:'none'}}><span className="trail-sign">MINAS →</span></Html></group>
+    <group position={[-3.7,0,-10]}><mesh position={[0,0.75,0]}><cylinderGeometry args={[0.06,0.1,1.5,6]}/><meshStandardMaterial color="#5e4c39"/></mesh><mesh position={[0,1.38,0]}><boxGeometry args={[1.3,0.45,0.12]}/><meshStandardMaterial color="#7b6547"/></mesh><Html zIndexRange={[7,0]} position={[0,1.45,0.1]} center distanceFactor={18} style={{pointerEvents:'none'}}><span className="trail-sign">FLORESTA ↑</span></Html></group>
+    <group position={[14,0,-18]}><mesh position={[0,0.8,0]}><cylinderGeometry args={[0.07,0.1,1.6,6]}/><meshStandardMaterial color="#5e4c39"/></mesh><mesh position={[0,1.45,0]}><boxGeometry args={[1.5,0.45,0.14]}/><meshStandardMaterial color="#6b6053"/></mesh><Html zIndexRange={[7,0]} position={[0,1.45,0.1]} center distanceFactor={18} style={{pointerEvents:'none'}}><span className="trail-sign">MINAS →</span></Html></group>
   </group>;
 }

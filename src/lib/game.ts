@@ -1,12 +1,14 @@
+import type {RegionId} from "./campaign";
+import { promotionRank } from "./journey";
 import { runProgram, type Value } from "./program";
 import { buildCatalogue } from "./catalogue";
 import { activeEquipment } from "./equipment";
 import { passiveBonuses, SKILLS } from "./skills";
 
-export const RELEASE = "1.4.0";
+export const RELEASE = "1.5.0";
 export type Race = "human" | "orc" | "dwarf" | "elf" | "gnome";
-export type ClassId = "paladin" | "warrior" | "hunter" | "engineer" | "mage" | "hacker";
-export type NpcId = "borin" | "eldrin" | "pip" | "lion";
+export type ClassId = "paladin" | "warrior" | "hunter" | "engineer" | "mage" | "hacker" | "prophet" | "duelist" | "shaman";
+export type NpcId = "borin" | "eldrin" | "pip" | "lion" | "traveler";
 export const CLASSES: Record<ClassId, { name: string; race: Race; role: string; skill: string; color: string; talents: string[]; stats: number[] }> = {
   paladin: { name: "Paladino", race: "human", role: "Espada, escudo e luz. Resiste e protege.", skill: "Luz da Aurora", color: "#edc86d", talents: ["Égide", "Juramento", "Luz"], stats: [8, 6, 9, 4, 5, 6] },
   warrior: { name: "Guerreiro", race: "orc", role: "Armadura leve, força e ataques físicos.", skill: "Golpe da Fúria", color: "#e58b62", talents: ["Fúria", "Disciplina", "Duelista"], stats: [10, 9, 5, 6, 5, 3] },
@@ -14,21 +16,35 @@ export const CLASSES: Record<ClassId, { name: string; race: Race; role: string; 
   engineer: { name: "Engenheiro", race: "dwarf", role: "Forja, invenções e preparação estratégica.", skill: "Pulso Mecânico", color: "#e3ab6f", talents: ["Forja", "Engenhocas", "Mobilidade"], stats: [6, 6, 6, 5, 8, 8] },
   mage: { name: "Mago", race: "elf", role: "Tecido, bastão, escudos e controle arcano.", skill: "Runa Estelar", color: "#b9a3ed", talents: ["Runas", "Elementos", "Proteção"], stats: [3, 8, 3, 6, 6, 12] },
   hacker: { name: "Hacker", race: "gnome", role: "Couro, adagas, furtividade e precisão.", skill: "Passo da Sombra", color: "#7bdbcb", talents: ["Sombra", "Sabotagem", "Agilidade"], stats: [4, 7, 4, 11, 9, 7] },
+  prophet: { name: "Profeta", race: "human", role: "Cura, bênçãos e proteção. Tecido e foco sagrado.", skill: "Prece Restauradora", color: "#e9d7a3", talents: ["Restauração","Bênçãos","Disciplina"], stats: [3,5,4,5,6,12] },
+  duelist: { name: "Dualista", race: "elf", role: "Duas lâminas, precisão, esquiva e contra-ataque.", skill: "Corte Duplo", color: "#c7a37e", talents: ["Duas Lâminas","Esquiva","Precisão"], stats: [6,8,4,10,10,4] },
+  shaman: { name: "Shaman", race: "orc", role: "Espíritos, elementos, cura e bênçãos tribais.", skill: "Sopro Ancestral", color: "#82c5b1", talents: ["Elementos","Espíritos","Totens"], stats: [6,7,5,5,5,10] },
 };
+export const RACE_CLASSES: Record<Race, readonly ClassId[]> = {
+  human: ['mage','prophet','paladin','hunter','warrior','hacker'],
+  elf: ['hunter','mage','prophet','hacker','duelist'],
+  dwarf: ['paladin','warrior','hunter','engineer'],
+  orc: ['shaman','warrior'],
+  gnome: ['hacker'], // Preserve the previously released race and existing heroes.
+};
+export function validRaceClass(race: unknown, classId: ClassId): race is Race {
+  return typeof race === 'string' && Object.hasOwn(RACE_CLASSES,race) && RACE_CLASSES[race as Race].includes(classId);
+}
+export function raceForClass(classId: ClassId, preferred?: Race): Race { return validRaceClass(preferred,classId) ? preferred : CLASSES[classId].race; }
 export const RACES: Record<Race, string> = { human: "Humano", orc: "Orc", dwarf: "Anão", elf: "Elfo", gnome: "Gnomo" };
 export const SKIN = ["#e7bd9e", "#c48a66", "#925f46", "#633f33", "#f1d5bb", "#7d9565", "#607c5b", "#a0b58a"];
 export const HAIR = ["#30251f", "#825235", "#bf8b4d", "#e1cfac", "#9697a4", "#533a5d", "#1e252d"];
 export const EYES = ["#527f91", "#788447", "#9c6a39", "#a287bd", "#bcbfbd", "#262d34"];
 export interface Look { body: number; hair: number; beard: number; moustache: number; skin: number; hairColor: number; eyes: number; face: number; nose: number; brows: number; scar: number; tattoo: number; accessory: number; cloth: number; }
 export const DEFAULT_LOOK: Look = { body: 2, hair: 1, beard: 1, moustache: 0, skin: 1, hairColor: 0, eyes: 0, face: 0, nose: 1, brows: 1, scar: 0, tattoo: 0, accessory: 0, cloth: 0 };
-export interface HeroData { id: string; name: string; race: Race; classId: ClassId; created: boolean; gold: number; xp: number; level: number; inventory: string[]; equipped: string[]; hp: number; mp: number; stamina: number; talents: number[]; mode: "normal" | "hardcore"; dead: boolean; kills: number; position: [number, number]; materials: number; inherited: number; skills: Record<string,number>; hotbar: string[]; }
-export interface Education { completed: string[]; attempts: Record<string, number>; drafts: Record<string, string>; reviews: Record<string, number>; projects: Record<string, { code: string; savedAt: number }>; }
+export interface HeroData { id: string; name: string; race: Race; classId: ClassId; created: boolean; gold: number; xp: number; level: number; inventory: string[]; equipped: string[]; hp: number; mp: number; stamina: number; talents: number[]; mode: "normal" | "hardcore"; dead: boolean; kills: number; position: [number, number]; materials: number; inherited: number; skills: Record<string,number>; hotbar: string[]; promotions: Partial<Record<ClassId,number>>; openedChests: string[]; region:RegionId; defeatedBosses:string[]; }
+export interface Education { deliveries:string[]; aiCompleted: string[]; aiEvidence: Record<string,string>; reviewedProjects: number[]; completed: string[]; attempts: Record<string, number>; drafts: Record<string, string>; reviews: Record<string, number>; projects: Record<string, { code: string; savedAt: number }>; }
 export interface Ancestor { id: string; name: string; classId: ClassId; level: number; diedAt: number; cause: string; legacy: number; claimed: boolean; }
 export interface Settings { volume: number; panelOpacity: number; uiScale: number; quality: "auto" | "low" | "high"; reduceMotion: boolean; }
 export interface SaveData { hero: HeroData; look: Look; education: Education; ancestors: Ancestor[]; settings: Settings; legacy: Record<string, unknown>; }
 export const uid = () => typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `lion-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-export function freshHero(): HeroData { return { id: uid(), name: "Viajante", race: "human", classId: "paladin", created: false, gold: 0, xp: 0, level: 1, inventory: [], equipped: [], hp: 100, mp: 60, stamina: 100, talents: [0, 0, 0], mode: "normal", dead: false, kills: 0, position: [0, 5], materials: 0, inherited: 0, skills: {}, hotbar: [] }; }
-export function freshSave(): SaveData { return { hero: freshHero(), look: { ...DEFAULT_LOOK }, education: { completed: [], attempts: {}, drafts: {}, reviews: {}, projects: {} }, ancestors: [], settings: { volume: 0, panelOpacity: 0.92, uiScale: 1, quality: "auto", reduceMotion: false }, legacy: {} }; }
+export function freshHero(): HeroData { return { id: uid(), name: "Viajante", race: "human", classId: "paladin", created: false, gold: 0, xp: 0, level: 1, inventory: [], equipped: [], hp: 100, mp: 60, stamina: 100, talents: [0, 0, 0], mode: "normal", dead: false, kills: 0, position: [0, 5], materials: 0, inherited: 0, skills: {}, hotbar: [], promotions: {}, openedChests: [], region:"aurora", defeatedBosses:[] }; }
+export function freshSave(): SaveData { return { hero: freshHero(), look: { ...DEFAULT_LOOK }, education: { deliveries:[], aiCompleted: [], aiEvidence: {}, reviewedProjects: [], completed: [], attempts: {}, drafts: {}, reviews: {}, projects: {} }, ancestors: [], settings: { volume: 0, panelOpacity: 0.92, uiScale: 1, quality: "auto", reduceMotion: false }, legacy: {} }; }
 const LEGACY_ITEMS: Record<string, { name: string; price: number; slot: string; power: number; defense: number; rarity: string; classId?: ClassId; recipe?: number; description: string }> = {
   axe: { name: "Machado de Ferro", price: 25, slot: "weapon", power: 5, defense: 0, rarity: "Comum", description: "Uma peça antiga da oficina de Borin." },
   shield: { name: "Escudo do Vale", price: 15, slot: "offhand", power: 0, defense: 5, rarity: "Comum", description: "Madeira reforçada com ferro." },
@@ -47,8 +63,8 @@ const LEGACY_ITEMS: Record<string, { name: string; price: number; slot: string; 
 };
 export const ITEMS = buildCatalogue(LEGACY_ITEMS);
 export function stats(hero: HeroData) {
-  const s=CLASSES[hero.classId].stats, gear=activeEquipment(hero,ITEMS), pass=passiveBonuses(hero);
-  return { strength:s[0]+hero.level,attack:7+s[1]+hero.level*2+gear.reduce((n,g)=>n+g.power,0)+hero.talents[0]*2+pass.attack,defense:s[2]+gear.reduce((n,g)=>n+g.defense,0)+hero.talents[1]*2+pass.defense,agility:s[3],dexterity:s[4],intelligence:s[5],maxHp:90+hero.level*10+s[2]*2+gear.reduce((n,g)=>n+(g.hp??0),0)+pass.hp,maxMp:40+s[5]*5+gear.reduce((n,g)=>n+(g.mp??0),0)+pass.mp,maxStamina:100+hero.talents[2]*10+pass.stamina,companion:gear.reduce((n,g)=>n+(g.companion??0),0)+pass.companion,craftDiscount:pass.craftDiscount,lifesteal:pass.lifesteal };
+  const s=CLASSES[hero.classId].stats, promotion=promotionRank(hero), gear=activeEquipment(hero,ITEMS), pass=passiveBonuses(hero);
+  return { strength:s[0]+hero.level,attack:7+s[1]+hero.level*2+promotion*3+gear.reduce((n,g)=>n+g.power,0)+hero.talents[0]*2+pass.attack,defense:s[2]+promotion*3+gear.reduce((n,g)=>n+g.defense,0)+hero.talents[1]*2+pass.defense,agility:s[3],dexterity:s[4],intelligence:s[5],maxHp:90+hero.level*10+s[2]*2+gear.reduce((n,g)=>n+(g.hp??0),0)+pass.hp,maxMp:40+s[5]*5+gear.reduce((n,g)=>n+(g.mp??0),0)+pass.mp,maxStamina:100+hero.talents[2]*10+pass.stamina,companion:gear.reduce((n,g)=>n+(g.companion??0),0)+pass.companion,craftDiscount:pass.craftDiscount,lifesteal:pass.lifesteal };
 }
 export function withXp(hero: HeroData, amount: number): HeroData {
   const xp = hero.xp + amount; const level = Math.min(60,Math.floor(Math.sqrt(xp / 100)) + 1);
@@ -118,8 +134,8 @@ export function migrateSave(input: unknown): SaveData {
   const data = record(input); const fresh = freshSave(); const old = record(data.hero); const oldLook = record(data.look); const appearance = record(data.appearance); const edu = record(data.education);
   const classId: ClassId = typeof old.classId === "string" && Object.hasOwn(CLASSES, old.classId) ? old.classId as ClassId : Object.keys(old).length ? "engineer" : "paladin";
   const completed = [...new Set([...strings(edu.completed), ...(old.missionComplete === true ? ["variables"] : [])])];
-  const hero: HeroData = { ...fresh.hero, id: typeof old.id === "string" ? old.id : fresh.hero.id, name: typeof old.name === "string" ? old.name.slice(0, 40) : fresh.hero.name, classId, race: CLASSES[classId].race, created: typeof old.created === "boolean" ? old.created : Object.keys(old).length > 0,
-    gold: number(old.gold, 0), xp: number(old.xp, 0), level: number(old.level, 1, 1), inventory: strings(old.inventory), equipped: strings(old.equipped), hp: number(old.hp, 100), mp: number(old.mp, 60), stamina: number(old.stamina, 100), talents: [0, 1, 2].map(i => number(Array.isArray(old.talents) ? old.talents[i] : 0, 0, 0, 10)), mode: old.mode === "hardcore" ? "hardcore" : "normal", dead: old.dead === true, kills: number(old.kills, 0), materials: number(old.materials, 0), inherited: number(old.inherited, 0), skills: Object.fromEntries(Object.entries(record(old.skills)).filter(([id])=>Object.hasOwn(SKILLS,id)).map(([id,value])=>[id,Math.floor(number(value,0,0,SKILLS[id].maxRank))])), hotbar: strings(old.hotbar).filter(id=>Object.hasOwn(SKILLS,id)).slice(0,4), position: Array.isArray(old.position) && old.position.length === 2 && old.position.every(v => typeof v === "number" && Number.isFinite(v) && Math.abs(v) <= 28) ? [old.position[0], old.position[1]] : [0, 5] };
+  const hero: HeroData = { ...fresh.hero, id: typeof old.id === "string" ? old.id : fresh.hero.id, name: typeof old.name === "string" ? old.name.slice(0, 40) : fresh.hero.name, classId, race: validRaceClass(old.race,classId) ? old.race : CLASSES[classId].race, created: typeof old.created === "boolean" ? old.created : Object.keys(old).length > 0,
+    gold: number(old.gold, 0), xp: number(old.xp, 0), level: number(old.level, 1, 1), inventory: strings(old.inventory), equipped: strings(old.equipped), hp: number(old.hp, 100), mp: number(old.mp, 60), stamina: number(old.stamina, 100), talents: [0, 1, 2].map(i => number(Array.isArray(old.talents) ? old.talents[i] : 0, 0, 0, 10)), mode: old.mode === "hardcore" ? "hardcore" : "normal", dead: old.dead === true, kills: number(old.kills, 0), materials: number(old.materials, 0), inherited: number(old.inherited, 0), skills: Object.fromEntries(Object.entries(record(old.skills)).filter(([id])=>Object.hasOwn(SKILLS,id)).map(([id,value])=>[id,Math.floor(number(value,0,0,SKILLS[id].maxRank))])), promotions: Object.fromEntries(Object.entries(record(old.promotions)).filter(([id])=>Object.hasOwn(CLASSES,id)).map(([id,value])=>[id,Math.floor(number(value,0,0,3))])), openedChests: strings(old.openedChests), region:["aurora","ruins","frontier","heart"].includes(String(old.region))?old.region as RegionId:"aurora", defeatedBosses:strings(old.defeatedBosses), hotbar: strings(old.hotbar).filter(id=>Object.hasOwn(SKILLS,id)).slice(0,4), position: Array.isArray(old.position) && old.position.length === 2 && old.position.every(v => typeof v === "number" && Number.isFinite(v) && Math.abs(v) <= 28) ? [old.position[0], old.position[1]] : [0, 5] };
   const look = { ...DEFAULT_LOOK };
   for (const key of Object.keys(look) as (keyof Look)[]) look[key] = Math.floor(number(oldLook[key], look[key], 0, key === "skin" ? SKIN.length - 1 : key === "hairColor" ? HAIR.length - 1 : 5));
   if (!data.look) { if (appearance.beard === "copper") look.hairColor = 2; if (appearance.beard === "silver") look.hairColor = 4; if (appearance.armor === "red") look.cloth = 2; if (appearance.armor === "green") look.cloth = 3; }
@@ -130,5 +146,5 @@ export function migrateSave(input: unknown): SaveData {
   for (const [key, raw] of Object.entries(record(edu.projects))) { const p = record(raw); if (typeof p.code === "string") projects[key] = { code: p.code, savedAt: number(p.savedAt, 0) }; }
   const settings = record(data.settings);
   const ancestors: Ancestor[] = Array.isArray(data.ancestors) ? data.ancestors.flatMap(raw => { const a = record(raw); return typeof a.id === "string" && typeof a.name === "string" ? [{ id: a.id, name: a.name, classId: typeof a.classId === "string" && Object.hasOwn(CLASSES, a.classId) ? a.classId as ClassId : "paladin" as ClassId, level: number(a.level, 1), diedAt: number(a.diedAt, 0), cause: typeof a.cause === "string" ? a.cause : "Jornada encerrada", legacy: number(a.legacy, 0, 0, 100), claimed: a.claimed === true }] : []; }) : [];
-  return { hero, look, education: { completed, drafts, attempts, reviews, projects }, ancestors, settings: { volume: number(settings.volume, 0, 0, 1), panelOpacity: number(settings.panelOpacity, 0.92, 0.4, 1), uiScale: number(settings.uiScale, 1, 0.85, 1.2), quality: settings.quality === "low" || settings.quality === "high" ? settings.quality : "auto", reduceMotion: settings.reduceMotion === true }, legacy: Object.keys(data).length ? { ...record(data.legacy), ...(!data.look ? { originalSave: data } : {}) } : {} };
+  return { hero, look, education: { deliveries:Array.isArray(edu.deliveries)?strings(edu.deliveries):[...completed.map(id=>`main:${id}`),...strings(edu.aiCompleted).map(id=>`ai:${id}`)], aiCompleted: strings(edu.aiCompleted), aiEvidence: Object.fromEntries(Object.entries(record(edu.aiEvidence)).filter((entry): entry is [string,string]=>typeof entry[1]==="string")), reviewedProjects: Array.isArray(edu.reviewedProjects)?[...new Set(edu.reviewedProjects.filter((v): v is number=>Number.isInteger(v)&&Number(v)>=0&&Number(v)<15))]:[], completed, drafts, attempts, reviews, projects }, ancestors, settings: { volume: number(settings.volume, 0, 0, 1), panelOpacity: number(settings.panelOpacity, 0.92, 0.4, 1), uiScale: number(settings.uiScale, 1, 0.85, 1.2), quality: settings.quality === "low" || settings.quality === "high" ? settings.quality : "auto", reduceMotion: settings.reduceMotion === true }, legacy: Object.keys(data).length ? { ...record(data.legacy), ...(!data.look ? { originalSave: data } : {}) } : {} };
 }

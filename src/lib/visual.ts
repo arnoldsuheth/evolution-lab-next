@@ -1,4 +1,5 @@
 import type { Look, Race } from './game';
+import { BODY_TRAITS, FACE_TRAITS, NOSE_TRAITS, BROW_NAMES } from './characterTraits';
 
 // Indices stay stable (0..7). No persisted fields or storage versions are changed.
 export const RACE_SKIN: Record<Race, readonly string[]> = {
@@ -22,6 +23,10 @@ export function skinColor(race: Race, index: number): string {
   return palette[Number.isFinite(index) ? Math.max(0,Math.min(7,Math.floor(index))) : 1];
 }
 export function appearanceLabel(key: keyof Look, index: number): string {
+  if (key === 'body') return BODY_TRAITS[index]?.name ?? 'Corpo';
+  if (key === 'face') return FACE_TRAITS[index]?.name ?? 'Rosto';
+  if (key === 'nose') return NOSE_TRAITS[index]?.name ?? 'Nariz';
+  if (key === 'brows') return BROW_NAMES[index] ?? 'Sobrancelhas';
   if (key === 'hair') return HAIR_NAMES[index] ?? 'Estilo';
   if (key === 'beard') return BEARD_NAMES[index] ?? 'Estilo';
   return index === 0 && ['moustache','scar','tattoo','accessory'].includes(key) ? 'Nenhum' : `Variação ${index+1}`;
