@@ -1,54 +1,52 @@
 # LION’S CAVE RPG PROGRAMADOR
 
-## 1.3.2 · Expedição Aurora
+## 1.4.0 · Caminhos da Aurora
 
-RPG individual 3D com criação de personagem compartilhada com o mundo, cinco raças e seis classes oficiais. Personagens novos usam roupas remendadas. O aprendizado é persistido separadamente da aventura.
+RPG individual 3D em desenvolvimento. Cinco raças, seis classes, personagens novos com roupas remendadas e educação separada da aventura. Esta versão amplia sistemas; não representa um RPG profissional concluído.
 
-### Executar
+### Conteúdo disponível
+
+- **1.087 definições de itens**: 562 armaduras, 176 armas, 144 acessórios, 78 materiais, 67 consumíveis, 40 alimentos, seis companheiros, seis ferramentas e oito troféus. São famílias e variantes de progressão; não 1.087 modelos 3D exclusivos.
+- 871 receitas com materiais e custo, compra/venda, mochila, busca, filtros e paginação. Ferramentas e troféus têm funções de acervo; nem todo objeto tem interação especializada.
+- Equipamentos nas faixas 1, 5, 10 e a cada cinco níveis até 60, com nível mínimo, classe, slot e conflito de duas mãos. Peças antigas continuam permitidas; possuir equipamento de nível maior não permite usá-lo antes da hora.
+- **90 habilidades**, três ramos e 15 nós por classe. Pontos por nível, pré-requisitos, ranks, passivas, MP/estamina, quatro atalhos ativos e recargas. Reespecialização gratuita. É uma base inicial de balanceamento.
+- Combates progressivos até 60 com recursos, cura, proteção, controle, sangramento, recompensas, materiais e equipamentos. Encontros são uma arena tática simplificada, não um sistema completo de ação em tempo real.
+- Criador com preview independente do mundo, enquadramentos de corpo/rosto/costas, rotação manual e painel de edição com rolagem separada. Malhas procedurais suaves, silhuetas raciais, verde em degradê nos orcs e cinza azulado nos gnomos.
+- Emblema original de leão/caverna/código, favicon, ícones de início de tela e manifesto. Sem service worker: não há promessa de funcionamento offline.
+
+### Direção de arte escolhida
+
+Fantasia semirrealista estilizada. As prévias conceituais aprovadas são uma referência artística; os modelos atuais continuam procedurais, sem GLB, rig esquelético, texturas de artista ou equivalência visual às imagens geradas. Acabamento profissional requer uma etapa dedicada de escultura, retopologia, UV, materiais e animação. Modelos e aparência são compartilhados pelo criador e pelo mundo.
+
+### Executar e verificar
 
 Node 22 ou superior. `npm ci`, `npm run dev`.
 
-### Verificar
-
-- `npm test`: regras originais, interpretador, missões, migração, navegação e integridade do legado.
+- `npm test`: regras, interpretador, missões, migrações, equipamento, receitas, habilidades, combate e legado.
 - `npm run typecheck`
 - `npm run lint -- --max-warnings=0`
 - `GITHUB_PAGES=true npm run build`: exporta `out/` com basePath `/evolution-lab-next`.
 
 ### Controles
 
-Clique/toque para caminhar; clique em NPC para aproximar e conversar. Botão direito arrastado gira a câmera; roda/pinça muda o zoom. Um arrasto no celular gira a câmera. WASD/setas e E são alternativas de teclado. Painéis pausam o movimento. Use a aba Configurações para qualidade, escala, opacidade, exportação e recuperação.
+Clique/toque para caminhar e interagir. Botão direito arrastado gira a câmera; roda/pinça muda o zoom. Um arrasto no celular gira a câmera. WASD/setas e E são alternativas. No criador, arraste para girar; não existe giro automático. Configurações oferecem qualidade, escala, opacidade, exportação e recuperação.
 
-### Progresso e recuperação
+### Salvamentos
 
-A chave `genesis-reborn-rpg-v3` é mantida, com envelope de versão 2 e migração da versão 1. A primeira leitura copia o texto original para `genesis-reborn-rpg-v3-before-lions-cave-1.3.1`; essa cópia não é rotacionada. Há uma cópia de recuperação periódica e outra antes de importar. Saves futuros/desconhecidos bloqueiam escrita. Itens desconhecidos permanecem nos dados, e o objeto original legado é preservado.
+A chave **`genesis-reborn-rpg-v3`** permanece. O envelope agora é versão **3**, com migração das versões anteriores. Antes do upgrade, o original é copiado para `genesis-reborn-rpg-v3-before-1.4.0`; o backup anterior `genesis-reborn-rpg-v3-before-lions-cave-1.3.1` também permanece. Há recuperação periódica e cópia antes de importar. Saves desconhecidos bloqueiam escrita. Itens desconhecidos, XP, ouro, aparência, educação, legado e inventário são conservados.
 
-O armazenamento pertence ao navegador e à origem. Não há conta ou sincronização automática. Exporte antes de mudar de aparelho/domínio. Nunca exclua saves para resolver um erro. Não há reset destrutivo na interface.
+Itens incompatíveis ficam guardados e não concedem atributos. Talentos antigos continuam contados no orçamento de pontos e podem ser reespecializados. Builds de outras classes ficam lembradas, com bônus apenas da classe ativa. O novo limite de progressão é 60; saves antigos acima disso não são rebaixados.
 
-Hardcore arquiva a morte e conserva educação e portfólio. Herança: 15% do XP próprio, teto 100, resgate único; XP herdado não gera nova herança. Importações preservam evidências existentes e registros de legado consumido. O navegador local não é uma autoridade antifraude: não há ranking, comércio multiplayer ou promessa de proteção contra edição manual dos dados.
+O armazenamento pertence ao navegador e à origem. Não há conta nem sincronização automática. Exporte antes de mudar de aparelho/domínio. Nunca exclua saves para corrigir um erro.
 
-### Ensino
+Hardcore preserva educação e arquiva o personagem. Herança: 15% do XP próprio, teto 100, resgate único; XP herdado não gera nova herança. Importações preservam evidências existentes e resgates. Armazenamento local não é autoridade antifraude; não há ranking ou comércio multiplayer.
 
-Oito missões executáveis cobrem variáveis, operações, decisões, laços, funções, arrays, objetos e depuração. O interpretador é intencionalmente limitado: não usa eval/Function, não expõe APIs do navegador e limita entrada, operações, recursão e console. Não é uma implementação completa de JavaScript. A biblioteca adicional contém 15 roteiros de projetos com pré-requisitos e rubricas; não representa cursos completos ou domínio certificado. Projetos HTML/CSS têm iframe sem scripts, com CSP restritiva.
+### Ensino e limites
 
-### Limites desta versão
+Oito missões executáveis de JavaScript: variáveis, operações, decisões, laços, funções, arrays, objetos e depuração. Interpretador limitado, sem eval/Function ou APIs do navegador, com limites de operações, entrada, recursão e console. Biblioteca adicional: 15 roteiros de projetos com pré-requisitos e rubricas, ainda não cursos completos. HTML/CSS usa iframe sem scripts e CSP restritiva.
 
-- Personagens e cenário são geometria procedural original, sem GLB, rig esquelético ou assets artísticos externos.
-- Combate tático simplificado: ataque, habilidade de classe, retaliação, recursos, consumíveis e recuo. Animações completas de ataque ainda não existem.
-- Talentos têm três ramos por classe com bônus iniciais compartilhados de ataque, defesa e estamina. Árvores avançadas dependem de balanceamento posterior.
-- Companheiro Hunter tem representação visual e bônus no combate, sem IA de navegação independente.
-- NPCs têm respiração, orientação e uma pequena rotina de Pip; não há simulação completa de agendas.
-- Hora e iluminação seguem America/Sao_Paulo pelo relógio do aparelho.
-- O desempenho em iPhone físico precisa de homologação. Perfil leve permite desativar sombras.
+Companheiro Hunter tem representação e bônus, sem IA independente. NPCs têm respiração, orientação e rotina simplificada de Pip. Hora e luz seguem America/Sao_Paulo pelo relógio do aparelho. Combate e economia precisam de testes prolongados de balanceamento. Homologação de GPU, gestos, desempenho e acabamento em iPhone físico permanece necessária; o navegador de auditoria pode não oferecer WebGL.
 
-### Fonte e publicação
+### Publicação
 
-Desenvolvimento: `work/lions-cave-131`; checks também executam nessa branch. Produção: `interface-nexus`, cujo push publica após verificações. Backup da revisão anterior: `backup/lions-cave-before-131-20261104`. Publicação desta entrega foi expressamente autorizada pelo proprietário na conversa.
-
-Não há serviços pagos, chaves de API, IA remota ou dependências adicionadas nesta versão.
-
-### Aprimoramento visual 1.3.2
-
-Paletas de oito tons por raça: Orc verde, Gnomo cinza-azulado, e tons humanos, anões e élficos próprios. A pele usa degradê por cores de vértice. Perfis raciais distinguem silhueta, mandíbula, orelhas, olhos e cabeça; cabelo e barba têm seis estilos com formas diferentes. Pip mantém pele verde como goblin. A câmera do criador enquadra raças menores mais de perto. Casas recebem bandeiras, lanternas e barris; flores usam instâncias e vaga-lumes aparecem à noite no perfil de qualidade apropriado. Botões têm relevo, foco e resposta ao toque revisados.
-
-O formato do save não mudou. Os índices escolhidos de aparência são mantidos, e a cor correspondente passa a seguir a paleta racial. XP, ouro, itens, missões e educação não são alterados por este ajuste. Os testes incluem compatibilidade do estado e isolamento das cores entre personagens. A renderização em GPU e o desempenho em iPhone físico ainda precisam de homologação.
+Produção: `interface-nexus`. O workflow exige testes, TypeScript, ESLint e build antes de publicar no GitHub Pages. Sem novos serviços pagos, chaves ou dependências de produção. Mudanças e publicação autorizadas pelo proprietário.
