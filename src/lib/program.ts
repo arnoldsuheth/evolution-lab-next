@@ -104,6 +104,14 @@ export function runProgram(code: string): { variables: Record<string, Value>; ou
   const functions = new Map<string, Stmt>(); const output: string[] = [];
   let steps = 0; let depth = 0;
   function tick() { if (++steps > 8000) throw new Error("Limite de execução atingido. Verifique se seu laço consegue terminar."); }
+  function bounded(v: Value, depth = 0): Value {
+    tick();
+    if (depth > 18) throw new Error("Estrutura de dados profunda demais para este laboratório.");
+    if (typeof v === "string" && v.length > 16000) throw new Error("Texto acima do limite de 16 mil caracteres.");
+    if (Array.isArray(v)) for (const item of v) bounded(item, depth + 1);
+    else if (v && typeof v === "object") for (const item of Object.values(v)) bounded(item, depth + 1);
+    return v;
+  }
   const num = (v: Value): number => { if (typeof v !== "number" || !Number.isFinite(v)) throw new Error("Esta operação precisa de números finitos."); return v; };
   function value(e: Expr, env: Record<string, Value>): Value {
     tick();
@@ -123,7 +131,7 @@ export function runProgram(code: string): { variables: Record<string, Value>; ou
     if (e.kind === "call") {
       if (e.left?.kind === "member" && e.left.left?.name === "console" && e.left.right?.value === "log") {
         if (output.length >= 100) throw new Error("Console limitado a 100 linhas.");
-        output.push(e.args!.map(a => { const v = value(a, env); return typeof v === "object" ? JSON.stringify(v) : String(v); }).join(" ")); return null;
+        output.push(e.args!.map(a => { const v = bounded(value(a, env)); return typeof v === "object" ? JSON.stringify(v) : String(v); }).join(" ")); return null;
       }
       const fn = e.left?.kind === "name" ? functions.get(e.left.name!) : undefined;
       if (!fn) throw new Error("Chame uma função que você declarou ou use console.log(...).");
@@ -137,7 +145,10 @@ export function runProgram(code: string): { variables: Record<string, Value>; ou
     if (e.op === "||") return a ? a : value(e.right!, env);
     const b = value(e.right!, env);
     switch (e.op) {
-      case "+": return typeof a === "string" || typeof b === "string" ? String(a) + String(b) : num(a) + num(b);
+      case "+": {
+        if (typeof a === "string" || typeof b === "string") { const x = String(a), y = String(b); if (x.length + y.length > 16000) throw new Error("Texto acima do limite de 16 mil caracteres."); return x + y; }
+        return num(a) + num(b);
+      }
       case "-": return num(a) - num(b);
       case "*": return num(a) * num(b);
       case "/": if (b === 0) throw new Error("Divisão por zero."); return num(a) / num(b);
@@ -157,7 +168,7 @@ export function runProgram(code: string): { variables: Record<string, Value>; ou
       if (s.kind === "var" || s.kind === "assign") {
         if (s.kind === "assign" && !Object.hasOwn(env, s.name!)) throw new Error(`Declare “${s.name}” antes de atribuir.`);
         if (s.kind === "assign" && constants.get(env)?.has(s.name!)) throw new Error(`A constante “${s.name}” não pode receber outro valor.`);
-        env[s.name!] = value(s.expr!, env);
+        env[s.name!] = bounded(value(s.expr!, env));
         if (s.kind === "var" && !s.mutable) { const names = constants.get(env) ?? new Set<string>(); names.add(s.name!); constants.set(env, names); }
       } else if (s.kind === "function") functions.set(s.name!, s);
       else if (s.kind === "return") return { value: value(s.expr!, env) };
