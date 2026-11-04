@@ -142,11 +142,9 @@ export default function GameWorld(props: { paused: boolean; interact: (id: NpcId
   const quality = useGame(s => s.settings.quality);
   return <WorldBoundary><Canvas frameloop={props.paused ? "demand" : "always"} shadows={quality !== "low"} dpr={quality === "high" ? [1, 1.75] : [1, 1.25]} camera={{ position: [8, 10, 16], fov: 46 }} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} fallback={<div className="world-fallback">Seu navegador não disponibilizou o WebGL. Os painéis continuam disponíveis.</div>}><Suspense fallback={null}><Scene {...props} /></Suspense></Canvas></WorldBoundary>;
 }
-function Turntable({ classId, look, equipped, rotate }: { classId: ClassId; look: Look; equipped: string[]; rotate: boolean }) {
-  const group = useRef<THREE.Group>(null);
-  useFrame((_, dt) => { if (group.current && rotate) group.current.rotation.y += dt * 0.24; });
+function CharacterPreview({ classId, look, equipped }: { classId: ClassId; look: Look; equipped: string[] }) {
   const reduced = useGame(s => s.settings.reduceMotion);
-  return <group ref={group}><Character classId={classId} look={look} equipped={equipped} preview animated={!reduced} /></group>;
+  return <Character classId={classId} look={look} equipped={equipped} preview animated={!reduced} />;
 }
 function PreviewCamera({ classId }: { classId: ClassId }) {
   const camera = useThree(s => s.camera);
@@ -154,8 +152,8 @@ function PreviewCamera({ classId }: { classId: ClassId }) {
   const race = CLASSES[classId].race;
   const target = race==='gnome'?0.9:race==='dwarf'?1.0:1.25;
   useEffect(()=>{camera.position.set(0,target+0.3,race==='gnome'?3.8:race==='dwarf'?4.4:5.4);controls.current?.target.set(0,target,0);controls.current?.update();},[camera,race,target]);
-  return <OrbitControls ref={controls} target={[0,target,0]} enablePan={false} minDistance={1.8} maxDistance={7} minPolarAngle={0.3} maxPolarAngle={1.65} />;
+  return <OrbitControls ref={controls} target={[0,target,0]} enablePan={false} autoRotate={false} enableDamping={false} minDistance={1.8} maxDistance={7} minPolarAngle={0.3} maxPolarAngle={1.65} />;
 }
-export function CreatorStage({ classId, look, equipped, rotate }: { classId: ClassId; look: Look; equipped: string[]; rotate: boolean }) {
-  return <WorldBoundary><Canvas shadows dpr={[1, 1.5]} camera={{ position: [0, 1.7, 5.4], fov: 36 }} gl={{ antialias: true }}><color attach="background" args={["#121b23"]} /><fog attach="fog" args={["#121b23", 8, 18]} /><ambientLight intensity={1.1} /><hemisphereLight args={["#c8dce4", "#504130", 1.8]} /><directionalLight position={[3, 5, 4]} intensity={2.1} color="#f3e9da" castShadow /><directionalLight position={[-4, 3, -3]} intensity={1.15} color="#94b3d1" /><Turntable classId={classId} look={look} equipped={equipped} rotate={rotate} /><mesh position={[0, -0.18, 0]} receiveShadow><cylinderGeometry args={[1.15, 1.35, 0.26, 32]} /><meshStandardMaterial color="#354047" metalness={0.3} roughness={0.6} /></mesh><PreviewCamera classId={classId} /></Canvas></WorldBoundary>;
+export function CreatorStage({ classId, look, equipped }: { classId: ClassId; look: Look; equipped: string[] }) {
+  return <WorldBoundary><Canvas shadows dpr={[1, 1.5]} camera={{ position: [0, 1.7, 5.4], fov: 36 }} gl={{ antialias: true }}><color attach="background" args={["#121b23"]} /><fog attach="fog" args={["#121b23", 8, 18]} /><ambientLight intensity={1.1} /><hemisphereLight args={["#c8dce4", "#504130", 1.8]} /><directionalLight position={[3, 5, 4]} intensity={2.1} color="#f3e9da" castShadow /><directionalLight position={[-4, 3, -3]} intensity={1.15} color="#94b3d1" /><CharacterPreview classId={classId} look={look} equipped={equipped} /><mesh position={[0, -0.18, 0]} receiveShadow><cylinderGeometry args={[1.15, 1.35, 0.26, 32]} /><meshStandardMaterial color="#354047" metalness={0.3} roughness={0.6} /></mesh><PreviewCamera classId={classId} /></Canvas></WorldBoundary>;
 }
