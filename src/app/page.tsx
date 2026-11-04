@@ -1,225 +1,89 @@
 "use client";
-
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import dynamic from "next/dynamic";
-import { useGame } from "@/lib/store";
-import { catalog, checkAnswer, type ItemId } from "@/lib/rpg";
-
-const GameWorld = dynamic(() => import("@/components/GameWorld"), {
-  ssr: false,
-  loading: () => <p>Preparando Pedra da Aurora...</p>,
-});
-
-type Panel = "none" | "shop" | "bag" | "mission" | "hero";
-
+import { useGame, savedState, SAVE_KEY, BACKUP_KEY } from "@/lib/store";
+import { CLASSES, RACES, SKIN, HAIR, EYES, ITEMS, LESSONS, CURRICULUM, RELEASE, stats, type ClassId, type Race, type Look, type NpcId, type evaluateLesson } from "@/lib/game";
+const World = dynamic(() => import("@/components/GameWorld"), { ssr: false, loading: () => <div className="world-fallback">Abrindo o caminho para Pedra da Aurora…</div> });
+const Stage = dynamic(() => import("@/components/GameWorld").then(m => m.CreatorStage), { ssr: false, loading: () => <div className="world-fallback">Preparando seu personagem…</div> });
+type Panel = "none" | "creator" | "journal" | "bag" | "talents" | "academy" | "settings" | "ancestors" | "npc";
+const icons: Record<string, string> = { journal: "◈", bag: "▣", talents: "✧", academy: "⌘", creator: "♙", settings: "⚙", ancestors: "♜" };
+function download(name: string, content: string, type = "application/json") { const url = URL.createObjectURL(new Blob([content], { type })); const a = document.createElement("a"); a.href = url; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
+function Modal({ title, close, children, wide = false }: { title: string; close: () => void; children: ReactNode; wide?: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => { const previous = document.activeElement as HTMLElement | null; ref.current?.focus(); const key = (e: KeyboardEvent) => { if (e.key === "Escape") close(); if (e.key === "Tab") { const elements = ref.current?.querySelectorAll<HTMLElement>('button:not(:disabled), input, select, textarea, a[href], [tabindex="0"]'); if (!elements?.length) return; const first = elements[0], last = elements[elements.length - 1]; if (e.shiftKey && (document.activeElement === first || document.activeElement === ref.current)) { e.preventDefault(); last.focus(); } else if (!e.shiftKey && (document.activeElement === last || document.activeElement === ref.current)) { e.preventDefault(); first.focus(); } } }; window.addEventListener("keydown", key); return () => { window.removeEventListener("keydown", key); previous?.focus(); }; }, [close]);
+  return <div className="modal-shade" onPointerDown={e => { if (e.target === e.currentTarget) close(); }}><div ref={ref} tabIndex={-1} className={`modal ${wide ? "wide" : ""}`} role="dialog" aria-modal="true" aria-label={title}><header className="modal-head"><div><span className="eyebrow">LION’S CAVE · O CÓDIGO PERDIDO</span><h2>{title}</h2></div><button className="icon-button" onClick={close} aria-label="Fechar painel">×</button></header>{children}</div></div>;
+}
+function Meter({ label, value, max, tone }: { label: string; value: number; max: number; tone: string }) { return <div className="meter" aria-label={`${label}: ${Math.round(value)} de ${max}`}><div className="meter-fill" style={{ width: `${Math.max(0, Math.min(100, value / max * 100))}%`, background: tone }} /><span>{label}</span><b>{Math.round(value)} / {max}</b></div>; }
+function Minimap() { const position = useGame(s => s.hero.position); const completed = useGame(s => s.education.completed); return <div className="minimap"><div className="map-north">N</div><svg viewBox="0 0 116 100" aria-label="Minimapa: vila ao sul, floresta ao norte e minas a leste" role="img"><rect width="116" height="100" fill="#34483d" /><path d="M57 97V18M57 30H103" stroke="#a3946f" strokeWidth="4" fill="none" /><path d="M0 0H85V35H0Z" fill={completed.includes("variables") ? "#4e674c" : "#252f35"} /><path d="M88 8H116V48H88Z" fill={completed.includes("conditions") ? "#68646a" : "#252f35"} />{[[39, 77], [74, 75], [40, 54], [74, 51]].map(([x, y], i) => <rect key={i} x={x} y={y} width="7" height="7" rx="1" fill="#ba9c77" />)}<circle cx="56" cy="65" r="3" fill="#8dd4de" /><circle cx="44" cy="67" r="2" fill="#edc47a" /><circle cx="66" cy="55" r="2" fill="#bb9fe3" /><circle cx={(position[0] + 28) * 2} cy={(position[1] + 32) * 2} r="3" fill="#fff4cc" stroke="#17272d" strokeWidth="1" /></svg><span>Pedra da Aurora</span></div>; }
+function Creator({ close }: { close: () => void }) {
+  const hero = useGame(s => s.hero); const look = useGame(s => s.look); const customize = useGame(s => s.customize); const reduced = useGame(s => s.settings.reduceMotion);
+  const [selected, setSelected] = useState<ClassId>(hero.classId); const [name, setName] = useState(hero.name === "Guardiao da Aurora" ? "Guardião da Aurora" : hero.name); const [mode, setMode] = useState<"normal" | "hardcore">(hero.mode); const [category, setCategory] = useState("Rosto"); const [rotate, setRotate] = useState(!reduced);
+  const fresh = !hero.created || hero.dead; const info = CLASSES[selected];
+  const groups: Record<string, { key: keyof Look; title: string; count: number; colors?: string[] }[]> = {
+    Corpo: [{ key: "body", title: "Proporção corporal", count: 6 }, { key: "skin", title: "Tom de pele", count: SKIN.length, colors: SKIN }, { key: "cloth", title: "Roupas remendadas", count: 6 }],
+    Rosto: [{ key: "face", title: "Formato do rosto", count: 6 }, { key: "nose", title: "Nariz", count: 6 }, { key: "eyes", title: "Olhos", count: 6, colors: EYES }, { key: "brows", title: "Sobrancelhas", count: 6 }],
+    Cabelo: [{ key: "hair", title: "Estilo de cabelo", count: 6 }, { key: "beard", title: "Barba", count: 6 }, { key: "moustache", title: "Bigode", count: 6 }, { key: "hairColor", title: "Cor dos fios", count: HAIR.length, colors: HAIR }],
+    Marcas: [{ key: "scar", title: "Cicatriz", count: 6 }, { key: "tattoo", title: "Marca de tinta", count: 6 }, { key: "accessory", title: "Acessório simples", count: 6 }],
+  };
+  function confirm() { if (fresh) useGame.getState().createCharacter(name, selected, mode); else { useGame.getState().chooseClass(selected); useGame.setState(s => ({ hero: { ...s.hero, name: name.trim().slice(0, 30) || s.hero.name } })); } close(); }
+  return <div className="creator-grid">
+    <section className="creator-identity"><span className="eyebrow">01 · SEU CAMINHO</span><h3>Uma nova história<br /><em>começa em você.</em></h3><label htmlFor="hero-name">Nome do personagem</label><input id="hero-name" value={name} maxLength={30} onChange={e => setName(e.target.value)} />
+      <label htmlFor="race">Raça</label><select id="race" value={info.race} onChange={e => setSelected((Object.keys(CLASSES) as ClassId[]).find(id => CLASSES[id].race === e.target.value)!)}>{(Object.keys(RACES) as Race[]).map(r => <option key={r} value={r}>{RACES[r]}</option>)}</select>
+      <div className="class-choices">{(Object.entries(CLASSES) as [ClassId, typeof info][]).filter(([, c]) => c.race === info.race).map(([id, c]) => <button key={id} className={id === selected ? "selected" : ""} onClick={() => setSelected(id)}><span>◇</span>{c.name}</button>)}</div><p className="muted">{info.role}</p>
+      <div className="class-stat-grid">{["FOR", "ATQ", "DEF", "AGI", "DEX", "INT"].map((label, i) => <div key={label}><small>{label}</small><b>{info.stats[i]}</b></div>)}</div>
+      {fresh ? <label className="hardcore-choice"><input type="checkbox" checked={mode === "hardcore"} onChange={e => setMode(e.target.checked ? "hardcore" : "normal")} /><span>Modo Hardcore<small>Morte permanente. Seu aprendizado permanece.</small></span></label> : <p className="small-note">Trocar de classe preserva seus dados e devolve os pontos de talento. Itens incompatíveis ficam na mochila.</p>}
+    </section>
+    <section className="creator-model"><div className="model-caption"><span className="eyebrow">{RACES[info.race]} · {info.name}</span><h3>{name || "Viajante"}</h3></div><Stage classId={selected} look={look} equipped={fresh ? [] : hero.equipped} rotate={rotate} /><div className="model-controls"><button onClick={() => setRotate(!rotate)}>{rotate ? "Pausar rotação" : "Girar personagem"}</button><span>Arraste para 360° · pinça ou roda para zoom</span></div></section>
+    <section className="creator-options"><span className="eyebrow">02 · SUA IDENTIDADE</span><h3>Cada detalhe conta.</h3><div className="tabs">{Object.keys(groups).map(c => <button key={c} className={category === c ? "active" : ""} onClick={() => setCategory(c)}>{c}</button>)}</div><div className="appearance-options">{groups[category].map(g => <fieldset key={g.key}><legend>{g.title}</legend><div className="option-row">{Array.from({ length: g.count }, (_, i) => <button key={i} aria-label={`${g.title}: opção ${i + 1}`} aria-pressed={look[g.key] === i} className={`appearance-choice ${look[g.key] === i ? "chosen" : ""} ${g.colors ? "swatch" : ""}`} style={g.colors ? { background: g.colors[i] } : {}} onClick={() => customize({ [g.key]: i })}>{g.colors ? "" : i === 0 && ["hair", "beard", "moustache", "scar", "tattoo", "accessory"].includes(g.key) ? "–" : i + 1}</button>)}</div></fieldset>)}</div><p className="small-note">Aparência atualizada em tempo real e compartilhada com o mundo. Os modelos desta versão são estilizados e procedurais.</p><button className="primary large" onClick={confirm}>{fresh ? "Começar minha jornada" : "Salvar e voltar ao mundo"}<span>↗</span></button><span className="save-caption">◇ Salvamento automático neste navegador</span></section>
+  </div>;
+}
+function Journal() {
+  const completed = useGame(s => s.education.completed); const drafts = useGame(s => s.education.drafts); const reviews = useGame(s => s.education.reviews);
+  const [id, setId] = useState(LESSONS.find(l => !completed.includes(l.id))?.id ?? LESSONS[0].id); const lesson = LESSONS.find(l => l.id === id)!;
+  const [code, setCode] = useState(drafts[id] ?? lesson.starter); const [result, setResult] = useState<ReturnType<typeof evaluateLesson> | null>(null); const [hint, setHint] = useState(false);
+  const [now] = useState(() => Date.now());
+  function select(next: string) { useGame.getState().draft(id, code); const l = LESSONS.find(l => l.id === next)!; setId(next); setCode(useGame.getState().education.drafts[next] ?? l.starter); setResult(null); setHint(false); }
+  useEffect(() => { const timer = setTimeout(() => useGame.getState().draft(id, code), 700); return () => clearTimeout(timer); }, [code, id]);
+  return <div className="journal-grid"><nav className="lesson-nav" aria-label="Missões educacionais"><span className="eyebrow">CAPÍTULO I · AS RUNAS</span>{LESSONS.map((l, i) => { const locked = i > 0 && !completed.includes(LESSONS[i - 1].id); return <button key={l.id} disabled={locked} className={id === l.id ? "active" : ""} onClick={() => select(l.id)}><span className={completed.includes(l.id) ? "complete" : ""}>{completed.includes(l.id) ? "✓" : locked ? "·" : `0${i + 1}`}</span><div>{l.title}<small>{l.concept}{completed.includes(l.id) && reviews[l.id] <= now ? " · revisar" : ""}</small></div></button>; })}<div className="lesson-progress"><b>{completed.filter(x => LESSONS.some(l => l.id === x)).length} / 8</b><span>competências praticadas</span></div></nav><section className="lesson-content"><span className="eyebrow">{lesson.region} · {lesson.concept}</span><h3>{lesson.title}</h3><p>{lesson.intro}</p><div className="quest-task"><small>SUA MISSÃO</small><p>{lesson.task}</p><span>+{lesson.xp} XP · +{lesson.gold} ouro · recompensa única</span></div><div className="code-header"><span>runas.js</span><span>Laboratório protegido · JavaScript introdutório</span></div><label className="sr-only" htmlFor="lesson-code">Seu código da missão</label><textarea id="lesson-code" className="code-editor" spellCheck={false} value={code} onChange={e => setCode(e.target.value)} onKeyDown={e => { if (e.key === "Tab") { e.preventDefault(); const t = e.currentTarget; const start = t.selectionStart; setCode(code.slice(0, start) + "  " + code.slice(t.selectionEnd)); requestAnimationFrame(() => { t.selectionStart = t.selectionEnd = start + 2; }); } }} /><div className="editor-actions"><button className="primary" onClick={() => setResult(useGame.getState().solve(id, code))}>▷ Executar e testar</button><button className="quiet" onClick={() => setHint(!hint)}>{hint ? "Ocultar dica" : "Pedir orientação"}</button></div>{hint && <p className="hint-box">Lion: {lesson.hint}</p>}<div className="test-results" aria-live="polite">{result ? <><h4>{result.passed ? "✓ Runas restauradas" : "Vamos investigar"}</h4>{result.results.map((r, i) => <div className={r.passed ? "test-pass" : "test-fail"} key={i}><b>{r.passed ? "✓" : "○"} {r.label}</b><span>{r.message}</span></div>)}{result.output.length > 0 && <pre>{result.output.join("\n")}</pre>}</> : <p className="muted">Os testes verificam o resultado do programa. Missões posteriores também variam as entradas.</p>}</div><details><summary>O que este laboratório suporta?</summary><p>let, const, números, textos, booleanos, arrays, objetos, operadores, if/else com chaves, for, while, funções, return e console.log. É um interpretador didático limitado; não é um motor JavaScript completo. DOM, APIs e bibliotecas são estudados nos projetos.</p></details></section></div>;
+}
+function Inventory({ shop = false }: { shop?: boolean }) { const hero = useGame(s => s.hero); const [filter, setFilter] = useState("all"); const entries = Object.entries(ITEMS).filter(([id, item]) => shop ? filter === "all" || item.classId === hero.classId || !item.classId : hero.inventory.includes(id)); return <div className="panel-body"><div className="section-line"><div><span className="eyebrow">{shop ? "OFICINA DE BORIN" : "SUA JORNADA"}</span><h3>{shop ? "Nada se conquista por acaso." : "O que você carrega."}</h3></div><span className="currency">◉ {hero.gold} ouro</span></div>{shop && <div className="tabs"><button className={filter === "all" ? "active" : ""} onClick={() => setFilter("all")}>Todos</button><button className={filter !== "all" ? "active" : ""} onClick={() => setFilter("class")}>Minha classe</button></div>}<div className="item-grid">{entries.map(([id, item]) => { const owned = hero.inventory.filter(x => x === id).length; const equipped = hero.equipped.includes(id); return <article className={`item-card ${item.rarity === "Raro" ? "rare" : ""}`} key={id}><div className="item-art">{item.slot === "consumable" ? "♜" : item.slot === "chest" ? "♙" : item.slot === "head" ? "♛" : item.slot === "offhand" ? "◈" : "⚔"}</div><span className="eyebrow">{item.rarity} · {item.classId ? CLASSES[item.classId].name : "Todas as classes"}</span><h4>{item.name}</h4><p>{item.description}</p><small>{item.power ? `+${item.power} ATQ ` : ""}{item.defense ? `+${item.defense} DEF ` : ""}{owned > 0 ? ` · ${owned} na mochila` : ""}</small><div className="item-actions">{shop ? <><button disabled={hero.dead || hero.gold < item.price || (item.slot !== "consumable" && owned > 0)} onClick={() => useGame.getState().buy(id)}>{owned && item.slot !== "consumable" ? "Adquirido" : `Comprar · ${item.price} ◉`}</button>{item.recipe && <button className="quiet" disabled={owned > 0 || hero.materials < item.recipe || !useGame.getState().education.completed.includes("arithmetic")} onClick={() => useGame.getState().craft(id)}>Forjar · {item.recipe} fragmentos</button>}</> : <button className={equipped ? "selected" : ""} onClick={() => item.slot === "consumable" ? useGame.getState().useItem(id) : useGame.getState().equip(id)} disabled={hero.dead}>{item.slot === "consumable" ? "Usar" : equipped ? "Desequipar" : "Equipar"}</button>}</div></article>; })}</div>{!entries.length && <div className="empty-state">Sua mochila está vazia. Procure Eldrin e conquiste seus primeiros recursos.</div>}<p className="small-note">{hero.materials} fragmentos disponíveis. Equipamentos antigos desconhecidos são preservados: {hero.inventory.filter(id => !ITEMS[id]).join(", ") || "nenhum"}.</p></div>; }
+function Talents() { const hero = useGame(s => s.hero); const st = stats(hero); const points = Math.max(0, hero.level - 1 - hero.talents.reduce((a, b) => a + b, 0)); return <div className="panel-body"><span className="eyebrow">{CLASSES[hero.classId].name} · NÍVEL {hero.level}</span><h3>Escolha como evoluir.</h3><p className="muted">{points} ponto(s) disponível(is). Os efeitos desta versão inicial são ofensiva, defesa e reserva de estamina.</p><div className="talent-grid">{CLASSES[hero.classId].talents.map((name, i) => <article key={name}><div className="talent-rune">{["⚔", "◈", "✧"][i]}</div><h4>{name}</h4><p>{["+2 ATQ por ponto", "+2 DEF por ponto", "+10 estamina máxima por ponto"][i]}</p><div className="talent-nodes">{Array.from({ length: 10 }, (_, n) => <span key={n} className={hero.talents[i] > n ? "lit" : ""}>◆</span>)}</div><button disabled={!points || hero.talents[i] >= 10 || hero.dead} onClick={() => useGame.getState().talent(i)}>Aprender · {hero.talents[i]}/10</button></article>)}</div><div className="attributes">{Object.entries({ FOR: st.strength, ATQ: st.attack, DEF: st.defense, AGI: st.agility, DEX: st.dexterity, INT: st.intelligence }).map(([key, value]) => <div key={key}><span>{key}</span><b>{value}</b></div>)}</div><p className="small-note">Balanceamento inicial: habilidades têm identidades distintas; especializações completas, efeitos avançados e animações de ataque ainda serão expandidos.</p></div>; }
+function Academy() {
+  const projects = useGame(s => s.education.projects); const [index, setIndex] = useState(0); const [code, setCode] = useState(projects["0"]?.code ?? ""); const course = CURRICULUM[index];
+  function select(i: number) { useGame.getState().project(String(index), code); setIndex(i); setCode(useGame.getState().education.projects[String(i)]?.code ?? ""); }
+  return <div className="academy-grid"><nav className="curriculum-nav" aria-label="Trilha educacional">{CURRICULUM.map((m, i) => <button key={m.title} className={i === index ? "active" : ""} onClick={() => select(i)}><span>{String(i + 1).padStart(2, "0")}</span>{m.title}{projects[String(i)]?.code && <b>·</b>}</button>)}</nav><section className="lesson-content"><span className="eyebrow">TRILHA DE CARREIRA · ROTEIRO DE PROJETOS</span><h3>{course.title}</h3><p>{course.goal}</p><div className="prerequisite">Pré-requisito: {course.requires}</div><h4>Seu projeto real</h4><p>{course.project}</p><div className="quest-task"><small>EVIDÊNCIAS PARA REVISÃO</small><p>{course.evidence}</p></div><label htmlFor="project-code">{course.kind === "html" ? "Seu HTML e CSS" : "Código, explicação, testes e links do projeto"}</label><textarea id="project-code" className="code-editor project-editor" value={code} onChange={e => setCode(e.target.value)} spellCheck={false} placeholder={course.kind === "html" ? '<h1>Missões de Pedra da Aurora</h1>\n<style>body { font-family: sans-serif; }</style>' : "Registre seu trabalho aqui. Os projetos avançados são realizados no seu ambiente de desenvolvimento."} /><div className="editor-actions"><button className="primary" onClick={() => useGame.getState().project(String(index), code)}>Salvar no portfólio</button><button onClick={() => download(`lions-cave-projeto-${index + 1}.${course.kind === "html" ? "html" : "md"}`, code, "text/plain")}>Exportar projeto ↗</button></div>{course.kind === "html" && <iframe title="Prévia isolada do projeto HTML e CSS" className="html-preview" sandbox="" referrerPolicy="no-referrer" srcDoc={'<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'; img-src data:; font-src \'none\'; form-action \'none\'; base-uri \'none\'">' + code} />}<p className="small-note">As oito missões de Eldrin têm execução e testes. Esta trilha adicional contém propostas e rubricas de projetos, não cursos completos nem certificação automática. Seu trabalho fica salvo separado da vida do personagem.</p></section></div>;
+}
+function SettingsPanel() {
+  const settings = useGame(s => s.settings); const error = useGame(s => s.saveError); const [feedback, setFeedback] = useState(""); const file = useRef<HTMLInputElement>(null);
+  return <div className="panel-body settings-body"><h3>Seu mundo, do seu jeito.</h3><label>Opacidade dos painéis <b>{Math.round(settings.panelOpacity * 100)}%</b><input type="range" min="0.4" max="1" step="0.02" value={settings.panelOpacity} onChange={e => useGame.getState().setting({ panelOpacity: Number(e.target.value) })} /></label><label>Tamanho da interface<input type="range" min="0.85" max="1.2" step="0.05" value={settings.uiScale} onChange={e => useGame.getState().setting({ uiScale: Number(e.target.value) })} /></label><label htmlFor="quality">Qualidade gráfica</label><select id="quality" value={settings.quality} onChange={e => useGame.getState().setting({ quality: e.target.value as "auto" | "low" | "high" })}><option value="auto">Equilibrada · celular e desktop</option><option value="low">Leve · sem sombras</option><option value="high">Alta · maior resolução</option></select><label className="check-row"><input type="checkbox" checked={settings.reduceMotion} onChange={e => useGame.getState().setting({ reduceMotion: e.target.checked })} />Reduzir movimento e animações</label><hr /><h3>Proteja sua jornada.</h3><p>O salvamento fica neste navegador e neste endereço. Exporte antes de trocar de aparelho ou limpar os dados.</p>{error && <p className="error-banner">{error}</p>}<div className="backup-actions"><button className="primary" onClick={() => download("lions-cave-jornada.json", JSON.stringify({ state: savedState(useGame.getState()), version: 2 }, null, 2))}>Exportar jornada</button><button onClick={() => { const raw = localStorage.getItem(BACKUP_KEY) ?? localStorage.getItem(SAVE_KEY); if (raw) download("lions-cave-original-preservado.json", raw); else setFeedback("Não há cópia anterior neste navegador."); }}>Exportar original preservado</button><button onClick={() => file.current?.click()}>Importar jornada</button></div><input className="sr-only" ref={file} type="file" accept="application/json,.json" aria-label="Importar arquivo de jornada" onChange={async e => { const f = e.target.files?.[0]; if (!f) return; if (f.size > 8000000) { setFeedback("Arquivo muito grande. Limite de 8 MB."); return; } try { useGame.getState().restore(await f.text()); setFeedback("Arquivo importado. Evidências educacionais e legados consumidos foram preservados."); } catch (err) { setFeedback(err instanceof Error ? err.message : "Não foi possível importar."); } e.target.value = ""; }} /><p aria-live="polite">{feedback}</p><div className="release-note"><b>LION’S CAVE {RELEASE} · Expedição Aurora</b><p>RPG individual experimental. Dados locais podem ser alterados pelo proprietário do navegador; não há ranking ou economia compartilhada. Combate tático simplificado, modelos procedurais e oito missões executáveis.</p></div></div>;
+}
 export default function Home() {
-  const hero = useGame(s => s.hero);
-  const buy = useGame(s => s.buy);
-  const equip = useGame(s => s.equip);
-  const answerMission = useGame(s => s.answer);
-
-  const [ready, setReady] = useState(false);
-  const [panel, setPanel] = useState<Panel>("none");
-  const [answer, setAnswer] = useState("");
-  const [nearby, setNearby] = useState<"shop" | "mentor" | null>(null);
-  const appearance = useGame(s => s.appearance);
-  const setArmor = useGame(s => s.setArmor);
-  const setBeard = useGame(s => s.setBeard);
-  const [feedback, setFeedback] = useState("");
-
-  useEffect(() => {
-    void Promise.resolve(useGame.persist.rehydrate()).then(() => setReady(true));
-  }, []);
-
-  const items = Object.keys(catalog) as ItemId[];
-
-  if (!ready) {
-    return <main className="loading">Carregando sua jornada...</main>;
-  }
-
-  function submit() {
-    if (hero.missionComplete) return;
-    const correct = checkAnswer(answer);
-    answerMission(answer);
-
-    setFeedback(correct
-      ? "Correto! Missao concluida: +100 XP e +20 ouro."
-      : "Ainda nao. Declare a variavel nivel com valor 1 e ponto e virgula.");
-  }
-
-  return (
-    <main className="app">
-      <header className="header">
-        <div>
-          <small>EVOLUTION LAB RPG</small>
-          <h1>GENESIS REBORN</h1>
-        </div>
-        <div className="stats">
-          <span>Nivel {hero.level}</span>
-          <span>{hero.xp} XP</span>
-          <span>{hero.gold} ouro</span>
-        </div>
-      </header>
-
-      <div className="layout">
-        <section className="world">
-          <GameWorld
-            openShop={() => setPanel("shop")}
-            openMission={() => setPanel("mission")}
-            proximity={setNearby}
-          />
-          <div className="hint">
-            WASD / setas: mover | E: interagir quando estiver proximo
-          </div>
-        </section>
-
-        <aside className="sidebar">
-          <small>CAPITULO I</small>
-          <h2>Pedra da Aurora</h2>
-          <p>
-            Um jovem guerreiro chega a cidade para aprender
-            as linguagens que governam o mundo.
-          </p>
-          <button onClick={() => setPanel("mission")}>
-            A Linguagem das Runas
-          </button>
-          <button onClick={() => setPanel("shop")}>
-            Loja do Mercador
-          </button>
-          <button onClick={() => setPanel("hero")}>
-            Personalizar Guerreiro
-          </button>
-          <button onClick={() => setPanel("bag")}>
-            Inventario ({hero.inventory.length})
-          </button>
-
-          {nearby && (
-            <p className="nearby">
-              Pressione E para interagir com {nearby === "shop" ? "o Mercador" : "o Mestre das Runas"}.
-            </p>
-          )}
-
-          <div className="quest">
-            <strong>Missao principal</strong>
-            <p>{hero.missionComplete
-              ? "Concluida - 100 XP conquistados."
-              : "Aprender a declarar uma variavel JavaScript."}</p>
-          </div>
-
-          <small>Salvamento automatico neste navegador.</small>
-        </aside>
-      </div>
-
-      {panel !== "none" && (
-        <div className="overlay">
-          <section className="dialog" role="dialog"
-            aria-modal="true" aria-label="Painel de jogo">
-            <button className="close" onClick={() => setPanel("none")}>
-              Fechar
-            </button>
-
-            {panel === "hero" && (
-              <>
-                <h2>Personalizar Guerreiro</h2>
-                <p>Escolha a aparencia do seu anao.</p>
-
-                <label htmlFor="armor">Cor da armadura</label>
-                <select id="armor" value={appearance.armor}
-                  onChange={e => setArmor(e.target.value as "blue" | "red" | "green")}>
-                  <option value="blue">Azul da Aurora</option>
-                  <option value="red">Vermelho da Forja</option>
-                  <option value="green">Verde do Vale</option>
-                </select>
-
-                <label htmlFor="beard">Cor da barba</label>
-                <select id="beard" value={appearance.beard}
-                  onChange={e => setBeard(e.target.value as "copper" | "brown" | "silver")}>
-                  <option value="copper">Cobre</option>
-                  <option value="brown">Castanho</option>
-                  <option value="silver">Prata</option>
-                </select>
-
-                <p>As escolhas sao salvas automaticamente.</p>
-              </>
-            )}
-
-            {panel === "shop" && (
-              <>
-                <h2>Mercador da Aurora</h2>
-                <p>Seu ouro: {hero.gold}</p>
-                {items.map(item => (
-                  <div className="item" key={item}>
-                    <span>{catalog[item].name} — {catalog[item].price} ouro</span>
-                    <button
-                      disabled={
-                        hero.inventory.includes(item) ||
-                        hero.gold < catalog[item].price
-                      }
-                      onClick={() => buy(item)}
-                    >
-                      {hero.inventory.includes(item)
-                        ? "Adquirido" : "Comprar"}
-                    </button>
-                  </div>
-                ))}
-              </>
-            )}
-
-            {panel === "bag" && (
-              <>
-                <h2>Inventario</h2>
-                {hero.inventory.length === 0 && <p>Inventario vazio.</p>}
-                {hero.inventory.map(item => (
-                  <div className="item" key={item}>
-                    <span>{catalog[item].name}</span>
-                    <button
-                      disabled={hero.equipped.includes(item)}
-                      onClick={() => equip(item)}
-                    >
-                      {hero.equipped.includes(item)
-                        ? "Equipado" : "Equipar"}
-                    </button>
-                  </div>
-                ))}
-              </>
-            )}
-
-            {panel === "mission" && (
-              <>
-                <h2>A Linguagem das Runas</h2>
-                <p>
-                  Em JavaScript, uma variavel armazena informacoes.
-                  Usamos <code>let</code> para declarar uma variavel
-                  cujo valor pode mudar.
-                </p>
-                <p>
-                  <strong>Desafio:</strong> declare uma variavel
-                  chamada <code>nivel</code> com valor numerico
-                  <code>1</code>.
-                </p>
-                <label htmlFor="code">Seu codigo JavaScript</label>
-                <textarea
-                  id="code"
-                  rows={4}
-                  value={answer}
-                  onChange={e => setAnswer(e.target.value)}
-                  placeholder="let nivel = 1;"
-                  disabled={hero.missionComplete}
-                />
-                <button onClick={submit}
-                  disabled={hero.missionComplete}>
-                  Verificar resposta
-                </button>
-                <p aria-live="polite">
-                  {hero.missionComplete
-                    ? "Missao concluida! Recompensa recebida."
-                    : feedback}
-                </p>
-              </>
-            )}
-          </section>
-        </div>
-      )}
-    </main>
-  );
+  const ready = useGame(s => s.ready); const hero = useGame(s => s.hero); const completed = useGame(s => s.education.completed); const encounter = useGame(s => s.encounter); const notice = useGame(s => s.notice); const buff = useGame(s => s.buff); const settings = useGame(s => s.settings); const error = useGame(s => s.saveError); const ancestors = useGame(s => s.ancestors);
+  const [panel, setPanel] = useState<Panel>("none"); const [npc, setNpc] = useState<NpcId>("lion"); const [collapsed, setCollapsed] = useState(false); const [clock, setClock] = useState("Brasília"); const [worldMessage, setWorldMessage] = useState(""); const audio = useRef<AudioContext | null>(null); const soundGain = useRef<GainNode | null>(null);
+  useEffect(() => { void useGame.getState().hydrate(); const id = setInterval(() => { useGame.getState().tick(1); setClock(new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" }).format(new Date())); }, 1000); return () => clearInterval(id); }, []);
+  useEffect(() => { if (notice) { const id = setTimeout(() => useGame.getState().clearNotice(), 8000); return () => clearTimeout(id); } }, [notice]);
+  useEffect(() => { return () => { void audio.current?.close(); }; }, []);
+  function toggleAudio() { if (!audio.current) { const ctx = new AudioContext(); const gain = ctx.createGain(); gain.gain.value = 0; gain.connect(ctx.destination); [110, 164.81, 220].forEach((frequency, i) => { const oscillator = ctx.createOscillator(); oscillator.type = "sine"; oscillator.frequency.value = frequency + i * 0.3; oscillator.connect(gain); oscillator.start(); }); audio.current = ctx; soundGain.current = gain; } void audio.current.resume(); const on = settings.volume === 0; soundGain.current!.gain.setTargetAtTime(on ? 0.012 : 0, audio.current.currentTime, 0.4); useGame.getState().setting({ volume: on ? 0.25 : 0 }); }
+  const close = useCallback(() => setPanel("none"), []);
+  if (!ready) return <main className="loading-screen"><div className="loading-crystal">◆</div><span className="eyebrow">LION’S CAVE</span><h1>O Código Perdido</h1><p>Preservando sua jornada e abrindo o portal…</p></main>;
+  const limits = stats(hero); const next = LESSONS.find(l => !completed.includes(l.id)); const activePanel = !hero.created && panel !== "settings" ? "creator" : panel;
+  const titles: Record<Panel, string> = { none: "", creator: "Seu personagem", journal: "O Código Perdido", bag: "Inventário", talents: "Árvore de talentos", academy: "Biblioteca do conhecimento", settings: "Configurações & recuperação", ancestors: "Arquivo de antepassados", npc: npc === "borin" ? "Borin · mercador e ferreiro" : npc === "eldrin" ? "Eldrin · Mestre das Runas" : npc === "pip" ? "Pip · viajante improvável" : "Lion · guardião cristalino" };
+  return <main className="game-shell" style={{ "--panel-opacity": settings.panelOpacity, "--ui-scale": settings.uiScale } as CSSProperties}>
+    <div className="world-container"><World paused={activePanel !== "none"} interact={id => { setNpc(id); setPanel("npc"); }} report={text => { setWorldMessage(text); setTimeout(() => setWorldMessage(""), 6000); }} /></div><div className="world-vignette" />
+    <header className="game-brand"><span className="brand-rune">♜</span><div><h1>LION’S CAVE</h1><span>RPG PROGRAMADOR</span></div><span className="version-tag">{RELEASE}</span></header>
+    <div className="location-display"><span className="eyebrow">O CÓDIGO PERDIDO · CAPÍTULO I</span><h2>{hero.position[0] > 15 && hero.position[1] < -12 ? "Minas das Condições" : hero.position[1] < -12 ? "Floresta das Variáveis" : "Pedra da Aurora"}</h2><span className="location-time">{clock} · horário de Brasília</span></div>
+    <div className="top-actions"><button className="icon-button" onClick={toggleAudio} aria-label="Ativar ou silenciar som ambiente">{settings.volume ? "♪" : "♩"}</button><button className="icon-button" onClick={() => setPanel("settings")} aria-label="Configurações">⚙</button></div>
+    <aside className="left-hud"><Minimap /><div className={`hero-card ${collapsed ? "collapsed" : ""}`}><button className="hero-card-header" onClick={() => setCollapsed(!collapsed)} aria-expanded={!collapsed}><div className="portrait">{hero.dead ? "♜" : "♙"}<b>{hero.level}</b></div><div><strong>{hero.name}</strong><small>{RACES[hero.race]} · {CLASSES[hero.classId].name}</small></div><span>{collapsed ? "+" : "−"}</span></button>{!collapsed && <><Meter label="HP" value={hero.hp} max={limits.maxHp} tone="linear-gradient(90deg,#743d45,#b76462)" /><Meter label="MP" value={hero.mp} max={limits.maxMp} tone="linear-gradient(90deg,#385d82,#709bbc)" /><Meter label="EST" value={hero.stamina} max={limits.maxStamina} tone="linear-gradient(90deg,#627349,#9cae6c)" /><div className="hero-card-footer"><span>◉ {hero.gold}</span><span>{hero.xp} XP</span></div></> }</div>{buff > 0 && <div className="buff-indicator">✧ Chá de Lion · proteção +5 · {Math.ceil(buff)}s</div>}{hero.mode === "hardcore" && <span className="hardcore-tag">HARDCORE · morte permanente</span>}</aside>
+    <aside className="quest-tracker"><span className="eyebrow">◆ SUA JORNADA</span><h3>{next ? next.title : "As runas foram restauradas"}</h3><p>{next ? next.id === "variables" ? "Encontre Eldrin, o Mestre das Runas, na praça." : "Volte a Eldrin para continuar seu aprendizado." : "Explore a floresta, vença o guardião e construa seu portfólio."}</p><button className="text-button" onClick={() => setPanel("journal")}>Abrir diário <span>↗</span></button><div className="quest-counter"><span>{completed.filter(id => LESSONS.some(l => l.id === id)).length} / 8 runas</span><span>{hero.kills} vitórias</span></div></aside>
+    {(notice || worldMessage) && <div className="toast" role="status"><span>◆</span>{worldMessage || notice}</div>}
+    {error && <button className="save-alert" onClick={() => setPanel("settings")}>Salvamento precisa de atenção · exportar e recuperar ↗</button>}
+    {hero.dead && <div className="death-banner"><span className="eyebrow">A JORNADA DE {hero.name.toUpperCase()} TERMINOU</span><h2>O conhecimento permanece.</h2><button className="primary" onClick={() => setPanel("ancestors")}>Ver antepassados e recomeçar</button></div>}
+    {encounter && <section className="combat-panel"><span className="eyebrow">ENCONTRO · {encounter.elite ? "CHEFE" : "SENTINELA"}</span><h3>{encounter.name}</h3><Meter label="HP" value={encounter.hp} max={encounter.maxHp} tone="#a75d68" /><div className="combat-actions"><button className="primary" onClick={() => useGame.getState().attack()}>⚔ Atacar <small>9 EST</small></button><button onClick={() => useGame.getState().attack(true)}>✧ {CLASSES[hero.classId].skill}<small>18 MP</small></button><button disabled={!hero.inventory.includes("potion")} onClick={() => useGame.getState().useItem("potion")}>Poção</button><button className="quiet" onClick={() => useGame.getState().flee()}>Recuar</button></div><small>Combate tático: cada ataque provoca uma reação. Intervalo de 0,65s.</small></section>}
+    <footer className="bottom-hud"><div className="controls-help"><span>CLIQUE / TOQUE PARA CAMINHAR</span><small>Arraste com botão direito para câmera · roda / pinça para zoom · WASD opcional</small></div><nav className="action-bar" aria-label="Painéis do jogo">{([['journal', 'Missões'], ['bag', 'Mochila'], ['talents', 'Talentos'], ['academy', 'Estudos'], ['creator', 'Personagem'], ['ancestors', 'Legado']] as [Panel, string][]).map(([id, label]) => <button key={id} onClick={() => setPanel(id)} className={activePanel === id ? "active" : ""}><span>{icons[id]}</span><small>{label}</small></button>)}<button onClick={() => useGame.getState().rest()} disabled={!!encounter || hero.dead || Math.hypot(...hero.position) > 11}><span>☽</span><small>Descansar</small></button></nav><span className="save-indicator">◇ {error ? "Exportação necessária" : "Jornada salva neste navegador"}</span></footer>
+    {activePanel !== "none" && <Modal title={titles[activePanel]} close={close} wide={["creator", "journal", "academy"].includes(activePanel)}>
+      {activePanel === "creator" && <Creator close={close} />}{activePanel === "journal" && <Journal />}{activePanel === "bag" && <Inventory />}{activePanel === "talents" && <Talents />}{activePanel === "academy" && <Academy />}{activePanel === "settings" && <SettingsPanel />}
+      {activePanel === "ancestors" && <div className="panel-body"><span className="eyebrow">SEU LEGADO É O QUE VOCÊ APRENDEU</span><h3>Nenhuma descoberta se perde.</h3><p>{completed.length} missões educacionais preservadas. A herança equivale a 15% do XP próprio da aventura encerrada, limitada a 100 XP e recebida uma única vez. O XP herdado não gera nova herança.</p>{ancestors.length ? ancestors.map(a => <article className="ancestor" key={a.id}><span>♜</span><div><h4>{a.name}</h4><p>{CLASSES[a.classId].name} · nível {a.level} · {a.cause}</p><small>{new Date(a.diedAt).toLocaleDateString("pt-BR")} · {a.legacy} XP de legado · {a.claimed ? "utilizado" : "disponível"}</small></div></article>) : <div className="empty-state">As primeiras páginas ainda estão em branco.</div>}{hero.dead && <button className="primary" onClick={() => setPanel("creator")}>Criar um novo personagem</button>}<p className="small-note">Modo individual local. Restaurar arquivos fora do aplicativo ou adulterar dados pode contornar proteções locais; não existe competição ou ranking nesta versão.</p></div>}
+      {activePanel === "npc" && <>{npc === "borin" ? <Inventory shop /> : <div className="panel-body npc-dialogue"><div className={`npc-symbol ${npc}`}>{npc === "lion" ? "◆" : npc === "eldrin" ? "✧" : "◇"}</div><span className="eyebrow">{npc === "lion" ? "LION" : npc === "eldrin" ? "ELDRIN" : "PIP"}</span><h3>{npc === "lion" ? "O mundo se lembra de você." : npc === "eldrin" ? "Cada runa é uma descoberta." : "Uma oportunidade entre as árvores."}</h3><p>{npc === "lion" ? "O Código Perdido fragmentou as regras deste mundo. Você pode reconstruí-las. Conclua missões com Eldrin, equipe-se com Borin e explore quando os portais se abrirem." : npc === "eldrin" ? "Não quero uma resposta decorada. Escreva, execute e observe. A primeira runa abre a floresta. A comporta das decisões libera as minas." : "As sentinelas deixaram fragmentos no bosque. Derrote-as e leve os materiais à oficina de Borin. Você também pode retornar a uma missão para revisar, sem repetir sua recompensa."}</p><button className="primary" onClick={() => setPanel(npc === "pip" ? "bag" : "journal")}>{npc === "pip" ? "Ver meus recursos" : "Abrir o diário de runas"} ↗</button></div>}</>}
+    </Modal>}
+  </main>;
 }

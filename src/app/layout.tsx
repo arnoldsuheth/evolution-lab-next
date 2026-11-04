@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Evolution Lab RPG | Genesis Reborn",
-  description: "RPG de fantasia e aprendizagem real",
+  title: "Lion’s Cave RPG Programador",
+  description: "O Código Perdido — aprenda programação explorando Pedra da Aurora.",
 };
 
 export default function RootLayout({

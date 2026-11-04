@@ -1,53 +1,41 @@
-name: Genesis Reborn - GitHub Pages
-
+name: Lion's Cave - checks and GitHub Pages
 on:
   push:
-    branches: ["interface-nexus"]
+    branches: ["interface-nexus", "work/lions-cave-131"]
   workflow_dispatch:
-
 permissions:
   contents: read
-
 concurrency:
-  group: genesis-reborn-pages
+  group: lions-cave-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: npm
-
-      - name: Instalar dependencias
-        run: npm ci
-
-      - name: Testar regras
-        run: npx tsx --test src/lib/*.test.ts
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Build estatico
+      - run: npm ci
+      - name: Unit and migration tests
+        run: npm test
+      - name: TypeScript
+        run: npm run typecheck
+      - name: ESLint
+        run: npm run lint -- --max-warnings=0
+      - name: Static production build
         env:
           GITHUB_PAGES: "true"
         run: npm run build
-
-      - name: Preparar Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload do site
-        uses: actions/upload-pages-artifact@v4
+      - uses: actions/configure-pages@v5
+        if: github.ref == 'refs/heads/interface-nexus'
+      - uses: actions/upload-pages-artifact@v4
+        if: github.ref == 'refs/heads/interface-nexus'
         with:
           path: ./out
-
   deploy:
+    if: github.ref == 'refs/heads/interface-nexus'
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -57,6 +45,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Publicar
+      - name: Publish authorized release
         id: deployment
         uses: actions/deploy-pages@v4

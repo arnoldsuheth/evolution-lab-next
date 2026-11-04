@@ -1,12 +1,14 @@
 {
-  "name": "genesis-reborn-clean-seed",
-  "version": "0.1.0",
+  "name": "lions-cave-rpg-programador",
+  "version": "1.3.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "node --import tsx --test src/lib/*.test.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",
