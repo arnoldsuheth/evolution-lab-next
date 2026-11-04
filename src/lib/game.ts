@@ -5,7 +5,7 @@ import { buildCatalogue } from "./catalogue";
 import { activeEquipment } from "./equipment";
 import { passiveBonuses, SKILLS } from "./skills";
 
-export const RELEASE = "1.5.0";
+export const RELEASE = "1.5.1";
 export type Race = "human" | "orc" | "dwarf" | "elf" | "gnome";
 export type ClassId = "paladin" | "warrior" | "hunter" | "engineer" | "mage" | "hacker" | "prophet" | "duelist" | "shaman";
 export type NpcId = "borin" | "eldrin" | "pip" | "lion" | "traveler";

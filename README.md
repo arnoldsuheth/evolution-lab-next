@@ -1,6 +1,6 @@
 # LION’S CAVE RPG PROGRAMADOR
 
-## 1.5.0 · Identidades da Aurora
+## 1.5.1 · Revisão de anatomia
 
 RPG individual 3D em desenvolvimento. Cinco raças, nove classes, personagens novos com roupas remendadas e educação separada da aventura. Esta versão amplia sistemas; não representa um RPG profissional concluído.
 
@@ -86,3 +86,11 @@ O mapa inicial mede aproximadamente 54 × 42 unidades, com quatro casas, vila, f
 ### Publicação
 
 Produção: `interface-nexus`. O workflow exige testes, TypeScript, ESLint e build antes de publicar no GitHub Pages. Sem novos serviços pagos, chaves ou dependências de produção. Mudanças e publicação autorizadas pelo proprietário.
+
+### Revisão visual 1.5.1
+
+O personagem da 1.5.0 ainda tinha aparência de brinquedo. A 1.5.1 substitui o montador anterior por `avatarMesh.ts`: malhas contínuas e afuniladas nos membros, proporções adultas, rosto com bochechas/mandíbula/nariz esculpidos na mesma geometria, olhos menores, sobrancelhas finas, barba mais discreta, cabelo em cobertura e mechas e roupa com trama procedural. Criador e mundo usam a mesma construção. O enquadramento fixo foi reajustado para o modelo mais alto; zoom e giro automático continuam desativados.
+
+A revisão foi inspecionada em renderização técnica fora do navegador, com depth buffer e iluminação aproximada. Isso permite conferir geometria e sobreposições; não equivale à homologação de WebGL, materiais, sombras e desempenho em aparelho físico. O resultado continua sendo arte procedural estilizada, sem equivalência ao conceito semirrealista gerado. Atingir esse conceito exige uma etapa dedicada de produção artística.
+
+Não houve mudança de schema nem regravação de aparência por migração: índices e campos salvos permanecem, incluindo XP, missões, equipamento e histórico.

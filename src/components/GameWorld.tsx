@@ -148,7 +148,7 @@ function PreviewCamera({ race }: { race: Race }) {
   const camera = useThree(s => s.camera);
   const controls = useRef<ComponentRef<typeof OrbitControls>>(null);
   const height = {human:1.1,orc:1.14,dwarf:0.82,elf:1.2,gnome:0.69}[race];
-  const target=1.18*height, distance=4.75*height;
+  const target=1.68*height, distance=6.5*height;
   useEffect(()=>{camera.position.set(0,target+.08,distance);controls.current?.target.set(0,target,0);controls.current?.update();},[camera,target,distance]);
   return <OrbitControls ref={controls} target={[0,target,0]} enablePan={false} enableZoom={false} autoRotate={false} enableDamping={false} minDistance={distance} maxDistance={distance} minPolarAngle={Math.PI/2-.035} maxPolarAngle={Math.PI/2-.035} touches={{ONE:THREE.TOUCH.ROTATE}} />;
 }
