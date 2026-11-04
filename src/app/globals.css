@@ -59,3 +59,5 @@ button:focus-visible{outline:2px solid #ecce90;outline-offset:3px;box-shadow:0 0
 
 .item-inspector{position:sticky;top:0;z-index:6;max-height:250px;overflow:auto}.entrance-brand .brand-emblem{width:76px;height:76px}.entrance-brand b{background:linear-gradient(130deg,#f2e3ba,#bea16a,#f3dfaf);background-clip:text;color:transparent;text-shadow:0 5px 20px #0004}
 @media(max-width:600px){.item-inspector{max-height:205px}.entrance-brand .brand-emblem{width:53px;height:53px}}
+
+.toast{z-index:65}.item-art-button:hover .game-artwork{filter:drop-shadow(0 0 9px #d0b47866)}
