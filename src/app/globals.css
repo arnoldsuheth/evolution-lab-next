@@ -61,3 +61,6 @@ button:focus-visible{outline:2px solid #ecce90;outline-offset:3px;box-shadow:0 0
 @media(max-width:600px){.item-inspector{max-height:205px}.entrance-brand .brand-emblem{width:53px;height:53px}}
 
 .toast{z-index:65}.item-art-button:hover .game-artwork{filter:drop-shadow(0 0 9px #d0b47866)}
+
+.left-hud{bottom:198px}.top-actions{right:166px;top:26px}
+@media(max-width:600px){.left-hud{bottom:169px}.top-actions{right:14px;top:110px}}
