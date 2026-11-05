@@ -1,4 +1,5 @@
 "use client";
+import { HOTBAR_SIZE } from './controls';
 import {MONSTERS,REGIONS,regionRequirement,monsterRequirement,type RegionId} from "./campaign";
 import { AI_COURSE, CHESTS, aiRequirement, travelerFor, pendingDelivery, makeChallenge, mainRequirement, projectRequirement, promotionRequirement, promotionRank, type Challenge } from "./journey";
 import { create } from "zustand";
@@ -35,6 +36,7 @@ const guardedStorage = {
 export type Encounter = EnemyState;
 interface GameStore extends SaveData {
   ready: boolean; saveError: string; notice: string; encounter: Encounter | null; buff: number; lastAttack: number; cooldowns: Record<string,number>; now: number; effects: {kind:string;amount:number;remaining:number}[];
+  battleEvent:{time:number;damage:number;received:number;x:number;z:number;tone:string}|null;
   challenge: Challenge|null;
   beginPromotion:()=>void; beginChest:(id:string)=>void; beginAI:(id:string)=>void; answerChallenge:(answer:string)=>void; cancelChallenge:()=>void;
   deliverQuest:(kind:"main"|"ai")=>void;
@@ -45,7 +47,7 @@ interface GameStore extends SaveData {
   draft: (id: string, code: string) => void; solve: (id: string, code: string) => ReturnType<typeof evaluateLesson>; project: (id: string, code: string) => void;
   buy: (id: string) => void; equip: (id: string) => void; useItem: (id: string) => void; craft: (id: string) => void; talent: (branch: number) => void;
   startEncounter: (elite?: boolean, level?: number, monsterId?:string) => void; travelRegion:(region:RegionId)=>void; attack: (skill?: boolean) => void; flee: () => void; rest: () => void; tick: (seconds: number) => void;
-  sell: (id: string) => void; learnSkill: (id:string) => void; bindSkill: (id:string) => void; respec: () => void; castSkill: (id:string) => void;
+  sell: (id: string) => void; learnSkill: (id:string) => void; bindSkill: (id:string,slot?:number) => void; respec: () => void; castSkill: (id:string) => void;
   setting: (v: Partial<Settings>) => void; restore: (raw: string) => void; clearNotice: () => void;
 }
 export function savedState(s: SaveData): SaveData { return { hero: s.hero, look: s.look, education: s.education, ancestors: s.ancestors, settings: s.settings, legacy: s.legacy }; }
@@ -53,16 +55,18 @@ function executeBattle(id:string|undefined,starter:boolean,set:(value:Partial<Ga
  const s=get(),enemy=s.encounter!;
  const result=resolveCombat(s.hero,enemy,{skillId:id,starter,attackBuff:s.effects.filter(e=>e.kind==='attack').reduce((n,e)=>n+e.amount,0),defenseBuff:(s.buff>0?5:0)+s.effects.filter(e=>e.kind==='defense').reduce((n,e)=>n+e.amount,0)});
  if(result.error){set({notice:result.error});return;}
+ const target=MONSTERS.find(m=>m.id===enemy.monsterId);
+ const feedback={battleEvent:{time:Date.now(),damage:result.damage,received:result.received,x:target?.x??s.hero.position[0],z:target?.z??s.hero.position[1],tone:id?CLASSES[s.hero.classId].color:'#efd49a'}};
  const skillBuff=id?SKILLS[id].buff:undefined;
  const effects=skillBuff?[...s.effects.filter(e=>e.kind!==skillBuff.kind),{kind:skillBuff.kind,amount:Math.round(skillBuff.amount*(1+(skillRank(s.hero,id!)-1)*.14)),remaining:skillBuff.duration}]:s.effects;
  const now=Date.now(),cooldowns={...s.cooldowns,...(id?{[id]:now+SKILLS[id].cooldown*1000}:{})};
- if(result.won){const reward=battleRewards(s.hero,enemy);const inventory=[...result.hero.inventory];for(const drop of reward.drops){const item=ITEMS[drop];if(item&&countItem(inventory,drop)<item.maxStack)inventory.push(drop);}set({hero:{...withXp(result.hero,reward.xp),gold:result.hero.gold+reward.gold,materials:result.hero.materials+reward.fragments,kills:result.hero.kills+1,defeatedBosses:enemy.bossId?[...new Set([...result.hero.defeatedBosses,enemy.bossId])]:result.hero.defeatedBosses,inventory},encounter:null,cooldowns,effects,now,lastAttack:now,notice:`Vitória! +${reward.xp} XP · +${reward.gold} ouro · ${reward.drops.length} itens/materiais. Confira a mochila.`});return;}
- if(result.dead&&s.hero.mode==='hardcore'){const h=result.hero;const ancestor={id:h.id,name:h.name,classId:h.classId,level:h.level,diedAt:now,cause:enemy.name,legacy:Math.min(100,Math.max(0,Math.floor((h.xp-h.inherited)*.15))),claimed:false};set({hero:{...h,hp:0,dead:true},ancestors:s.ancestors.some(a=>a.id===h.id)?s.ancestors:[...s.ancestors,ancestor],encounter:null,cooldowns,effects,now,lastAttack:now,notice:'Aventura encerrada. Educação e portfólio preservados.'});return;}
- if(result.dead){set({hero:{...result.hero,hp:Math.round(stats(result.hero).maxHp*.6),region:"aurora",position:[0,5]},encounter:null,cooldowns,effects,now,lastAttack:now,notice:'Lion levou você à vila. Seu progresso foi preservado.'});return;}
- set({hero:result.hero,encounter:result.enemy,cooldowns,effects,now,lastAttack:now,notice:`${id?SKILLS[id].name:starter?CLASSES[s.hero.classId].skill:'Ataque'}: ${result.damage} de dano · ${result.received} recebido.`});
+ if(result.won){const reward=battleRewards(s.hero,enemy);const inventory=[...result.hero.inventory];for(const drop of reward.drops){const item=ITEMS[drop];if(item&&countItem(inventory,drop)<item.maxStack)inventory.push(drop);}set({...feedback,hero:{...withXp(result.hero,reward.xp),gold:result.hero.gold+reward.gold,materials:result.hero.materials+reward.fragments,kills:result.hero.kills+1,defeatedBosses:enemy.bossId?[...new Set([...result.hero.defeatedBosses,enemy.bossId])]:result.hero.defeatedBosses,inventory},encounter:null,cooldowns,effects,now,lastAttack:now,notice:`Vitória! +${reward.xp} XP · +${reward.gold} ouro · ${reward.drops.length} itens/materiais. Confira a mochila.`});return;}
+ if(result.dead&&s.hero.mode==='hardcore'){const h=result.hero;const ancestor={id:h.id,name:h.name,classId:h.classId,level:h.level,diedAt:now,cause:enemy.name,legacy:Math.min(100,Math.max(0,Math.floor((h.xp-h.inherited)*.15))),claimed:false};set({...feedback,hero:{...h,hp:0,dead:true},ancestors:s.ancestors.some(a=>a.id===h.id)?s.ancestors:[...s.ancestors,ancestor],encounter:null,cooldowns,effects,now,lastAttack:now,notice:'Aventura encerrada. Educação e portfólio preservados.'});return;}
+ if(result.dead){set({...feedback,hero:{...result.hero,hp:Math.round(stats(result.hero).maxHp*.6),region:"aurora",position:[0,5]},encounter:null,cooldowns,effects,now,lastAttack:now,notice:'Lion levou você à vila. Seu progresso foi preservado.'});return;}
+ set({...feedback,hero:result.hero,encounter:result.enemy,cooldowns,effects,now,lastAttack:now,notice:`${id?SKILLS[id].name:starter?CLASSES[s.hero.classId].skill:'Ataque'}: ${result.damage} de dano · ${result.received} recebido.`});
 }
 export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>((set, get) => ({
-  ...freshSave(), challenge:null, ready: false, saveError: "", notice: "", encounter: null, buff: 0, lastAttack: 0, cooldowns: {}, now: 0, effects: [],
+  ...freshSave(), battleEvent:null, challenge:null, ready: false, saveError: "", notice: "", encounter: null, buff: 0, lastAttack: 0, cooldowns: {}, now: 0, effects: [],
   hydrate: async () => { await useGame.persist.rehydrate(); set({ ready: true, now: Date.now(), saveError: storageIssue, notice: storageIssue ? "Salvamento protegido. Exporte o original antes de recuperar." : "Bem-vindo a Pedra da Aurora." }); },
   createCharacter: (name, classId, mode, race) => {
     if(race && !validRaceClass(race,classId))return;
@@ -111,8 +115,8 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     if(s.hero.materials<fragments||s.hero.gold<fee)return;const inventory=removeItems(s.hero.inventory,item.ingredients??{});if(!inventory)return;
     set({hero:{...s.hero,materials:s.hero.materials-fragments,gold:s.hero.gold-fee,inventory:[...inventory,id]},notice:`${item.name} fabricado. Materiais e custo descontados uma única vez.`});
   },
-  learnSkill: id => {const s=get();if(s.encounter)return;const reason=skillRequirement(s.hero,id);if(reason){set({notice:reason});return;}const skill=SKILLS[id];const hero={...s.hero,skills:{...s.hero.skills,[id]:skillRank(s.hero,id)+1},hotbar:skill.kind==='active'&&!s.hero.hotbar.includes(id)&&s.hero.hotbar.length<4?[...s.hero.hotbar,id]:s.hero.hotbar};set({hero,notice:`${skill.name} aprimorada.`});},
-  bindSkill: id => {const s=get(),skill=SKILLS[id];if(!skill||skill.classId!==s.hero.classId||skill.kind!=='active'||!skillRank(s.hero,id)||s.encounter)return;if(s.hero.hotbar.includes(id)){set({hero:{...s.hero,hotbar:s.hero.hotbar.filter(x=>x!==id)}});return;}if(s.hero.hotbar.length>=4){set({notice:'Retire uma habilidade da barra para selecionar outra. Limite: quatro.'});return;}set({hero:{...s.hero,hotbar:[...s.hero.hotbar,id]}});},
+  learnSkill: id => {const s=get();if(s.encounter)return;const reason=skillRequirement(s.hero,id);if(reason){set({notice:reason});return;}const skill=SKILLS[id];const hero={...s.hero,skills:{...s.hero.skills,[id]:skillRank(s.hero,id)+1},hotbar:skill.kind==='active'&&!s.hero.hotbar.includes(id)&&s.hero.hotbar.filter(Boolean).length<HOTBAR_SIZE?(()=>{const bar=[...s.hero.hotbar],empty=bar.indexOf('');if(empty>=0)bar[empty]=id;else bar.push(id);return bar;})():s.hero.hotbar};set({hero,notice:`${skill.name} aprimorada.`});},
+  bindSkill: (id,slot) => {const s=get(),skill=SKILLS[id];if(!skill||skill.classId!==s.hero.classId||skill.kind!=='active'||!skillRank(s.hero,id)||s.encounter||s.hero.dead)return;const bar=[...s.hero.hotbar];const existing=bar.indexOf(id);if(slot===undefined&&existing>=0){bar[existing]='';}else{const target=slot??(bar.includes('')?bar.indexOf(''):bar.length);if(!Number.isInteger(target)||target<0||target>=HOTBAR_SIZE){set({notice:'Escolha um dos dez espaços da barra.'});return;}if(existing>=0)bar[existing]='';while(bar.length<=target)bar.push('');bar[target]=id;}set({hero:{...s.hero,hotbar:bar}});},
   respec:()=>{const s=get();if(s.encounter||s.hero.dead)return;const skills=Object.fromEntries(Object.entries(s.hero.skills).filter(([id])=>SKILLS[id]?.classId!==s.hero.classId));const hero={...s.hero,skills,hotbar:[],talents:[0,0,0]};const limits=stats(hero);set({hero:{...hero,hp:Math.min(hero.hp,limits.maxHp),mp:Math.min(hero.mp,limits.maxMp),stamina:Math.min(hero.stamina,limits.maxStamina)},notice:'Pontos da classe devolvidos. XP e progresso preservados.'});},
   castSkill:id=>{const s=get(),skill=SKILLS[id];if(!s.encounter||s.hero.dead||!skill||skill.classId!==s.hero.classId||skill.kind!=='active'||!skillRank(s.hero,id)||s.hero.level<skill.minLevel)return;if(Date.now()<(s.cooldowns[id]??0)||Date.now()-s.lastAttack<650)return;executeBattle(id,false,set,get);},
   talent: branch => { const s = get(); if (s.hero.dead || branch < 0 || branch > 2 || s.hero.talents.reduce((a, b) => a + b, 0) >= s.hero.level - 1 || s.hero.talents[branch] >= 10) return; set({ hero: { ...s.hero, talents: s.hero.talents.map((v, i) => i === branch ? v + 1 : v) } }); },

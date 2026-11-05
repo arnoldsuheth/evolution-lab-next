@@ -1,24 +1,25 @@
 "use client";
 import {useEffect,useMemo,useRef} from 'react';
+import type * as THREE from 'three';
 import {createPortal,useFrame} from '@react-three/fiber';
-import * as THREE from 'three';
 import {CLASSES,ITEMS,HAIR,EYES,type ClassId,type Look,type Race} from '@/lib/game';
 import {activeEquipment} from '@/lib/equipment';
-import {buildAvatar,disposeAvatar} from '@/lib/avatarMesh';
+import {buildCartoonAvatar} from '@/lib/cartoonAvatar';
+import {disposeAvatar} from '@/lib/avatarMesh';
+import {useGame} from '@/lib/store';
 import EquipmentVisual,{rarityTone} from './EquipmentVisual';
-export default function Character({classId,look,equipped=[],walking=false,animated=true,preview=false,skinOverride,level=1,race:selectedRace}:{classId:ClassId;look:Look;equipped?:string[];walking?:boolean;animated?:boolean;preview?:boolean;skinOverride?:string;level?:number;race?:Race}){
- const race=selectedRace??CLASSES[classId].race,phase=useRef(0);
- const equipmentKey=equipped.join('|');
+export default function Character({classId,look,equipped=[],walking=false,animated=true,preview=false,skinOverride,level=1,race:selectedRace,combatant=false}:{classId:ClassId;look:Look;equipped?:string[];walking?:boolean;animated?:boolean;preview?:boolean;skinOverride?:string;level?:number;race?:Race;combatant?:boolean}){
+ const race=selectedRace??CLASSES[classId].race,modelRef=useRef<THREE.Group>(null),phase=useRef(0),event=useGame(s=>combatant?s.battleEvent:null);
+ const equipmentKey=equipped.join('|'),lookKey=JSON.stringify(look);
  const gear=useMemo(()=>activeEquipment({classId,level,dead:false,equipped:equipmentKey.split('|').filter(Boolean)},ITEMS),[classId,level,equipmentKey]);
- const chest=gear.find(i=>i.slot==='chest'),weapon=gear.find(i=>i.slot==='weapon'||i.slot==='twohand'),offhand=gear.find(i=>i.slot==='offhand');
- const accent=chest?rarityTone(chest.rarity):CLASSES[classId].color;
- const cloth=['#756e59','#58676a','#795d58','#5c6b52','#655e74','#8a7d62'][look.cloth]??'#756e59';
- const armorColors:Record<string,string>={Pesada:'#79858d',Leve:'#66705e',Couro:'#705f4c',Reforçada:'#727c77',Tecido:CLASSES[classId].color};
- const torsoColor=chest?armorColors[chest.armor??'']??cloth:cloth;
- const avatarRef=useRef<THREE.Group>(null);
- const lookKey=JSON.stringify(look),gearKey=gear.map(i=>i.slot).join(',');
- const avatar=useMemo(()=>{const selectedLook=JSON.parse(lookKey) as Look,slots=new Set(gearKey.split(','));return buildAvatar({race,look:selectedLook,hairColor:HAIR[selectedLook.hairColor]??HAIR[0],eyeColor:EYES[selectedLook.eyes]??EYES[0],clothColor:torsoColor,accent,skinOverride,gear:{chest:slots.has('chest'),head:slots.has('head'),shoulders:slots.has('shoulders'),hands:slots.has('hands'),legs:slots.has('legs'),feet:slots.has('feet'),back:slots.has('back')}});},[race,lookKey,gearKey,torsoColor,accent,skinOverride]);
+ const weapon=gear.find(i=>i.slot==='weapon'||i.slot==='twohand'),offhand=gear.find(i=>i.slot==='offhand');
+ const gearKey=gear.map(i=>i.slot).join(',');
+ const avatar=useMemo(()=>{const selectedLook=JSON.parse(lookKey) as Look;return buildCartoonAvatar({race,classId,look:selectedLook,hairColor:HAIR[selectedLook.hairColor]??HAIR[0],eyeColor:EYES[selectedLook.eyes]??EYES[0],skinOverride,gear:new Set(gearKey.split(','))});},[race,classId,lookKey,gearKey,skinOverride]);
+ const rig=useMemo(()=>({head:avatar.getObjectByName('head'),legs:[avatar.getObjectByName('legLeft'),avatar.getObjectByName('legRight')],arms:[avatar.getObjectByName('armLeft'),avatar.getObjectByName('armRight')],weapon:avatar.getObjectByName('weaponAnchor')!,offhand:avatar.getObjectByName('offhandAnchor')!}),[avatar]);
  useEffect(()=>()=>disposeAvatar(avatar),[avatar]);
- useFrame((_,delta)=>{const model=avatarRef.current;if(!animated||!model)return;phase.current+=Math.min(delta,.05)*(walking?8:1.6);const a=walking?Math.sin(phase.current)*.42:0;for(const [name,sign]of [['legLeft',1],['legRight',-1],['armLeft',-.6],['armRight',.6]] as const){const joint=model.getObjectByName(name);if(joint)joint.rotation.x=a*sign;}model.position.y=walking?Math.abs(Math.sin(phase.current))*.025:Math.sin(phase.current)*.006;});
- return <group scale={preview?1:.74}><primitive object={avatar} ref={avatarRef}/>{weapon&&createPortal(<EquipmentVisual visual={weapon.visual} tone={rarityTone(weapon.rarity)}/>,avatar.getObjectByName('weaponAnchor')!)}{offhand&&createPortal(<EquipmentVisual visual={offhand.visual} tone={rarityTone(offhand.rarity)} small={offhand.visual==='dagger'}/>,avatar.getObjectByName('offhandAnchor')!)}{preview&&<mesh rotation={[-Math.PI/2,0,0]} position={[0,-.025,0]}><ringGeometry args={[.75,.763,64]}/><meshBasicMaterial color={accent} transparent opacity={.5}/></mesh>}</group>;
+ useFrame((_,delta)=>{const model=modelRef.current;if(!animated||!model)return;const joints={head:model.getObjectByName('head'),legs:[model.getObjectByName('legLeft'),model.getObjectByName('legRight')],arms:[model.getObjectByName('armLeft'),model.getObjectByName('armRight')]};phase.current+=Math.min(delta,.05)*(walking?9:1.8);const p=phase.current,a=walking?Math.sin(p)*.65:Math.sin(p)*.045,age=event?(Date.now()-event.time)/1000:2,swing=age<.55?Math.sin(age/.55*Math.PI):0;
+ joints.legs.forEach((joint,i)=>{if(joint)joint.rotation.x=a*(i?1:-1);});joints.arms.forEach((joint,i)=>{if(joint){const activity=!combatant&&!preview&&!walking?(classId==='engineer'&&i===1?-.45+Math.sin(p*1.8)*.3:classId==='mage'&&i===0?-.35+Math.sin(p)*.12:0):0;joint.rotation.x=a*(i?-.65:.65)-swing*(i?1.4:.4)+activity;joint.rotation.z=(i?1:-1)*(.12+Math.sin(p*.6)*.035+swing*.15);}});
+ if(joints.head){joints.head.rotation.y=walking?Math.sin(p*.5)*.035:Math.sin(p*.33)*.12;joints.head.rotation.z=Math.sin(p*.65)*.022;}
+ model.position.y=walking?Math.abs(Math.sin(p))*.055:Math.sin(p)*.016;model.rotation.z=walking?Math.sin(p)*.025:0;});
+ return <group scale={preview?1:.74}><primitive object={avatar} ref={modelRef}/>{weapon&&createPortal(<EquipmentVisual visual={weapon.visual} tone={rarityTone(weapon.rarity)}/>,rig.weapon)}{offhand&&createPortal(<EquipmentVisual visual={offhand.visual} tone={rarityTone(offhand.rarity)} small={offhand.visual==='dagger'}/>,rig.offhand)}{preview&&<mesh rotation={[-Math.PI/2,0,0]} position={[0,-.025,0]}><ringGeometry args={[.8,.82,48]}/><meshBasicMaterial color={CLASSES[classId].color} transparent opacity={.5}/></mesh>}</group>;
 }

@@ -3,6 +3,9 @@ import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber"
 import { Html, OrbitControls } from "@react-three/drei";
 import { Component, Suspense, useEffect, useLayoutEffect, useRef, useState, type ReactNode, type ComponentRef, type RefObject } from "react";
 import * as THREE from "three";
+import KingdomDetails from './KingdomDetails';
+import CombatFeedback from './CombatFeedback';
+import {advanceJump,isEditingTarget} from '@/lib/controls';
 import Character from "./Character";
 import { frameWorld } from "@/lib/worldCamera";
 import WorldDetails, { HouseDetails } from "./WorldDetails";
@@ -26,18 +29,20 @@ const DEFAULT_LOOK: Look = { body: 2, hair: 2, beard: 2, moustache: 1, skin: 1, 
 function Stone({ position, size = 1, color = "#777e79" }: { position: [number, number, number]; size?: number; color?: string }) { return <mesh position={position} scale={[size, size * 0.6, size * 0.8]} castShadow receiveShadow><dodecahedronGeometry args={[1, 0]} /><meshStandardMaterial color={color} flatShading roughness={0.96} /></mesh>; }
 function Tree({ x, z, size = 1 }: { x: number; z: number; size?: number }) {
   return <group position={[x, 0, z]} scale={size}>
-    <mesh position={[0, 1.6, 0]} castShadow><cylinderGeometry args={[0.16, 0.38, 3.2, 7]} /><meshStandardMaterial color="#64503e" flatShading /></mesh>
-    {[0, 1, 2].map(i => <mesh key={i} position={[Math.sin(i*2)*.35,2.6+i*.8,Math.cos(i*2)*.25]} scale={[1,.8,1]} castShadow><icosahedronGeometry args={[1.65-i*.3,1]} /><meshStandardMaterial color={["#314d43", "#426b50", "#5a805b"][i]} flatShading /></mesh>)}
+    <mesh position={[0, 1.6, 0]} castShadow><cylinderGeometry args={[0.16, 0.38, 3.2, 7]} /><meshStandardMaterial color="#98633e" flatShading /></mesh>
+    {[0, 1, 2].map(i => <mesh key={i} position={[Math.sin(i*2)*.35,2.6+i*.8,Math.cos(i*2)*.25]} scale={[1,.8,1]} castShadow><icosahedronGeometry args={[1.65-i*.3,2]} /><meshStandardMaterial color={["#448d48", "#62a649", "#8abd59"][i]} flatShading /></mesh>)}
   </group>;
 }
 function House({ x, z, index }: { x: number; z: number; index: number }) {
+  const roofMaterial=useRef<THREE.MeshStandardMaterial>(null),ray=useRef(new THREE.Ray()),origin=useRef(new THREE.Vector3()),direction=useRef(new THREE.Vector3()),hit=useRef(new THREE.Vector3()),bounds=useRef(new THREE.Box3(new THREE.Vector3(x-3.1,3,z-3.1),new THREE.Vector3(x+3.1,5.8,z+3.1)));
+  useFrame(({camera},dt)=>{if(!roofMaterial.current)return;const p=useGame.getState().hero.position;origin.current.set(p[0],1.7,p[1]);direction.current.copy(camera.position).sub(origin.current);const distance=direction.current.length();ray.current.set(origin.current,direction.current.normalize());const covered=ray.current.intersectBox(bounds.current,hit.current)&&origin.current.distanceTo(hit.current)<distance;roofMaterial.current.opacity=THREE.MathUtils.damp(roofMaterial.current.opacity,covered?.28:1,10,dt);roofMaterial.current.depthWrite=roofMaterial.current.opacity>.95;});
   return <group position={[x, 0, z]} rotation={[0, index % 2 ? -0.12 : 0.1, 0]}>
     <HouseDetails index={index} />
     <mesh position={[0, 0.3, 0]} receiveShadow><boxGeometry args={[5.3, 0.65, 5]} /><meshStandardMaterial color="#77786d" flatShading /></mesh>
-    <mesh position={[0, 1.9, 0]} castShadow receiveShadow><boxGeometry args={[4.7, 3.2, 4.5]} /><meshStandardMaterial color={["#b1a187", "#b4a18a", "#c0b29a", "#a99b81"][index]} roughness={1} /></mesh>
-    <mesh position={[0, 4.1, 0]} rotation={[0, Math.PI / 4, 0]} castShadow><coneGeometry args={[4.05, 2.8, 4]} /><meshStandardMaterial color={index % 2 ? "#495d65" : "#70534d"} flatShading /></mesh>
+    <mesh position={[0, 1.9, 0]} castShadow receiveShadow><boxGeometry args={[4.7, 3.2, 4.5]} /><meshStandardMaterial color={["#f1d6a5", "#e7cbaa", "#e6d6bd", "#ebcc97"][index]} roughness={1} /></mesh>
+    <mesh position={[0, 4.1, 0]} rotation={[0, Math.PI / 4, 0]} castShadow><coneGeometry args={[4.05, 2.8, 4]} /><meshStandardMaterial ref={roofMaterial} transparent color={index % 2 ? "#386c93" : "#b2644b"} flatShading /></mesh>
     {[-2.3, 0, 2.3].map(a => <mesh key={a} position={[a, 1.9, 2.28]} castShadow><boxGeometry args={[0.16, 3.3, 0.17]} /><meshStandardMaterial color="#4b4235" /></mesh>)}
-    <mesh position={[0, 1.38, 2.3]}><boxGeometry args={[1.1, 2.15, 0.15]} /><meshStandardMaterial color="#4c4034" /></mesh>
+    <mesh position={[0, 1.62, 2.3]}><boxGeometry args={[1.25, 2.7, 0.15]} /><meshStandardMaterial color="#4c4034" /></mesh>
     {[-1.45, 1.45].map(a => <group key={a} position={[a, 2.25, 2.31]}><mesh><boxGeometry args={[0.8, 0.95, 0.1]} /><meshStandardMaterial color="#efc483" emissive="#e6a858" emissiveIntensity={0.4} /></mesh><mesh><boxGeometry args={[0.07, 0.99, 0.15]} /><meshStandardMaterial color="#554737" /></mesh><mesh><boxGeometry args={[0.84, 0.08, 0.15]} /><meshStandardMaterial color="#554737" /></mesh></group>)}
     <mesh position={[1.4, 4.5, -1]} castShadow><boxGeometry args={[0.65, 2.3, 0.7]} /><meshStandardMaterial color="#797c74" /></mesh>
     {[0, 1, 2].map(i => <mesh key={i} position={[1.4 + i * 0.16, 5.8 + i * 0.6, -1]} scale={0.25 + i * 0.14}><sphereGeometry args={[1, 7, 6]} /><meshBasicMaterial color="#c5c9c0" transparent opacity={0.12 - i * 0.025} depthWrite={false} /></mesh>)}
@@ -58,7 +63,7 @@ function Npc({ npc, interact, player }: { npc: typeof NPCS_LIVE[number]; interac
   const root = useRef<THREE.Group>(null); const questHero=useGame(s=>s.hero),questEducation=useGame(s=>s.education); const marker=npc.id==="eldrin"?questMarker(questHero,questEducation,"main"):""; const reduced = useGame(s => s.settings.reduceMotion);
   useFrame(state => { if (!root.current) return; const close = Math.hypot(player.current.x - npc.x, player.current.z - npc.z) < 5; root.current.rotation.y = close ? Math.atan2(player.current.x - npc.x, player.current.z - npc.z) : Math.sin(state.clock.elapsedTime * 0.15 + npc.x) * 0.3; if (!reduced && npc.id === "pip" && !close) root.current.position.x = Math.sin(state.clock.elapsedTime * 0.45) * 0.5; });
   return <group position={[npc.x, 0, npc.z]} onClick={e => { if (e.delta < 6 && e.button === 0) { e.stopPropagation(); interact(npc.id); } }}>
-    {npc.id === "lion" ? <Crystal /> : <group ref={root} position={[0, 0, 0]}><Character classId={npc.classId} skinOverride={npc.id === "pip" ? "#7d9858" : undefined} look={{ ...DEFAULT_LOOK, skin: npc.id === "pip" ? 5 : 1, beard: npc.id === "eldrin" ? 5 : npc.id === "pip" ? 0 : 3, hairColor: npc.id === "eldrin" ? 4 : 2, cloth: npc.id === "eldrin" ? 4 : 0 }} equipped={["tunic"]} animated={!reduced} /></group>}
+    {npc.id === "lion" ? <Crystal /> : <group ref={root} position={[0, 0, 0]}><Character classId={npc.classId} skinOverride={npc.id === "pip" ? "#7d9858" : undefined} look={{ ...DEFAULT_LOOK, skin: npc.id === "pip" ? 5 : 1, beard: npc.id === "eldrin" ? 5 : npc.id === "pip" ? 0 : 3, hairColor: npc.id === "eldrin" ? 4 : 2, cloth: npc.id === "eldrin" ? 4 : 0 }} equipped={npc.id==="eldrin"?["staff","tunic"]:npc.id==="borin"?["tool","tunic"]:["dagger","tunic"]} animated={!reduced} /></group>}
     <Html zIndexRange={[8, 0]} position={[0, npc.id === "lion" ? 3.2 : 3.1, 0]} center style={{ pointerEvents: "none" }}><div className="npc-label"><span className="quest-marker main-quest">{marker}</span><strong>{npc.name}</strong><small>{npc.title}</small></div></Html>
   </group>;
 }
@@ -68,24 +73,26 @@ function WorldFraming() {
   return null;
 }
 function Scene({ paused, interact, report }: { paused: boolean; interact: (id: NpcId) => void; report: (text: string) => void }) {
-  const controls = useRef<ComponentRef<typeof OrbitControls>>(null); const heroRoot = useRef<THREE.Group>(null);
+  const controls = useRef<ComponentRef<typeof OrbitControls>>(null); const shadowRoot=useRef<THREE.Group>(null);const jump=useRef({height:0,velocity:0});const touch=useRef({x:0,z:0}); const heroRoot = useRef<THREE.Group>(null);
   const hero = useGame(s => s.hero); const look = useGame(s => s.look); const education = useGame(s => s.education.completed); const reduced = useGame(s => s.settings.reduceMotion);
   const low = useGame(s => s.settings.quality === "low");
   const forest = hero.region!=="aurora"||education.includes("variables"); const mines = hero.region!=="aurora"||education.includes("conditions")&&hero.defeatedBosses.includes("boss-forest");
   const lastRegion=useRef(hero.region); const player = useRef(new THREE.Vector3(hero.position[0], 0, hero.position[1])); // Position belongs to the simulation; save checkpoints do not recreate it.
   const path = useRef<[number, number][]>([]); const pending = useRef<NpcId | null>(null); const keys = useRef(new Set<string>()); const checkpoint = useRef(0); const wasWalking = useRef(false); const [walking, setWalking] = useState(false);
-  const camera = useThree(s => s.camera); const temp = useRef(new THREE.Vector3()); const offset = useRef(new THREE.Vector3());
+  const camera = useThree(s => s.camera);const invalidate=useThree(s=>s.invalidate); const temp = useRef(new THREE.Vector3()); const offset = useRef(new THREE.Vector3());
+  useLayoutEffect(()=>{const c=controls.current;if(!c)return;const p=player.current;temp.current.set(p.x,1.2,p.z);offset.current.copy(temp.current).sub(c.target);camera.position.add(offset.current);c.target.copy(temp.current);c.update();invalidate();},[camera,invalidate]);
   const pausedRef = useRef(paused); useEffect(() => { pausedRef.current = paused; }, [paused]);
   const [light, setLight] = useState(0.8);
   useEffect(() => { const update = () => { const parts = new Intl.DateTimeFormat("en", { timeZone: "America/Sao_Paulo", hour: "numeric", minute: "numeric", hourCycle: "h23" }).formatToParts(new Date()); const h = Number(parts.find(p => p.type === "hour")?.value ?? 12) + Number(parts.find(p => p.type === "minute")?.value ?? 0)/60; setLight(Math.max(0.22, Math.sin((h - 6) / 12 * Math.PI))); }; update(); const id = setInterval(update, 60000); return () => clearInterval(id); }, []);
   useEffect(() => {
-    if (Math.hypot(player.current.x - hero.position[0], player.current.z - hero.position[1]) > 6 || hero.dead || lastRegion.current!==hero.region) { player.current.set(hero.position[0], 0, hero.position[1]); path.current = [];lastRegion.current=hero.region; }
-  }, [hero.position, hero.dead, hero.region, player]);
+    if (Math.hypot(player.current.x - hero.position[0], player.current.z - hero.position[1]) > 6 || hero.dead || lastRegion.current!==hero.region) { player.current.set(hero.position[0], 0, hero.position[1]);jump.current={height:0,velocity:0};path.current = [];lastRegion.current=hero.region;if(controls.current){temp.current.set(player.current.x,1.2,player.current.z);offset.current.copy(temp.current).sub(controls.current.target);camera.position.add(offset.current);controls.current.target.copy(temp.current);controls.current.update();invalidate();} }
+  }, [hero.position, hero.dead, hero.region, player,camera,invalidate]);
   useEffect(() => {
-    const down = (e: KeyboardEvent) => { if (pausedRef.current || /INPUT|TEXTAREA|SELECT/.test((e.target as HTMLElement)?.tagName)) return; const k = e.key.toLowerCase(); if (["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright", "e"].includes(k)) { e.preventDefault(); keys.current.add(k); } };
+    const down = (e: KeyboardEvent) => { if (pausedRef.current||e.ctrlKey||e.altKey||e.metaKey||isEditingTarget(e.target))return;if(e.code==="Space"){e.preventDefault();if(!e.repeat)keys.current.add("jump");return;} const k = e.key.toLowerCase(); if (["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright", "e"].includes(k)) { e.preventDefault(); keys.current.add(k); } };
     const up = (e: KeyboardEvent) => keys.current.delete(e.key.toLowerCase()); const blur = () => keys.current.clear();
+    const onJump=()=>{if(!pausedRef.current)keys.current.add("jump");},onInteract=()=>{if(!pausedRef.current)keys.current.add("e");},onMove=(e:Event)=>{const p=(e as CustomEvent<{x:number;z:number}>).detail;if(p&&Number.isFinite(p.x)&&Number.isFinite(p.z))touch.current=p;};window.addEventListener("lions-cave-jump",onJump);window.addEventListener("lions-cave-interact",onInteract);window.addEventListener("lions-cave-move",onMove);
     window.addEventListener("keydown", down); window.addEventListener("keyup", up); window.addEventListener("blur", blur);
-    return () => { window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); window.removeEventListener("blur", blur); };
+    return () => {window.removeEventListener("lions-cave-jump",onJump);window.removeEventListener("lions-cave-interact",onInteract);window.removeEventListener("lions-cave-move",onMove); window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); window.removeEventListener("blur", blur); };
   }, []);
   function travel(x: number, z: number) {
     path.current = findPath([player.current.x, player.current.z], [x, z], forest, mines,hero.region);
@@ -100,28 +107,30 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
   useFrame((_, delta) => {
     const dt = Math.min(delta, 0.05); let moving = false;
     if (!paused && !hero.dead && !useGame.getState().encounter) {
-      const k = keys.current; const x = Number(k.has("d") || k.has("arrowright")) - Number(k.has("a") || k.has("arrowleft")); const z = Number(k.has("s") || k.has("arrowdown")) - Number(k.has("w") || k.has("arrowup"));
+      const k = keys.current; const x = Number(k.has("d") || k.has("arrowright")) - Number(k.has("a") || k.has("arrowleft"))+touch.current.x; const z = Number(k.has("s") || k.has("arrowdown")) - Number(k.has("w") || k.has("arrowup"))+touch.current.z;
       if (x || z) { path.current = []; pending.current = null; temp.current.set(x, 0, z).normalize().multiplyScalar(dt * 4.5); if (walkable(player.current.x + temp.current.x, player.current.z, forest, mines,hero.region)) player.current.x += temp.current.x; if (walkable(player.current.x, player.current.z + temp.current.z, forest, mines,hero.region)) player.current.z += temp.current.z; moving = true; }
       else if (path.current.length) { const p = path.current[0]; temp.current.set(p[0] - player.current.x, 0, p[1] - player.current.z); if (temp.current.length() < 0.14) path.current.shift(); else { const step = Math.min(temp.current.length(), dt * 4.5); temp.current.normalize().multiplyScalar(step); player.current.add(temp.current); moving = true; } }
       if (heroRoot.current && moving) heroRoot.current.rotation.y = Math.atan2(temp.current.x, temp.current.z);
       if (pending.current) { const npc = NPCS_LIVE.find(n => n.id === pending.current)!; if (Math.hypot(player.current.x - npc.x, player.current.z - npc.z) < 3.2) { path.current = []; const id = pending.current; pending.current = null; interact(id); } }
       if (k.has("e")) { k.delete("e"); const npc = NPCS_LIVE.find(n => Math.hypot(player.current.x - n.x, player.current.z - n.z) < 3.3); if (npc) interact(npc.id); }
     } else { keys.current.clear(); path.current = []; }
+    if(!paused&&!hero.dead&&!useGame.getState().encounter){if(keys.current.delete("jump")&&jump.current.height===0)jump.current.velocity=6.2;jump.current=advanceJump(jump.current.height,jump.current.velocity,dt);}else{keys.current.delete("jump");touch.current={x:0,z:0};}
     if (moving !== wasWalking.current) { setWalking(moving); wasWalking.current = moving; }
-    if (heroRoot.current) heroRoot.current.position.copy(player.current);
+    if(heroRoot.current){heroRoot.current.position.copy(player.current);heroRoot.current.position.y=jump.current.height;}if(shadowRoot.current){shadowRoot.current.position.set(player.current.x,.045,player.current.z);shadowRoot.current.scale.setScalar(1-jump.current.height*.13);}
     if (controls.current) { temp.current.set(player.current.x, 1.2, player.current.z); offset.current.copy(temp.current).sub(controls.current.target).multiplyScalar(reduced ? 1 : Math.min(1, dt * 6)); controls.current.target.add(offset.current); camera.position.add(offset.current); }
     checkpoint.current += dt;
     if (checkpoint.current > 0.7) { checkpoint.current = 0; const p = useGame.getState().hero.position; if (Math.hypot(p[0] - player.current.x, p[1] - player.current.z) > 0.05) useGame.getState().move([player.current.x, player.current.z]); }
   });
   const groundClick = (e: ThreeEvent<MouseEvent>) => { if (e.button !== 0 || e.delta > 6 || paused) return; e.stopPropagation(); pending.current = null; travel(e.point.x, e.point.z); };
-  const sky = new THREE.Color("#26374a").lerp(new THREE.Color("#b4c6c0"),Math.max(0,Math.min(1,(light-0.22)/0.78))).getStyle();
+  const sky = new THREE.Color("#435b83").lerp(new THREE.Color("#b1def2"),Math.max(0,Math.min(1,(light-0.22)/0.78))).getStyle();
   return <>
     <color attach="background" args={[sky]} /><fog attach="fog" args={[sky,38,88]} />
-    <ambientLight intensity={0.48 + light * 0.52} /><hemisphereLight args={["#d1e0de", "#59624d", 1.15]} />
+    <ambientLight intensity={0.75 + light * 0.45} /><hemisphereLight args={["#d1e0de", "#59624d", 1.15]} />
     <directionalLight position={[12, 22, 8]} intensity={0.6 + light * 1.5} color="#ffe5bb" castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-22} shadow-camera-right={22} shadow-camera-top={20} shadow-camera-bottom={-25} shadow-bias={-0.001} />
+    <KingdomDetails region={hero.region} low={low}/><CombatFeedback />
     <TerrainSurface onClick={groundClick} color={REGIONS[hero.region].color}/><CampaignWorld paused={paused}/>{hero.region==="aurora"&&<>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.014, -4]} onClick={groundClick} receiveShadow><planeGeometry args={[4.8, 48]} /><meshStandardMaterial color="#a8997c" /></mesh>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.018, 0]} onClick={groundClick} receiveShadow><circleGeometry args={[5.8, 32]} /><meshStandardMaterial color="#a5a18a" /></mesh>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.014, -4]} onClick={groundClick} receiveShadow><planeGeometry args={[4.8, 48]} /><meshStandardMaterial color="#d8bd86" /></mesh>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.018, 0]} onClick={groundClick} receiveShadow><circleGeometry args={[5.8, 32]} /><meshStandardMaterial color="#c7c3a8" /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[11, 0.025, -16]} onClick={groundClick}><planeGeometry args={[25, 3]} /><meshStandardMaterial color="#8e8b76" /></mesh>
     <ExplorationEncounters paused={paused} interact={()=>interact("traveler")} report={report} /><WorldDetails night={light<0.4} low={low} reduced={reduced} />
     {BUILDINGS.map((b, i) => <House key={i} x={b.x} z={b.z} index={i} />)}
@@ -137,7 +146,8 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
     {!forest && <group position={[0, 0, -12]}><mesh position={[0, 1.5, 0]}><boxGeometry args={[5, 3, 0.15]} /><meshStandardMaterial color="#a7b8d7" emissive="#756eaa" emissiveIntensity={0.4} transparent opacity={0.3} /></mesh><Html zIndexRange={[8, 0]} position={[0, 3.8, 0]} center><span className="gate-label">A primeira runa abre a floresta</span></Html></group>}
     {!mines && <mesh position={[15, 1.3, -16]}><boxGeometry args={[0.2, 2.6, 6]} /><meshStandardMaterial color="#b8a3cf" transparent opacity={0.25} /></mesh>}
     </>}
-    <group ref={heroRoot} position={[hero.position[0], 0, hero.position[1]]}><Character race={hero.race} classId={hero.classId} look={look} equipped={activeEquipment(hero,ITEMS).map(i=>i.id)} level={hero.level} walking={walking} animated={!reduced} />
+    <group ref={shadowRoot}><mesh rotation={[-Math.PI/2,0,0]}><circleGeometry args={[.48,24]}/><meshBasicMaterial color="#172a39" transparent opacity={.25} depthWrite={false}/></mesh><mesh rotation={[-Math.PI/2,0,0]} position={[0,.003,0]}><ringGeometry args={[.51,.55,24]}/><meshBasicMaterial color="#f8d474" transparent opacity={.55} depthWrite={false}/></mesh></group>
+    <group ref={heroRoot} position={[hero.position[0], 0, hero.position[1]]}><Character race={hero.race} classId={hero.classId} look={look} equipped={activeEquipment(hero,ITEMS).map(i=>i.id)} level={hero.level} combatant walking={walking} animated={!reduced} />
       {hero.classId === "hunter" && activeEquipment(hero,ITEMS).some(i=>i.category==="weapon") && <group position={[-1.3, 0, 0.5]}><mesh position={[0, 0.45, 0]}><boxGeometry args={[0.4, 0.55, 0.9]} /><meshStandardMaterial color="#b6a88a" /></mesh><mesh position={[0, 0.75, 0.5]}><coneGeometry args={[0.24, 0.65, 4]} /><meshStandardMaterial color="#d3c9af" /></mesh></group>}
     </group>
     <OrbitControls ref={controls} enablePan={false} enabled={!paused} enableDamping={!reduced} dampingFactor={0.08} minZoom={24} maxZoom={65} minPolarAngle={0.84} maxPolarAngle={0.84} mouseButtons={{ LEFT: undefined, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE }} touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }} />
@@ -148,17 +158,17 @@ export default function GameWorld(props: { paused: boolean; interact: (id: NpcId
   return <WorldBoundary><Canvas frameloop={props.paused ? "demand" : "always"} orthographic dpr={quality === "high" ? [1, 1.75] : [1, 1.25]} camera={{ position: [14, 18, 14], zoom: 42, left:-840, right:840, top:420, bottom:-420, near:.1, far:220 }} shadows={quality !== "low" ? "percentage" : false} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} fallback={<div className="world-fallback">Seu navegador não disponibilizou o WebGL. Os painéis continuam disponíveis.</div>}><Suspense fallback={null}><WorldFraming /><Scene {...props} /></Suspense></Canvas></WorldBoundary>;
 }
 function CharacterPreview({ classId, race, look, equipped, level }: { classId: ClassId; race: Race; look: Look; equipped: string[]; level: number }) {
-  return <Character classId={classId} race={race} look={look} equipped={equipped} level={level} preview animated={false} />;
+  return <Character classId={classId} race={race} look={look} equipped={equipped} level={level} preview animated={true} />;
 }
 function PreviewCamera({ race }: { race: Race }) {
   const camera = useThree(s => s.camera);
   const controls = useRef<ComponentRef<typeof OrbitControls>>(null);
   const height = {human:1.1,orc:1.14,dwarf:0.82,elf:1.2,gnome:0.69}[race];
-  const target=1.68*height, distance=6.5*height;
+  const target=1.6*height, distance=7.4*height;
   useEffect(()=>{camera.position.set(0,target+.08,distance);controls.current?.target.set(0,target,0);controls.current?.update();},[camera,target,distance]);
   return <OrbitControls ref={controls} target={[0,target,0]} enablePan={false} enableZoom={false} autoRotate={false} enableDamping={false} minDistance={distance} maxDistance={distance} minPolarAngle={Math.PI/2-.035} maxPolarAngle={Math.PI/2-.035} touches={{ONE:THREE.TOUCH.ROTATE}} />;
 }
 export function CreatorStage({ classId, race=CLASSES[classId].race, look, equipped, level=1 }: { classId: ClassId; race?: Race; look: Look; equipped: string[]; level?: number }) {
-  return <WorldBoundary><Canvas shadows dpr={[1, 1.5]} camera={{ position: [0, 1.7, 5.4], fov: 36 }} gl={{ antialias: true }}><color attach="background" args={["#121b23"]} /><ambientLight intensity={1.1} /><hemisphereLight args={["#c8dce4", "#504130", 1.8]} /><directionalLight position={[3, 5, 4]} intensity={2.1} color="#f3e9da" castShadow /><directionalLight position={[-4, 3, -3]} intensity={1.15} color="#94b3d1" /><CharacterPreview classId={classId} race={race} look={look} equipped={equipped} level={level} /><mesh position={[0, -0.18, 0]} receiveShadow><cylinderGeometry args={[1.15, 1.35, 0.26, 32]} /><meshStandardMaterial color="#354047" metalness={0.3} roughness={0.6} /></mesh><PreviewCamera race={race} /></Canvas></WorldBoundary>;
+  return <WorldBoundary><Canvas shadows dpr={[1, 1.5]} camera={{ position: [0, 1.7, 5.4], fov: 36 }} gl={{ antialias: true }}><color attach="background" args={["#bdd9e8"]} /><ambientLight intensity={1.1} /><hemisphereLight args={["#c8dce4", "#504130", 1.8]} /><directionalLight position={[3, 5, 4]} intensity={2.1} color="#f3e9da" castShadow /><directionalLight position={[-4, 3, -3]} intensity={1.15} color="#94b3d1" /><CharacterPreview classId={classId} race={race} look={look} equipped={equipped} level={level} /><mesh position={[0, -0.18, 0]} receiveShadow><cylinderGeometry args={[1.15, 1.35, 0.26, 32]} /><meshStandardMaterial color="#354047" metalness={0.3} roughness={0.6} /></mesh><PreviewCamera race={race} /></Canvas></WorldBoundary>;
 }
 
