@@ -1,5 +1,6 @@
 "use client";
 import {create} from 'zustand';
+import {waitForLocalSave} from './cloudStartup';
 import {CLOUD_READY,cloudClient,readCloud,writeCloud,CloudConflict} from './cloudClient';
 import {canonical,decideSync,fingerprint,hasJourney,type CloudSave,type SyncBase} from './cloudProtocol';
 import {savedState,useGame,SAVE_KEY,replaceFromCloud} from './store';
@@ -14,7 +15,7 @@ function acknowledge(uid:string,row:CloudSave,hash:string){localStorage.setItem(
 function backupLocal(){const raw=localStorage.getItem(SAVE_KEY);if(raw)localStorage.setItem(SAVE_KEY+'-before-cloud-'+Date.now(),raw);}
 async function pull(uid:string,row:CloudSave,gen:number,backup:boolean,expectedLocal?:string){const hash=await fingerprint(row.state);if(gen!==generation)return;if(expectedLocal&&canonical(savedState(useGame.getState()))!==expectedLocal){useCloud.setState({status:'conflict',remote:row,message:'Sua jornada mudou enquanto a conta era consultada. Escolha qual continuar.'});return;}applying=true;try{replaceFromCloud(row.state,backup);acknowledge(uid,row,hash);useCloud.setState(s=>({reload:s.reload+1}));}finally{applying=false;}}
 async function reconcile(initial=false){
- const {userId:uid,status}=useCloud.getState();if(!uid||busy||(!initial&&['choose','conflict','loading','disabled'].includes(status)))return;
+ const {userId:uid,status}=useCloud.getState();if(!useGame.getState().ready||!uid||busy||(!initial&&['choose','conflict','loading','disabled'].includes(status)))return;
  const gen=generation;busy=true;clearTimers();
  try{
   const local=savedState(useGame.getState()),localHash=await fingerprint(local),remote=await readCloud();if(gen!==generation)return;
@@ -31,7 +32,7 @@ async function reconcile(initial=false){
 }
 export function syncNow(){return reconcile();}
 export async function chooseJourney(choice:'local'|'cloud'){
- const {userId:uid}=useCloud.getState();if(!uid||busy)return;const gen=generation;busy=true;useCloud.setState({status:'loading'});clearTimers();
+ const {userId:uid}=useCloud.getState();if(!useGame.getState().ready||!uid||busy)return;const gen=generation;busy=true;useCloud.setState({status:'loading'});clearTimers();
  try{const remote=await readCloud();if(gen!==generation)return;
   // Re-read before replacing anything. A new remote revision requires a new explicit choice.
   const offered=useCloud.getState().remote;if((remote?.revision??0)!==(offered?.revision??0)){useCloud.setState({status:'conflict',remote,message:'A jornada online mudou novamente. Confira a versão antes de escolher.'});return;}
@@ -49,8 +50,9 @@ export async function loginWithPassword(email:string,password:string,create=fals
 }
 export async function disconnectCloud(){const gen=++generation;clearTimers();useCloud.setState({status:'loading',message:'Desconectando a conta…'});try{const {error}=await cloudClient().auth.signOut({scope:'local'});if(error)throw error;if(gen===generation){base=null;owner=null;useCloud.setState({status:'local',userId:null,email:'',remote:null,message:'Conta desconectada. A cópia deste aparelho foi mantida.'});}}catch{if(gen===generation)useCloud.setState({status:'error',message:'Não foi possível desconectar. Tente novamente; sua cópia local foi mantida.'});}}
 export function startCloudSync(){
+ void useGame.getState().hydrate().catch(()=>useCloud.setState({status:'error',message:'Não foi possível carregar o salvamento local. Sua jornada foi preservada.'}));
  if(!CLOUD_READY)return()=>{};let alive=true,initializedUid:string|null|undefined=undefined;
- async function session(uid:string|null,email=''){if(!alive||uid===initializedUid)return;initializedUid=uid;const gen=++generation;clearTimers();base=null;owner=null;if(!uid){useCloud.setState({status:'local',userId:null,email:'',remote:null});return;}try{owner=localStorage.getItem(OWNER);base=readBase(uid);useCloud.setState({status:'loading',userId:uid,email,remote:null,message:'Conferindo sua jornada na conta…'});while((!useGame.getState().ready||busy)&&alive&&gen===generation)await new Promise(resolve=>setTimeout(resolve,50));if(alive&&gen===generation)await reconcile(true);}catch{if(alive&&gen===generation)useCloud.setState({status:'error',message:'Armazenamento indisponível. Sua jornada não foi enviada.'});}}
+ async function session(uid:string|null,email=''){if(!alive||uid===initializedUid)return;initializedUid=uid;const gen=++generation;clearTimers();base=null;owner=null;if(!uid){useCloud.setState({status:'local',userId:null,email:'',remote:null});return;}try{owner=localStorage.getItem(OWNER);base=readBase(uid);useCloud.setState({status:'loading',userId:uid,email,remote:null,message:'Conferindo sua jornada na conta…'});if(await waitForLocalSave(()=>useGame.getState().ready&&!busy,()=>alive&&gen===generation))await reconcile(true);}catch(error){if(alive&&gen===generation)useCloud.setState({status:'error',message:error instanceof Error?error.message:'Armazenamento indisponível. Sua jornada não foi enviada.'});}}
  const {data:{subscription}}=cloudClient().auth.onAuthStateChange((_event,s)=>{setTimeout(()=>void session(s?.user.id??null,s?.user.email??''),0);});
  void cloudClient().auth.getSession().then(({data,error})=>{if(!alive)return;if(error)useCloud.setState({status:'error',message:'Não foi possível verificar sua conta.'});else void session(data.session?.user.id??null,data.session?.user.email??'');});
  const unsubscribe=useGame.subscribe((state,previous)=>{if(state.ready&&(state.hero!==previous.hero||state.look!==previous.look||state.education!==previous.education||state.ancestors!==previous.ancestors||state.settings!==previous.settings))schedule();});

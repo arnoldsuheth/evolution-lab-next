@@ -94,7 +94,7 @@ export default function Home() {
   const [menuOpen,setMenuOpen]=useState(false);
   const [questsCollapsed,setQuestsCollapsed]=useState(false);
   const [panel, setPanel] = useState<Panel>("none"); const [npc, setNpc] = useState<NpcId>("lion"); const [collapsed, setCollapsed] = useState(false); const [clock, setClock] = useState("Brasília"); const [worldMessage, setWorldMessage] = useState(""); const audio = useRef<KingdomAudio | null>(null);
-  useEffect(() => { void useGame.getState().hydrate(); const id = setInterval(() => { useGame.getState().tick(1); setClock(new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" }).format(new Date())); }, 1000); return () => clearInterval(id); }, []);
+  useEffect(() => { const id = setInterval(() => { useGame.getState().tick(1); setClock(new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" }).format(new Date())); }, 1000); return () => clearInterval(id); }, []);
   useEffect(() => { if (notice) { const id = setTimeout(() => useGame.getState().clearNotice(), 8000); return () => clearTimeout(id); } }, [notice]);
   useEffect(() => { const music=new KingdomAudio();audio.current=music;return ()=>{music.close();audio.current=null;}; }, []);
   useEffect(()=>{

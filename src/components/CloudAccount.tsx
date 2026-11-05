@@ -1,5 +1,6 @@
 "use client";
 import {useEffect,useState,useSyncExternalStore,type FormEvent} from 'react';
+import {usePathname} from 'next/navigation';
 import {CLOUD_READY} from '@/lib/cloudClient';
 import {startCloudSync,useCloud,loginWithPassword,disconnectCloud,chooseJourney,syncNow} from '@/lib/cloudSync';
 import {useGame} from '@/lib/store';
@@ -21,5 +22,5 @@ export default function CloudAccount(){
   {!['loading','choose','conflict'].includes(account.status)&&<button onClick={()=>void syncNow()}>Sincronizar agora</button>}<button disabled={account.status==='loading'} onClick={()=>void disconnectCloud()}>Desconectar conta</button>
  </>}{error&&<p role="alert">{error}</p>}{account.message&&!account.userId&&<p role="status">{account.message}</p>}</section>;
 }
-export function CloudGate(){const status=useCloud(s=>s.status);if(!['loading','choose','conflict'].includes(status))return null;return <div className="cloud-gate"><div role="dialog" aria-modal="true" aria-label="Conferir salvamento"><CloudAccount/></div></div>;}
+export function CloudGate(){const status=useCloud(s=>s.status),pathname=usePathname();if(/\/visual-lab\/?$/.test(pathname)||!['loading','choose','conflict'].includes(status))return null;return <div className="cloud-gate"><div role="dialog" aria-modal="true" aria-label="Conferir salvamento"><CloudAccount/></div></div>;}
 export function CloudIndicator(){const status=useCloud(s=>s.status),user=useCloud(s=>s.userId);return <span className="cloud-indicator">{!user?'◇ Salvo neste aparelho':status==='synced'?'☁ Salvo na conta':status==='pending'?'☁ Salvamento pendente':status==='offline'?'◇ Sem conexão · cópia local':status==='loading'?'☁ Conferindo conta…':'◇ Confira sua conta nas configurações'}</span>;}
