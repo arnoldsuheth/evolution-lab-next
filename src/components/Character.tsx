@@ -1,5 +1,5 @@
 "use client";
-import {useEffect,useMemo,useRef} from 'react';
+import {Component,Suspense,useEffect,useMemo,useRef,type ReactNode} from 'react';
 import type * as THREE from 'three';
 import {createPortal,useFrame} from '@react-three/fiber';
 import {CLASSES,ITEMS,HAIR,EYES,type ClassId,type Look,type Race} from '@/lib/game';
@@ -9,7 +9,9 @@ import {CLASS_STYLE} from '@/lib/cartoonAvatar';
 import {buildAvatar,disposeAvatar} from '@/lib/avatarMesh';
 import {useGame} from '@/lib/store';
 import EquipmentVisual,{rarityTone} from './EquipmentVisual';
-export default function Character({classId,look,equipped=[],walking=false,animated=true,preview=false,skinOverride,level=1,race:selectedRace,combatant=false,organic=false}:{classId:ClassId;look:Look;equipped?:string[];walking?:boolean;animated?:boolean;preview?:boolean;skinOverride?:string;level?:number;race?:Race;combatant?:boolean;organic?:boolean}){
+import HeroModel from './HeroModel';
+import {skinColor} from '@/lib/visual';
+function ProceduralCharacter({classId,look,equipped=[],walking=false,animated=true,preview=false,skinOverride,level=1,race:selectedRace,combatant=false,organic=false}:{classId:ClassId;look:Look;equipped?:string[];walking?:boolean;animated?:boolean;preview?:boolean;skinOverride?:string;level?:number;race?:Race;combatant?:boolean;organic?:boolean}){
  const race=selectedRace??CLASSES[classId].race,modelRef=useRef<THREE.Group>(null),phase=useRef(0),event=useGame(s=>combatant?s.battleEvent:null);
  const equipmentKey=equipped.join('|'),lookKey=JSON.stringify(look);
  const gear=useMemo(()=>activeEquipment({classId,level,dead:false,equipped:equipmentKey.split('|').filter(Boolean)},ITEMS),[classId,level,equipmentKey]);
@@ -23,4 +25,21 @@ export default function Character({classId,look,equipped=[],walking=false,animat
  if(joints.head){joints.head.rotation.y=walking?Math.sin(p*.5)*.035:Math.sin(p*.33)*.12;joints.head.rotation.z=Math.sin(p*.65)*.022;}
  model.position.y=walking?Math.abs(Math.sin(p))*.055:Math.sin(p)*.016;model.rotation.z=walking?Math.sin(p)*.025:0;});
  return <group scale={preview?1:.74}><primitive object={avatar} ref={modelRef}/>{weapon&&createPortal(<EquipmentVisual visual={weapon.visual} tone={rarityTone(weapon.rarity)}/>,rig.weapon)}{offhand&&createPortal(<EquipmentVisual visual={offhand.visual} tone={rarityTone(offhand.rarity)} small={offhand.visual==='dagger'}/>,rig.offhand)}{preview&&<mesh rotation={[-Math.PI/2,0,0]} position={[0,-.025,0]}><ringGeometry args={[.8,.82,48]}/><meshBasicMaterial color={CLASSES[classId].color} transparent opacity={.5}/></mesh>}</group>;
+}
+
+type CharacterProps=Parameters<typeof ProceduralCharacter>[0];
+/** Se um modelo animado não carregar, o boneco procedural continua disponível. */
+class ModelBoundary extends Component<{fallback:ReactNode;children:ReactNode},{failed:boolean}>{
+ state={failed:false};
+ static getDerivedStateFromError(){return{failed:true};}
+ render(){return this.state.failed?this.props.fallback:this.props.children;}
+}
+export default function Character(props:CharacterProps){
+ const {classId,look,equipped=[],level=1,race:selectedRace,skinOverride,organic=false,preview=false}=props;
+ const race=selectedRace??CLASSES[classId].race,equipmentKey=equipped.join('|');
+ const gear=useMemo(()=>activeEquipment({classId,level,dead:false,equipped:equipmentKey.split('|').filter(Boolean)},ITEMS),[classId,level,equipmentKey]);
+ if(organic)return <ProceduralCharacter {...props}/>;
+ const fallback=<ProceduralCharacter {...props}/>;
+ const armed=gear.some(i=>i.slot==='weapon'||i.slot==='twohand'),shielded=gear.some(i=>i.slot==='offhand');
+ return <ModelBoundary fallback={fallback}><Suspense fallback={fallback}><group scale={preview?1:.74}><HeroModel classId={classId} race={race} skin={skinOverride??skinColor(race,look.skin)} armed={armed} shielded={shielded} walking={props.walking} animated={props.animated} combatant={props.combatant} preview={preview}/>{preview&&<mesh rotation={[-Math.PI/2,0,0]} position={[0,-.025,0]}><ringGeometry args={[.8,.82,48]}/><meshBasicMaterial color={CLASSES[classId].color} transparent opacity={.5}/></mesh>}</group></Suspense></ModelBoundary>;
 }

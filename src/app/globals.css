@@ -64,3 +64,5 @@ button:focus-visible{outline:2px solid #ecce90;outline-offset:3px;box-shadow:0 0
 
 .left-hud{bottom:198px}.top-actions{right:166px;top:26px}
 @media(max-width:600px){.left-hud{bottom:169px}.top-actions{right:14px;top:110px}}
+
+.warmup{margin:16px 0;padding:12px 15px;border:1px dashed #c9addd66;background:#8c72ac10;font-size:13px}.warmup summary{cursor:pointer;color:#e2d2ef;line-height:1.6}.warmup p{margin:10px 0 0;color:#cfe3d3}.hint-box p{margin:0 0 8px}.hint-box p:last-child{margin:0}

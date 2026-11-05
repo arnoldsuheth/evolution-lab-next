@@ -80,11 +80,11 @@ class Parser {
     else if (["!", "-"].includes(token.text)) node = { kind: "unary", op: token.text, left: this.atom() };
     else if (token.text === "(") { node = this.expr(); this.expect(")"); }
     else if (token.text === "[") {
-      const args: Expr[] = []; if (this.peek() !== "]") do { args.push(this.expr()); } while (this.is(","));
+      const args: Expr[] = []; if (this.peek() !== "]") do { if (this.peek() === "]") break; args.push(this.expr()); } while (this.is(","));
       this.expect("]"); node = { kind: "array", args };
     } else if (token.text === "{") {
       const keys: string[] = []; const args: Expr[] = [];
-      if (this.peek() !== "}") do { const key = this.name(); if (forbidden.has(key)) throw new Error("Propriedade bloqueada."); keys.push(key); this.expect(":"); args.push(this.expr()); } while (this.is(","));
+      if (this.peek() !== "}") do { if (this.peek() === "}") break; const key = this.name(); if (forbidden.has(key)) throw new Error("Propriedade bloqueada."); keys.push(key); this.expect(":"); args.push(this.expr()); } while (this.is(","));
       this.expect("}"); node = { kind: "object", keys, args };
     } else if (token.kind === "name") node = { kind: "name", name: token.text };
     else throw new Error(`Expressão incompleta perto de “${token.text}”.`);

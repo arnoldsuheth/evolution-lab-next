@@ -11,6 +11,7 @@ import MaterialCraftStand from "./MaterialCraftStand";
 import OriginalPilot from "./OriginalPilot";
 import ProfessionalPilot from "./ProfessionalPilot";
 import Character from "./Character";
+import SceneDressing from "./SceneDressing";
 import MonsterModel from "./MonsterModel";
 import { frameWorld } from "@/lib/worldCamera";
 import WorldDetails, { HouseDetails } from "./WorldDetails";
@@ -82,7 +83,7 @@ function WorldFraming() {
 function Scene({ paused, interact, report }: { paused: boolean; interact: (id: NpcId) => void; report: (text: string) => void }) {
   const controls = useRef<ComponentRef<typeof OrbitControls>>(null); const shadowRoot=useRef<THREE.Group>(null);const jump=useRef({height:0,velocity:0});const touch=useRef({x:0,z:0}); const heroRoot = useRef<THREE.Group>(null);
   const mounted=useGame(s=>s.mounted); const encounter=useGame(s=>s.encounter); const relocation=useGame(s=>s.relocation); const lastRelocation=useRef(relocation); const hero = useGame(s => s.hero); const riding=mounted&&hero.level>=30&&!hero.dead&&hero.inventory.includes("mount-boar")&&hero.equipped.includes("mount-boar")&&!encounter; const look = useGame(s => s.look); const education = useGame(s => s.education.completed); const reduced = useGame(s => s.settings.reduceMotion);
-  const low = useGame(s => s.settings.quality === "low");
+  const low = useGame(s => s.settings.quality === "low"); const quality = useGame(s => s.settings.quality);
   const worldRegion=hero.instance?"instance":hero.region;const forest = !!hero.instance||hero.region!=="aurora"||education.includes("variables"); const mines = !!hero.instance||hero.region!=="aurora"||education.includes("conditions")&&hero.defeatedBosses.includes("boss-forest");
   const lastRegion=useRef(hero.region); const player = useRef(new THREE.Vector3(hero.position[0], 0, hero.position[1])); // Position belongs to the simulation; save checkpoints do not recreate it.
   const monsterTarget=useRef<string|null>(null); const path = useRef<[number, number][]>([]); const pending = useRef<NpcId | null>(null); const keys = useRef(new Set<string>()); const checkpoint = useRef(0); const wasWalking = useRef(false); const [walking, setWalking] = useState(false);
@@ -148,7 +149,7 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
     <ambientLight intensity={0.75 + light * 0.45} /><hemisphereLight args={["#d1e0de", "#59624d", 1.15]} />
     <directionalLight position={[12, 22, 8]} intensity={0.6 + light * 1.5} color="#ffe5bb" castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-22} shadow-camera-right={22} shadow-camera-top={20} shadow-camera-bottom={-25} shadow-bias={-0.001} />
     <KingdomDetails region={hero.region} low={low}/><CombatFeedback />
-    <TerrainSurface onClick={groundClick} color={REGIONS[hero.region].color}/><CampaignWorld paused={paused} approach={approachMonster}/>{!hero.instance&&hero.region==="aurora"&&<BiomeDetails region="aurora"/>}{hero.region==="aurora"&&!hero.instance&&<>
+    <TerrainSurface onClick={groundClick} color={REGIONS[hero.region].color}/><CampaignWorld paused={paused} approach={approachMonster}/>{!hero.instance&&hero.region==="aurora"&&<BiomeDetails region="aurora"/>}{!hero.instance&&hero.region==="aurora"&&<SceneDressing quality={low?"low":quality==="high"?"high":"medium"} groundColor={REGIONS.aurora.color}/>}{hero.region==="aurora"&&!hero.instance&&<>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.014, -4]} onClick={groundClick} receiveShadow><planeGeometry args={[4.8, 48]} /><meshStandardMaterial color="#d8bd86" /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.018, 0]} onClick={groundClick} receiveShadow><circleGeometry args={[5.8, 32]} /><meshStandardMaterial color="#c7c3a8" /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[11, 0.025, -16]} onClick={groundClick}><planeGeometry args={[25, 3]} /><meshStandardMaterial color="#8e8b76" /></mesh>

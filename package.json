@@ -1,10 +1,11 @@
 {
   "name": "lions-cave-rpg-programador",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/fetch-heroes.mjs",
     "dev": "next dev --webpack",
-    "prebuild": "node scripts/fetch-pilot.mjs && node scripts/fetch-original-pilot.mjs",
+    "prebuild": "node scripts/fetch-pilot.mjs && node scripts/fetch-original-pilot.mjs && node scripts/fetch-heroes.mjs",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
