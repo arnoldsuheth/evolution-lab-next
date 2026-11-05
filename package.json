@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
-    "prebuild": "node scripts/fetch-pilot.mjs",
+    "prebuild": "node scripts/fetch-pilot.mjs && node scripts/fetch-original-pilot.mjs",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",

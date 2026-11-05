@@ -1,0 +1,5 @@
+import {readFile,writeFile,mkdir} from 'node:fs/promises';import {createHash} from 'node:crypto';
+const target=new URL('../public/models/lions-cave/paladin-approved.glb',import.meta.url),expected='0b6c162585a819d5c48d940d4fea5a98c26f0d5af5049bc8e2ac2db648aba2b8';
+const hash=b=>createHash('sha256').update(b).digest('hex');
+try{if(hash(await readFile(target))===expected){console.log('Original paladin pilot verified.');process.exit(0);}}catch{}
+const response=await fetch('https://d8j0ntlcm91z4.cloudfront.net/user_3L9nOBs8ghnPGbUdWctWkyQ4Tsc/hf_20261105_172235_b4f6d23b-7b33-4242-844a-7c2c83e045ef.glb',{signal:AbortSignal.timeout(30000)});if(!response.ok)throw Error('Original pilot download failed: '+response.status);const data=Buffer.from(await response.arrayBuffer());if(hash(data)!==expected)throw Error('Original pilot checksum mismatch');await mkdir(new URL('../public/models/lions-cave/',import.meta.url),{recursive:true});await writeFile(target,data);console.log('Original pilot downloaded and verified.');

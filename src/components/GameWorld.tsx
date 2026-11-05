@@ -7,6 +7,8 @@ import KingdomDetails from './KingdomDetails';
 import CombatFeedback from './CombatFeedback';
 import {advanceJump,isEditingTarget} from '@/lib/controls';
 import BiomeDetails from "./BiomeDetails";
+import MaterialCraftStand from "./MaterialCraftStand";
+import OriginalPilot from "./OriginalPilot";
 import ProfessionalPilot from "./ProfessionalPilot";
 import Character from "./Character";
 import MonsterModel from "./MonsterModel";
@@ -186,7 +188,7 @@ function PreviewCamera({ race }: { race: Race }) {
   useEffect(()=>{camera.position.set(0,target+.08,distance);controls.current?.target.set(0,target,0);controls.current?.update();},[camera,target,distance]);
   return <OrbitControls ref={controls} target={[0,target,0]} enablePan={false} enableZoom={false} autoRotate={false} enableDamping={false} minDistance={distance} maxDistance={distance} minPolarAngle={Math.PI/2-.035} maxPolarAngle={Math.PI/2-.035} touches={{ONE:THREE.TOUCH.ROTATE}} />;
 }
-export function CreatorStage({ classId, race=CLASSES[classId].race, look, equipped, level=1,organic=false,professional=false,animation="Idle" }: { classId: ClassId; race?: Race; look: Look; equipped: string[]; level?: number;organic?:boolean;professional?:boolean;animation?:string }) {
-  return <WorldBoundary><Canvas shadows dpr={[1, 1.5]} camera={{ position: [0, 1.7, 5.4], fov: 36 }} gl={{ antialias: true }}><color attach="background" args={["#bdd9e8"]} /><ambientLight intensity={1.1} /><hemisphereLight args={["#c8dce4", "#504130", 1.8]} /><directionalLight position={[3, 5, 4]} intensity={2.1} color="#f3e9da" castShadow /><directionalLight position={[-4, 3, -3]} intensity={1.15} color="#94b3d1" /><Suspense fallback={null}>{professional?<ProfessionalPilot animation={animation}/>:<CharacterPreview classId={classId} race={race} look={look} equipped={equipped} level={level} organic={organic} />}</Suspense><mesh position={[0, -0.18, 0]} receiveShadow><cylinderGeometry args={[1.15, 1.35, 0.26, 32]} /><meshStandardMaterial color="#354047" metalness={0.3} roughness={0.6} /></mesh><PreviewCamera race={race} /></Canvas></WorldBoundary>;
+export function CreatorStage({ classId, race=CLASSES[classId].race, look, equipped, level=1,organic=false,professional=false,original=false,materialPreview=false,animation="Idle" }: { classId: ClassId; race?: Race; look: Look; equipped: string[]; level?: number;organic?:boolean;professional?:boolean;original?:boolean;materialPreview?:boolean;animation?:string }) {
+  return <WorldBoundary><Canvas shadows dpr={[1, 1.5]} camera={{ position: [0, 1.7, 5.4], fov: 36 }} gl={{ antialias: true }}><color attach="background" args={["#bdd9e8"]} /><ambientLight intensity={1.1} /><hemisphereLight args={["#c8dce4", "#504130", 1.8]} /><directionalLight position={[3, 5, 4]} intensity={2.1} color="#f3e9da" castShadow /><directionalLight position={[-4, 3, -3]} intensity={1.15} color="#94b3d1" /><Suspense fallback={null}>{original?<OriginalPilot/>:professional?<ProfessionalPilot animation={animation}/>:<CharacterPreview classId={classId} race={race} look={look} equipped={equipped} level={level} organic={organic} />}</Suspense><Suspense fallback={null}>{materialPreview?<MaterialCraftStand/>:<mesh position={[0, -0.18, 0]} receiveShadow><cylinderGeometry args={[1.15, 1.35, 0.26, 32]} /><meshStandardMaterial color="#354047" metalness={0.3} roughness={0.6} /></mesh>}</Suspense><PreviewCamera race={race} /></Canvas></WorldBoundary>;
 }
 

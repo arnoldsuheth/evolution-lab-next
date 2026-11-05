@@ -19,7 +19,9 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Fetch pinned licensed pilot model
-        run: node scripts/fetch-pilot.mjs
+        run: |
+          node scripts/fetch-pilot.mjs
+          node scripts/fetch-original-pilot.mjs
       - name: Unit and migration tests
         run: npm test
       - name: TypeScript
