@@ -1,0 +1,5 @@
+export const DEFAULT_BINDINGS={bag:'Tab',journal:'m',character:'c',map:'g',talents:'k',academy:'j'} as const;
+export type BoundPanel=keyof typeof DEFAULT_BINDINGS;
+export const BINDING_NAMES:Record<BoundPanel,string>={bag:'Mochila',journal:'Missões',character:'Personagem',map:'Mapa',talents:'Talentos',academy:'Estudos'};
+export const ALLOWED_KEYS=['Tab','m','c','g','k','j','b','i','p','l','o','u','h','n','v','t','y','q','z','x'];
+export function cleanBindings(value:unknown):Record<BoundPanel,string>{const raw=value&&typeof value==='object'?value as Record<string,unknown>:{};const out={...DEFAULT_BINDINGS} as Record<BoundPanel,string>;const used=new Set<string>();for(const panel of Object.keys(out) as BoundPanel[]){const key=raw[panel];if(typeof key==='string'&&ALLOWED_KEYS.includes(key)&&!used.has(key)){out[panel]=key;used.add(key);}else out[panel]='';}for(const panel of Object.keys(out) as BoundPanel[])if(!out[panel]){const key=[DEFAULT_BINDINGS[panel],...ALLOWED_KEYS].find(k=>!used.has(k))!;out[panel]=key;used.add(key);}return out;}

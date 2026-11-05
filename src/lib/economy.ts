@@ -1,0 +1,4 @@
+export const PROFESSIONS={blacksmith:'Ferreiro',weaponsmith:'Armeiro',tailor:'Alfaiate',leatherworker:'Coureiro',alchemist:'Alquimista'} as const;
+export type Profession=keyof typeof PROFESSIONS;
+export function currency(value:number){const total=Math.max(0,Math.floor(Number.isFinite(value)?value:0));const gold=Math.floor(total/10000),silver=Math.floor(total%10000/100),bronze=total%100;return [gold?`${gold} ouro`:'',silver?`${silver} prata`:'',bronze||!total?`${bronze} bronze`:''].filter(Boolean).join(' · ');}
+export function repairCost(equipped:string[],durability:Record<string,number>,catalogue:Record<string,{price:number}>){return [...new Set(equipped)].reduce((cost,id)=>{const missing=100-(durability[id]??100);return cost+(missing>0&&catalogue[id]?Math.max(1,Math.ceil(catalogue[id].price*missing/1000)):0);},0);}

@@ -1,6 +1,6 @@
 import type { HeroData } from './game';
 import type { Item } from './catalogue';
-type EquipmentActor=Pick<HeroData,'classId'|'level'|'dead'>;
+type EquipmentActor=Pick<HeroData,'classId'|'level'|'dead'|'durability'>;
 export const isEquipment=(item:Item)=>!['consumable','food','material','trophy'].includes(item.category);
 export function itemRequirement(hero:EquipmentActor,item:Item):string|undefined{
  if(hero.dead)return'Personagem encerrado';
@@ -10,7 +10,7 @@ export function itemRequirement(hero:EquipmentActor,item:Item):string|undefined{
 }
 export function activeEquipment(hero:EquipmentActor&{equipped:string[];inventory?:string[]},catalogue:Record<string,Item>):Item[]{
  const result:Item[]=[];const occupied=new Set<string>();
- for(const id of hero.equipped){const item=catalogue[id];if(!item||hero.inventory&&!hero.inventory.includes(id)||!isEquipment(item)||itemRequirement({...hero,dead:false},item))continue;
+ for(const id of hero.equipped){const item=catalogue[id];if(!item||hero.durability?.[id]===0||hero.inventory&&!hero.inventory.includes(id)||!isEquipment(item)||itemRequirement({...hero,dead:false},item))continue;
  const slots=item.slot==='twohand'?['weapon','offhand']:item.slot==='weapon'?['weapon']:[item.slot];
  if(slots.some(slot=>occupied.has(slot)))continue;slots.forEach(slot=>occupied.add(slot));result.push(item);
  }return result;

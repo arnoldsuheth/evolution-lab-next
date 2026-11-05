@@ -5,16 +5,17 @@ import {createPortal,useFrame} from '@react-three/fiber';
 import {CLASSES,ITEMS,HAIR,EYES,type ClassId,type Look,type Race} from '@/lib/game';
 import {activeEquipment} from '@/lib/equipment';
 import {buildCartoonAvatar} from '@/lib/cartoonAvatar';
-import {disposeAvatar} from '@/lib/avatarMesh';
+import {CLASS_STYLE} from '@/lib/cartoonAvatar';
+import {buildAvatar,disposeAvatar} from '@/lib/avatarMesh';
 import {useGame} from '@/lib/store';
 import EquipmentVisual,{rarityTone} from './EquipmentVisual';
-export default function Character({classId,look,equipped=[],walking=false,animated=true,preview=false,skinOverride,level=1,race:selectedRace,combatant=false}:{classId:ClassId;look:Look;equipped?:string[];walking?:boolean;animated?:boolean;preview?:boolean;skinOverride?:string;level?:number;race?:Race;combatant?:boolean}){
+export default function Character({classId,look,equipped=[],walking=false,animated=true,preview=false,skinOverride,level=1,race:selectedRace,combatant=false,organic=false}:{classId:ClassId;look:Look;equipped?:string[];walking?:boolean;animated?:boolean;preview?:boolean;skinOverride?:string;level?:number;race?:Race;combatant?:boolean;organic?:boolean}){
  const race=selectedRace??CLASSES[classId].race,modelRef=useRef<THREE.Group>(null),phase=useRef(0),event=useGame(s=>combatant?s.battleEvent:null);
  const equipmentKey=equipped.join('|'),lookKey=JSON.stringify(look);
  const gear=useMemo(()=>activeEquipment({classId,level,dead:false,equipped:equipmentKey.split('|').filter(Boolean)},ITEMS),[classId,level,equipmentKey]);
  const weapon=gear.find(i=>i.slot==='weapon'||i.slot==='twohand'),offhand=gear.find(i=>i.slot==='offhand');
  const gearKey=gear.map(i=>i.slot).join(',');
- const avatar=useMemo(()=>{const selectedLook=JSON.parse(lookKey) as Look;return buildCartoonAvatar({race,classId,look:selectedLook,hairColor:HAIR[selectedLook.hairColor]??HAIR[0],eyeColor:EYES[selectedLook.eyes]??EYES[0],skinOverride,gear:new Set(gearKey.split(','))});},[race,classId,lookKey,gearKey,skinOverride]);
+ const avatar=useMemo(()=>{const selectedLook=JSON.parse(lookKey) as Look;if(organic)return buildAvatar({race,look:selectedLook,hairColor:HAIR[selectedLook.hairColor]??HAIR[0],eyeColor:EYES[selectedLook.eyes]??EYES[0],clothColor:CLASS_STYLE[classId].cloth,accent:CLASS_STYLE[classId].trim,skinOverride,gear:Object.fromEntries(gearKey.split(",").map(k=>[k,true]))});return buildCartoonAvatar({race,classId,look:selectedLook,hairColor:HAIR[selectedLook.hairColor]??HAIR[0],eyeColor:EYES[selectedLook.eyes]??EYES[0],skinOverride,gear:new Set(gearKey.split(','))});},[race,classId,lookKey,gearKey,skinOverride,organic]);
  const rig=useMemo(()=>({head:avatar.getObjectByName('head'),legs:[avatar.getObjectByName('legLeft'),avatar.getObjectByName('legRight')],arms:[avatar.getObjectByName('armLeft'),avatar.getObjectByName('armRight')],weapon:avatar.getObjectByName('weaponAnchor')!,offhand:avatar.getObjectByName('offhandAnchor')!}),[avatar]);
  useEffect(()=>()=>disposeAvatar(avatar),[avatar]);
  useFrame((_,delta)=>{const model=modelRef.current;if(!animated||!model)return;const joints={head:model.getObjectByName('head'),legs:[model.getObjectByName('legLeft'),model.getObjectByName('legRight')],arms:[model.getObjectByName('armLeft'),model.getObjectByName('armRight')]};phase.current+=Math.min(delta,.05)*(walking?9:1.8);const p=phase.current,a=walking?Math.sin(p)*.65:Math.sin(p)*.045,age=event?(Date.now()-event.time)/1000:2,swing=age<.55?Math.sin(age/.55*Math.PI):0;

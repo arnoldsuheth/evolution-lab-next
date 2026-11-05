@@ -53,3 +53,5 @@ GENESIS-*.txt
 *.key
 # Isolated local SDK; CI uses npm ci
 /.cloud-deps/
+/public/models/pilot/knight.glb
+/public/models/pilot/knight_texture.png

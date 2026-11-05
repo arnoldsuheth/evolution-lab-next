@@ -18,6 +18,8 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm ci
+      - name: Fetch pinned licensed pilot model
+        run: node scripts/fetch-pilot.mjs
       - name: Unit and migration tests
         run: npm test
       - name: TypeScript

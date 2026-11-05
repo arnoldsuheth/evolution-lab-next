@@ -6,6 +6,7 @@ import * as THREE from "three";
 import KingdomDetails from './KingdomDetails';
 import CombatFeedback from './CombatFeedback';
 import {advanceJump,isEditingTarget} from '@/lib/controls';
+import ProfessionalPilot from "./ProfessionalPilot";
 import Character from "./Character";
 import MonsterModel from "./MonsterModel";
 import { frameWorld } from "@/lib/worldCamera";
@@ -29,9 +30,11 @@ export class WorldBoundary extends Component<{ children: ReactNode }, { failed: 
 const DEFAULT_LOOK: Look = { body: 2, hair: 2, beard: 2, moustache: 1, skin: 1, hairColor: 2, eyes: 0, face: 1, nose: 1, brows: 1, scar: 0, tattoo: 0, accessory: 0, cloth: 1 };
 function Stone({ position, size = 1, color = "#777e79" }: { position: [number, number, number]; size?: number; color?: string }) { return <mesh position={position} scale={[size, size * 0.6, size * 0.8]} castShadow receiveShadow><dodecahedronGeometry args={[1, 0]} /><meshStandardMaterial color={color} flatShading roughness={0.96} /></mesh>; }
 function Tree({ x, z, size = 1 }: { x: number; z: number; size?: number }) {
+  const crown=useRef<THREE.Group>(null),ray=useRef(new THREE.Ray()),origin=useRef(new THREE.Vector3()),direction=useRef(new THREE.Vector3()),hit=useRef(new THREE.Vector3()),bounds=useRef(new THREE.Box3(new THREE.Vector3(x-1.7*size,1.5*size,z-1.7*size),new THREE.Vector3(x+1.7*size,5.5*size,z+1.7*size)));
+  useFrame(({camera},dt)=>{const state=useGame.getState(),enemy=MONSTERS.find(m=>m.id===state.encounter?.monsterId);const targets=[state.hero.position,...(enemy?[[enemy.x,enemy.z]]:[])];const covered=targets.some(p=>{origin.current.set(p[0],1.3,p[1]);direction.current.copy(camera.position).sub(origin.current);const distance=direction.current.length();ray.current.set(origin.current,direction.current.normalize());return !!ray.current.intersectBox(bounds.current,hit.current)&&origin.current.distanceTo(hit.current)<distance;});crown.current?.children.forEach(o=>{const m=(o as THREE.Mesh).material as THREE.MeshStandardMaterial;if(m){m.opacity=THREE.MathUtils.damp(m.opacity,covered?.18:1,10,Math.min(dt,.1));m.depthWrite=m.opacity>.95;}});});
   return <group position={[x, 0, z]} scale={size}>
     <mesh position={[0, 1.6, 0]} castShadow><cylinderGeometry args={[0.16, 0.38, 3.2, 7]} /><meshStandardMaterial color="#98633e" flatShading /></mesh>
-    {[0, 1, 2].map(i => <mesh key={i} position={[Math.sin(i*2)*.35,2.6+i*.8,Math.cos(i*2)*.25]} scale={[1,.8,1]} castShadow><icosahedronGeometry args={[1.65-i*.3,2]} /><meshStandardMaterial color={["#448d48", "#62a649", "#8abd59"][i]} flatShading /></mesh>)}
+    <group ref={crown}>{[0, 1, 2].map(i => <mesh key={i} position={[Math.sin(i*2)*.35,2.6+i*.8,Math.cos(i*2)*.25]} scale={[1,.8,1]} castShadow><icosahedronGeometry args={[1.65-i*.3,2]} /><meshStandardMaterial transparent color={["#448d48", "#62a649", "#8abd59"][i]} flatShading /></mesh>)}</group>
   </group>;
 }
 function House({ x, z, index }: { x: number; z: number; index: number }) {
@@ -171,8 +174,8 @@ export default function GameWorld(props: { paused: boolean; interact: (id: NpcId
   const quality = useGame(s => s.settings.quality);
   return <WorldBoundary><Canvas frameloop={props.paused ? "demand" : "always"} orthographic dpr={quality === "high" ? [1, 1.75] : [1, 1.25]} camera={{ position: [14, 18, 14], zoom: 42, left:-840, right:840, top:420, bottom:-420, near:.1, far:220 }} shadows={quality !== "low" ? "percentage" : false} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} fallback={<div className="world-fallback">Seu navegador não disponibilizou o WebGL. Os painéis continuam disponíveis.</div>}><Suspense fallback={null}><WorldFraming /><Scene {...props} /></Suspense></Canvas></WorldBoundary>;
 }
-function CharacterPreview({ classId, race, look, equipped, level }: { classId: ClassId; race: Race; look: Look; equipped: string[]; level: number }) {
-  return <Character classId={classId} race={race} look={look} equipped={equipped} level={level} preview animated={true} />;
+function CharacterPreview({ classId, race, look, equipped, level,organic=false }: { classId: ClassId; race: Race; look: Look; equipped: string[]; level: number;organic?:boolean }) {
+  return <Character classId={classId} race={race} look={look} equipped={equipped} level={level} preview animated={true} organic={organic} />;
 }
 function PreviewCamera({ race }: { race: Race }) {
   const camera = useThree(s => s.camera);
@@ -182,7 +185,7 @@ function PreviewCamera({ race }: { race: Race }) {
   useEffect(()=>{camera.position.set(0,target+.08,distance);controls.current?.target.set(0,target,0);controls.current?.update();},[camera,target,distance]);
   return <OrbitControls ref={controls} target={[0,target,0]} enablePan={false} enableZoom={false} autoRotate={false} enableDamping={false} minDistance={distance} maxDistance={distance} minPolarAngle={Math.PI/2-.035} maxPolarAngle={Math.PI/2-.035} touches={{ONE:THREE.TOUCH.ROTATE}} />;
 }
-export function CreatorStage({ classId, race=CLASSES[classId].race, look, equipped, level=1 }: { classId: ClassId; race?: Race; look: Look; equipped: string[]; level?: number }) {
-  return <WorldBoundary><Canvas shadows dpr={[1, 1.5]} camera={{ position: [0, 1.7, 5.4], fov: 36 }} gl={{ antialias: true }}><color attach="background" args={["#bdd9e8"]} /><ambientLight intensity={1.1} /><hemisphereLight args={["#c8dce4", "#504130", 1.8]} /><directionalLight position={[3, 5, 4]} intensity={2.1} color="#f3e9da" castShadow /><directionalLight position={[-4, 3, -3]} intensity={1.15} color="#94b3d1" /><CharacterPreview classId={classId} race={race} look={look} equipped={equipped} level={level} /><mesh position={[0, -0.18, 0]} receiveShadow><cylinderGeometry args={[1.15, 1.35, 0.26, 32]} /><meshStandardMaterial color="#354047" metalness={0.3} roughness={0.6} /></mesh><PreviewCamera race={race} /></Canvas></WorldBoundary>;
+export function CreatorStage({ classId, race=CLASSES[classId].race, look, equipped, level=1,organic=false,professional=false,animation="Idle" }: { classId: ClassId; race?: Race; look: Look; equipped: string[]; level?: number;organic?:boolean;professional?:boolean;animation?:string }) {
+  return <WorldBoundary><Canvas shadows dpr={[1, 1.5]} camera={{ position: [0, 1.7, 5.4], fov: 36 }} gl={{ antialias: true }}><color attach="background" args={["#bdd9e8"]} /><ambientLight intensity={1.1} /><hemisphereLight args={["#c8dce4", "#504130", 1.8]} /><directionalLight position={[3, 5, 4]} intensity={2.1} color="#f3e9da" castShadow /><directionalLight position={[-4, 3, -3]} intensity={1.15} color="#94b3d1" /><Suspense fallback={null}>{professional?<ProfessionalPilot animation={animation}/>:<CharacterPreview classId={classId} race={race} look={look} equipped={equipped} level={level} organic={organic} />}</Suspense><mesh position={[0, -0.18, 0]} receiveShadow><cylinderGeometry args={[1.15, 1.35, 0.26, 32]} /><meshStandardMaterial color="#354047" metalness={0.3} roughness={0.6} /></mesh><PreviewCamera race={race} /></Canvas></WorldBoundary>;
 }
 

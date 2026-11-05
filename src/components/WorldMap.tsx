@@ -1,0 +1,9 @@
+"use client";
+import {useState} from 'react';
+import {useGame} from '@/lib/store';
+import {MONSTERS,REGIONS,regionRequirement,type RegionId} from '@/lib/campaign';
+export default function WorldMap(){
+ const hero=useGame(s=>s.hero),education=useGame(s=>s.education),[region,setRegion]=useState<RegionId>(hero.region);
+ const reason=regionRequirement(hero,education,region),map=(v:number)=>50+v*1.55;
+ return <section className="panel-body world-map"><nav className="tabs">{(Object.keys(REGIONS) as RegionId[]).map(id=><button key={id} className={region===id?'active':''} onClick={()=>setRegion(id)}>{REGIONS[id].name} · {REGIONS[id].level}+</button>)}</nav><p>{reason?`Região bloqueada: ${reason}`:'Região conhecida. Os portais conectam as regiões; abrir o mapa não teleporta.'}</p><svg viewBox="0 0 100 100" role="img" aria-label={`Mapa de ${REGIONS[region].name}`}><rect x="1" y="1" width="98" height="98" rx="6" fill={REGIONS[region].color}/><path d="M50 96V6M50 25H91" stroke="#cfbd8f" strokeWidth="4"/>{region==='aurora'&&<><circle cx="50" cy="50" r="10" fill="#c8c39d"/>{[[-8,-5],[8,-5],[-8,6],[8,6]].map(([x,z],i)=><rect key={i} x={map(x)-4} y={map(z)-4} width="8" height="8" fill="#76543e"/>)}<text x="50" y="53" textAnchor="middle">Praça</text><text x="27" y="64">Borin · forja</text><text x="64" y="46">Eldrin</text><text x="12" y="15">Floresta</text><text x="78" y="15">Minas</text></>}{!reason&&MONSTERS.filter(m=>m.region===region).map(m=><g key={m.id}><circle cx={map(m.x)} cy={map(m.z)} r={m.boss?2:1.3} fill={m.boss?'#efbd65':'#bf5352'}/><text x={map(m.x)+2} y={map(m.z)}>{m.boss?'◆ ':''}{m.level}</text></g>)}{region===hero.region&&<circle cx={map(hero.position[0])} cy={map(hero.position[1])} r="1.8" fill="#8ee5ff" stroke="white" strokeWidth=".5"/>}{reason&&<rect x="1" y="1" width="98" height="98" rx="6" fill="#172a36" opacity=".8"/>}</svg><small>Azul: você · vermelho: criaturas · dourado: chefes. Números indicam o nível.</small></section>;
+}

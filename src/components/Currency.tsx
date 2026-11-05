@@ -1,0 +1,2 @@
+import {currency} from '@/lib/economy';
+export default function Currency({value}:{value:number}){return <span className="aurora-currency" aria-label={`Moedas da Aurora: ${currency(value)}`}><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#a87649" stroke="#f0bf77" strokeWidth="2"/><circle cx="12" cy="12" r="7" fill="none" stroke="#d7a565"/><path d="m12 6 4 6-4 6-4-6Z" fill="#ffe0a1"/></svg>{currency(value)}</span>;}

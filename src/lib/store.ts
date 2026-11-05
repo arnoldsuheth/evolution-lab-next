@@ -1,4 +1,6 @@
 "use client";
+import {PROFESSIONS,repairCost,type Profession} from "./economy";
+import {recoverResources} from "./recovery";
 import { HOTBAR_SIZE } from './controls';
 import {MONSTERS,REGIONS,regionRequirement,monsterRequirement,type RegionId} from "./campaign";
 import { AI_COURSE, CHESTS, aiRequirement, travelerFor, pendingDelivery, makeChallenge, mainRequirement, projectRequirement, promotionRequirement, promotionRank, type Challenge } from "./journey";
@@ -35,7 +37,7 @@ const guardedStorage = {
 };
 export type Encounter = EnemyState;
 interface GameStore extends SaveData {
-  relocation:number; mounted:boolean; toggleMount:()=>void;
+  repair:()=>void;learnProfession:(id:Profession)=>void; bindAction:(id:string,slot:number)=>void; relocation:number; mounted:boolean; toggleMount:()=>void;
   ready: boolean; saveError: string; notice: string; encounter: Encounter | null; buff: number; lastAttack: number; cooldowns: Record<string,number>; now: number; effects: {kind:string;amount:number;remaining:number}[];
   battleEvent:{time:number;damage:number;received:number;x:number;z:number;tone:string}|null;
   challenge: Challenge|null;
@@ -65,18 +67,21 @@ function executeBattle(id:string|undefined,starter:boolean,set:(value:Partial<Ga
  const s=get(),enemy=s.encounter!;
  const result=resolveCombat(s.hero,enemy,{skillId:id,starter,attackBuff:s.effects.filter(e=>e.kind==='attack').reduce((n,e)=>n+e.amount,0),defenseBuff:(s.buff>0?5:0)+s.effects.filter(e=>e.kind==='defense').reduce((n,e)=>n+e.amount,0)});
  if(result.error){set({notice:result.error});return;}
+ result.hero={...result.hero,durability:{...result.hero.durability,...Object.fromEntries(s.hero.equipped.filter(id=>ITEMS[id]&&ITEMS[id].slot!=="pet").map(id=>[id,Math.max(0,(s.hero.durability?.[id]??100)-1)]))}};
  const target=MONSTERS.find(m=>m.id===enemy.monsterId);
  const feedback={battleEvent:{time:Date.now(),damage:result.damage,received:result.received,x:target?.x??s.hero.position[0],z:target?.z??s.hero.position[1],tone:id?CLASSES[s.hero.classId].color:'#efd49a'}};
  const skillBuff=id?SKILLS[id].buff:undefined;
  const effects=skillBuff?[...s.effects.filter(e=>e.kind!==skillBuff.kind),{kind:skillBuff.kind,amount:Math.round(skillBuff.amount*(1+(skillRank(s.hero,id!)-1)*.14)),remaining:skillBuff.duration}]:s.effects;
  const now=Date.now(),cooldowns={...s.cooldowns,...(id?{[id]:now+SKILLS[id].cooldown*1000}:{})};
- if(result.won){const reward=battleRewards(s.hero,enemy);const inventory=[...result.hero.inventory];for(const drop of reward.drops){const item=ITEMS[drop];if(item&&countItem(inventory,drop)<item.maxStack)inventory.push(drop);}set({...feedback,hero:{...withXp(result.hero,reward.xp),gold:result.hero.gold+reward.gold,materials:result.hero.materials+reward.fragments,kills:result.hero.kills+1,defeatedBosses:enemy.bossId?[...new Set([...result.hero.defeatedBosses,enemy.bossId])]:result.hero.defeatedBosses,inventory},encounter:null,cooldowns,effects,now,lastAttack:now,notice:`Vitória! +${reward.xp} XP · +${reward.gold} ouro · ${reward.drops.length} itens/materiais. Confira a mochila.`});return;}
+ if(result.won){const reward=battleRewards(s.hero,enemy);const inventory=[...result.hero.inventory];for(const drop of reward.drops){const item=ITEMS[drop];if(item&&countItem(inventory,drop)<item.maxStack)inventory.push(drop);}set({...feedback,hero:{...withXp(result.hero,reward.xp),gold:result.hero.gold+reward.gold,materials:result.hero.materials+reward.fragments,kills:result.hero.kills+1,defeatedBosses:enemy.bossId?[...new Set([...result.hero.defeatedBosses,enemy.bossId])]:result.hero.defeatedBosses,inventory},encounter:null,cooldowns,effects,now,lastAttack:now,notice:`Vitória! +${reward.xp} XP · +${reward.gold} bronze · ${reward.drops.length} itens/materiais. Confira a mochila.`});return;}
  if(result.dead&&s.hero.mode==='hardcore'){const h=result.hero;const ancestor={id:h.id,name:h.name,classId:h.classId,level:h.level,diedAt:now,cause:enemy.name,legacy:Math.min(100,Math.max(0,Math.floor((h.xp-h.inherited)*.15))),claimed:false};set({...feedback,hero:{...h,hp:0,dead:true},ancestors:s.ancestors.some(a=>a.id===h.id)?s.ancestors:[...s.ancestors,ancestor],encounter:null,cooldowns,effects,now,lastAttack:now,notice:'Aventura encerrada. Educação e portfólio preservados.'});return;}
  if(result.dead){set({...feedback,hero:{...result.hero,hp:Math.round(stats(result.hero).maxHp*.6),region:"aurora",position:[0,5]},encounter:null,cooldowns,effects,now,lastAttack:now,notice:'Lion levou você à vila. Seu progresso foi preservado.'});return;}
  set({...feedback,hero:result.hero,encounter:result.enemy,cooldowns,effects,now,lastAttack:now,notice:`${id?SKILLS[id].name:starter?CLASSES[s.hero.classId].skill:'Ataque'}: ${result.damage} de dano · ${result.received} recebido.`});
 }
 export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>((set, get) => ({
   ...freshSave(), relocation:0,mounted:false, battleEvent:null, challenge:null, ready: false, saveError: "", notice: "", encounter: null, buff: 0, lastAttack: 0, cooldowns: {}, now: 0, effects: [],
+  repair:()=>{const s=get();if(s.hero.dead||s.encounter||s.hero.region!=='aurora'||Math.hypot(s.hero.position[0]+7,s.hero.position[1])>8){set({notice:'Procure Borin na vila para reparar.'});return;}const fee=repairCost(s.hero.equipped,s.hero.durability??{},ITEMS);if(!fee||s.hero.gold<fee)return;set({hero:{...s.hero,gold:s.hero.gold-fee,durability:{...s.hero.durability,...Object.fromEntries(s.hero.equipped.map(id=>[id,100]))}},notice:'Equipamento reparado.'});},
+  learnProfession:id=>{const s=get();if(!Object.hasOwn(PROFESSIONS,id)||s.hero.dead||s.encounter||s.hero.gold<20||s.hero.professions?.[id]||s.hero.region!=='aurora'||Math.hypot(s.hero.position[0]+7,s.hero.position[1])>8)return;set({hero:{...s.hero,gold:s.hero.gold-20,professions:{...s.hero.professions,[id]:1}},notice:'Ofício aprendido: '+PROFESSIONS[id]});},
   toggleMount:()=>{const s=get();if(s.mounted){set({mounted:false});return;}if(s.hero.dead||s.encounter||s.challenge||s.hero.level<30){set({notice:'Montarias exigem nível 30 e estar fora de combate.'});return;}if(!s.hero.equipped.some(id=>ITEMS[id]?.mount&&s.hero.inventory.includes(id))){set({notice:'Equipe um pet de montaria na mochila.'});return;}set({mounted:true,notice:'Montado. Deslocamento 50% mais rápido.'});},
   hydrate: async () => { await useGame.persist.rehydrate(); set({ ready: true, now: Date.now(), saveError: storageIssue, notice: storageIssue ? "Salvamento protegido. Exporte o original antes de recuperar." : "Bem-vindo a Pedra da Aurora." }); },
   createCharacter: (name, classId, mode, race) => {
@@ -92,7 +97,7 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     if(race && !validRaceClass(race,classId))return;
     const s = get(); if (s.encounter || s.hero.dead || s.hero.created) return;
     const hero = { ...s.hero, classId, race: raceForClass(classId,race ?? s.hero.race), talents: [0, 0, 0], hotbar:s.hero.hotbar.filter(id=>SKILLS[id]?.classId===classId), equipped:s.hero.equipped.filter(id=>{const item=ITEMS[id];return !item||!itemRequirement({...s.hero,classId},item);}) };
-    const limits = stats(hero); set({ hero: { ...hero, hp: Math.min(hero.hp, limits.maxHp), mp: Math.min(hero.mp, limits.maxMp),stamina:Math.min(hero.stamina,limits.maxStamina) }, notice: "Novo caminho. Educação, itens, XP e ouro preservados; talentos devolvidos." });
+    const limits = stats(hero); set({ hero: { ...hero, hp: Math.min(hero.hp, limits.maxHp), mp: Math.min(hero.mp, limits.maxMp),stamina:Math.min(hero.stamina,limits.maxStamina) }, notice: "Novo caminho. Educação, itens, XP e bronze preservados; talentos devolvidos." });
   },
   move: position => { const s = get(); if (!s.hero.dead && !s.encounter) set({ hero: { ...s.hero, position } }); },
   draft: (id, code) => set(s => ({ education: { ...s.education, drafts: { ...s.education.drafts, [id]: code } } })),
@@ -101,7 +106,7 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     if (s.hero.dead || !lesson || !!mainRequirement(s.hero,s.education,id)) return { ...result, passed: false, results: [{ label: "Pré-requisito", passed: false, message: "Conclua a missão anterior com um personagem vivo." }] };
     const already = s.education.completed.includes(id);
     const education = { ...s.education, attempts: { ...s.education.attempts, [id]: (s.education.attempts[id] ?? 0) + 1 }, drafts: { ...s.education.drafts, [id]: code }, completed: result.passed ? [...new Set([...s.education.completed, id])] : s.education.completed, reviews: result.passed ? { ...s.education.reviews, [id]: Date.now() + 86400000 } : s.education.reviews };
-    set({ education, ...(result.passed && !already ? { hero: { ...withXp(s.hero, lesson.xp), gold: s.hero.gold + lesson.gold }, notice: `${lesson.title}: +${lesson.xp} XP e +${lesson.gold} ouro. O mundo se transforma.` } : {}), ...(result.passed && already ? { notice: "Revisão concluída. Recompensa já recebida." } : {}) }); return result;
+    set({ education, ...(result.passed && !already ? { hero: { ...withXp(s.hero, lesson.xp), gold: s.hero.gold + lesson.gold }, notice: `${lesson.title}: +${lesson.xp} XP e +${lesson.gold} bronze. O mundo se transforma.` } : {}), ...(result.passed && already ? { notice: "Revisão concluída. Recompensa já recebida." } : {}) }); return result;
   },
   project: (id, code) => set(s => ({ education: { ...s.education, projects: { ...s.education.projects, [id]: { code, savedAt: Date.now() } } }, notice: "Projeto salvo. Evidências salvas não certificam domínio automaticamente." })),
   buy: id => {const s=get(),item=ITEMS[id];if(!item||s.hero.dead)return;const reason=itemRequirement(s.hero,item);if(reason){set({notice:reason});return;}if(item.source!=='shop'){set({notice:'Este item é obtido por fabricação ou saque.'});return;}if(s.hero.gold<item.price||countItem(s.hero.inventory,id)>=item.maxStack)return;set({hero:{...s.hero,gold:s.hero.gold-item.price,inventory:[...s.hero.inventory,id]},notice:`${item.name} adquirido.`});},
@@ -113,7 +118,7 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     const hero={...s.hero,equipped:[...s.hero.equipped.filter(x=>!occupied.includes(ITEMS[x]?.slot)),id]};const limits=stats(hero);
     set({hero:{...hero,hp:Math.min(hero.hp,limits.maxHp),mp:Math.min(hero.mp,limits.maxMp),stamina:Math.min(hero.stamina,limits.maxStamina)},notice:`${item.name} equipado.`});
   },
-  sell: id => {const s=get(),item=ITEMS[id];if(!item||s.hero.dead||s.encounter||s.hero.equipped.includes(id)||!item.sellPrice)return;const inventory=removeItems(s.hero.inventory,{[id]:1});if(!inventory)return;set({hero:{...s.hero,inventory,gold:s.hero.gold+item.sellPrice},notice:`${item.name} vendido por ${item.sellPrice} ouro.`});},
+  sell: id => {const s=get(),item=ITEMS[id];if(!item||s.hero.dead||s.encounter||s.hero.equipped.includes(id)||!item.sellPrice)return;const inventory=removeItems(s.hero.inventory,{[id]:1});if(!inventory)return;set({hero:{...s.hero,inventory,gold:s.hero.gold+item.sellPrice},notice:`${item.name} vendido por ${item.sellPrice} bronze.`});},
   useItem: id => {
     const s=get(),item=ITEMS[id];if(!item?.effect||s.hero.dead)return;const reason=itemRequirement(s.hero,item);if(reason){set({notice:reason});return;}if(Date.now()<(s.cooldowns['consumable']??0))return;
     if(item.effect.teleport&&(s.encounter||s.challenge)){set({notice:"Não é possível teleportar durante combate ou desafio."});return;}
@@ -123,12 +128,13 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
   },
   craft: id => {
     const s=get(),item=ITEMS[id];if(!item||s.hero.dead||s.encounter||!s.education.completed.includes('arithmetic')||!item.recipe&&!item.ingredients)return;
-    if(s.hero.level<item.minLevel){set({notice:`Requer nível ${item.minLevel} para fabricar.`});return;}if(countItem(s.hero.inventory,id)>=item.maxStack)return;
+    if(item.profession&&!s.hero.professions?.[item.profession]){set({notice:"Aprenda o ofício necessário com Borin."});return;}if(s.hero.level<item.minLevel){set({notice:`Requer nível ${item.minLevel} para fabricar.`});return;}if(countItem(s.hero.inventory,id)>=item.maxStack)return;
     const fragments=item.recipe??0;const fee=item.ingredients?Math.max(item.sellPrice+1,Math.ceil((item.craftGold??0)*(1-passiveBonuses(s.hero).craftDiscount/100))):0;
     if(s.hero.materials<fragments||s.hero.gold<fee)return;const inventory=removeItems(s.hero.inventory,item.ingredients??{});if(!inventory)return;
-    set({hero:{...s.hero,materials:s.hero.materials-fragments,gold:s.hero.gold-fee,inventory:[...inventory,id]},notice:`${item.name} fabricado. Materiais e custo descontados uma única vez.`});
+    set({hero:{...s.hero,professions:item.profession?{...s.hero.professions,[item.profession]:Math.min(100000,(s.hero.professions?.[item.profession]??1)+1)}:s.hero.professions,materials:s.hero.materials-fragments,gold:s.hero.gold-fee,inventory:[...inventory,id]},notice:`${item.name} fabricado. Materiais e custo descontados uma única vez.`});
   },
   learnSkill: id => {const s=get();if(s.encounter)return;const reason=skillRequirement(s.hero,id);if(reason){set({notice:reason});return;}const skill=SKILLS[id];const hero={...s.hero,skills:{...s.hero.skills,[id]:skillRank(s.hero,id)+1},hotbar:skill.kind==='active'&&!s.hero.hotbar.includes(id)&&s.hero.hotbar.filter(Boolean).length<HOTBAR_SIZE?(()=>{const bar=[...s.hero.hotbar],empty=bar.indexOf('');if(empty>=0)bar[empty]=id;else bar.push(id);return bar;})():s.hero.hotbar};set({hero,notice:`${skill.name} aprimorada.`});},
+  bindAction:(id,slot)=>{const s=get();if(s.hero.dead||s.encounter||!Number.isInteger(slot)||slot<0||slot>=HOTBAR_SIZE)return;if(id){if(id.startsWith('item:')){const key=id.slice(5);if(!ITEMS[key]?.effect||!s.hero.inventory.includes(key))return;}else if(!SKILLS[id]||SKILLS[id].classId!==s.hero.classId||SKILLS[id].kind!=='active'||!skillRank(s.hero,id))return;}const bar=[...s.hero.hotbar];while(bar.length<=slot)bar.push('');if(id){const old=bar.indexOf(id);if(old>=0)bar[old]='';}bar[slot]=id;set({hero:{...s.hero,hotbar:bar}});},
   bindSkill: (id,slot) => {const s=get(),skill=SKILLS[id];if(!skill||skill.classId!==s.hero.classId||skill.kind!=='active'||!skillRank(s.hero,id)||s.encounter||s.hero.dead)return;const bar=[...s.hero.hotbar];const existing=bar.indexOf(id);if(slot===undefined&&existing>=0){bar[existing]='';}else{const target=slot??(bar.includes('')?bar.indexOf(''):bar.length);if(!Number.isInteger(target)||target<0||target>=HOTBAR_SIZE){set({notice:'Escolha um dos dez espaços da barra.'});return;}if(existing>=0)bar[existing]='';while(bar.length<=target)bar.push('');bar[target]=id;}set({hero:{...s.hero,hotbar:bar}});},
   respec:()=>{const s=get();if(s.encounter||s.hero.dead)return;const skills=Object.fromEntries(Object.entries(s.hero.skills).filter(([id])=>SKILLS[id]?.classId!==s.hero.classId));const hero={...s.hero,skills,hotbar:[],talents:[0,0,0]};const limits=stats(hero);set({hero:{...hero,hp:Math.min(hero.hp,limits.maxHp),mp:Math.min(hero.mp,limits.maxMp),stamina:Math.min(hero.stamina,limits.maxStamina)},notice:'Pontos da classe devolvidos. XP e progresso preservados.'});},
   castSkill:id=>{const s=get(),skill=SKILLS[id];if(!s.encounter||s.hero.dead||!skill||skill.classId!==s.hero.classId||skill.kind!=='active'||!skillRank(s.hero,id)||s.hero.level<skill.minLevel)return;if(Date.now()<(s.cooldowns[id]??0)||Date.now()-s.lastAttack<650)return;executeBattle(id,false,set,get);},
@@ -147,7 +153,7 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
   attack: starter => {const s=get();if(!s.encounter||s.hero.dead||Date.now()-s.lastAttack<650)return;executeBattle(undefined,!!starter,set,get);},
   flee: () => set(s => ({ encounter: null, hero: { ...s.hero, region:'aurora', position: [0, 5] }, notice: "Você recuou para Pedra da Aurora." })),
   rest: () => { const s = get(); if (s.encounter || s.hero.dead || s.hero.region!=="aurora" || Math.hypot(...s.hero.position) > 11) return; const st = stats(s.hero); set({ hero: { ...s.hero, hp: st.maxHp, mp: st.maxMp, stamina: st.maxStamina }, notice: "Você descansou junto ao cristal de Lion." }); },
-  tick: seconds => { const s = get(); if (storageIssue !== s.saveError) set({ saveError: storageIssue }); set({now:Date.now(),buff:Math.max(0,s.buff-seconds),effects:s.effects.map(e=>({...e,remaining:Math.max(0,e.remaining-seconds)})).filter(e=>e.remaining>0)}); },
+  tick: seconds => { const s = get(); if (storageIssue !== s.saveError) set({ saveError: storageIssue }); const resources=recoverResources(s.hero,stats(s.hero),seconds,!s.hero.created||s.hero.dead||!!s.encounter||Date.now()-s.lastAttack<10000);set({hero:{...s.hero,...resources},now:Date.now(),buff:Math.max(0,s.buff-seconds),effects:s.effects.map(e=>({...e,remaining:Math.max(0,e.remaining-seconds)})).filter(e=>e.remaining>0)}); },
   setting: value => set(s => ({ settings: migrateSave({ ...savedState(s), settings: { ...s.settings, ...value } }).settings })),
   restore: raw => {
     const envelope = checkEnvelope(raw); const next = migrateSave(envelope.state); const s = get();
