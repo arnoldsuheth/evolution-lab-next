@@ -1,9 +1,10 @@
 "use client";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { Html, OrbitControls } from "@react-three/drei";
-import { Component, Suspense, useEffect, useRef, useState, type ReactNode, type ComponentRef, type RefObject } from "react";
+import { Component, Suspense, useEffect, useLayoutEffect, useRef, useState, type ReactNode, type ComponentRef, type RefObject } from "react";
 import * as THREE from "three";
 import Character from "./Character";
+import { frameWorld } from "@/lib/worldCamera";
 import WorldDetails, { HouseDetails } from "./WorldDetails";
 import {REGIONS} from "@/lib/campaign";
 import CampaignWorld from "./CampaignWorld";
@@ -60,6 +61,11 @@ function Npc({ npc, interact, player }: { npc: typeof NPCS_LIVE[number]; interac
     {npc.id === "lion" ? <Crystal /> : <group ref={root} position={[0, 0, 0]}><Character classId={npc.classId} skinOverride={npc.id === "pip" ? "#7d9858" : undefined} look={{ ...DEFAULT_LOOK, skin: npc.id === "pip" ? 5 : 1, beard: npc.id === "eldrin" ? 5 : npc.id === "pip" ? 0 : 3, hairColor: npc.id === "eldrin" ? 4 : 2, cloth: npc.id === "eldrin" ? 4 : 0 }} equipped={["tunic"]} animated={!reduced} /></group>}
     <Html zIndexRange={[8, 0]} position={[0, npc.id === "lion" ? 3.2 : 3.1, 0]} center distanceFactor={14} style={{ pointerEvents: "none" }}><div className="npc-label"><span className="quest-marker main-quest">{marker}</span><strong>{npc.name}</strong><small>{npc.title}</small></div></Html>
   </group>;
+}
+function WorldFraming() {
+  const camera=useThree(s=>s.camera),size=useThree(s=>s.size);
+  useLayoutEffect(()=>{if(camera instanceof THREE.OrthographicCamera)frameWorld(camera,size.width,size.height);},[camera,size.width,size.height]);
+  return null;
 }
 function Scene({ paused, interact, report }: { paused: boolean; interact: (id: NpcId) => void; report: (text: string) => void }) {
   const controls = useRef<ComponentRef<typeof OrbitControls>>(null); const heroRoot = useRef<THREE.Group>(null);
@@ -139,7 +145,7 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
 }
 export default function GameWorld(props: { paused: boolean; interact: (id: NpcId) => void; report: (text: string) => void }) {
   const quality = useGame(s => s.settings.quality);
-  return <WorldBoundary><Canvas frameloop={props.paused ? "demand" : "always"} orthographic shadows={quality !== "low"} dpr={quality === "high" ? [1, 1.75] : [1, 1.25]} camera={{ position: [14, 18, 14], zoom: 42, near:.1, far:180 }} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} fallback={<div className="world-fallback">Seu navegador não disponibilizou o WebGL. Os painéis continuam disponíveis.</div>}><Suspense fallback={null}><Scene {...props} /></Suspense></Canvas></WorldBoundary>;
+  return <WorldBoundary><Canvas frameloop={props.paused ? "demand" : "always"} orthographic dpr={quality === "high" ? [1, 1.75] : [1, 1.25]} camera={{ position: [14, 18, 14], zoom: 42, left:-840, right:840, top:420, bottom:-420, near:.1, far:220 }} shadows={quality !== "low" ? "percentage" : false} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} fallback={<div className="world-fallback">Seu navegador não disponibilizou o WebGL. Os painéis continuam disponíveis.</div>}><Suspense fallback={null}><WorldFraming /><Scene {...props} /></Suspense></Canvas></WorldBoundary>;
 }
 function CharacterPreview({ classId, race, look, equipped, level }: { classId: ClassId; race: Race; look: Look; equipped: string[]; level: number }) {
   return <Character classId={classId} race={race} look={look} equipped={equipped} level={level} preview animated={false} />;
@@ -155,3 +161,4 @@ function PreviewCamera({ race }: { race: Race }) {
 export function CreatorStage({ classId, race=CLASSES[classId].race, look, equipped, level=1 }: { classId: ClassId; race?: Race; look: Look; equipped: string[]; level?: number }) {
   return <WorldBoundary><Canvas shadows dpr={[1, 1.5]} camera={{ position: [0, 1.7, 5.4], fov: 36 }} gl={{ antialias: true }}><color attach="background" args={["#121b23"]} /><ambientLight intensity={1.1} /><hemisphereLight args={["#c8dce4", "#504130", 1.8]} /><directionalLight position={[3, 5, 4]} intensity={2.1} color="#f3e9da" castShadow /><directionalLight position={[-4, 3, -3]} intensity={1.15} color="#94b3d1" /><CharacterPreview classId={classId} race={race} look={look} equipped={equipped} level={level} /><mesh position={[0, -0.18, 0]} receiveShadow><cylinderGeometry args={[1.15, 1.35, 0.26, 32]} /><meshStandardMaterial color="#354047" metalness={0.3} roughness={0.6} /></mesh><PreviewCamera race={race} /></Canvas></WorldBoundary>;
 }
+

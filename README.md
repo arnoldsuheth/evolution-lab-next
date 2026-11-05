@@ -94,3 +94,11 @@ O personagem da 1.5.0 ainda tinha aparência de brinquedo. A 1.5.1 substitui o m
 A revisão foi inspecionada em renderização técnica fora do navegador, com depth buffer e iluminação aproximada. Isso permite conferir geometria e sobreposições; não equivale à homologação de WebGL, materiais, sombras e desempenho em aparelho físico. O resultado continua sendo arte procedural estilizada, sem equivalência ao conceito semirrealista gerado. Atingir esse conceito exige uma etapa dedicada de produção artística.
 
 Não houve mudança de schema nem regravação de aparência por migração: índices e campos salvos permanecem, incluindo XP, missões, equipamento e histórico.
+
+
+
+### 1.5.2 — enquadramento e música
+
+Câmera do mundo com enquadramento explícito e responsivo em unidades do mapa, mantendo zoom e rotação; PCF de sombras compatível. Música modal original sintetizada no dispositivo (melodia, arpejos e acordes suaves), botão de áudio e volume nas configurações; pausa com a aba oculta e liberação após interação. Sem alteração da chave, esquema ou dados do salvamento.
+
+Validação visual WebGL da ocorrência relatada ainda depende de navegador com aceleração gráfica: o ambiente remoto disponível não criou contexto WebGL. Teste numérico cobre projeção e enquadramento desktop/iPhone; não equivale a validação visual no aparelho.
