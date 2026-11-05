@@ -1,8 +1,9 @@
+import {INSTANCES} from './instances';
 import { ITEMS,stats, type HeroData } from './game';
 import { activeEquipment } from './equipment';
 import { bandFor,LEVEL_BANDS } from './catalogue';
 import { SKILLS,effectiveSkillRank } from './skills';
-export interface EnemyState{id:string;name:string;hp:number;maxHp:number;power:number;reward:number;elite:boolean;level?:number;monsterId?:string;bossId?:string;bleed?:{damage:number;turns:number}}
+export interface EnemyState{instanceId?:"cavern"|"monastery";id:string;name:string;hp:number;maxHp:number;power:number;reward:number;elite:boolean;level?:number;monsterId?:string;bossId?:string;bleed?:{damage:number;turns:number}}
 export function resolveCombat(hero:HeroData,enemy:EnemyState,options:{skillId?:string;starter?:boolean;attackBuff?:number;defenseBuff?:number}={}){
  const st=stats(hero),skill=options.skillId?SKILLS[options.skillId]:undefined;const rank=skill?effectiveSkillRank(hero,skill.id):1;
  if(options.skillId&&(!skill||skill.classId!==hero.classId||skill.kind!=='active'||!rank||hero.level<skill.minLevel))return{hero,enemy,error:'Habilidade indisponível',won:false,dead:false,damage:0,received:0};
@@ -29,6 +30,7 @@ export function battleRewards(hero:HeroData,enemy:EnemyState){
  for(const kind of ['ore','wood','leather','cloth','crystal','parts']){const count=kind==='ore'||kind==='crystal'?enemy.elite?3:1:((hero.kills+tier)%3===0?1:0);for(let i=0;i<count;i++)drops.push(`mat-${kind}-${band}`);}
  if(enemy.elite||hero.kills%4===3){const pool=Object.values(ITEMS).filter(i=>i.minLevel<=level&&i.minLevel>=band&&i.source!=='trophy'&&i.source!=='chest'&&i.category!=='material'&&i.slot!=='consumable'&&(!i.classId||i.classId===hero.classId)&&(!i.classes||i.classes.includes(hero.classId)));if(pool.length)drops.push(pool[hero.kills%pool.length].id);}
  if(enemy.elite)drops.push(`trophy-${Math.min(7,Math.floor((level-1)/7))}`);
- const penalty=level<hero.level-5?.2:1;
- return{xp:Math.max(1,Math.round((25+level*18)*(enemy.elite?2.2:1)*penalty)),gold:Math.max(1,Math.round((8+level*3)*(enemy.elite?2:1)*penalty)),fragments:enemy.elite?3:1,drops};
+ if(enemy.instanceId&&enemy.instanceId===hero.instance)drops.push(INSTANCES[enemy.instanceId].material);
+ const instanceBonus=enemy.instanceId&&enemy.instanceId===hero.instance?2:1;const penalty=level<hero.level-5?.2:1;
+ return{xp:Math.max(1,Math.round((25+level*18)*(enemy.elite?2.2:1)*penalty*instanceBonus)),gold:Math.max(1,Math.round((8+level*3)*(enemy.elite?2:1)*penalty)),fragments:enemy.elite?3:1,drops};
 }

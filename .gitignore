@@ -55,3 +55,5 @@ GENESIS-*.txt
 /.cloud-deps/
 /public/models/pilot/knight.glb
 /public/models/pilot/knight_texture.png
+/public/models/pilot/*.glb
+/public/art/paladin-approved-rig-reference.png

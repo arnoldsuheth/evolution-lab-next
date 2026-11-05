@@ -6,6 +6,7 @@ import * as THREE from "three";
 import KingdomDetails from './KingdomDetails';
 import CombatFeedback from './CombatFeedback';
 import {advanceJump,isEditingTarget} from '@/lib/controls';
+import BiomeDetails from "./BiomeDetails";
 import ProfessionalPilot from "./ProfessionalPilot";
 import Character from "./Character";
 import MonsterModel from "./MonsterModel";
@@ -80,7 +81,7 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
   const controls = useRef<ComponentRef<typeof OrbitControls>>(null); const shadowRoot=useRef<THREE.Group>(null);const jump=useRef({height:0,velocity:0});const touch=useRef({x:0,z:0}); const heroRoot = useRef<THREE.Group>(null);
   const mounted=useGame(s=>s.mounted); const encounter=useGame(s=>s.encounter); const relocation=useGame(s=>s.relocation); const lastRelocation=useRef(relocation); const hero = useGame(s => s.hero); const riding=mounted&&hero.level>=30&&!hero.dead&&hero.inventory.includes("mount-boar")&&hero.equipped.includes("mount-boar")&&!encounter; const look = useGame(s => s.look); const education = useGame(s => s.education.completed); const reduced = useGame(s => s.settings.reduceMotion);
   const low = useGame(s => s.settings.quality === "low");
-  const forest = hero.region!=="aurora"||education.includes("variables"); const mines = hero.region!=="aurora"||education.includes("conditions")&&hero.defeatedBosses.includes("boss-forest");
+  const worldRegion=hero.instance?"instance":hero.region;const forest = !!hero.instance||hero.region!=="aurora"||education.includes("variables"); const mines = !!hero.instance||hero.region!=="aurora"||education.includes("conditions")&&hero.defeatedBosses.includes("boss-forest");
   const lastRegion=useRef(hero.region); const player = useRef(new THREE.Vector3(hero.position[0], 0, hero.position[1])); // Position belongs to the simulation; save checkpoints do not recreate it.
   const monsterTarget=useRef<string|null>(null); const path = useRef<[number, number][]>([]); const pending = useRef<NpcId | null>(null); const keys = useRef(new Set<string>()); const checkpoint = useRef(0); const wasWalking = useRef(false); const [walking, setWalking] = useState(false);
   const camera = useThree(s => s.camera);const invalidate=useThree(s=>s.invalidate); const temp = useRef(new THREE.Vector3()); const offset = useRef(new THREE.Vector3());
@@ -99,17 +100,17 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
     return () => {window.removeEventListener("lions-cave-jump",onJump);window.removeEventListener("lions-cave-interact",onInteract);window.removeEventListener("lions-cave-move",onMove); window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); window.removeEventListener("blur", blur); };
   }, []);
   function travel(x: number, z: number) {
-    path.current = findPath([player.current.x, player.current.z], [x, z], forest, mines,hero.region);
+    path.current = findPath([player.current.x, player.current.z], [x, z], forest, mines,worldRegion);
     if (!path.current.length) report(z < -12 && !forest ? "Conclua a primeira runa com Eldrin para abrir a floresta." : x > 15 && !mines ? "Resolva A comporta das decisões para abrir as minas." : "Escolha um ponto livre no caminho.");
   }
   function travelNear(x:number,z:number){
     const candidates=Array.from({length:16},(_,i)=>{const a=i*Math.PI/8;return [x+Math.cos(a)*2.7,z+Math.sin(a)*2.7] as [number,number];});
-    const routes=candidates.filter(([cx,cz])=>walkable(cx,cz,forest,mines,hero.region)).map(p=>findPath([player.current.x,player.current.z],p,forest,mines,hero.region)).filter(route=>route.length);
+    const routes=candidates.filter(([cx,cz])=>walkable(cx,cz,forest,mines,worldRegion)).map(p=>findPath([player.current.x,player.current.z],p,forest,mines,worldRegion)).filter(route=>route.length);
     routes.sort((a,b)=>a.length-b.length);path.current=routes[0]??[];
     if(!path.current.length){pending.current=null;monsterTarget.current=null;report('Não há caminho livre até esse alvo. Verifique os acessos da região.');}
   }
   function approachMonster(id:string){
-    if(paused)return;const m=MONSTERS.find(m=>m.id===id&&m.region===hero.region);if(!m)return;pending.current=null;monsterTarget.current=id;
+    if(paused)return;const m=MONSTERS.find(m=>m.id===id&&m.region===hero.region&&(m.instance??null)===(hero.instance??null));if(!m)return;pending.current=null;monsterTarget.current=id;
     if(Math.hypot(player.current.x-m.x,player.current.z-m.z)<4){useGame.getState().move([player.current.x,player.current.z]);useGame.getState().startEncounter(m.boss,m.level,m.id);monsterTarget.current=null;return;}
     travelNear(m.x,m.z);
   }
@@ -124,7 +125,7 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
     const dt = Math.min(delta, 0.05); let moving = false;
     if (!paused && !hero.dead && !useGame.getState().encounter) {
       const k = keys.current; const x = Number(k.has("d") || k.has("arrowright")) - Number(k.has("a") || k.has("arrowleft"))+touch.current.x; const z = Number(k.has("s") || k.has("arrowdown")) - Number(k.has("w") || k.has("arrowup"))+touch.current.z;
-      if (x || z) { path.current = []; pending.current = null;monsterTarget.current=null; temp.current.set(x, 0, z).normalize().multiplyScalar(dt * (riding?6.75:4.5)); if (walkable(player.current.x + temp.current.x, player.current.z, forest, mines,hero.region)) player.current.x += temp.current.x; if (walkable(player.current.x, player.current.z + temp.current.z, forest, mines,hero.region)) player.current.z += temp.current.z; moving = true; }
+      if (x || z) { path.current = []; pending.current = null;monsterTarget.current=null; temp.current.set(x, 0, z).normalize().multiplyScalar(dt * (riding?6.75:4.5)); if (walkable(player.current.x + temp.current.x, player.current.z, forest, mines,worldRegion)) player.current.x += temp.current.x; if (walkable(player.current.x, player.current.z + temp.current.z, forest, mines,worldRegion)) player.current.z += temp.current.z; moving = true; }
       else if (path.current.length) { const p = path.current[0]; temp.current.set(p[0] - player.current.x, 0, p[1] - player.current.z); if (temp.current.length() < 0.14) path.current.shift(); else { const step = Math.min(temp.current.length(), dt * (riding?6.75:4.5)); temp.current.normalize().multiplyScalar(step); player.current.add(temp.current); moving = true; } }
       if (heroRoot.current && moving) heroRoot.current.rotation.y = Math.atan2(temp.current.x, temp.current.z);
       if (pending.current) { const npc = NPCS_LIVE.find(n => n.id === pending.current)!; if (Math.hypot(player.current.x - npc.x, player.current.z - npc.z) < 3.2) { path.current = []; const id = pending.current; pending.current = null; interact(id); } }
@@ -145,12 +146,12 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
     <ambientLight intensity={0.75 + light * 0.45} /><hemisphereLight args={["#d1e0de", "#59624d", 1.15]} />
     <directionalLight position={[12, 22, 8]} intensity={0.6 + light * 1.5} color="#ffe5bb" castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-22} shadow-camera-right={22} shadow-camera-top={20} shadow-camera-bottom={-25} shadow-bias={-0.001} />
     <KingdomDetails region={hero.region} low={low}/><CombatFeedback />
-    <TerrainSurface onClick={groundClick} color={REGIONS[hero.region].color}/><CampaignWorld paused={paused} approach={approachMonster}/>{hero.region==="aurora"&&<>
+    <TerrainSurface onClick={groundClick} color={REGIONS[hero.region].color}/><CampaignWorld paused={paused} approach={approachMonster}/>{!hero.instance&&hero.region==="aurora"&&<BiomeDetails region="aurora"/>}{hero.region==="aurora"&&!hero.instance&&<>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.014, -4]} onClick={groundClick} receiveShadow><planeGeometry args={[4.8, 48]} /><meshStandardMaterial color="#d8bd86" /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.018, 0]} onClick={groundClick} receiveShadow><circleGeometry args={[5.8, 32]} /><meshStandardMaterial color="#c7c3a8" /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[11, 0.025, -16]} onClick={groundClick}><planeGeometry args={[25, 3]} /><meshStandardMaterial color="#8e8b76" /></mesh>
     <ExplorationEncounters paused={paused} interact={()=>interact("traveler")} report={report} /><WorldDetails night={light<0.4} low={low} reduced={reduced} />
-    {BUILDINGS.map((b, i) => <House key={i} x={b.x} z={b.z} index={i} />)}
+    {BUILDINGS.map((b, i) => <House key={i} x={b.x} z={b.z} index={i%4} />)}
     {TREES.map((t, i) => <Tree key={i} {...t} />)}
     {[-1, 1].flatMap(side => [0, 1, 2, 3, 4].map(i => <Tree key={`${side}-${i}`} x={side * (17 + i % 2 * 3)} z={10 - i * 6} size={0.9 + i * 0.11} />))}
     {Array.from({ length: 22 }, (_, i) => <Stone key={i} position={[Math.sin(i * 7.3) * 25, 0.2, -30 + Math.cos(i * 4.1) * 4]} size={1.6 + i % 3} color="#697879" />)}
