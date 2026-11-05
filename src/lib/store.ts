@@ -35,6 +35,7 @@ const guardedStorage = {
 };
 export type Encounter = EnemyState;
 interface GameStore extends SaveData {
+  relocation:number; mounted:boolean; toggleMount:()=>void;
   ready: boolean; saveError: string; notice: string; encounter: Encounter | null; buff: number; lastAttack: number; cooldowns: Record<string,number>; now: number; effects: {kind:string;amount:number;remaining:number}[];
   battleEvent:{time:number;damage:number;received:number;x:number;z:number;tone:string}|null;
   challenge: Challenge|null;
@@ -75,7 +76,8 @@ function executeBattle(id:string|undefined,starter:boolean,set:(value:Partial<Ga
  set({...feedback,hero:result.hero,encounter:result.enemy,cooldowns,effects,now,lastAttack:now,notice:`${id?SKILLS[id].name:starter?CLASSES[s.hero.classId].skill:'Ataque'}: ${result.damage} de dano · ${result.received} recebido.`});
 }
 export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>((set, get) => ({
-  ...freshSave(), battleEvent:null, challenge:null, ready: false, saveError: "", notice: "", encounter: null, buff: 0, lastAttack: 0, cooldowns: {}, now: 0, effects: [],
+  ...freshSave(), relocation:0,mounted:false, battleEvent:null, challenge:null, ready: false, saveError: "", notice: "", encounter: null, buff: 0, lastAttack: 0, cooldowns: {}, now: 0, effects: [],
+  toggleMount:()=>{const s=get();if(s.mounted){set({mounted:false});return;}if(s.hero.dead||s.encounter||s.challenge||s.hero.level<30){set({notice:'Montarias exigem nível 30 e estar fora de combate.'});return;}if(!s.hero.equipped.some(id=>ITEMS[id]?.mount&&s.hero.inventory.includes(id))){set({notice:'Equipe um pet de montaria na mochila.'});return;}set({mounted:true,notice:'Montado. Deslocamento 50% mais rápido.'});},
   hydrate: async () => { await useGame.persist.rehydrate(); set({ ready: true, now: Date.now(), saveError: storageIssue, notice: storageIssue ? "Salvamento protegido. Exporte o original antes de recuperar." : "Bem-vindo a Pedra da Aurora." }); },
   createCharacter: (name, classId, mode, race) => {
     if(race && !validRaceClass(race,classId))return;
@@ -88,7 +90,7 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
   customize: look => set(s => ({ look: migrateSave({ ...savedState(s), look: { ...s.look, ...look } }).look })),
   chooseClass: (classId, race) => {
     if(race && !validRaceClass(race,classId))return;
-    const s = get(); if (s.encounter || s.hero.dead) return;
+    const s = get(); if (s.encounter || s.hero.dead || s.hero.created) return;
     const hero = { ...s.hero, classId, race: raceForClass(classId,race ?? s.hero.race), talents: [0, 0, 0], hotbar:s.hero.hotbar.filter(id=>SKILLS[id]?.classId===classId), equipped:s.hero.equipped.filter(id=>{const item=ITEMS[id];return !item||!itemRequirement({...s.hero,classId},item);}) };
     const limits = stats(hero); set({ hero: { ...hero, hp: Math.min(hero.hp, limits.maxHp), mp: Math.min(hero.mp, limits.maxMp),stamina:Math.min(hero.stamina,limits.maxStamina) }, notice: "Novo caminho. Educação, itens, XP e ouro preservados; talentos devolvidos." });
   },
@@ -114,7 +116,9 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
   sell: id => {const s=get(),item=ITEMS[id];if(!item||s.hero.dead||s.encounter||s.hero.equipped.includes(id)||!item.sellPrice)return;const inventory=removeItems(s.hero.inventory,{[id]:1});if(!inventory)return;set({hero:{...s.hero,inventory,gold:s.hero.gold+item.sellPrice},notice:`${item.name} vendido por ${item.sellPrice} ouro.`});},
   useItem: id => {
     const s=get(),item=ITEMS[id];if(!item?.effect||s.hero.dead)return;const reason=itemRequirement(s.hero,item);if(reason){set({notice:reason});return;}if(Date.now()<(s.cooldowns['consumable']??0))return;
-    const inventory=removeItems(s.hero.inventory,{[id]:1});if(!inventory)return;const st=stats(s.hero),effect=item.effect;
+    if(item.effect.teleport&&(s.encounter||s.challenge)){set({notice:"Não é possível teleportar durante combate ou desafio."});return;}
+    const inventory=removeItems(s.hero.inventory,{[id]:1});if(!inventory)return;
+    if(item.effect.teleport){set({relocation:s.relocation+1,hero:{...s.hero,inventory,region:"aurora",position:[0,5]},mounted:false,cooldowns:{...s.cooldowns,consumable:Date.now()+1000},notice:"Você retornou à praça de Pedra da Aurora."});return;}const st=stats(s.hero),effect=item.effect;
     set({hero:{...s.hero,inventory,hp:Math.min(st.maxHp,s.hero.hp+(effect.hp??0)),mp:Math.min(st.maxMp,s.hero.mp+(effect.mp??0)),stamina:Math.min(st.maxStamina,s.hero.stamina+(effect.stamina??0))},cooldowns:{...s.cooldowns,consumable:Date.now()+1000},effects:effect.buff?[...s.effects.filter(e=>e.kind!==effect.buff),{kind:effect.buff,amount:effect.amount??0,remaining:effect.duration??60}]:s.effects,notice:`${item.name} utilizado.`});
   },
   craft: id => {
@@ -138,7 +142,7 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     if(Math.hypot(s.hero.position[0]-monster.x,s.hero.position[1]-monster.z)>4.5){set({notice:'Aproxime-se da criatura para iniciar o combate.'});return;}
     const level=monster.boss?monster.level:Math.max(monster.level,Math.min(60,s.hero.level+3,Number.isFinite(requestedLevel)?Math.floor(requestedLevel!):s.hero.level));
     const maxHp=Math.round((80+level*28+Math.floor(level/5)*35)*(monster.boss?1.8:1));
-    set({encounter:{id:`enemy-${Date.now()}`,monsterId:monster.id,bossId:monster.boss?monster.id:undefined,name:monster.name,hp:maxHp,maxHp,level,power:Math.round((15+level*4)*(monster.boss?1.2:1)),reward:25+level*18,elite:monster.boss},lastAttack:0,notice:monster.boss?'Chefe de região. A vitória abre o caminho seguinte.':'Observe seus recursos e habilidades.'});
+    set({mounted:false,encounter:{id:`enemy-${Date.now()}`,monsterId:monster.id,bossId:monster.boss?monster.id:undefined,name:monster.name,hp:maxHp,maxHp,level,power:Math.round((15+level*4)*(monster.boss?1.2:1)),reward:25+level*18,elite:monster.boss},lastAttack:0,notice:monster.boss?'Chefe de região. A vitória abre o caminho seguinte.':'Observe seus recursos e habilidades.'});
   },
   attack: starter => {const s=get();if(!s.encounter||s.hero.dead||Date.now()-s.lastAttack<650)return;executeBattle(undefined,!!starter,set,get);},
   flee: () => set(s => ({ encounter: null, hero: { ...s.hero, region:'aurora', position: [0, 5] }, notice: "Você recuou para Pedra da Aurora." })),

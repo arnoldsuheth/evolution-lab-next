@@ -6,7 +6,7 @@ import { buildCatalogue } from "./catalogue";
 import { activeEquipment } from "./equipment";
 import { passiveBonuses, SKILLS } from "./skills";
 
-export const RELEASE = "1.6.1";
+export const RELEASE = "1.6.2";
 export type Race = "human" | "orc" | "dwarf" | "elf" | "gnome";
 export type ClassId = "paladin" | "warrior" | "hunter" | "engineer" | "mage" | "hacker" | "prophet" | "duelist" | "shaman";
 export type NpcId = "borin" | "eldrin" | "pip" | "lion" | "traveler";

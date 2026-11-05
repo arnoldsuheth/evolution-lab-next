@@ -10,7 +10,7 @@ export function HudLayout({children,onEditingChange}:{children:ReactNode;onEditi
  useEffect(()=>{void useLayout.persist.rehydrate();return useLayout.persist.onFinishHydration(()=>{});},[]);
  function toggle(){setEditing(!editing);onEditingChange(!editing);}
  function reset(){try{useLayout.getState().reset();setError('');}catch{setError('Não foi possível salvar a organização. Seu progresso não foi alterado.');}}
- return <Editing.Provider value={editing}>{children}<div className="hud-toolbar"><button onClick={toggle} aria-pressed={editing}>{editing?'✓ Travar':'▦ Interface'}</button>{editing&&<><button onClick={reset}>Restaurar posições</button><span>Arraste pelo título · ajuste o tamanho · depois trave</span></>}{error&&<span role="status">{error}</span>}</div></Editing.Provider>;
+ return <Editing.Provider value={editing}>{children}<div className="hud-toolbar"><button onClick={toggle} aria-pressed={editing}>{editing?'✓ Travar':'▦ Interface'}</button>{editing&&<><button onClick={reset}>Aplicar HUD recomendado</button><span>Reposiciona apenas a interface. Seu personagem e progresso permanecem.</span><span>Arraste pelo título · ajuste o tamanho · depois trave</span></>}{error&&<span role="status">{error}</span>}</div></Editing.Provider>;
 }
 export function HudBlock({id,label,className,children}:{id:string;label:string;className:string;children:ReactNode}){
  const editing=useContext(Editing),positions=useLayout(s=>s.positions),root=useRef<HTMLElement>(null),drag=useRef<{x:number;y:number;left:number;top:number}|null>(null);

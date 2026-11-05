@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import "./globals.css";
 import "./cartoon.css";
 import "./cloud.css";
+import "./adventure.css";
 import {CloudRuntime,CloudGate} from "@/components/CloudAccount";
 
 const base = process.env.GITHUB_PAGES === "true" ? "/evolution-lab-next" : "";
