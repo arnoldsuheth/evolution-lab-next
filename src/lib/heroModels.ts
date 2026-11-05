@@ -5,13 +5,22 @@ import { RACE_FORM } from './visual';
 /**
  * Modelos KayKit Adventures 1.0 (CC0) com esqueleto e animações.
  * Cada classe usa um corpo-base, armas próprias e uma paleta recolorida.
- * Nenhum dado salvo muda: tudo é derivado de classId, raça, pele e equipamento.
+ * Nenhum dado salvo muda: tudo é derivado de classId, raça, aparência e equipamento.
  */
 export type HeroBase = 'knight' | 'barbarian' | 'mage' | 'rogue' | 'rogue_hooded';
 export const HERO_BASE_FILES: Record<HeroBase, string> = {
   knight: 'Knight.glb', barbarian: 'Barbarian.glb', mage: 'Mage.glb', rogue: 'Rogue.glb', rogue_hooded: 'Rogue_Hooded.glb',
 };
 export const HERO_WEAPON_MESHES = ['1H_Sword', '1H_Sword_Offhand', '2H_Sword', 'Badge_Shield', 'Rectangle_Shield', 'Round_Shield', 'Spike_Shield', '1H_Axe', '1H_Axe_Offhand', '2H_Axe', 'Barbarian_Round_Shield', 'Mug', 'Spellbook', 'Spellbook_open', '1H_Wand', '2H_Staff', 'Knife', 'Knife_Offhand', '1H_Crossbow', '2H_Crossbow', 'Throwable'] as const;
+/** Peças de cada corpo-base: cabeça, capa e o que conta como elmo. */
+export const HERO_PARTS: Record<HeroBase, { head: string; cape: string; helmet?: string; hood?: HeroBase }> = {
+  knight: { head: 'Knight_Head', cape: 'Knight_Cape', helmet: 'Knight_Helmet' },
+  barbarian: { head: 'Barbarian_Head', cape: 'Barbarian_Cape', helmet: 'Barbarian_Hat' },
+  mage: { head: 'Mage_Head', cape: 'Mage_Cape', helmet: 'Mage_Hat' },
+  rogue: { head: 'Rogue_Head', cape: 'Rogue_Cape', hood: 'rogue_hooded' },
+  rogue_hooded: { head: 'Rogue_Head_Hooded', cape: 'Rogue_Cape' },
+};
+export const HERO_HAT_MESHES = ['Knight_Helmet', 'Barbarian_Hat', 'Mage_Hat'];
 
 type HueRule = { hue: number; range: number; minSat: number; to: string };
 export interface HeroStyle {
@@ -20,8 +29,6 @@ export interface HeroStyle {
   weapon: string[];
   /** Item de mão secundária exibido quando há escudo/foco equipado. */
   offhand: string[];
-  /** Peças do corpo-base escondidas (chapéus que não combinam com a classe). */
-  hide: string[];
   recolor: HueRule[];
   /** Recolore o metal acinzentado da armadura. */
   metal?: string;
@@ -30,16 +37,43 @@ export interface HeroStyle {
 
 const cloth = (id: ClassId) => CLASS_STYLE[id].cloth, trim = (id: ClassId) => CLASS_STYLE[id].trim;
 export const HERO_STYLE: Record<ClassId, HeroStyle> = {
-  paladin: { base: 'knight', weapon: ['1H_Sword'], offhand: ['Badge_Shield'], hide: [], metal: '#3d6fc4', recolor: [{ hue: 358, range: 14, minSat: .45, to: '#22407e' }], idle: 'Idle', attack: '1H_Melee_Attack_Chop' },
-  warrior: { base: 'barbarian', weapon: ['2H_Axe'], offhand: [], hide: ['Barbarian_Hat'], recolor: [{ hue: 204, range: 14, minSat: .25, to: cloth('warrior') }], idle: '2H_Melee_Idle', attack: '2H_Melee_Attack_Chop' },
-  hunter: { base: 'rogue_hooded', weapon: ['2H_Crossbow'], offhand: [], hide: [], recolor: [{ hue: 160, range: 16, minSat: .5, to: cloth('hunter') }, { hue: 132, range: 10, minSat: .35, to: '#8fb35c' }], idle: 'Idle', attack: '2H_Ranged_Shoot' },
-  engineer: { base: 'barbarian', weapon: ['1H_Axe'], offhand: ['Barbarian_Round_Shield'], hide: ['Barbarian_Hat'], recolor: [{ hue: 204, range: 14, minSat: .25, to: cloth('engineer') }], idle: 'Idle', attack: '1H_Melee_Attack_Chop' },
-  mage: { base: 'mage', weapon: ['2H_Staff'], offhand: [], hide: [], recolor: [{ hue: 245, range: 12, minSat: .3, to: cloth('mage') }, { hue: 332, range: 12, minSat: .5, to: trim('mage') }], idle: 'Idle', attack: 'Spellcast_Shoot' },
-  hacker: { base: 'rogue_hooded', weapon: ['Knife'], offhand: ['Knife_Offhand'], hide: [], recolor: [{ hue: 160, range: 16, minSat: .5, to: cloth('hacker') }, { hue: 132, range: 10, minSat: .35, to: trim('hacker') }], idle: 'Idle', attack: 'Dualwield_Melee_Attack_Stab' },
-  prophet: { base: 'mage', weapon: ['1H_Wand'], offhand: ['Spellbook_open'], hide: ['Mage_Hat'], recolor: [{ hue: 245, range: 12, minSat: .3, to: cloth('prophet') }, { hue: 332, range: 12, minSat: .5, to: trim('prophet') }], idle: 'Idle', attack: 'Spellcast_Raise' },
-  duelist: { base: 'rogue', weapon: ['Knife'], offhand: ['Knife_Offhand'], hide: [], recolor: [{ hue: 160, range: 16, minSat: .5, to: cloth('duelist') }, { hue: 132, range: 10, minSat: .35, to: trim('duelist') }], idle: 'Idle', attack: 'Dualwield_Melee_Attack_Slice' },
-  shaman: { base: 'mage', weapon: ['2H_Staff'], offhand: [], hide: ['Mage_Hat'], recolor: [{ hue: 245, range: 12, minSat: .3, to: cloth('shaman') }, { hue: 332, range: 12, minSat: .5, to: trim('shaman') }], idle: 'Idle', attack: 'Spellcast_Long' },
+  paladin: { base: 'knight', weapon: ['1H_Sword'], offhand: ['Badge_Shield'], metal: '#3d6fc4', recolor: [{ hue: 358, range: 14, minSat: .45, to: '#22407e' }], idle: 'Idle', attack: '1H_Melee_Attack_Chop' },
+  warrior: { base: 'barbarian', weapon: ['2H_Axe'], offhand: [], recolor: [{ hue: 204, range: 14, minSat: .25, to: cloth('warrior') }], idle: '2H_Melee_Idle', attack: '2H_Melee_Attack_Chop' },
+  hunter: { base: 'rogue', weapon: ['2H_Crossbow'], offhand: [], recolor: [{ hue: 160, range: 16, minSat: .5, to: cloth('hunter') }, { hue: 132, range: 10, minSat: .35, to: '#8fb35c' }], idle: 'Idle', attack: '2H_Ranged_Shoot' },
+  engineer: { base: 'barbarian', weapon: ['1H_Axe'], offhand: ['Barbarian_Round_Shield'], recolor: [{ hue: 204, range: 14, minSat: .25, to: cloth('engineer') }], idle: 'Idle', attack: '1H_Melee_Attack_Chop' },
+  mage: { base: 'mage', weapon: ['2H_Staff'], offhand: [], recolor: [{ hue: 245, range: 12, minSat: .3, to: cloth('mage') }, { hue: 332, range: 12, minSat: .5, to: trim('mage') }], idle: 'Idle', attack: 'Spellcast_Shoot' },
+  hacker: { base: 'rogue', weapon: ['Knife'], offhand: ['Knife_Offhand'], recolor: [{ hue: 160, range: 16, minSat: .5, to: cloth('hacker') }, { hue: 132, range: 10, minSat: .35, to: trim('hacker') }], idle: 'Idle', attack: 'Dualwield_Melee_Attack_Stab' },
+  prophet: { base: 'mage', weapon: ['1H_Wand'], offhand: ['Spellbook_open'], recolor: [{ hue: 245, range: 12, minSat: .3, to: cloth('prophet') }, { hue: 332, range: 12, minSat: .5, to: trim('prophet') }], idle: 'Idle', attack: 'Spellcast_Raise' },
+  duelist: { base: 'rogue', weapon: ['Knife'], offhand: ['Knife_Offhand'], recolor: [{ hue: 160, range: 16, minSat: .5, to: cloth('duelist') }, { hue: 132, range: 10, minSat: .35, to: trim('duelist') }], idle: 'Idle', attack: 'Dualwield_Melee_Attack_Slice' },
+  shaman: { base: 'mage', weapon: ['2H_Staff'], offhand: [], recolor: [{ hue: 245, range: 12, minSat: .3, to: cloth('shaman') }, { hue: 332, range: 12, minSat: .5, to: trim('shaman') }], idle: 'Idle', attack: 'Spellcast_Long' },
 };
+export const HERO_WALK = 'Walking_A', HERO_PUNCH = 'Unarmed_Melee_Attack_Punch_A';
+/** Todas as animações que o jogo usa. As demais são removidas dos arquivos publicados. */
+export const HERO_ANIMATIONS = [...new Set(['Idle', HERO_WALK, HERO_PUNCH, ...Object.values(HERO_STYLE).flatMap(s => [s.idle, s.attack])])];
+
+/** Penteados: cada opção usa a cabeça (com cabelo) de um corpo-base. 0 = o da classe. */
+export const HERO_HAIRSTYLES: { label: string; base: HeroBase | null }[] = [
+  { label: 'Da classe', base: null }, { label: 'Curto', base: 'knight' }, { label: 'Longo', base: 'rogue' }, { label: 'Repartido', base: 'mage' },
+];
+/** Estrutura corporal muda a largura do herói. */
+export const BODY_WIDTH = [.9, .95, 1, 1.05, 1.1, 1.15];
+
+export interface HeroGear { head: boolean; chest: boolean; back: boolean }
+export interface HeroDress { outfit: 'rags' | 'class'; hat: string | null; cape: boolean; head: HeroBase }
+/**
+ * O iniciante veste roupas remendadas: sem elmo, sem capa e sem as cores da classe.
+ * Peitoral traz as cores da classe; item de cabeça mostra o elmo (se o jogador quiser); capa vem com peitoral ou costas.
+ */
+export function heroDress(classId: ClassId, gear: HeroGear, hairStyle: number, showHelmet: boolean): HeroDress {
+  const base = HERO_STYLE[classId].base, parts = HERO_PARTS[base], helmet = gear.head && showHelmet;
+  const chosen = HERO_HAIRSTYLES[hairStyle]?.base ?? base;
+  return {
+    outfit: gear.chest ? 'class' : 'rags',
+    hat: helmet ? parts.helmet ?? null : null,
+    cape: gear.chest || gear.back,
+    head: helmet ? parts.hood ?? base : chosen,
+  };
+}
 
 /** Altura e largura relativas ao humano, a partir das formas já usadas pelo jogo. */
 export function heroProportions(race: Race) {
@@ -55,19 +89,34 @@ const clamp = (n: number) => Math.max(0, Math.min(1, n));
 
 /** Pele do atlas KayKit: tom pêssego claro (matiz ~23°, saturação ~0,37). */
 export const isAtlasSkin = (h: number, s: number, v: number) => h >= 16 && h <= 28 && s >= .26 && s <= .48 && v >= .74;
+/** Cor do cabelo de cada cabeça no atlas (medida nos arquivos originais). */
+export const HAIR_RULES: Record<HeroBase, { hue: number; range: number; sat: [number, number]; val: [number, number] }> = {
+  knight: { hue: 34, range: 6, sat: [.3, .52], val: [.76, .94] },
+  barbarian: { hue: 24, range: 8, sat: [.07, .2], val: [.38, .64] },
+  mage: { hue: 312, range: 26, sat: [.04, .16], val: [.08, .26] },
+  rogue: { hue: 15, range: 5, sat: [.5, .67], val: [.44, .72] },
+  rogue_hooded: { hue: 15, range: 5, sat: [.5, .67], val: [.44, .72] },
+};
+export const RAGS_HUE = 30;
 
+export interface RecolorOptions { rags?: boolean; hair?: { base: HeroBase; color: string } }
 /**
- * Recolore os pixels RGBA do atlas: pele pela raça, roupa pela classe e,
- * quando indicado, o metal da armadura. Preserva o degradê de luz original.
+ * Recolore os pixels RGBA do atlas: pele pela raça, cabelo pela escolha do jogador,
+ * roupa pela classe (ou tecido remendado) e, quando indicado, o metal da armadura.
+ * Preserva o degradê de luz original.
  */
-export function recolorAtlas(data: Uint8ClampedArray, style: Pick<HeroStyle, 'recolor' | 'metal'>, skin: string) {
+export function recolorAtlas(data: Uint8ClampedArray, style: Pick<HeroStyle, 'recolor' | 'metal'>, skin: string, options: RecolorOptions = {}) {
   const [sh, ss, sv] = rgbToHsv(...hexToRgb(skin));
   const targets = style.recolor.map(rule => ({ rule, hsv: rgbToHsv(...hexToRgb(rule.to)) }));
   const metal = style.metal ? rgbToHsv(...hexToRgb(style.metal)) : null;
+  const hairRule = options.hair ? HAIR_RULES[options.hair.base] : null, hair = options.hair ? rgbToHsv(...hexToRgb(options.hair.color)) : null;
+  const hairRef = hairRule ? [(hairRule.sat[0] + hairRule.sat[1]) / 2, (hairRule.val[0] + hairRule.val[1]) / 2] : [1, 1];
   for (let i = 0; i < data.length; i += 4) {
     const [h, s, v] = rgbToHsv(data[i] / 255, data[i + 1] / 255, data[i + 2] / 255);
     let out: [number, number, number] | null = null;
     if (isAtlasSkin(h, s, v)) out = hsvToRgb(sh, clamp(ss * (s / .37)), clamp(sv * (v / .96)));
+    else if (hairRule && hair && hueGap(h, hairRule.hue) <= hairRule.range && s >= hairRule.sat[0] && s <= hairRule.sat[1] && v >= hairRule.val[0] && v <= hairRule.val[1]) out = hsvToRgb(hair[0], clamp(hair[1] * (.7 + .3 * s / hairRef[0])), clamp(hair[2] * (.55 + .45 * v / hairRef[1])));
+    else if (options.rags) { if (v > .06) out = hsvToRgb(RAGS_HUE + (h % 24 - 12) * .35, clamp(.34 + s * .22), clamp(.1 + v * .62)); }
     else if (metal && s < .16 && v > .28 && v < .9 && h > 150 && h < 240) out = hsvToRgb(metal[0], clamp(metal[1] * (.75 + v * .3)), clamp(metal[2] * (v / .57) * .92));
     else if (v > .2) for (const { rule, hsv } of targets) if (s >= rule.minSat && hueGap(h, rule.hue) <= rule.range) { out = hsvToRgb(hsv[0], clamp(hsv[1] * (.65 + s * .35)), clamp(hsv[2] * (v / .55))); break; }
     if (out) { data[i] = Math.round(out[0] * 255); data[i + 1] = Math.round(out[1] * 255); data[i + 2] = Math.round(out[2] * 255); }

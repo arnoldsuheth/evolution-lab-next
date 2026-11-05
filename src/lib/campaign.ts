@@ -1,7 +1,7 @@
 import type {HeroData,Education} from './game';
 export type RegionId='aurora'|'ruins'|'frontier'|'heart';
 export type MonsterKind='wolf'|'spider'|'boar'|'golem'|'wraith'|'dragon';
-export const REGIONS:Record<RegionId,{name:string;boss?:string;lesson?:string;level:number;color:string}>={aurora:{name:'Pedra da Aurora',level:1,color:'#607651'},ruins:{name:'Ruínas das Funções',boss:'boss-mines',lesson:'functions',level:15,color:'#647c83'},frontier:{name:'Fronteira dos Algoritmos',boss:'boss-ruins',lesson:'arrays',level:30,color:'#7b705d'},heart:{name:'Coração do Código Perdido',boss:'boss-frontier',lesson:'debug',level:45,color:'#5e5474'}};
+export const REGIONS:Record<RegionId,{name:string;boss?:string;lesson?:string;level:number;color:string}>={aurora:{name:'Pedra da Aurora',level:1,color:'#76a35a'},ruins:{name:'Ruínas das Funções',boss:'boss-mines',lesson:'functions',level:15,color:'#647c83'},frontier:{name:'Fronteira dos Algoritmos',boss:'boss-ruins',lesson:'arrays',level:30,color:'#7b705d'},heart:{name:'Coração do Código Perdido',boss:'boss-frontier',lesson:'debug',level:45,color:'#5e5474'}};
 export interface Monster{id:string;name:string;kind:MonsterKind;region:RegionId;x:number;z:number;level:number;boss:boolean;instance?:"cavern"|"monastery"}
 export const MONSTERS:Monster[]=[
  {id:'cavern-spider',name:'Aranha Cristalina',kind:'spider',region:'aurora',instance:'cavern',x:-6,z:0,level:8,boss:false},

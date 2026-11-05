@@ -59,3 +59,8 @@
  .skills-hud{width:max-content;bottom:calc(env(safe-area-inset-bottom) + 68px)}.combat-hotbar{display:flex;gap:4px;padding:6px}.combat-hotbar>button{width:42px;height:42px}.starter-actions{position:absolute;left:50%;bottom:66px;transform:translateX(-50%);width:270px}.bottom-hud{width:min(490px,65vw)}.touch-stick{bottom:calc(env(safe-area-inset-bottom) + 52px);left:max(20px,env(safe-area-inset-left))}.touch-actions{bottom:calc(env(safe-area-inset-bottom) + 40px);right:max(18px,env(safe-area-inset-right));flex-direction:row}.touch-actions button{width:56px;height:56px}.combat-panel{left:auto;right:100px;bottom:130px;width:300px;max-height:42svh}.challenge-panel{right:100px;bottom:125px;max-height:40svh;overflow:auto}.toast{bottom:130px;max-width:300px;font-size:10px}.creator-grid{display:grid;grid-template-columns:40% 60%}.creator-model{height:70svh;min-height:240px;position:sticky;top:0}.creator-editor{display:block}.creator-identity h3{font-size:23px}.creator-options h3{font-size:23px}
 }
 @media(prefers-reduced-motion:reduce){button{transition:none}.damage-number{transition:none}}
+/* Cursores cartoon (desenhos em src/lib/cursor.ts): mão no mapa, seta no que é clicável, espada em inimigos e no combate. */
+.world-container canvas{cursor:var(--cursor-map,grab)}
+.world-container canvas[data-cursor="point"]{cursor:var(--cursor-point,pointer)}
+.world-container canvas[data-cursor="combat"]{cursor:var(--cursor-combat,crosshair)}
+body button:not(:disabled),body a[href],body summary,body select,body [role="button"]{cursor:var(--cursor-point,pointer)}

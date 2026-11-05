@@ -11,7 +11,7 @@ import {useGame} from '@/lib/store';
 import EquipmentVisual,{rarityTone} from './EquipmentVisual';
 import HeroModel from './HeroModel';
 import {skinColor} from '@/lib/visual';
-function ProceduralCharacter({classId,look,equipped=[],walking=false,animated=true,preview=false,skinOverride,level=1,race:selectedRace,combatant=false,organic=false}:{classId:ClassId;look:Look;equipped?:string[];walking?:boolean;animated?:boolean;preview?:boolean;skinOverride?:string;level?:number;race?:Race;combatant?:boolean;organic?:boolean}){
+function ProceduralCharacter({classId,look,equipped=[],walking=false,animated=true,preview=false,skinOverride,level=1,race:selectedRace,combatant=false,organic=false}:{classId:ClassId;look:Look;equipped?:string[];walking?:boolean;animated?:boolean;preview?:boolean;skinOverride?:string;level?:number;race?:Race;combatant?:boolean;organic?:boolean;fullGear?:boolean}){
  const race=selectedRace??CLASSES[classId].race,modelRef=useRef<THREE.Group>(null),phase=useRef(0),event=useGame(s=>combatant?s.battleEvent:null);
  const equipmentKey=equipped.join('|'),lookKey=JSON.stringify(look);
  const gear=useMemo(()=>activeEquipment({classId,level,dead:false,equipped:equipmentKey.split('|').filter(Boolean)},ITEMS),[classId,level,equipmentKey]);
@@ -41,5 +41,6 @@ export default function Character(props:CharacterProps){
  if(organic)return <ProceduralCharacter {...props}/>;
  const fallback=<ProceduralCharacter {...props}/>;
  const armed=gear.some(i=>i.slot==='weapon'||i.slot==='twohand'),shielded=gear.some(i=>i.slot==='offhand');
- return <ModelBoundary fallback={fallback}><Suspense fallback={fallback}><group scale={preview?1:.74}><HeroModel classId={classId} race={race} skin={skinOverride??skinColor(race,look.skin)} armed={armed} shielded={shielded} walking={props.walking} animated={props.animated} combatant={props.combatant} preview={preview}/>{preview&&<mesh rotation={[-Math.PI/2,0,0]} position={[0,-.025,0]}><ringGeometry args={[.8,.82,48]}/><meshBasicMaterial color={CLASSES[classId].color} transparent opacity={.5}/></mesh>}</group></Suspense></ModelBoundary>;
+ const worn={head:gear.some(i=>i.slot==='head'),chest:gear.some(i=>i.slot==='chest'),back:gear.some(i=>i.slot==='back')},dressed=props.fullGear?{head:true,chest:true,back:true}:worn;
+ return <ModelBoundary fallback={fallback}><Suspense fallback={fallback}><group scale={preview?1:.74}><HeroModel classId={classId} race={race} skin={skinOverride??skinColor(race,look.skin)} hair={HAIR[look.hairColor]??HAIR[1]} hairStyle={look.hair} body={look.body} showHelmet={look.helmet!==0} gear={dressed} armed={armed||!!props.fullGear} shielded={shielded||!!props.fullGear} walking={props.walking} animated={props.animated} combatant={props.combatant} preview={preview}/>{preview&&<mesh rotation={[-Math.PI/2,0,0]} position={[0,-.025,0]}><ringGeometry args={[.8,.82,48]}/><meshBasicMaterial color={CLASSES[classId].color} transparent opacity={.5}/></mesh>}</group></Suspense></ModelBoundary>;
 }

@@ -23,4 +23,4 @@ export function scatter(count: number, seed: number, radius = 34, cluster = 6): 
   }
   return result;
 }
-export const SCENERY_DENSITY = { low: { grass: 260, flowers: 60, pebbles: 30 }, medium: { grass: 520, flowers: 120, pebbles: 50 }, high: { grass: 900, flowers: 200, pebbles: 80 } } as const;
+export const SCENERY_DENSITY = { low: { grass: 140, flowers: 50, pebbles: 20 }, medium: { grass: 300, flowers: 90, pebbles: 36 }, high: { grass: 520, flowers: 150, pebbles: 60 } } as const;

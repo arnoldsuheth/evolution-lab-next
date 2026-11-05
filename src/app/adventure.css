@@ -38,3 +38,41 @@
 .menu-toggle{display:none}.skills-hud{bottom:24px}.left-hud{width:236px}.hero-card{padding:8px}.hero-card-header{min-height:38px}.hero-card-header small{font-size:9px}.quest-tracker{top:190px;width:190px;padding:12px}.quest-tracker h3{font-size:18px}.quest-tracker p{font-size:11px}.game-brand{left:276px}.location-display{top:22px}
 @media(max-width:1000px){.bottom-hud{right:max(10px,env(safe-area-inset-right));top:calc(env(safe-area-inset-top) + 202px);bottom:auto;left:auto;transform:none;width:68px;max-height:calc(100dvh - 220px);overflow:auto}.menu-toggle{display:block;min-height:44px;width:64px;padding:6px;font-size:11px}.bottom-hud .action-bar{display:none;width:64px}.bottom-hud.menu-open .action-bar,.bottom-hud.hud-editing .action-bar{display:flex}.bottom-hud .action-bar button{width:54px;min-height:44px}.bottom-hud .save-indicator{display:none}.left-hud{width:200px}.skills-hud{bottom:calc(env(safe-area-inset-bottom) + 14px)}.location-display{top:calc(env(safe-area-inset-top) + 129px)}.quest-tracker{top:calc(env(safe-area-inset-top) + 175px);width:165px}.touch-stick{bottom:calc(env(safe-area-inset-bottom) + 190px)}.touch-actions{bottom:calc(env(safe-area-inset-bottom) + 184px)}}
 @media(max-width:1000px) and (orientation:landscape){.bottom-hud{top:calc(env(safe-area-inset-top) + 92px);max-height:calc(100dvh - 108px)}.bottom-hud .action-bar{display:grid;grid-template-columns:repeat(2,54px);width:118px}.bottom-hud:not(.menu-open):not(.hud-editing) .action-bar{display:none}.bottom-hud.menu-open{width:118px}.skills-hud{bottom:calc(env(safe-area-inset-bottom) + 10px)}.location-display{top:10px}.touch-stick{bottom:calc(env(safe-area-inset-bottom) + 28px)}.touch-actions{right:88px;bottom:calc(env(safe-area-inset-bottom) + 90px)}}
+
+/* ===== 1.8 · Cartoon claro: painéis mais leves e quentes, no mesmo traço dos heróis ===== */
+:root{--toon-panel:linear-gradient(160deg,#3a6f93f2,#2a5675f2);--toon-panel-solid:#2c5878;--toon-edge:#f4d68a;--toon-ink:#173246;--toon-text:#fff8e7;--toon-soft:#dbe9ef}
+.game-shell,.modal{font-family:ui-rounded,"SF Pro Rounded","Segoe UI","Trebuchet MS",system-ui,sans-serif}
+.hero-card,.quest-tracker,.combat-hotbar,.action-bar,.map-hud .minimap{background:var(--toon-panel);border:2px solid var(--toon-edge);border-radius:16px;box-shadow:0 4px 0 var(--toon-ink),0 10px 20px #12304a33}
+.hero-card-header strong{font-size:15px;color:var(--toon-text)}.hero-card-header small{font-size:11px;color:var(--toon-soft)}
+.meter{border-radius:999px;overflow:hidden}.meter>span,.meter>b{font-size:11px}
+.quest-tracker h3{color:var(--toon-text)}.quest-tracker p{font-size:13px;color:var(--toon-soft);line-height:1.5}.quest-tracker .eyebrow,.eyebrow{font-size:10px}
+.combat-hotbar>button{background:#24506d;border:2px solid #f4d68acc;border-radius:12px}.combat-hotbar:not(:has(button)){display:none}
+.action-bar button{border-radius:12px;color:var(--toon-text)}.action-bar button>small{font-size:11px;color:var(--toon-soft)}.bottom-hud .action-bar button>small{font-size:10px}
+.hud-toolbar button,.audio-controls>summary,.top-actions .icon-button{background:var(--toon-panel-solid);border:2px solid #f4d68aaa;border-radius:12px;color:var(--toon-text);font-size:12px}
+.location-display h2{color:#fffaf0;text-shadow:0 2px 0 #1d4560,0 4px 10px #12304a66}
+.world-vignette{box-shadow:inset 0 0 120px 20px #0c2a4022;background:linear-gradient(#10324a33,transparent 20%,transparent 75%,#10324a44)}
+/* Rótulos do mundo: de longe só o nome; de perto, a função da pessoa. */
+.npc-label{background:#fff6dfee;border:2px solid #173246;border-radius:12px;padding:3px 10px;filter:drop-shadow(0 3px 0 #17324655)}.npc-label strong{color:#173246;font-size:13px}.npc-label small{display:none;color:#3f5b6b;font-size:11px}.npc-label.near small{display:block}
+.service-sign{background:#fff6dfe6;color:#173246;border:2px solid #173246;border-radius:10px;text-shadow:none;font-size:11px}
+/* Janelas */
+.modal{background:linear-gradient(160deg,#24485f,#1b3a4f);border:2px solid var(--toon-edge);border-radius:18px;box-shadow:0 6px 0 var(--toon-ink),0 25px 70px #0a1f2e99}
+.modal-head,.modal:not(.creator-modal) .modal-head{background:linear-gradient(110deg,#326687,#24506d);border-bottom:2px solid #f4d68a88}
+.lesson-content p{font-size:14px;color:#e5eef0;line-height:1.65}.modal button{border-radius:10px}
+/* Criação: botões de prévia abaixo do modelo */
+.model-toggles{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:6px}.model-toggles button{min-height:40px;padding:6px 12px;font-size:12px;border-radius:999px;background:#fff6df;color:#173246;border:2px solid #173246}.model-toggles button[aria-pressed=true]{background:#f4d68a}
+.model-controls>span{display:block;text-align:center;font-size:12px;color:#21394a;max-width:420px;margin:auto}
+/* Laboratório: passo a passo, desafio extra, aviso de projeto externo, revisão */
+.trace-steps{margin-top:10px;border:1px solid #f4d68a66;border-radius:12px;padding:8px 12px;background:#10283a}.trace-steps summary{font-size:13px;color:#f4d68a}.trace-steps ol{margin:8px 0;padding-left:0;list-style:none;max-height:220px;overflow:auto}.trace-steps li{display:flex;gap:10px;font-size:13px;padding:3px 0;border-bottom:1px dashed #ffffff1a}.trace-steps li span{color:#9fc1d2;min-width:56px}.trace-steps code{color:#fff3cf;white-space:pre-wrap;word-break:break-word}.trace-steps small{font-size:12px;color:#c8d8df}
+.extra-toggle{display:block;width:100%;margin:10px 0;min-height:44px;border:2px dashed #f4d68a!important;background:#173b52!important;color:#ffe9a8!important;font-size:13px}
+.outside-note{border-left:4px solid #f4d68a;padding:8px 12px;background:#173b52;border-radius:8px;font-size:13px!important}
+.warmup.recall{border:1px solid #9fd0e6;border-radius:10px;padding:8px 12px;margin-bottom:10px;background:#16384d}.warmup.recall summary{font-size:13px;color:#bfe6f7}
+@media(max-width:1000px){
+ .hero-card-header strong{font-size:13px}.hero-card-header small,.hero-card-footer{font-size:10px}.meter>span,.meter>b{font-size:9px}.hero-card>.meter{height:13px}
+ .minimap>span{font-size:9px}.location-time{font-size:10px}.quest-tracker h3{font-size:15px}.quest-tracker .text-button{font-size:12px}
+ .hud-toolbar button{font-size:11px}.action-bar button>small,.bottom-hud .action-bar button>small{font-size:9px}.touch-actions small{font-size:10px}.combat-panel>small{font-size:11px}.combat-actions button{font-size:12px}.toast{font-size:13px}.save-indicator{font-size:9px}
+ .npc-label strong{font-size:12px}.npc-label small{font-size:10px}.lesson-content p{font-size:14px}
+}
+/* Inimigos com rótulo vermelho claro (combina com o cursor de espada); portais em lilás. */
+.monster-name{display:block;text-align:center;white-space:nowrap;background:#ffe4dcee;color:#5a1f1a;border:2px solid #5a1f1a;border-radius:12px;padding:2px 9px;font-size:12px;font-weight:700;filter:drop-shadow(0 3px 0 #5a1f1a55)}.monster-name small{display:block;font-size:10px;font-weight:400;color:#7d3b33}.monster-name.boss-name{background:#ffd27a;border-color:#5a2f0a;color:#4a2306}
+.gate-label{font-size:12px;color:#2c1d4a;background:#efe3ffee;border:2px solid #2c1d4a;border-radius:12px;text-shadow:none}
+.quest-toggle{background:#24506d;border:2px solid #f4d68a88;border-radius:10px;color:var(--toon-text);font-size:11px}

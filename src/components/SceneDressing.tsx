@@ -21,11 +21,11 @@ export default function SceneDressing({quality='medium',groundColor='#607651'}:{
   const merged=mergeSimple(parts);tuft.copy(merged);parts.forEach(p=>p.dispose());blade.dispose();merged.dispose();
   const blossom=new THREE.IcosahedronGeometry(.17,0);blossom.translate(0,.55,0);
   const stone=new THREE.DodecahedronGeometry(.22,0);stone.scale(1,.55,.8);
-  return {tuft,blossom,stone,grassMaterial:new THREE.MeshStandardMaterial({color:'#ffffff',roughness:1,flatShading:true}),flowerMaterial:new THREE.MeshStandardMaterial({color:'#ffffff',roughness:.8,emissive:'#3a2a10',emissiveIntensity:.15}),stoneMaterial:new THREE.MeshStandardMaterial({color:'#8d8f86',roughness:.95,flatShading:true})};
+  return {tuft,blossom,stone,grassMaterial:new THREE.MeshStandardMaterial({color:'#ffffff',roughness:1}),flowerMaterial:new THREE.MeshStandardMaterial({color:'#ffffff',roughness:.8,emissive:'#3a2a10',emissiveIntensity:.15}),stoneMaterial:new THREE.MeshStandardMaterial({color:'#8d8f86',roughness:.95})};
  },[]);
  useEffect(()=>()=>{Object.values(assets).forEach(a=>a.dispose());},[assets]);
  const base=useMemo(()=>new THREE.Color(groundColor),[groundColor]);
- const grassTint=useMemo(()=>(d:Decoration,c:THREE.Color)=>{c.copy(base).lerp(new THREE.Color(d.tone>.5?'#9cc265':'#5f9a4c'),.55).multiplyScalar(.95+d.tone*.25);},[base]);
+ const grassTint=useMemo(()=>(d:Decoration,c:THREE.Color)=>{c.copy(base).lerp(new THREE.Color(d.tone>.5?'#a8d46a':'#6db352'),.6).multiplyScalar(1+d.tone*.2);},[base]);
  const flowerTint=useMemo(()=>(d:Decoration,c:THREE.Color)=>{c.set(FLOWER_COLORS[Math.floor(d.tone*FLOWER_COLORS.length)%FLOWER_COLORS.length]);},[]);
  const stoneTint=useMemo(()=>(d:Decoration,c:THREE.Color)=>{c.set('#9a9b91').multiplyScalar(.8+d.tone*.35);},[]);
  return <group>
