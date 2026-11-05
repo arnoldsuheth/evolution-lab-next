@@ -27,6 +27,7 @@ jobs:
       - name: Static production build
         env:
           GITHUB_PAGES: "true"
+          NEXT_PUBLIC_CLOUD_SYNC_ENABLED: "true"
         run: npm run build
       - uses: actions/configure-pages@v5
         if: github.ref == 'refs/heads/interface-nexus'

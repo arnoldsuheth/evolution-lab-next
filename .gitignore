@@ -51,3 +51,5 @@ GENESIS-*.txt
 *RELATORIO.txt
 *.pem
 *.key
+# Isolated local SDK; CI uses npm ci
+/.cloud-deps/

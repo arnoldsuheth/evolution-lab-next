@@ -51,6 +51,15 @@ interface GameStore extends SaveData {
   setting: (v: Partial<Settings>) => void; restore: (raw: string) => void; clearNotice: () => void;
 }
 export function savedState(s: SaveData): SaveData { return { hero: s.hero, look: s.look, education: s.education, ancestors: s.ancestors, settings: s.settings, legacy: s.legacy }; }
+/** Cloud replaces a chosen snapshot. Unlike file import, it must not merge different accounts. */
+export function replaceFromCloud(snapshot:SaveData,backup:boolean){
+ const raw=JSON.stringify({state:snapshot,version:4});checkEnvelope(raw);
+ const next=migrateSave(snapshot);
+ if(backup){const previous=localStorage.getItem(SAVE_KEY);if(previous)localStorage.setItem(SAVE_KEY+'-before-cloud-'+Date.now(),previous);}
+ blocked=false;storageIssue='';
+ useGame.setState({...next,ready:true,encounter:null,challenge:null,battleEvent:null,cooldowns:{},lastAttack:0,effects:[],buff:0,saveError:'',notice:'Jornada da conta carregada.'});
+ if(blocked)throw Error(storageIssue);
+}
 function executeBattle(id:string|undefined,starter:boolean,set:(value:Partial<GameStore>)=>void,get:()=>GameStore){
  const s=get(),enemy=s.encounter!;
  const result=resolveCombat(s.hero,enemy,{skillId:id,starter,attackBuff:s.effects.filter(e=>e.kind==='attack').reduce((n,e)=>n+e.amount,0),defenseBuff:(s.buff>0?5:0)+s.effects.filter(e=>e.kind==='defense').reduce((n,e)=>n+e.amount,0)});

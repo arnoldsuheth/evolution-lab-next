@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
 import "./cartoon.css";
+import "./cloud.css";
+import {CloudRuntime,CloudGate} from "@/components/CloudAccount";
 
 const base = process.env.GITHUB_PAGES === "true" ? "/evolution-lab-next" : "";
 
@@ -22,7 +24,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body><CloudRuntime/>{children}<CloudGate/></body>
     </html>
   );
 }

@@ -1,0 +1,16 @@
+import {test} from 'node:test';
+import {strict as assert} from 'node:assert';
+import {freshSave} from './game';
+import {canonical,fingerprint,decideSync,validateCloudState,validateCloudRow,hasJourney} from './cloudProtocol';
+const common={base:{revision:3,hash:'base'},localHash:'base',remoteHash:'base',remoteRevision:3,owned:true,meaningful:true};
+test('chaves JSONB ordenadas não geram conflitos falsos',async()=>{const a=freshSave(),b=JSON.parse(JSON.stringify(a));b.hero=Object.fromEntries(Object.entries(b.hero).reverse());assert.equal(canonical(a),canonical(b));assert.equal(await fingerprint(a),await fingerprint(b));});
+test('aparelho novo baixa a jornada já salva na conta',()=>assert.equal(decideSync({...common,base:null,owned:false,meaningful:false,localHash:'fresh'}),'download'));
+test('primeiro vínculo de jornada existente exige escolha',()=>assert.equal(decideSync({...common,base:null,owned:false,localHash:'local',remoteHash:null,remoteRevision:0}),'choose'));
+test('trocar conta não envia automaticamente o personagem de outra conta',()=>assert.equal(decideSync({...common,owned:false,localHash:'other-account'}),'choose'));
+test('alteração só local envia usando a revisão conhecida',()=>assert.equal(decideSync({...common,localHash:'new-local'}),'upload'));
+test('alteração só remota pode ser carregada sem sobrescrever trabalho local',()=>assert.equal(decideSync({...common,remoteHash:'new-remote',remoteRevision:4}),'download'));
+test('dois aparelhos alterados geram conflito em vez de perder progresso',()=>assert.equal(decideSync({...common,localHash:'new-local',remoteHash:'new-remote',remoteRevision:4}),'conflict'));
+test('resposta perdida de envio pode ser reconhecida por conteúdo idêntico',()=>assert.equal(decideSync({...common,localHash:'posted',remoteHash:'posted',remoteRevision:4}),'same'));
+test('jornada removida remotamente não é recriada silenciosamente',()=>assert.equal(decideSync({...common,remoteHash:null,remoteRevision:0}),'conflict'));
+test('salvamento remoto incompleto é rejeitado antes de substituir o local',()=>{assert.throws(()=>validateCloudState({hero:{id:'broken'}}));assert.throws(()=>validateCloudRow({revision:0,state:freshSave(),updated_at:'now'}));assert.throws(()=>validateCloudRow({revision:1.5,state:freshSave(),updated_at:'now'}));});
+test('carregar estado válido preserva itens e educação',()=>{const save=freshSave();save.hero.created=true;save.hero.inventory=['potion','potion','axe'];save.hero.gold=912;save.education.completed=['variables'];assert.deepEqual(validateCloudState(save),save);assert.ok(hasJourney(save));assert.ok(!hasJourney(freshSave()));});
