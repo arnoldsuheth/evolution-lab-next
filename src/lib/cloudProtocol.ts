@@ -1,3 +1,4 @@
+import {characterSlots} from './characterSlots';
 import {migrateSave,type SaveData} from './game';
 export interface CloudSave {revision:number;state:SaveData;updated_at:string}
 export interface SyncBase {revision:number;hash:string}
@@ -15,7 +16,7 @@ export function validateCloudState(value:unknown):SaveData{
  if(new TextEncoder().encode(JSON.stringify(value)).byteLength>8000000)throw Error('O salvamento ultrapassou o limite de 8 MB.');
  return migrateSave(value);
 }
-export function hasJourney(state:SaveData){return state.hero.created||state.hero.xp>0||state.hero.inventory.length>0||state.education.completed.length>0||Object.keys(state.education.projects).length>0;}
+export function hasJourney(state:SaveData){return characterSlots(state).slots.some(s=>s&&(s.hero.created||s.hero.xp>0||s.hero.inventory.length>0||s.education.completed.length>0||Object.keys(s.education.projects).length>0));}
 export function decideSync({base,localHash,remoteHash,remoteRevision,owned,meaningful}:{base:SyncBase|null;localHash:string;remoteHash:string|null;remoteRevision:number;owned:boolean;meaningful:boolean}):SyncDecision{
  if(remoteHash===localHash)return'same';
  if(!meaningful&&remoteHash!==null)return'download';

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {waitForLocalSave} from './cloudStartup';
+import {waitForLocalSave,withCloudDeadline} from './cloudStartup';
 import {freshSave} from './game';
 import {useGame,SAVE_KEY} from './store';
 
@@ -27,4 +27,8 @@ test('an unread local save times out instead of waiting forever',async()=>{
 });
 test('a cancelled account cannot continue synchronization',async()=>{
  assert.equal(await waitForLocalSave(()=>true,()=>false),false);
+});
+test('a stalled legacy session cannot trap device migration forever',async()=>{
+ await assert.rejects(withCloudDeadline(new Promise(()=>{}),0),/preservada/);
+ assert.equal(await withCloudDeadline(Promise.resolve('ready')),'ready');
 });

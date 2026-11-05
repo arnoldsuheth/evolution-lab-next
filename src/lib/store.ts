@@ -1,4 +1,5 @@
 "use client";
+import {packCharacters,selectCharacter} from './characterSlots';
 import {INSTANCES,instanceRequirement,type InstanceId} from "./instances";
 import {PROFESSIONS,repairCost,type Profession} from "./economy";
 import {recoverResources} from "./recovery";
@@ -46,6 +47,7 @@ interface GameStore extends SaveData {
   deliverQuest:(kind:"main"|"ai")=>void;
   draftAI:(id:string,code:string)=>void; reviewProject:(index:number)=>void;
   hydrate: () => Promise<void>;
+  selectCharacter: (slot:number)=>boolean;
   createCharacter: (name: string, classId: ClassId, mode: "normal" | "hardcore", race?: Race) => void;
   customize: (look: Partial<Look>) => void; chooseClass: (id: ClassId, race?: Race) => void; move: (p: [number, number]) => void;
   draft: (id: string, code: string) => void; solve: (id: string, code: string) => ReturnType<typeof evaluateLesson>; project: (id: string, code: string) => void;
@@ -54,7 +56,7 @@ interface GameStore extends SaveData {
   sell: (id: string) => void; learnSkill: (id:string) => void; bindSkill: (id:string,slot?:number) => void; respec: () => void; castSkill: (id:string) => void;
   setting: (v: Partial<Settings>) => void; restore: (raw: string) => void; clearNotice: () => void;
 }
-export function savedState(s: SaveData): SaveData { return { hero: s.hero, look: s.look, education: s.education, ancestors: s.ancestors, settings: s.settings, legacy: s.legacy }; }
+export function savedState(s: SaveData): SaveData { return { hero: s.hero, look: s.look, education: s.education, ancestors: s.ancestors, settings: s.settings, legacy: packCharacters(s).legacy }; }
 /** Cloud replaces a chosen snapshot. Unlike file import, it must not merge different accounts. */
 export function replaceFromCloud(snapshot:SaveData,backup:boolean){
  const raw=JSON.stringify({state:snapshot,version:4});checkEnvelope(raw);
@@ -86,6 +88,7 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
   repair:()=>{const s=get();if(s.hero.dead||s.encounter||s.hero.region!=='aurora'||!!s.hero.instance||Math.hypot(s.hero.position[0]+7,s.hero.position[1])>8){set({notice:'Procure Borin na vila para reparar.'});return;}const fee=repairCost(s.hero.equipped,s.hero.durability??{},ITEMS);if(!fee||s.hero.gold<fee)return;set({hero:{...s.hero,gold:s.hero.gold-fee,durability:{...s.hero.durability,...Object.fromEntries(s.hero.equipped.map(id=>[id,100]))}},notice:'Equipamento reparado.'});},
   learnProfession:id=>{const s=get();if(!Object.hasOwn(PROFESSIONS,id)||s.hero.dead||s.encounter||s.hero.gold<20||s.hero.professions?.[id]||s.hero.region!=='aurora'||!!s.hero.instance||Math.hypot(s.hero.position[0]+7,s.hero.position[1])>8)return;set({hero:{...s.hero,gold:s.hero.gold-20,professions:{...s.hero.professions,[id]:1}},notice:'Ofício aprendido: '+PROFESSIONS[id]});},
   toggleMount:()=>{const s=get();if(s.mounted){set({mounted:false});return;}if(s.hero.dead||s.encounter||s.challenge||s.hero.level<30){set({notice:'Montarias exigem nível 30 e estar fora de combate.'});return;}if(!s.hero.equipped.some(id=>ITEMS[id]?.mount&&s.hero.inventory.includes(id))){set({notice:'Equipe um pet de montaria na mochila.'});return;}set({mounted:true,notice:'Montado. Deslocamento 50% mais rápido.'});},
+  selectCharacter: slot=>{const s=get();if(!s.ready||s.saveError||s.encounter||s.challenge)return false;const next=selectCharacter(savedState(s),slot);set({...next,relocation:s.relocation+1,mounted:false,encounter:null,challenge:null,effects:[],cooldowns:{},buff:0,lastAttack:0,battleEvent:null,notice:''});return true;},
   hydrate: async () => { if(get().ready)return; await useGame.persist.rehydrate(); set({ ready: true, now: Date.now(), saveError: storageIssue, notice: storageIssue ? "Salvamento protegido. Exporte o original antes de recuperar." : "Bem-vindo a Pedra da Aurora." }); },
   createCharacter: (name, classId, mode, race) => {
     if(race && !validRaceClass(race,classId))return;

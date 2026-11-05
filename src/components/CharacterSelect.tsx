@@ -1,0 +1,11 @@
+"use client";
+import {useState} from 'react';
+import {useGame} from '@/lib/store';
+import {characterSlots} from '@/lib/characterSlots';
+import {CLASSES,RACES} from '@/lib/game';
+import {ClassPortrait} from './ApprovedArtwork';
+import CloudAccount from './CloudAccount';
+export default function CharacterSelect({enter}:{enter:()=>void}){
+ const state=useGame(),roster=characterSlots(state),[error,setError]=useState('');
+ return <main className="character-select"><header><span className="eyebrow">LION’S CAVE · SUAS CAMPANHAS</span><h1>Escolha sua jornada</h1><p>Cinco personagens. Cada um com sua história, equipamentos e progresso.</p></header><div className="character-slots">{roster.slots.map((save,index)=><button key={index} onClick={()=>{if(useGame.getState().selectCharacter(index))enter();else setError('Termine o combate ou exercício antes de trocar. Se houver erro no salvamento, preserve uma exportação primeiro.');}}><small>PERSONAGEM {index+1}</small>{save?.hero.created?<><ClassPortrait classId={save.hero.classId}/><h2>{save.hero.name}</h2><p>{RACES[save.hero.race]} · {CLASSES[save.hero.classId].name}</p><span>Nível {save.hero.level} · {save.education.completed.length}/8 runas</span><b>{save.hero.dead?'Ver legado':'Continuar campanha'} →</b></>:<><span className="empty-character">＋</span><h2>Novo personagem</h2><p>Comece uma campanha independente</p><b>Criar personagem →</b></>}</button>)}</div>{error&&<p role="alert">{error}</p>}<div className="character-cloud"><CloudAccount/></div></main>;
+}
