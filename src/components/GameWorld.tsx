@@ -59,7 +59,7 @@ function Npc({ npc, interact, player }: { npc: typeof NPCS_LIVE[number]; interac
   useFrame(state => { if (!root.current) return; const close = Math.hypot(player.current.x - npc.x, player.current.z - npc.z) < 5; root.current.rotation.y = close ? Math.atan2(player.current.x - npc.x, player.current.z - npc.z) : Math.sin(state.clock.elapsedTime * 0.15 + npc.x) * 0.3; if (!reduced && npc.id === "pip" && !close) root.current.position.x = Math.sin(state.clock.elapsedTime * 0.45) * 0.5; });
   return <group position={[npc.x, 0, npc.z]} onClick={e => { if (e.delta < 6 && e.button === 0) { e.stopPropagation(); interact(npc.id); } }}>
     {npc.id === "lion" ? <Crystal /> : <group ref={root} position={[0, 0, 0]}><Character classId={npc.classId} skinOverride={npc.id === "pip" ? "#7d9858" : undefined} look={{ ...DEFAULT_LOOK, skin: npc.id === "pip" ? 5 : 1, beard: npc.id === "eldrin" ? 5 : npc.id === "pip" ? 0 : 3, hairColor: npc.id === "eldrin" ? 4 : 2, cloth: npc.id === "eldrin" ? 4 : 0 }} equipped={["tunic"]} animated={!reduced} /></group>}
-    <Html zIndexRange={[8, 0]} position={[0, npc.id === "lion" ? 3.2 : 3.1, 0]} center distanceFactor={14} style={{ pointerEvents: "none" }}><div className="npc-label"><span className="quest-marker main-quest">{marker}</span><strong>{npc.name}</strong><small>{npc.title}</small></div></Html>
+    <Html zIndexRange={[8, 0]} position={[0, npc.id === "lion" ? 3.2 : 3.1, 0]} center style={{ pointerEvents: "none" }}><div className="npc-label"><span className="quest-marker main-quest">{marker}</span><strong>{npc.name}</strong><small>{npc.title}</small></div></Html>
   </group>;
 }
 function WorldFraming() {
