@@ -20,3 +20,8 @@ export function removeItems(inventory:string[],requirements:Record<string,number
  for(const [id,quantity]of Object.entries(requirements))if(!Number.isInteger(quantity)||quantity<0||countItem(inventory,id)<quantity)return null;
  const remaining={...requirements};return inventory.filter(id=>{if((remaining[id]??0)>0){remaining[id]--;return false;}return true;});
 }
+
+
+export function bagCount(hero:Pick<HeroData,'inventory'|'equipped'>,id:string){return Math.max(0,countItem(hero.inventory,id)-(hero.equipped.includes(id)?1:0));}
+
+export function equipmentForSlot(hero:HeroData,slot:string,catalogue:Record<string,Item>){return Object.values(catalogue).filter(item=>isEquipment(item)&&bagCount(hero,item.id)>0&&!hero.equipped.includes(item.id)&&!itemRequirement(hero,item)&&(item.slot===slot||slot==='weapon'&&item.slot==='twohand'));}

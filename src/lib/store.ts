@@ -1,4 +1,5 @@
 "use client";
+import {ATTRIBUTE_KEYS,attributePoints,cleanAttributes,type AttributeKey} from "./attributes";
 import {packCharacters,selectCharacter} from './characterSlots';
 import {INSTANCES,instanceRequirement,type InstanceId} from "./instances";
 import {PROFESSIONS,repairCost,type Profession} from "./economy";
@@ -10,7 +11,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { SKILLS, skillRank, skillRequirement, passiveBonuses } from "./skills";
 import { isEquipment, itemRequirement, removeItems, countItem } from "./equipment";
-import { resolveCombat, battleRewards, type EnemyState } from "./combat";
+import { enemyVitals, resolveCombat, battleRewards, type EnemyState } from "./combat";
 import { CLASSES, ITEMS, LESSONS, evaluateLesson, freshHero, freshSave, migrateSave, stats, withXp, type SaveData, type ClassId, type Look, type Settings, type Race, validRaceClass, raceForClass } from "./game";
 export const SAVE_KEY = "genesis-reborn-rpg-v3";
 export const BACKUP_KEY = SAVE_KEY + "-before-lions-cave-1.3.1";
@@ -51,6 +52,7 @@ interface GameStore extends SaveData {
   createCharacter: (name: string, classId: ClassId, mode: "normal" | "hardcore", race?: Race) => void;
   customize: (look: Partial<Look>) => void; chooseClass: (id: ClassId, race?: Race) => void; move: (p: [number, number]) => void;
   draft: (id: string, code: string) => void; solve: (id: string, code: string) => ReturnType<typeof evaluateLesson>; project: (id: string, code: string) => void;
+  allocateAttribute:(key:AttributeKey)=>void;
   buy: (id: string) => void; equip: (id: string) => void; useItem: (id: string) => void; craft: (id: string) => void; talent: (branch: number) => void;
   startEncounter: (elite?: boolean, level?: number, monsterId?:string) => void; travelRegion:(region:RegionId)=>void; attack: (skill?: boolean) => void; flee: () => void; rest: () => void; tick: (seconds: number) => void;
   sell: (id: string) => void; learnSkill: (id:string) => void; bindSkill: (id:string,slot?:number) => void; respec: () => void; castSkill: (id:string) => void;
@@ -116,6 +118,7 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
   },
   project: (id, code) => set(s => ({ education: { ...s.education, projects: { ...s.education.projects, [id]: { code, savedAt: Date.now() } } }, notice: "Projeto salvo. Evidências salvas não certificam domínio automaticamente." })),
   buy: id => {const s=get(),item=ITEMS[id];if(!item||s.hero.dead)return;const reason=itemRequirement(s.hero,item);if(reason){set({notice:reason});return;}if(item.source!=='shop'){set({notice:'Este item é obtido por fabricação ou saque.'});return;}if(s.hero.gold<item.price||countItem(s.hero.inventory,id)>=item.maxStack)return;set({hero:{...s.hero,gold:s.hero.gold-item.price,inventory:[...s.hero.inventory,id]},notice:`${item.name} adquirido.`});},
+  allocateAttribute:key=>{const s=get();if(!ATTRIBUTE_KEYS.includes(key)||s.hero.dead||s.encounter||s.challenge||attributePoints(s.hero)<1)return;const allocated=cleanAttributes(s.hero.attributeAllocation,s.hero.level);set({hero:{...s.hero,attributeAllocation:{...allocated,[key]:allocated[key]+1}}});},
   equip: id => {
     const s=get(),item=ITEMS[id];if(!item||s.hero.dead||s.encounter||!s.hero.inventory.includes(id)||!isEquipment(item))return;
     if(s.hero.equipped.includes(id)){const hero={...s.hero,equipped:s.hero.equipped.filter(x=>x!==id)};const st=stats(hero);set({hero:{...hero,hp:Math.min(hero.hp,st.maxHp),mp:Math.min(hero.mp,st.maxMp),stamina:Math.min(hero.stamina,st.maxStamina)}});return;}
@@ -153,8 +156,8 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     const reason=monsterRequirement(s.hero,s.education,monster.id);if(reason){set({notice:reason});return;}
     if(Math.hypot(s.hero.position[0]-monster.x,s.hero.position[1]-monster.z)>4.5){set({notice:'Aproxime-se da criatura para iniciar o combate.'});return;}
     const level=monster.boss?monster.level:Math.max(monster.level,Math.min(60,s.hero.level+3,Number.isFinite(requestedLevel)?Math.floor(requestedLevel!):s.hero.level));
-    const maxHp=Math.round((80+level*28+Math.floor(level/5)*35)*(monster.boss?1.8:1));
-    set({mounted:false,encounter:{id:`enemy-${Date.now()}`,monsterId:monster.id,bossId:monster.boss?monster.id:undefined,name:monster.name,hp:maxHp,maxHp,level,instanceId:s.hero.instance??undefined,power:Math.round((15+level*4)*(monster.boss?1.2:1)*(s.hero.instance?1.15:1)),reward:25+level*18,elite:monster.boss},lastAttack:0,notice:monster.boss?'Chefe de região. A vitória abre o caminho seguinte.':'Observe seus recursos e habilidades.'});
+    const vitals=enemyVitals(monster.kind,level,monster.boss),maxHp=vitals.maxHp;
+    set({mounted:false,encounter:{...vitals,id:`enemy-${Date.now()}`,monsterId:monster.id,bossId:monster.boss?monster.id:undefined,name:monster.name,hp:maxHp,maxHp,level,instanceId:s.hero.instance??undefined,power:Math.round((15+level*4)*(monster.boss?1.2:1)*(s.hero.instance?1.15:1)),reward:25+level*18,elite:monster.boss},lastAttack:0,notice:monster.boss?'Chefe de região. A vitória abre o caminho seguinte.':'Observe seus recursos e habilidades.'});
   },
   attack: starter => {const s=get();if(!s.encounter||s.hero.dead||Date.now()-s.lastAttack<650)return;executeBattle(undefined,!!starter,set,get);},
   flee: () => set(s => ({ encounter: null, hero: { ...s.hero, region:'aurora', position: [0, 5] }, notice: "Você recuou para Pedra da Aurora." })),
@@ -184,3 +187,4 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
   cancelChallenge:()=>set({challenge:null}),
   clearNotice: () => set({ notice: "" }),
 }), { name: SAVE_KEY, version: 4, skipHydration: true, storage: createJSONStorage<SaveData>(() => guardedStorage), partialize: savedState, migrate: state => migrateSave(state), merge: (saved, current) => ({ ...current, ...migrateSave(saved) }), onRehydrateStorage: () => (_s, error) => { if (error) { blocked = true; storageIssue ||= "Seu salvamento foi preservado, mas precisa de recuperação."; } } }));
+
