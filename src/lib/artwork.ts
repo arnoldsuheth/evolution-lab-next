@@ -2,10 +2,10 @@ import type {Item} from './catalogue';
 import type {ClassId} from './game';
 export const ART_BASE=process.env.NEXT_PUBLIC_GITHUB_PAGES==='true'?'/evolution-lab-next':'';
 export type ArtCrop={sheet:'items'|'equipment'|'classes';x:number;y:number;w:number;h:number};
-const itemCrop=(index:number):ArtCrop=>({sheet:'items',x:index%6*256+15,y:[108,331,552,774][Math.floor(index/6)],w:226,h:185});
+const itemCrop=(index:number):ArtCrop=>({sheet:'items',x:index%6*256+15,y:[94,345,551,754][Math.floor(index/6)],w:226,h:[202,166,166,178][Math.floor(index/6)]});
 const equipment=(x:number,y:number,w:number,h:number):ArtCrop=>({sheet:'equipment',x,y,w,h});
-const armor:Record<ClassId,ArtCrop>={paladin:equipment(18,125,195,230),warrior:equipment(423,135,200,211),hunter:equipment(818,134,179,220),engineer:equipment(18,512,194,237),mage:equipment(433,575,205,198),hacker:equipment(815,543,191,213),prophet:equipment(20,929,199,221),duelist:equipment(426,927,199,218),shaman:equipment(815,951,203,207)};
-const weapons:Record<string,ArtCrop>={sword:equipment(194,218,75,186),greatsword:equipment(704,149,91,238),dagger:equipment(1083,612,75,177),hammer:equipment(212,567,119,178),tool:equipment(308,579,85,170),axe:equipment(212,567,119,178),bow:equipment(1019,126,180,149),crossbow:equipment(1011,240,184,78),gun:equipment(999,331,202,74),staff:equipment(633,489,103,295),wand:equipment(720,578,77,207),shield:equipment(267,224,130,173)};
+const armor:Record<ClassId,ArtCrop>={paladin:equipment(10,140,215,215),warrior:equipment(415,140,215,207),hunter:equipment(800,108,190,238),engineer:equipment(10,497,215,246),mage:equipment(420,566,198,198),hacker:equipment(806,504,207,244),prophet:equipment(10,885,230,258),duelist:equipment(412,885,202,253),shaman:equipment(800,865,202,288)};
+const weapons:Record<string,ArtCrop>={sword:equipment(190,195,93,218),greatsword:equipment(677,113,82,306),dagger:equipment(1015,610,92,182),hammer:equipment(218,558,95,184),tool:equipment(300,567,78,146),axe:equipment(218,558,95,184),bow:equipment(1018,116,154,177),crossbow:equipment(1050,242,160,92),gun:equipment(965,330,244,90),staff:equipment(604,473,92,314),wand:equipment(670,548,71,141),shield:equipment(252,215,130,201)};
 export function artworkForItem(item:Item):ArtCrop|undefined{
  const id=item.id,v=item.visual;
  if(id==='tea')return itemCrop(5);
@@ -20,8 +20,9 @@ export function artworkForItem(item:Item):ArtCrop|undefined{
  if(v==='charm')return itemCrop(15);if(v==='ring')return itemCrop(16);if(v==='trinket')return itemCrop(17);if(v==='back')return itemCrop(18);
  if(weapons[v])return weapons[v];
  if(item.category==='armor'&&item.slot==='chest')return armor[item.classId??'warrior'];
- if(item.slot==='head')return equipment(item.classId==='mage'?425:item.classId==='hacker'?1008:228,item.classId==='mage'?491:item.classId==='hacker'?505:112,160,144);
- if(item.slot==='feet')return equipment(27,336,164,78);
+ if(item.slot==='head')return item.classId==='mage'?equipment(415,470,170,98):item.classId==='hacker'?equipment(1020,478,147,127):equipment(208,99,139,123);
+ if(item.slot==='feet')return equipment(18,337,156,91);
  return undefined;
 }
 export const CLASS_CROPS:Record<ClassId,ArtCrop>=Object.fromEntries((['paladin','warrior','hunter','engineer','mage','hacker','prophet','duelist','shaman'] as ClassId[]).map((id,i)=>[id,{sheet:'classes',x:[95,500,900][i%3],y:[128,520,935][Math.floor(i/3)],w:210,h:210}])) as Record<ClassId,ArtCrop>;
+

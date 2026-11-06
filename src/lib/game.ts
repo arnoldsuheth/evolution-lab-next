@@ -8,7 +8,7 @@ import { buildCatalogue } from "./catalogue";
 import { activeEquipment } from "./equipment";
 import { passiveBonuses, SKILLS } from "./skills";
 
-export const RELEASE = "1.8.0";
+export const RELEASE = "1.8.1";
 export type Race = "human" | "orc" | "dwarf" | "elf" | "gnome";
 export type ClassId = "paladin" | "warrior" | "hunter" | "engineer" | "mage" | "hacker" | "prophet" | "duelist" | "shaman";
 export type NpcId = "borin" | "eldrin" | "pip" | "lion" | "traveler" | "elara" | "dorin" | "mira";
@@ -164,4 +164,5 @@ export function migrateSave(input: unknown): SaveData {
   const ancestors: Ancestor[] = Array.isArray(data.ancestors) ? data.ancestors.flatMap(raw => { const a = record(raw); return typeof a.id === "string" && typeof a.name === "string" ? [{ id: a.id, name: a.name, classId: typeof a.classId === "string" && Object.hasOwn(CLASSES, a.classId) ? a.classId as ClassId : "paladin" as ClassId, level: number(a.level, 1), diedAt: number(a.diedAt, 0), cause: typeof a.cause === "string" ? a.cause : "Jornada encerrada", legacy: number(a.legacy, 0, 0, 100), claimed: a.claimed === true }] : []; }) : [];
   return { hero, look, education: { deliveries:Array.isArray(edu.deliveries)?strings(edu.deliveries):[...completed.map(id=>`main:${id}`),...strings(edu.aiCompleted).map(id=>`ai:${id}`)], aiCompleted: strings(edu.aiCompleted), aiEvidence: Object.fromEntries(Object.entries(record(edu.aiEvidence)).filter((entry): entry is [string,string]=>typeof entry[1]==="string")), reviewedProjects: Array.isArray(edu.reviewedProjects)?[...new Set(edu.reviewedProjects.filter((v): v is number=>Number.isInteger(v)&&Number(v)>=0&&Number(v)<15))]:[], completed, drafts, attempts, reviews, projects }, ancestors, settings: {keybindings:cleanBindings(settings.keybindings), ambienceVolume:number(settings.ambienceVolume,.55,0,1),muted:settings.muted===true,volume: number(settings.volume, .3, 0, 1), panelOpacity: number(settings.panelOpacity, 0.92, 0.4, 1), uiScale: number(settings.uiScale, 1, 0.85, 1.2), quality: settings.quality === "low" || settings.quality === "high" ? settings.quality : "auto", reduceMotion: settings.reduceMotion === true }, legacy: Object.keys(data).length ? { ...record(data.legacy), ...(!data.look ? { originalSave: data } : {}) } : {} };
 }
+
 

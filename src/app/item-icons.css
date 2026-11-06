@@ -1,0 +1,32 @@
+/* Compact item selection; details and transaction controls appear after selection. */
+.equipment-icons .tabs{display:flex;flex-wrap:wrap;gap:8px}
+.equipment-icons .tabs button{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:76px;min-height:64px;border-radius:12px}
+.equipment-icons .tabs button>span{font-size:25px;line-height:1}.equipment-icons .tabs small{font-size:12px}
+.equipment-icons .item-browser{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-items:start}
+.equipment-icons .item-browser.has-selection{grid-template-columns:minmax(0,1fr) minmax(250px,340px)}
+.equipment-icons .item-icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px;align-content:start}
+.equipment-icons .item-icon{position:relative;min-width:0;padding:7px;border:2px solid #92aac3;border-radius:12px;background:linear-gradient(145deg,#365671,#1a3149);color:#fff0ca;display:flex;align-items:center;flex-direction:column;gap:7px;box-shadow:0 3px 0 #101e30;min-height:124px}
+.equipment-icons .item-icon:hover,.equipment-icons .item-icon.is-inspected{border-color:#ffe2a1;background:#3b5e7b}
+.equipment-icons .item-icon:focus-visible,.item-detail-panel:focus-visible{outline:3px solid #ffe2a1;outline-offset:3px}
+.equipment-icons .item-icon-art{width:100%;aspect-ratio:1;display:grid;place-items:center;min-height:0;border-radius:9px;background:#dcebf6;overflow:hidden}
+.equipment-icons .item-icon-art>.game-artwork{display:block;width:100%;height:100%;aspect-ratio:1;max-width:none;max-height:none;margin:0;object-fit:contain;align-self:center}
+.equipment-icons .item-icon-name{font-size:11px;line-height:1.35;text-align:center;overflow-wrap:anywhere}
+.item-icon-count,.item-icon-equipped{position:absolute;top:10px;right:10px;padding:2px 5px;border-radius:6px;background:#142b43;color:#fff4cd;font-size:12px;pointer-events:none}.item-icon-equipped{right:auto;left:10px;background:#305b3e}
+.equipment-icons .rarity-incomum{border-color:#8dbd85}.equipment-icons .rarity-raro{border-color:#75b3de}.equipment-icons .rarity-épico{border-color:#bd99df}.equipment-icons .rarity-lendário{border-color:#e0b85c}
+.equipment-icons .item-detail-panel{position:sticky;top:8px;min-width:0;padding:18px;border:2px solid #c9b178;border-radius:14px;background:linear-gradient(145deg,#2b4964,#162b43);color:#f4e9d0;box-shadow:0 6px 20px #08152555}
+.equipment-icons .item-detail-art{width:132px;height:132px;max-width:100%;margin:0 auto 14px;display:grid;place-items:center;overflow:hidden;border-radius:12px;background:#dcebf6}
+.equipment-icons .item-detail-art>.game-artwork{width:100%;height:100%;max-width:none;max-height:none;object-fit:contain}
+.equipment-icons .item-detail-close{position:absolute;top:8px;right:8px;min-width:36px;min-height:36px}
+.equipment-icons .item-detail-panel h4{font-size:20px;margin:8px 0}.equipment-icons .item-name{text-align:left;font:inherit;padding:0;background:none;border:0;color:inherit}
+.equipment-icons .item-detail-panel p{font-size:13px;line-height:1.6;margin:10px 0}.equipment-icons .item-detail-panel>small{display:block;margin:8px 0;line-height:1.5}.equipment-icons .item-detail-panel .eyebrow{font-size:10px}
+.equipment-icons .item-detail-panel .item-actions button{width:100%;min-height:44px;margin-top:8px;font-size:13px}.equipment-icons .item-price{padding-top:10px;border-top:1px solid #a0b4c855;color:#ffe0a0}
+.equipment-icons .equipment-slots{margin-bottom:16px}.equipment-icons .catalogue-summary{gap:10px;flex-wrap:wrap}
+.skills-hud .hud-content{display:flex;flex-direction:column;align-items:center;gap:8px}
+.experience-hud{box-sizing:border-box;width:min(680px,calc(100vw - 24px));padding:8px 12px;border:2px solid #cbb17a;border-radius:12px;background:#152c43ed;box-shadow:0 4px 0 #0a172b88;color:#fff0cf;text-align:center;pointer-events:auto}
+.experience-caption{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px;line-height:1.5}.experience-caption strong{color:#ffe1a2}.experience-caption span{font-size:11px}
+.experience-track{position:relative;height:22px;border-radius:6px;border:1px solid #d9bf8b77;background:#0b192b;overflow:hidden;margin:4px 0}
+.experience-fill{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#6361b8,#aaa0ef,#dfc6ff);transition:width .3s ease}
+.experience-numbers{position:relative;z-index:1;display:block;line-height:20px;font-size:12px;font-weight:700;color:#fff;text-shadow:0 1px 3px #071323,0 0 3px #071323}
+.experience-hud>small{display:block;font-size:11px;line-height:1.5;color:#d1e1ed}
+@media(max-width:700px){.equipment-icons .item-browser.has-selection{grid-template-columns:minmax(0,1fr)}.equipment-icons .item-detail-panel{grid-row:1;position:relative;top:auto;padding:14px}.equipment-icons .item-detail-art{width:100px;height:100px}.equipment-icons .item-icon-grid{grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px}.equipment-icons .item-icon{padding:5px;min-height:110px}.equipment-icons .tabs button{min-width:62px;min-height:58px}.equipment-icons .tabs small{font-size:10px}.experience-hud{padding:6px 9px}.experience-caption{font-size:11px}.experience-caption span,.experience-hud>small{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.experience-fill{transition:none}}
