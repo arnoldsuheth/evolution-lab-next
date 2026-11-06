@@ -1,6 +1,6 @@
 {
   "name": "lions-cave-rpg-programador",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "private": true,
   "scripts": {
     "predev": "node scripts/fetch-heroes.mjs",
@@ -33,4 +33,3 @@
     "typescript": "^5"
   }
 }
-

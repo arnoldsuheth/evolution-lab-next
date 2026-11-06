@@ -22,3 +22,9 @@ export function advanceJump(height:number,velocity:number,dt:number) {
 export const ATTACK_SLOT = 0, BAR_SLOTS = HOTBAR_SIZE - 1;
 export const keyForBar = (index: number) => HOTBAR_KEYS[index + 1];
 export const barForKey = (key: string) => { const i = hotbarIndex(key); return i > 0 ? i - 1 : -1; };
+
+/** A queued approach must not be reset on each automatic-attack pulse. */
+export function autoAttackStep(s:{identity:string|null;dead:boolean;stamina:number;encounter:boolean;queued:boolean;hidden:boolean},target:string):'stop'|'wait'|'approach'|'attack'{
+ if(s.hidden||s.dead||s.identity!==target||s.stamina<9)return 'stop';
+ return s.encounter?'attack':s.queued?'wait':'approach';
+}

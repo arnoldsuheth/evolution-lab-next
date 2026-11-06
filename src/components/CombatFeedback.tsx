@@ -1,5 +1,5 @@
 "use client";
-import {useEffect,useRef} from 'react';
+import {useRef} from 'react';
 import {useFrame} from '@react-three/fiber';
 import {Html} from '@react-three/drei';
 import * as THREE from 'three';
@@ -31,10 +31,10 @@ function buildParts(kind:EffectKind,color:string){
   return list.map(p=>p.mesh);
 }
 function Effect({kind,color,from,to,time,delay=0}:{kind:EffectKind;color:string;from:[number,number];to:[number,number];time:number;delay?:number}){
- const root=useRef<THREE.Group>(null),start=useRef(0),live=useRef<THREE.Mesh[]>([]);
+ const root=useRef<THREE.Group>(null),start=useRef(0),live=useRef<THREE.Mesh[]>([]),finished=useRef(false);
  useFrame(()=>{
-  const g=root.current;if(!g)return;
-  if(!start.current){start.current=performance.now()-Math.max(0,Date.now()-time)+delay*1000;live.current=buildParts(kind,color);live.current.forEach(mesh=>g.add(mesh));}const age=(performance.now()-start.current)/1000,t=Math.min(1,age/EFFECT_SECONDS);if(age<0){live.current.forEach(mesh=>{mesh.visible=false;});return;}if(t>=1){live.current.forEach(mesh=>{mesh.visible=false;});return;}
+  const g=root.current;if(!g||finished.current)return;
+  if(!start.current){start.current=performance.now()-Math.max(0,Date.now()-time)+delay*1000;live.current=buildParts(kind,color);live.current.forEach(mesh=>g.add(mesh));}const age=(performance.now()-start.current)/1000,t=Math.min(1,age/EFFECT_SECONDS);if(age<0){live.current.forEach(mesh=>{mesh.visible=false;});return;}if(t>=1){g.visible=false;finished.current=true;return;}
   const [hx,hz]=from,[tx,tz]=to,fade=1-t,travel=Math.min(1,age/.32);
   for(const mesh of live.current){const {role,i}=mesh.userData as {role:string;i:number},mat=mesh.material as THREE.MeshBasicMaterial;mesh.visible=true;mat.opacity=fade;mesh.rotation.set(0,0,0);mesh.scale.setScalar(1);
    const at=(x:number,y:number,z:number)=>mesh.position.set(x,y,z);
@@ -61,13 +61,18 @@ function Effect({kind,color,from,to,time,delay=0}:{kind:EffectKind;color:string;
  return <group ref={root}/>;
 }
 
-/** Número de dano + efeito do golpe. Cada classe tem a sua magia; ataques normais mostram um corte. */
+function FloatingDamage({time,amount,position,critical=false,received=false}:{time:number;amount:number;position:[number,number];critical?:boolean;received?:boolean}){
+ const label=useRef<HTMLDivElement>(null),finished=useRef(false);
+ useFrame(()=>{if(!label.current||finished.current)return;const age=Math.max(0,(Date.now()-time)/1000);if(age>=1.15){label.current.style.opacity="0";finished.current=true;return;}label.current.style.opacity=String(Math.max(0,1-age/1.15));label.current.style.translate=`0 ${-age*45}px`;});
+ if(!amount)return null;
+ return <Html center position={[position[0],received?2.5:3,position[1]]} zIndexRange={[15,0]} style={{pointerEvents:'none'}}><div ref={label} className={`floating-damage ${received?'damage-received':critical?'critical-hit':'damage-caused'}`} aria-label={`${received?'Dano sofrido':critical?'Dano crítico':'Dano causado'}: ${amount}`}>{critical&&<small>CRÍTICO!</small>}{amount}</div></Html>;
+}
+/** Os números acompanham quem recebeu o golpe; crítico corresponde ao cálculo real. */
 export default function CombatFeedback(){
- const event=useGame(s=>s.battleEvent),label=useRef<HTMLDivElement>(null),labelRoot=useRef<THREE.Group>(null),start=useRef(0);
- useEffect(()=>{if(event)start.current=performance.now()-Math.max(0,Date.now()-event.time);},[event]);
- useFrame(()=>{if(!labelRoot.current)return;const age=event&&start.current?(performance.now()-start.current)/1000:2;labelRoot.current.visible=age<.95;if(label.current){label.current.style.opacity=String(Math.max(0,1-age));label.current.style.translate='0 '+(-age*35)+'px';}});
+ const event=useGame(s=>s.battleEvent);
  if(!event)return null;
  const kind=effectFor(event.kind,event.classId);
  return <group><Effect key={event.time} kind={kind} color={event.tone} from={[event.hx??event.x,event.hz??event.z]} to={[event.x,event.z]} time={event.time}/>{event.enemyPower&&ENEMY_POWER_EFFECT[event.enemyPower]&&<Effect key={'e'+event.time} kind={ENEMY_POWER_EFFECT[event.enemyPower].kind} color={ENEMY_POWER_EFFECT[event.enemyPower].color} from={[event.x,event.z]} to={[event.hx,event.hz]} time={event.time} delay={.35}/>}
-  <group ref={labelRoot} position={[event.x,0,event.z]}><Html center position={[0,2.8,0]} zIndexRange={[9,0]} style={{pointerEvents:'none'}}><div ref={label} className="damage-number" style={{color:event.tone}}>{event.damage?'-'+event.damage:''}{event.received?<small>Você recebeu {event.received}</small>:null}</div></Html></group></group>;
+ <FloatingDamage key={'hit'+event.time} time={event.time} amount={event.damage} position={[event.x,event.z]} critical={event.critical}/><FloatingDamage key={'hurt'+event.time} time={event.time} amount={event.received} position={[event.hx,event.hz]} received/>
+ </group>;
 }

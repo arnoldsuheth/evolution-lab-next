@@ -19,7 +19,7 @@ import TeachingGuide from "@/components/TeachingGuide";
 import CharacterSelect from "@/components/CharacterSelect";
 import CloudAccount from '@/components/CloudAccount';
 import {useCloud} from '@/lib/cloudSync';
-import MobileControls from '@/components/MobileControls';
+import LootNotifications from '@/components/LootNotifications';
 import {ClassPortrait} from '@/components/ApprovedArtwork';
 import GameMenu from '@/components/GameMenu';
 import { QuestDialog, QuestTrackerList } from '@/components/QuestDialog';
@@ -144,7 +144,7 @@ export default function Home() {
     {error && <button className="save-alert" onClick={() => setPanel("settings")}>Salvamento precisa de atenção · exportar e recuperar ↗</button>}
     {hero.dead && <div className="death-banner"><span className="eyebrow">A JORNADA DE {hero.name.toUpperCase()} TERMINOU</span><h2>O conhecimento permanece.</h2><button className="primary" onClick={() => setPanel("ancestors")}>Ver antepassados e recomeçar</button></div>}
     {hero.defeatedBosses.includes("boss-master")&&<div className="campaign-victory" role="status"><b>O Código Perdido foi restaurado.</b><span>Nullarion foi vencido. Seu conhecimento e sua aventura permanecem.</span><button onClick={()=>setPanel("academy")}>Ver meu portfólio</button></div>}
-    <CombatPanel paused={activePanel!=="none"||editingHud||cloudBlocked||portrait}/><MobileControls paused={activePanel!=="none"||editingHud||cloudBlocked||portrait}/>
+    <CombatPanel paused={activePanel!=="none"||editingHud||cloudBlocked||portrait}/><LootNotifications/>
     <HudBlock id="skills" label="Habilidades" className="skills-hud"><ExperienceBar hero={hero}/></HudBlock><CombatHotbar paused={activePanel!=="none"||editingHud||cloudBlocked||portrait}/>
     {activePanel !== "none" && <Modal title={titles[activePanel]} close={close} wide={["creator", "journal", "academy"].includes(activePanel)} creator={activePanel === "creator"}>
       {activePanel === "map" && <WorldMap/>}{activePanel === "character" && <CharacterSheet edit={()=>setPanel("creator")} bag={()=>setPanel("bag")}/>}{activePanel === "journey" && <JourneyPanel />}{activePanel === "challenge" && <ChallengePanel />}{activePanel === "creator" && (!hero.created || hero.dead) && <Creator close={close} />}{activePanel === "journal" && <Journal />}{activePanel === "bag" && <Inventory />}{activePanel === "talents" && <Talents />}{activePanel === "academy" && <Academy />}{activePanel === "settings" && <SettingsPanel />}

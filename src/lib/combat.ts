@@ -14,7 +14,7 @@ export type HeroStatus={kind:'poison'|'slow'|'freeze'|'burn';turns:number;damage
 export const MONSTER_POWER:Record<MonsterKind,{name:string;kind:HeroStatus['kind']|'charge';every:number}>={spider:{name:'Picada venenosa',kind:'poison',every:3},wolf:{name:'Mordida que atrasa',kind:'slow',every:3},golem:{name:'Golpe de pedra',kind:'slow',every:4},wraith:{name:'Toque congelante',kind:'freeze',every:3},dragon:{name:'Sopro de fogo',kind:'burn',every:3},boar:{name:'Investida',kind:'charge',every:3}};
 export const STATUS_NAMES:Record<HeroStatus['kind'],string>={poison:'Envenenado',slow:'Lento',freeze:'Congelado',burn:'Queimando'};
 export interface EnemyState{kind?:MonsterKind;turn?:number;heroStatus?:HeroStatus;resource?:'mp'|'stamina';resourceCurrent?:number;resourceMax?:number;instanceId?:"cavern"|"monastery";id:string;name:string;hp:number;maxHp:number;power:number;reward:number;elite:boolean;level?:number;monsterId?:string;bossId?:string;bleed?:{damage:number;turns:number}}
-export function resolveCombat(hero:HeroData,enemy:EnemyState,options:{skillId?:string;starter?:boolean;attackBuff?:number;defenseBuff?:number}={}){
+export function resolveCombat(hero:HeroData,enemy:EnemyState,options:{skillId?:string;starter?:boolean;attackBuff?:number;defenseBuff?:number;criticalRoll?:number}={}){
  const st=stats(hero),skill=options.skillId?SKILLS[options.skillId]:undefined;const rank=skill?effectiveSkillRank(hero,skill.id):1;
  if(options.skillId&&(!skill||skill.classId!==hero.classId||skill.kind!=='active'||!rank||hero.level<skill.minLevel))return{hero,enemy,error:'Habilidade indisponível',won:false,dead:false,damage:0,received:0};
  const resource=skill?.resource??(options.starter?'mp':'stamina');const cost=skill?.cost??(options.starter?18:9);
@@ -25,7 +25,8 @@ export function resolveCombat(hero:HeroData,enemy:EnemyState,options:{skillId?:s
  const dot=enemy.bleed&&enemy.bleed.turns>0?enemy.bleed.damage:0;
  // Lento ou congelado: o herói bate mais fraco enquanto o efeito durar.
  const status=enemy.heroStatus&&enemy.heroStatus.turns>0?enemy.heroStatus:undefined,weaken=status?.kind==='freeze'?.5:status?.kind==='slow'?.75:1;
- const damage=Math.max(0,Math.round((power*(skill?skill.damage*scale:options.starter?1.8:1)+pet)*weaken+dot));
+ const critical=(options.criticalRoll??1)<Math.min(.25,.05+st.dexterity*.002);
+ const damage=Math.max(0,Math.round((power*(skill?skill.damage*scale:options.starter?1.8:1)+pet)*weaken*(critical?1.5:1)+dot));
  const hp=Math.max(0,enemy.hp-damage);
  const next={...hero,[resource]:hero[resource]-cost};
  const heal=skill?Math.round(st.maxHp*skill.heal*scale):options.starter&&['paladin','prophet','shaman'].includes(hero.classId)?Math.round(st.maxHp*(hero.classId==='paladin'?.07:.24)):0;
@@ -43,7 +44,7 @@ export function resolveCombat(hero:HeroData,enemy:EnemyState,options:{skillId?:s
  next.hp=Math.min(st.maxHp,Math.max(0,next.hp+heal+steal-received));
  if(skill?.restore){next.mp=Math.min(st.maxMp,next.mp+Math.floor(st.maxMp*skill.restore));next.stamina=Math.min(st.maxStamina,next.stamina+Math.floor(st.maxStamina*skill.restore));}
  const bleed=skill?.bleed?{damage:Math.max(1,Math.round(power*skill.bleed*scale)),turns:2}:enemy.bleed&&enemy.bleed.turns>1?{...enemy.bleed,turns:enemy.bleed.turns-1}:undefined;
- return{hero:next,enemy:{...enemy,hp,bleed,resourceCurrent,turn,heroStatus:hp>0?heroStatus:undefined},error:undefined,won:hp===0,dead:next.hp===0,damage,received,enemySkill:special&&power2?power2.name:undefined,enemyPower:special&&power2?power2.kind:undefined};
+ return{hero:next,enemy:{...enemy,hp,bleed,resourceCurrent,turn,heroStatus:hp>0?heroStatus:undefined},error:undefined,won:hp===0,dead:next.hp===0,damage,received,critical,enemySkill:special&&power2?power2.name:undefined,enemyPower:special&&power2?power2.kind:undefined};
 }
 export function battleRewards(hero:HeroData,enemy:EnemyState){
  const level=enemy.level??hero.level;const tier=bandFor(level),band=LEVEL_BANDS[tier];const drops:string[]=[];
