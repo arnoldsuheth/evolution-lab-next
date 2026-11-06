@@ -1,11 +1,11 @@
 import type {Item} from './catalogue';
 import type {ClassId} from './game';
 export const ART_BASE=process.env.NEXT_PUBLIC_GITHUB_PAGES==='true'?'/evolution-lab-next':'';
-export type ArtCrop={sheet:'items'|'equipment'|'classes';x:number;y:number;w:number;h:number};
+export type ArtCrop={sheet:'items'|'equipment'|'classes';x:number;y:number;w:number;h:number;outline?:string};
 const itemCrop=(index:number):ArtCrop=>({sheet:'items',x:index%6*256+15,y:[94,345,551,754][Math.floor(index/6)],w:226,h:[202,166,166,178][Math.floor(index/6)]});
 const equipment=(x:number,y:number,w:number,h:number):ArtCrop=>({sheet:'equipment',x,y,w,h});
-const armor:Record<ClassId,ArtCrop>={paladin:equipment(10,140,215,215),warrior:equipment(415,140,215,207),hunter:equipment(800,108,190,238),engineer:equipment(10,497,215,246),mage:equipment(420,566,198,198),hacker:equipment(806,504,207,244),prophet:equipment(10,885,230,258),duelist:equipment(412,885,202,253),shaman:equipment(800,865,202,288)};
-const weapons:Record<string,ArtCrop>={sword:equipment(190,195,93,218),greatsword:equipment(677,113,82,306),dagger:equipment(1015,610,92,182),hammer:equipment(218,558,95,184),tool:equipment(300,567,78,146),axe:equipment(218,558,95,184),bow:equipment(1018,116,154,177),crossbow:equipment(1050,242,160,92),gun:equipment(965,330,244,90),staff:equipment(604,473,92,314),wand:equipment(670,548,71,141),shield:equipment(252,215,130,201)};
+const armor:Record<ClassId,ArtCrop>={paladin:equipment(10,140,205,215),warrior:equipment(415,140,215,207),hunter:equipment(800,108,190,238),engineer:equipment(10,497,215,246),mage:equipment(420,566,198,198),hacker:equipment(806,504,207,244),prophet:equipment(10,885,230,258),duelist:equipment(412,885,202,253),shaman:equipment(800,865,202,288)};
+const weapons:Record<string,ArtCrop>={sword:{...equipment(200,190,80,226),outline:'218,190 263,190 263,316 278,316 278,354 261,354 261,416 218,416 218,354 202,354 202,316 218,316'},greatsword:equipment(677,113,82,306),dagger:equipment(1015,610,92,182),hammer:equipment(218,558,95,184),tool:equipment(300,567,78,146),axe:equipment(218,558,95,184),bow:equipment(1018,116,154,177),crossbow:equipment(1050,242,160,92),gun:equipment(965,330,244,90),staff:{...equipment(604,473,92,314),outline:'604,473 696,473 696,600 672,600 672,787 625,787 625,600 604,600'},wand:{...equipment(670,543,75,146),outline:'716,543 745,543 745,580 704,689 670,689 670,651 710,573'},shield:{...equipment(265,224,123,190),outline:'265,246 314,224 388,247 383,337 354,388 337,414 301,385 276,344 265,290'}};
 export function artworkForItem(item:Item):ArtCrop|undefined{
  const id=item.id,v=item.visual;
  if(id==='tea')return itemCrop(5);
