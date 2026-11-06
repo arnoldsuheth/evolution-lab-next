@@ -14,7 +14,7 @@ export const viewport:Viewport={width:"device-width",initialScale:1,viewportFit:
 export const metadata: Metadata = {
   title: "Lion’s Cave RPG Programador",
   applicationName: "Lion’s Cave RPG Programador",
-  icons: { icon: `${base}/lion-emblem.svg`, apple: `${base}/apple-touch-icon.png` },
+  icons: { icon: [{url:`${base}/lion-emblem.svg?v=20261106`,type:"image/svg+xml"},{url:`${base}/lion-icon-192.png?v=20261106`,sizes:"192x192",type:"image/png"}], apple: [{url:`${base}/apple-touch-icon.png?v=20261106`,sizes:"180x180",type:"image/png"}] },
   manifest: `${base}/manifest.webmanifest`,
   appleWebApp: { capable: true, title: "Lion’s Cave", statusBarStyle: "black-translucent" },
   description: "O Código Perdido — aprenda programação explorando Pedra da Aurora.",
