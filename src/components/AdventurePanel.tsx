@@ -1,7 +1,7 @@
 "use client";
 import { useState } from 'react';
 import { useGame, currentAdventure } from '@/lib/store';
-import { ACHIEVEMENTS, DAILY_POOL, FACTIONS, PETS, REP_LEVELS, REP_MAX, REP_PETS, SPECS, SPEC_LEVEL, adventureOf, dailyReward, repPercent, repRank, specChangeCost, unlockedPets, type Faction, type PetId } from '@/lib/adventure';
+import { ACHIEVEMENTS, DAILY_POOL, FACTIONS, PETS, REP_LEVELS, REP_MAX, REP_PETS, SPECS, SPEC_LEVEL, dailyReward, repPercent, repRank, specChangeCost, unlockedPets, type Faction, type PetId } from '@/lib/adventure';
 import Currency from './Currency';
 
 const TABS = [['daily', '☀', 'Do dia'], ['feats', '🏆', 'Conquistas'], ['rep', '♥', 'Reputação'], ['spec', '✦', 'Especialização'], ['pets', '🐾', 'Mascotes']] as const;
