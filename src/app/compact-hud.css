@@ -34,3 +34,5 @@
 .combat-pad .starter-actions{position:static;transform:none;width:auto;left:auto;bottom:auto}
 @media(pointer:fine) and (min-height:541px){.skills-hud{bottom:8px}.bottom-hud{bottom:44px}.left-hud{top:auto;bottom:52px}.quest-tracker{top:90px}}
 @media(pointer:coarse) and (orientation:landscape){.modal:not(.creator-modal) .modal-head{min-height:46px!important}.combat-pad .combat-hotbar{gap:4px}.combat-pad .combat-hotbar button{width:36px;height:36px;min-height:36px}.combat-pad .combat-hotbar .game-artwork{width:28px;height:28px}}
+@media(pointer:coarse) and (orientation:landscape),(max-height:540px) and (orientation:landscape){.sheet-equipment{gap:4px;grid-template-columns:repeat(3,minmax(48px,76px))}.sheet-equipment button{min-height:40px!important;padding:2px;gap:1px}.sheet-equipment button>.game-artwork{width:24px;height:24px}.sheet-equipment button>span{font-size:18px}.sheet-equipment button small{font-size:8px;line-height:1.1}.sheet-model{min-height:260px!important}}
+.combat-pad .starter-actions{position:relative;justify-content:center;width:100%;height:76px}.combat-pad .starter-actions>button:not(.primary-attack){position:absolute;right:0;bottom:0}
