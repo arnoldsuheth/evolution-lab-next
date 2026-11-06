@@ -54,3 +54,56 @@
 .character-slot{position:relative;display:flex;flex-direction:column}.character-slot>button:first-child{flex:1}
 .delete-character{position:absolute;top:6px;right:6px;width:34px;height:34px;min-height:34px;padding:0;border-radius:50%;background:#ffe1d6;border:2px solid #5a1f1a;color:#5a1f1a;font-size:16px;z-index:2}
 .delete-confirm{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;text-align:center;background:#2a0f0cf2;border:2px solid #ff9a8a;border-radius:14px}.delete-confirm p{color:#ffe3dc!important;font-size:13px!important;margin:0}.delete-confirm button{min-height:40px;width:100%}.delete-confirm .danger{background:#c0392b;border-color:#ffb4a8;color:#fff}
+
+/* 1.10 · Aventura: do dia, conquistas, reputação, especialização, mascotes, portas, raro e fases */
+.adventure-panel{display:grid;gap:12px}
+.adventure-tabs{flex-wrap:wrap}
+.adventure-list{display:grid;gap:10px}
+.adventure-card{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:10px 12px;border:2px solid #17324633;border-radius:14px;background:#fff6dfcc}
+.adventure-card.ready{border-color:#2f8a4a;box-shadow:0 0 0 3px #2f8a4a22}
+.adventure-card.claimed{opacity:.6}
+.adventure-card b{display:block;font-size:14px}
+.adventure-card small{font-size:12px;opacity:.85}
+.adventure-icon{font-size:26px;text-align:center}
+.adventure-meter{position:relative;height:16px;margin:5px 0 3px;border-radius:8px;background:#17324622;overflow:hidden}
+.adventure-meter i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#5fb36f,#a6e08a)}
+.adventure-meter.rep i{background:linear-gradient(90deg,#c58a3a,#f3cf6b)}
+.adventure-meter span{position:relative;display:block;text-align:center;font-size:11px;font-weight:700;line-height:16px;color:#173246}
+.adventure-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.feat{display:grid;gap:3px;justify-items:center;text-align:center;padding:12px 8px;border-radius:14px;border:2px solid #17324633;background:#ffffff99;min-height:120px}
+.feat>span{font-size:28px}.feat b{font-size:13px}.feat small{font-size:11px;opacity:.8}.feat em{font-size:11px;font-style:normal;color:#7a5a12}
+.feat:disabled{filter:grayscale(1);opacity:.55;cursor:default}
+.feat.got{border-color:#c89b2c;background:#fff3cf}
+.feat.worn{border-color:#2f8a4a;box-shadow:0 0 0 3px #2f8a4a33}
+.adventure-spec{display:grid;gap:10px}
+.spec-choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.spec-card{display:grid;gap:6px;justify-items:start;text-align:left;padding:14px;border-radius:16px;border:2px solid #17324633;background:#ffffffaa}
+.spec-card>span{font-size:30px}.spec-card b{font-size:16px}.spec-card em{font-style:normal;font-weight:700;color:#7a3fb0}.spec-card small{font-size:12px}
+.spec-card.guard{border-left:6px solid #3d7fc4}.spec-card.fury{border-left:6px solid #d0553a}
+.spec-card.chosen{background:#e9f8ea;border-color:#2f8a4a}.spec-card strong{color:#2f8a4a}
+.door-panel{display:grid;gap:10px}
+.door-panel .code-editor{min-height:150px;font:13px/1.5 ui-monospace,Consolas,monospace}
+.door-actions{display:flex;flex-wrap:wrap;gap:8px}
+.door-results{margin:0;padding-left:18px;display:grid;gap:4px;font-size:13px}
+.door-label{pointer-events:auto;cursor:pointer;font-weight:700;background:#dff3ffee;border-color:#1d5f8a;color:#123b57;padding:4px 10px}
+.player-name small{display:block;font-size:10px;font-weight:500;color:#ffe9a6;text-align:center}
+.hero-title{font-style:normal;font-weight:500;font-size:11px;color:#b88a1e}
+.rare-name{color:#ffd54a!important;text-shadow:0 0 6px #ffb300,0 1px 2px #000}
+.experience-rested{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(90deg,#7fc8ff66 0 6px,#7fc8ff33 6px 12px);pointer-events:none}
+.rested-tag{font-style:normal;color:#9fd7ff}
+.phase-card{position:fixed;z-index:34;top:calc(env(safe-area-inset-top) + 64px);left:50%;transform:translateX(-50%);display:grid;gap:2px;padding:6px 12px;border-radius:12px;background:#0f2230e6;border:2px solid #f3cf6b;color:#e8eef3;font-size:12px;pointer-events:none}
+.phase-card>span{font-weight:700;color:#f3cf6b;text-align:center}
+.phase-card code{font:12px/1.4 ui-monospace,Consolas,monospace;opacity:.45}
+.phase-card code.on{opacity:1;color:#a6e08a}
+.phase-card.angry{border-color:#ff6a4a;animation:phase-pulse 1s ease-in-out infinite}
+.phase-card.angry>span{color:#ff8a6a}.phase-card.angry code.on{color:#ffb09a}
+@keyframes phase-pulse{50%{box-shadow:0 0 14px #ff6a4a}}
+@media(prefers-reduced-motion:reduce){.phase-card.angry{animation:none}}
+@media(max-width:560px){.adventure-card{grid-template-columns:34px 1fr auto;padding:8px}.adventure-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}}
+/* contraste dentro do painel azul-escuro */
+.adventure-card,.feat,.spec-card{background:#0d2333cc;border-color:#f3cf6b44;color:#f4ecd8}
+.adventure-card small,.feat small,.spec-card small{color:#d9d2bf;opacity:1}
+.adventure-meter{background:#ffffff22}.adventure-meter span{color:#fff;text-shadow:0 1px 2px #000}
+.feat.got{background:#3a2e10cc;border-color:#f3cf6b}.feat em{color:#f3cf6b}
+.spec-card em{color:#cbb2ff}.spec-card.chosen{background:#173d24cc;border-color:#5fd07a}.spec-card strong{color:#8be0a0}
+.adventure-card.ready{border-color:#5fd07a;box-shadow:0 0 0 3px #5fd07a33}
