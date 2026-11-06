@@ -1,7 +1,7 @@
 // Remove animações não usadas de um arquivo .glb e reempacota o buffer binário.
 // Malhas, esqueleto, texturas e as animações mantidas ficam byte a byte iguais.
 /** Animações usadas pelo jogo (conferidas com HERO_ANIMATIONS em src/lib/heroModels.test.ts). As demais não são publicadas. */
-export const KEEP_ANIMATIONS = ['Idle','Walking_A','Unarmed_Melee_Attack_Punch_A','1H_Melee_Attack_Chop','2H_Melee_Idle','2H_Melee_Attack_Chop','2H_Ranged_Shoot','Spellcast_Shoot','Dualwield_Melee_Attack_Stab','Spellcast_Raise','Dualwield_Melee_Attack_Slice','Spellcast_Long'];
+export const KEEP_ANIMATIONS = ['Idle','Walking_A','Unarmed_Melee_Attack_Punch_A','1H_Melee_Attack_Chop','2H_Melee_Idle','2H_Melee_Attack_Chop','2H_Ranged_Shoot','Spellcast_Shoot','Dualwield_Melee_Attack_Stab','Spellcast_Raise','Dualwield_Melee_Attack_Slice','Spellcast_Long','Hit_A'];
 const GLB = 0x46546c67, JSON_CHUNK = 0x4e4f534a, BIN_CHUNK = 0x004e4942;
 
 export function readGlb(data) {

@@ -76,3 +76,34 @@
 .monster-name{display:block;text-align:center;white-space:nowrap;background:#ffe4dcee;color:#5a1f1a;border:2px solid #5a1f1a;border-radius:12px;padding:2px 9px;font-size:12px;font-weight:700;filter:drop-shadow(0 3px 0 #5a1f1a55)}.monster-name small{display:block;font-size:10px;font-weight:400;color:#7d3b33}.monster-name.boss-name{background:#ffd27a;border-color:#5a2f0a;color:#4a2306}
 .gate-label{font-size:12px;color:#2c1d4a;background:#efe3ffee;border:2px solid #2c1d4a;border-radius:12px;text-shadow:none}
 .quest-toggle{background:#24506d;border:2px solid #f4d68a88;border-radius:10px;color:var(--toon-text);font-size:11px}
+/* ===== 1.9 · Um único menu: o resto da tela fica livre para o mundo ===== */
+.game-menu{position:fixed;top:132px;right:20px;z-index:40;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.zone-name{font-size:12px;color:#fffaf0;text-shadow:0 1px 0 #173246,0 2px 6px #12304a99;white-space:nowrap}
+.game-menu-toggle{min-height:44px;padding:8px 16px;border-radius:999px;background:var(--toon-panel);border:2px solid var(--toon-edge);color:var(--toon-text);font-size:14px;font-weight:700;box-shadow:0 4px 0 var(--toon-ink)}
+.game-menu.open .game-menu-toggle{background:#f4d68a;color:#173246}
+.game-menu-panel{width:min(420px,calc(100vw - 24px));max-height:calc(100dvh - 200px);overflow:auto;background:linear-gradient(160deg,#2f6286f7,#234b67f7);border:2px solid var(--toon-edge);border-radius:18px;box-shadow:0 5px 0 var(--toon-ink),0 20px 40px #0a1f2e66;padding:12px}
+.game-menu-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.game-menu-grid button{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:86px;padding:10px 4px;border-radius:14px;background:#fff6df;color:#173246;border:2px solid #173246;box-shadow:0 3px 0 #17324666}
+.game-menu-grid button:hover:not(:disabled){background:#ffeab0}.game-menu-grid button:disabled{opacity:.5}
+.game-menu-grid .menu-icon{font-size:24px;line-height:1}.game-menu-grid b{font-size:13px}.game-menu-grid small{font-size:10px;color:#3f5b6b;text-align:center;line-height:1.2}
+.game-menu-grid kbd{position:absolute;top:5px;right:6px;font-size:10px;background:#173246;color:#fff6df;border-radius:4px;padding:0 4px}
+.game-menu-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.game-menu-row>button,.game-menu-row .audio-controls>summary{min-height:40px;padding:6px 10px;font-size:12px;border-radius:10px;background:#24506d;border:2px solid #f4d68a88;color:var(--toon-text)}
+.game-menu-row .audio-controls>div{position:static;width:100%;margin-top:6px;box-shadow:none}
+.game-menu-help{font-size:12px!important;color:#dbe9ef!important;margin:10px 2px 6px;line-height:1.5}
+.game-menu-panel footer{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:#bcd3de;border-top:1px solid #ffffff22;padding-top:6px}
+.game-brand,.location-display,.top-actions,.bottom-hud{display:none!important}
+@media(max-width:1000px){.game-menu{top:calc(env(safe-area-inset-top) + 92px);right:max(10px,env(safe-area-inset-right))}.game-menu-toggle{min-height:44px;padding:6px 12px;font-size:13px}.game-menu-panel{max-height:calc(100dvh - 160px)}.game-menu-grid button{min-height:76px}.zone-name{font-size:10px}}
+@media(max-width:1000px) and (orientation:landscape){.game-menu{top:calc(env(safe-area-inset-top) + 76px)}.game-menu-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.game-menu-panel{width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 100px)}}
+/* Missões de clique, mercado e efeitos */
+.enemy-hp{display:block;width:84px;height:7px;margin:3px auto 0;border-radius:99px;background:#5a1f1a;overflow:hidden;border:1px solid #5a1f1a}.enemy-hp>b{display:block;height:100%;background:linear-gradient(90deg,#e0473a,#ff8a5c);transition:width .25s}
+.town-sign{display:block;white-space:nowrap;font-size:11px;font-weight:700;color:#3b2a17;background:#f3dfb4ee;border:2px solid #6e4a2c;border-radius:8px;padding:1px 7px}
+.unlock-banner{white-space:nowrap;font-size:15px;font-weight:800;color:#5a3c06;background:#ffe9a3;border:3px solid #5a3c06;border-radius:999px;padding:6px 14px;box-shadow:0 4px 0 #5a3c0666;animation:unlock-pop .5s ease-out}
+@keyframes unlock-pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+.quest-dialog{padding:14px 16px 0;display:grid;gap:10px}
+.quest-offer{display:flex;gap:12px;background:#fff6df;color:#173246;border:2px solid #173246;border-radius:14px;padding:12px}
+.quest-offer h4{margin:0 0 4px;font-size:16px;color:#173246}.quest-offer p{font-size:13px!important;color:#2d4a5b!important;margin:0 0 6px;line-height:1.5}.quest-offer small{display:block;font-size:12px;color:#5b6f7a;margin-bottom:6px}
+.quest-offer ul{list-style:none;padding:0;margin:0 0 6px;font-size:13px}.quest-offer li.complete{color:#2f7d3a;font-weight:700}
+.quest-offer button{min-height:40px;padding:6px 14px}
+.quest-badge{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#f4c542;color:#3b2a06;font-weight:900;font-size:20px;border:2px solid #3b2a06}.quest-offer.active .quest-badge{background:#c9d3d8;color:#41515a;border-color:#41515a}
+.quest-tracker-list{list-style:none;margin:8px 0 0;padding:8px 0 0;border-top:1px solid #ffffff2a;display:grid;gap:6px}.quest-tracker-list b{display:block;font-size:12px;color:#fff3cf}.quest-tracker-list small{display:block;font-size:11px;color:#cfe2ea}.quest-tracker-list li.ready b{color:#ffd35e}
+.npc-label .quest-marker{font-size:18px;font-weight:900;color:#e9a81d;text-shadow:0 1px 0 #3b2a06}

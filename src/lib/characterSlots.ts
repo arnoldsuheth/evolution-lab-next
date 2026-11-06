@@ -16,3 +16,10 @@ export function selectCharacter(s:SaveData,index:number):SaveData{
  roster.active=index;
  return{...next,settings:s.settings,legacy:{...s.legacy,...next.legacy,characterSlots:roster}};
 }
+/** Exclui o personagem do espaço: o espaço volta a ficar vazio. As configurações do jogo continuam. */
+export function deleteCharacter(s:SaveData,index:number):SaveData{
+ if(!Number.isInteger(index)||index<0||index>=SLOT_COUNT)throw Error('Slot inválido.');
+ const roster=characterSlots(s);roster.slots[index]=null;
+ if(index!==roster.active)return{...snapshot(s),legacy:{...s.legacy,characterSlots:roster}};
+ const fresh=freshSave();return{...fresh,settings:s.settings,legacy:{...s.legacy,characterSlots:{...roster,slots:roster.slots.map((slot,i)=>i===index?null:slot)}}};
+}

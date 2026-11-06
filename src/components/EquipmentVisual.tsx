@@ -1,6 +1,6 @@
 "use client";
 import * as THREE from 'three';
-export const rarityTone=(rarity:string)=>({Comum:'#bcc2b7',Incomum:'#a3bc8d',Raro:'#8cbbd2','Épico':'#bb9bd8','Lendário':'#e0be73'}[rarity]??'#bcc2b7');
+export const rarityTone=(rarity:string)=>({Comum:'#bcc2b7',Incomum:'#a3bc8d',Raro:'#8cbbd2','Épico':'#bb9bd8','Lendário':'#e0be73','Mítico':'#f2c14e'}[rarity]??'#bcc2b7');
 function Box({p,s,color,rotation=[0,0,0]}:{p:[number,number,number];s:[number,number,number];color:string;rotation?:[number,number,number]}){return <mesh position={p} rotation={rotation} castShadow><boxGeometry args={s}/><meshStandardMaterial color={color} metalness={.4} roughness={.65}/></mesh>;}
 export default function EquipmentVisual({visual,tone,small=false}:{visual:string;tone:string;small?:boolean}){const wood='#66503a';return <group scale={small?.7:1}>
  {['sword','greatsword','dagger'].includes(visual)&&<><Box p={[0,.02,0]} s={[.075,.32,.075]} color={wood}/><Box p={[0,.18,0]} s={[visual==='dagger'?.22:.34,.06,.09]} color={tone}/><mesh position={[0,visual==='dagger'?.4:visual==='greatsword'?.83:.65,0]} castShadow><coneGeometry args={[visual==='greatsword'?.12:.075,visual==='dagger'?.45:visual==='greatsword'?1.3:.92,4]}/><meshStandardMaterial color={tone} metalness={.65} roughness={.35}/></mesh></>}

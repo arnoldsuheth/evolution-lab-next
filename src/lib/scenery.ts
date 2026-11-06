@@ -1,4 +1,5 @@
 import { BUILDINGS, TREES } from './navigation';
+import { PROPS, onRoad, townBlocked } from './town';
 
 /** Detalhes decorativos do chão: posições fixas (mesmas em todo aparelho) e fora de caminhos e construções. */
 export type Decoration = { x: number; z: number; scale: number; turn: number; tone: number };
@@ -9,6 +10,7 @@ export function isClearGround(x: number, z: number) {
   if (Math.abs(z - 9 - x * .12) < 2.2 && Math.abs(x) > 7 && Math.abs(x) < 35) return false; // estradas laterais
   if (BUILDINGS.some(b => Math.abs(x - b.x) < b.w + 1.2 && Math.abs(z - b.z) < b.d + 1.2)) return false;
   if (TREES.some(t => Math.hypot(x - t.x, z - t.z) < .9 * t.size)) return false;
+  if (onRoad(x, z, .35) || townBlocked(x, z) || PROPS.some(p => Math.hypot(x - p.x, z - p.z) < Math.max(.8, p.radius + .5))) return false; // ruas e objetos da cidade
   return true;
 }
 export function scatter(count: number, seed: number, radius = 34, cluster = 6): Decoration[] {

@@ -3,14 +3,17 @@ import {createContext,useContext,useEffect,useRef,useState,type ReactNode,type C
 import {create} from 'zustand';
 import {persist,createJSONStorage} from 'zustand/middleware';
 import {clampHud,cleanHud,type HudPosition} from '@/lib/hud';
+import {MENU_EDIT_EVENT} from './GameMenu';
 const useLayout=create(persist<{positions:Record<string,HudPosition>;put:(id:string,p:HudPosition)=>void;reset:()=>void}>((set)=>({positions:{},put:(id,p)=>set(s=>({positions:{...s.positions,[id]:p}})),reset:()=>set({positions:{}})}),{name:'lions-cave-interface-v1',skipHydration:true,storage:createJSONStorage(()=>window.localStorage),merge:(saved,current)=>({...current,positions:cleanHud((saved as {positions?:unknown})?.positions)})}));
 const Editing=createContext(false);
 export function HudLayout({children,onEditingChange}:{children:ReactNode;onEditingChange:(editing:boolean)=>void}){
  const [editing,setEditing]=useState(false),[error,setError]=useState('');
  useEffect(()=>{void useLayout.persist.rehydrate();return useLayout.persist.onFinishHydration(()=>{});},[]);
  function toggle(){setEditing(!editing);onEditingChange(!editing);}
+ // O botão “Organizar a tela” fica no menu; a barra de edição só aparece enquanto você organiza.
+ useEffect(()=>{const start=()=>{setEditing(true);onEditingChange(true);};window.addEventListener(MENU_EDIT_EVENT,start);return()=>window.removeEventListener(MENU_EDIT_EVENT,start);},[onEditingChange]);
  function reset(){try{useLayout.getState().reset();setError('');}catch{setError('Não foi possível salvar a organização. Seu progresso não foi alterado.');}}
- return <Editing.Provider value={editing}>{children}<div className="hud-toolbar"><button onClick={toggle} aria-pressed={editing}>{editing?'✓ Travar':'▦ Interface'}</button>{editing&&<><button onClick={reset}>Aplicar HUD recomendado</button><span>Reposiciona apenas a interface. Seu personagem e progresso permanecem.</span><span>Arraste pelo título · ajuste o tamanho · depois trave</span></>}{error&&<span role="status">{error}</span>}</div></Editing.Provider>;
+ return <Editing.Provider value={editing}>{children}{editing&&<div className="hud-toolbar"><button onClick={toggle} aria-pressed={editing}>✓ Pronto</button><><button onClick={reset}>Aplicar HUD recomendado</button><span>Reposiciona apenas a interface. Seu personagem e progresso permanecem.</span><span>Arraste pelo título · ajuste o tamanho · depois toque em Pronto</span></>{error&&<span role="status">{error}</span>}</div>}</Editing.Provider>;
 }
 export function HudBlock({id,label,className,children}:{id:string;label:string;className:string;children:ReactNode}){
  const editing=useContext(Editing),positions=useLayout(s=>s.positions),root=useRef<HTMLElement>(null),drag=useRef<{x:number;y:number;left:number;top:number}|null>(null);

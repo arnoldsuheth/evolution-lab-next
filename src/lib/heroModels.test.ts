@@ -7,7 +7,7 @@ test('cada classe tem corpo animado, arma e paleta próprias',()=>{
  const signatures=new Set(ids.map(id=>{const s=HERO_STYLE[id];return [s.base,s.weapon.join(),s.offhand.join(),s.recolor.map(r=>r.to).join()].join('|');}));
  assert.equal(signatures.size,ids.length,'duas classes não podem ser idênticas');
 });
-test('raças mantêm proporções diferentes',()=>{assert.ok(heroProportions('gnome').height<heroProportions('dwarf').height);assert.ok(heroProportions('dwarf').height<heroProportions('human').height);assert.ok(heroProportions('elf').height>heroProportions('human').height);});
+test('humano, elfo e orc têm a mesma altura; anão menor; gnomo menor que o anão',()=>{const h=(r:Parameters<typeof heroProportions>[0])=>heroProportions(r).height;assert.equal(h('elf'),h('human'));assert.equal(h('orc'),h('human'));assert.ok(h('dwarf')<h('human'));assert.ok(h('gnome')<h('dwarf'));assert.ok(h('gnome')>.6,'gnomo continua só um pouco menor');});
 test('recoloração troca a pele e a roupa sem mexer no restante',()=>{
  const px=new Uint8ClampedArray([245,193,155,255, 76,104,130,255, 20,24,28,255]);
  assert.ok(isAtlasSkin(23,.37,.96));
@@ -24,7 +24,7 @@ test('iniciante usa roupas remendadas, sem elmo e sem capa',()=>{
 });
 test('equipamento conquistado aparece no modelo e o elmo pode ser escondido',()=>{
  const full={head:true,chest:true,back:false};
- assert.deepEqual(heroDress('paladin',full,0,true),{outfit:'class',hat:'Knight_Helmet',cape:true,head:'knight'});
+ assert.deepEqual(heroDress('paladin',full,0,true),{outfit:'class',hat:'Knight_Helmet',cape:true,head:'knight',covered:true});
  assert.equal(heroDress('paladin',full,0,false).hat,null,'jogador escolheu esconder o elmo');
  assert.equal(heroDress('hunter',full,0,true).head,'rogue_hooded','capuz substitui a cabeça');
  assert.equal(heroDress('hunter',full,0,false).head,'rogue');

@@ -17,3 +17,8 @@ export function advanceJump(height:number,velocity:number,dt:number) {
   const nextHeight=height+(velocity+nextVelocity)*.5*dt;
   return nextHeight<=0?{height:0,velocity:0}:{height:nextHeight,velocity:nextVelocity};
 }
+
+/** A tecla 1 é sempre Atacar. A barra salva continua igual; sua posição 0 aparece na tecla 2, a 1 na tecla 3… até a 8 na tecla 0. */
+export const ATTACK_SLOT = 0, BAR_SLOTS = HOTBAR_SIZE - 1;
+export const keyForBar = (index: number) => HOTBAR_KEYS[index + 1];
+export const barForKey = (key: string) => { const i = hotbarIndex(key); return i > 0 ? i - 1 : -1; };

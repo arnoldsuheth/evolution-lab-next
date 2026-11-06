@@ -1,6 +1,5 @@
 import type { ClassId, Race } from './game';
 import { CLASS_STYLE } from './cartoonAvatar';
-import { RACE_FORM } from './visual';
 
 /**
  * Modelos KayKit Adventures 1.0 (CC0) com esqueleto e animações.
@@ -47,39 +46,42 @@ export const HERO_STYLE: Record<ClassId, HeroStyle> = {
   duelist: { base: 'rogue', weapon: ['Knife'], offhand: ['Knife_Offhand'], recolor: [{ hue: 160, range: 16, minSat: .5, to: cloth('duelist') }, { hue: 132, range: 10, minSat: .35, to: trim('duelist') }], idle: 'Idle', attack: 'Dualwield_Melee_Attack_Slice' },
   shaman: { base: 'mage', weapon: ['2H_Staff'], offhand: [], recolor: [{ hue: 245, range: 12, minSat: .3, to: cloth('shaman') }, { hue: 332, range: 12, minSat: .5, to: trim('shaman') }], idle: 'Idle', attack: 'Spellcast_Long' },
 };
-export const HERO_WALK = 'Walking_A', HERO_PUNCH = 'Unarmed_Melee_Attack_Punch_A';
+export const HERO_WALK = 'Walking_A', HERO_PUNCH = 'Unarmed_Melee_Attack_Punch_A', HERO_HIT = 'Hit_A';
 /** Todas as animações que o jogo usa. As demais são removidas dos arquivos publicados. */
-export const HERO_ANIMATIONS = [...new Set(['Idle', HERO_WALK, HERO_PUNCH, ...Object.values(HERO_STYLE).flatMap(s => [s.idle, s.attack])])];
+export const HERO_ANIMATIONS = [...new Set(['Idle', HERO_WALK, HERO_PUNCH, HERO_HIT, ...Object.values(HERO_STYLE).flatMap(s => [s.idle, s.attack])])];
 
-/** Penteados: cada opção usa a cabeça (com cabelo) de um corpo-base. 0 = o da classe. */
-export const HERO_HAIRSTYLES: { label: string; base: HeroBase | null }[] = [
-  { label: 'Da classe', base: null }, { label: 'Curto', base: 'knight' }, { label: 'Longo', base: 'rogue' }, { label: 'Repartido', base: 'mage' },
+/** Penteados: cada opção usa a cabeça (com cabelo) de um corpo-base, às vezes com um prendedor. 0 = o da classe. */
+export const HERO_HAIRSTYLES: { label: string; base: HeroBase | null; extra?: 'ponytail' | 'bun' }[] = [
+  { label: 'Da classe', base: null }, { label: 'Curto', base: 'knight' }, { label: 'Longo', base: 'rogue' }, { label: 'Repartido', base: 'mage' }, { label: 'Rabo de cavalo', base: 'knight', extra: 'ponytail' }, { label: 'Coque', base: 'mage', extra: 'bun' },
 ];
 /** Estrutura corporal muda a largura do herói. */
 export const BODY_WIDTH = [.9, .95, 1, 1.05, 1.1, 1.15];
 
 export interface HeroGear { head: boolean; chest: boolean; back: boolean }
-export interface HeroDress { outfit: 'rags' | 'class'; hat: string | null; cape: boolean; head: HeroBase }
+export interface HeroDress { outfit: 'rags' | 'class'; hat: string | null; cape: boolean; head: HeroBase; extra?: 'ponytail' | 'bun'; covered: boolean }
 /**
  * O iniciante veste roupas remendadas: sem elmo, sem capa e sem as cores da classe.
  * Peitoral traz as cores da classe; item de cabeça mostra o elmo (se o jogador quiser); capa vem com peitoral ou costas.
  */
 export function heroDress(classId: ClassId, gear: HeroGear, hairStyle: number, showHelmet: boolean): HeroDress {
   const base = HERO_STYLE[classId].base, parts = HERO_PARTS[base], helmet = gear.head && showHelmet;
-  const chosen = HERO_HAIRSTYLES[hairStyle]?.base ?? base;
+  const style = HERO_HAIRSTYLES[hairStyle], chosen = style?.base ?? base;
   return {
     outfit: gear.chest ? 'class' : 'rags',
     hat: helmet ? parts.helmet ?? null : null,
     cape: gear.chest || gear.back,
     head: helmet ? parts.hood ?? base : chosen,
+    ...(!helmet && style?.extra ? { extra: style.extra } : {}),
+    covered: helmet,
   };
 }
 
-/** Altura e largura relativas ao humano, a partir das formas já usadas pelo jogo. */
-export function heroProportions(race: Race) {
-  const form = RACE_FORM[race] ?? RACE_FORM.human, human = RACE_FORM.human;
-  return { height: form.height / human.height, width: Math.max(.85, Math.min(1.25, Math.sqrt(form.width / human.width))) };
-}
+/**
+ * Tamanho por raça, igual para heróis e NPCs: humano, elfo e orc têm a mesma altura;
+ * o anão é um pouco menor e o gnomo, um pouco menor que o anão. A largura dá a silhueta de cada raça.
+ */
+export const RACE_SIZE: Record<Race, { height: number; width: number }> = { human: { height: 1, width: 1 }, elf: { height: 1, width: .94 }, orc: { height: 1, width: 1.14 }, dwarf: { height: .86, width: 1.16 }, gnome: { height: .76, width: 1 } };
+export function heroProportions(race: Race) { return RACE_SIZE[race] ?? RACE_SIZE.human; }
 
 function hexToRgb(hex: string): [number, number, number] { const n = parseInt(hex.replace('#', ''), 16); return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255]; }
 function rgbToHsv(r: number, g: number, b: number): [number, number, number] { const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min; let h = 0; if (d) { if (max === r) h = ((g - b) / d) % 6; else if (max === g) h = (b - r) / d + 2; else h = (r - g) / d + 4; h *= 60; if (h < 0) h += 360; } return [h, max ? d / max : 0, max]; }
@@ -99,7 +101,9 @@ export const HAIR_RULES: Record<HeroBase, { hue: number; range: number; sat: [nu
 };
 export const RAGS_HUE = 30;
 
-export interface RecolorOptions { rags?: boolean; hair?: { base: HeroBase; color: string } }
+export interface RecolorOptions { rags?: boolean; hair?: { base: HeroBase; color: string }; eyes?: string }
+/** Olhos pintados do atlas: azul-acinzentado bem escuro, igual nas cinco cabeças. */
+export const isAtlasEye = (h: number, s: number, v: number) => h >= 188 && h <= 204 && s >= .24 && s <= .34 && v <= .22;
 /**
  * Recolore os pixels RGBA do atlas: pele pela raça, cabelo pela escolha do jogador,
  * roupa pela classe (ou tecido remendado) e, quando indicado, o metal da armadura.
@@ -111,10 +115,12 @@ export function recolorAtlas(data: Uint8ClampedArray, style: Pick<HeroStyle, 're
   const metal = style.metal ? rgbToHsv(...hexToRgb(style.metal)) : null;
   const hairRule = options.hair ? HAIR_RULES[options.hair.base] : null, hair = options.hair ? rgbToHsv(...hexToRgb(options.hair.color)) : null;
   const hairRef = hairRule ? [(hairRule.sat[0] + hairRule.sat[1]) / 2, (hairRule.val[0] + hairRule.val[1]) / 2] : [1, 1];
+  const eye = options.eyes ? rgbToHsv(...hexToRgb(options.eyes)) : null;
   for (let i = 0; i < data.length; i += 4) {
     const [h, s, v] = rgbToHsv(data[i] / 255, data[i + 1] / 255, data[i + 2] / 255);
     let out: [number, number, number] | null = null;
     if (isAtlasSkin(h, s, v)) out = hsvToRgb(sh, clamp(ss * (s / .37)), clamp(sv * (v / .96)));
+    else if (eye && isAtlasEye(h, s, v)) out = hsvToRgb(eye[0], clamp(Math.max(.35, eye[1])), clamp(Math.min(.46, eye[2] * .45 + v * 1.2)));
     else if (hairRule && hair && hueGap(h, hairRule.hue) <= hairRule.range && s >= hairRule.sat[0] && s <= hairRule.sat[1] && v >= hairRule.val[0] && v <= hairRule.val[1]) out = hsvToRgb(hair[0], clamp(hair[1] * (.7 + .3 * s / hairRef[0])), clamp(hair[2] * (.55 + .45 * v / hairRef[1])));
     else if (options.rags) { if (v > .06) out = hsvToRgb(RAGS_HUE + (h % 24 - 12) * .35, clamp(.34 + s * .22), clamp(.1 + v * .62)); }
     else if (metal && s < .16 && v > .28 && v < .9 && h > 150 && h < 240) out = hsvToRgb(metal[0], clamp(metal[1] * (.75 + v * .3)), clamp(metal[2] * (v / .57) * .92));

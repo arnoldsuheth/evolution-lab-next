@@ -30,3 +30,20 @@
 .experience-hud>small{display:block;font-size:11px;line-height:1.5;color:#d1e1ed}
 @media(max-width:700px){.equipment-icons .item-browser.has-selection{grid-template-columns:minmax(0,1fr)}.equipment-icons .item-detail-panel{grid-row:1;position:relative;top:auto;padding:14px}.equipment-icons .item-detail-art{width:100px;height:100px}.equipment-icons .item-icon-grid{grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px}.equipment-icons .item-icon{padding:5px;min-height:110px}.equipment-icons .tabs button{min-width:62px;min-height:58px}.equipment-icons .tabs small{font-size:10px}.experience-hud{padding:6px 9px}.experience-caption{font-size:11px}.experience-caption span,.experience-hud>small{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.experience-fill{transition:none}}
+/* 1.9 · Bônus em verde, perdas em vermelho; painel do item translúcido sobre a mochila. */
+.stat-good{color:#5fdc7a!important;font-weight:700}.stat-bad,.requirement-fail{color:#ff6b6b!important;font-weight:700}.stat-same{color:#c9d4da}
+.item-compare{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.item-compare b{font-size:12px}
+.item-attributes span.stat-good{background:#1f4a2c99;border:1px solid #5fdc7a66;border-radius:8px;padding:2px 7px}
+.equipment-icons .item-detail-panel{background:#163049d9!important;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid #f4d68a66;border-radius:14px}
+.aurora-currency{display:inline-flex;gap:6px;align-items:center}.aurora-currency .coin{display:inline-flex;align-items:center;gap:2px;font-weight:700}.reward-line{display:flex!important;align-items:center;gap:6px}
+/* Ferreiro: aprimorar Comum → Épico → Mítico */
+.forge h4{margin:14px 0 6px;font-size:15px;color:#ffe9a8}.forge-list{display:grid;gap:8px}
+.forge-card{display:grid;grid-template-columns:120px minmax(0,1fr);gap:10px;align-items:center;padding:10px;border-radius:12px;border:2px solid #b49bd4;background:#22224099}.forge-card.rarity-mitico{border-color:#f2c14e;background:#3a2a0a99}
+.forge-art{display:flex;align-items:center;gap:4px}.forge-art .game-artwork{width:50px;height:50px}.forge-card b{font-size:13px}
+.forge-cost{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0;font-size:11px}.forge-card button{min-height:38px;font-size:12px}
+.forge-professions{display:flex;flex-wrap:wrap;gap:6px}.forge-professions button{min-height:38px;font-size:12px;display:inline-flex;align-items:center;gap:4px}
+.item-icon.rarity-epico{border-color:#b49bd4!important;box-shadow:0 0 10px #b49bd466}.item-icon.rarity-mitico{border-color:#f2c14e!important;box-shadow:0 0 12px #f2c14e88}
+.item-icon.rarity-épico{border-color:#b49bd4!important;box-shadow:0 0 10px #b49bd466}.item-icon.rarity-mítico{border-color:#f2c14e!important;box-shadow:0 0 12px #f2c14e88}
+.nexus-panel{margin:14px 16px 0;padding:12px;border-radius:14px;border:2px solid #9fdbe6;background:#123a4acc}.nexus-panel h4{margin:0 0 6px;color:#bff3ff}.nexus-panel p{font-size:13px!important;margin:0 0 8px}
+.nexus-bar{position:relative;height:22px;border-radius:99px;background:#0c2633;border:1px solid #9fdbe666;overflow:hidden;margin-bottom:10px}.nexus-bar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#4fb3c8,#ffd86b)}.nexus-bar span{position:relative;display:block;text-align:center;font-size:11px;line-height:22px;color:#fff;text-shadow:0 1px 2px #000}
+.buff-indicator.aura{color:#ffe28a;border-color:#ffd86b}

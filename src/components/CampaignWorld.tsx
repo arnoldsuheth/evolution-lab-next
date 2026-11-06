@@ -3,14 +3,26 @@ import {enemyVitals} from '@/lib/combat';
 import {cursorOn} from "@/lib/cursor";
 import BiomeDetails from './BiomeDetails';
 import {Html} from '@react-three/drei';
+import {useRef,type ReactNode} from 'react';
+import {useFrame} from '@react-three/fiber';
+import * as THREE from 'three';
 
 import {MONSTERS,REGIONS,nextRegion} from '@/lib/campaign';
 import {INSTANCES,type InstanceId} from '@/lib/instances';
 import {useGame} from '@/lib/store';
 import MonsterModel from './MonsterModel';
+/** Reação do monstro: treme ao levar golpe e avança quando ataca de volta. */
+function Reacting({x,z,reduced,children}:{x:number;z:number;reduced:boolean;children:ReactNode}){
+ const root=useRef<THREE.Group>(null);
+ useFrame(()=>{const g=root.current;if(!g)return;const e=useGame.getState().battleEvent;const age=e?(Date.now()-e.time)/1000:9;if(reduced||!e||Math.abs(e.x-x)>.01||Math.abs(e.z-z)>.01||age>1){g.position.set(0,0,0);g.scale.setScalar(1);return;}
+  const hit=age<.35?Math.sin(age*60)*.12*(1-age/.35):0,squash=age<.25?1-Math.sin(age/.25*Math.PI)*.12:1;
+  const lunge=e.received>0&&age>.35&&age<.8?Math.sin((age-.35)/.45*Math.PI)*.9:0,dx=e.hx-x,dz=e.hz-z,len=Math.hypot(dx,dz)||1;
+  g.position.set(hit+dx/len*lunge,0,dz/len*lunge);g.scale.set(1/squash,squash,1/squash);});
+ return <group ref={root}>{children}</group>;
+}
 export default function CampaignWorld({paused,approach}:{paused:boolean;approach:(id:string)=>void}){
- const enemy=useGame(s=>s.encounter);const hero=useGame(s=>s.hero),reduced=useGame(s=>s.settings.reduceMotion),next=nextRegion(hero.region);
- const monsters=MONSTERS.filter(m=>m.region===hero.region&&(m.instance??null)===(hero.instance??null)&&(!hero.instance||!hero.instanceProgress?.includes(m.id))).map(m=>{const active=enemy?.monsterId===m.id?enemy:undefined,vitals=active??enemyVitals(m.kind,m.level,m.boss),near=Math.hypot(hero.position[0]-m.x,hero.position[1]-m.z)<6;return <group key={m.id} position={[m.x,0,m.z]} {...cursorOn("combat")} onClick={e=>{if(paused||e.delta>6||e.button!==0)return;e.stopPropagation();approach(m.id);}}><MonsterModel kind={m.kind} boss={m.boss} reduced={reduced}/><Html zIndexRange={[6,0]} position={[0,m.boss?4.4:2.8,0]} center style={{pointerEvents:'none'}}><div className={`monster-vitals ${active?'targeted':''}`} aria-label={`${m.name}, nível ${active?.level??m.level}`}>
+ const enemy=useGame(s=>s.encounter),target=useGame(s=>s.target);const slain=useGame(s=>s.slain),now=useGame(s=>s.now);const hero=useGame(s=>s.hero),reduced=useGame(s=>s.settings.reduceMotion),next=nextRegion(hero.region);
+ const monsters=MONSTERS.filter(m=>m.region===hero.region&&(m.instance??null)===(hero.instance??null)&&(!hero.instance||!hero.instanceProgress?.includes(m.id))&&(slain[m.id]??0)<=now).map(m=>{const active=enemy?.monsterId===m.id?enemy:undefined,vitals=active??enemyVitals(m.kind,m.level,m.boss),near=Math.hypot(hero.position[0]-m.x,hero.position[1]-m.z)<6||target===m.id;return <group key={m.id} position={[m.x,0,m.z]} {...cursorOn("combat")} onClick={e=>{if(paused||e.delta>6||e.button!==0)return;e.stopPropagation();approach(m.id);}}><Reacting x={m.x} z={m.z} reduced={reduced}><MonsterModel kind={m.kind} boss={m.boss} reduced={reduced}/></Reacting>{(target===m.id||active)&&<mesh rotation={[-Math.PI/2,0,0]} position={[0,.06,0]}><ringGeometry args={[m.boss?1.9:1.2,m.boss?2.15:1.4,40]}/><meshBasicMaterial color={active?'#ff5a4a':'#ffd24a'} transparent opacity={.85} depthWrite={false}/></mesh>}<Html zIndexRange={[6,0]} position={[0,m.boss?4.4:2.8,0]} center style={{pointerEvents:'none'}}><div className={`monster-vitals ${active?'targeted':''}`} aria-label={`${m.name}, nível ${active?.level??m.level}`}>
  {(near||active||m.boss)&&<strong>{m.boss?'◆ ':''}{m.name} <small>{active?.level??m.level}</small></strong>}
  <div className="world-resource health" role="meter" aria-label="HP" aria-valuemin={0} aria-valuemax={vitals.maxHp} aria-valuenow={active?.hp??vitals.maxHp}><i style={{width:`${(active?.hp??vitals.maxHp)/vitals.maxHp*100}%`}}/><span>HP</span></div>
  <div className={`world-resource ${vitals.resource}`} role="meter" aria-label={vitals.resource==='mp'?'MP':'Estamina'} aria-valuemin={0} aria-valuemax={vitals.resourceMax??100} aria-valuenow={vitals.resourceCurrent??100}><i style={{width:`${(vitals.resourceCurrent??100)/(vitals.resourceMax??100)*100}%`}}/><span>{vitals.resource==='mp'?'MP':'STA'}</span></div>

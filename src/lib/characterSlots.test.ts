@@ -25,3 +25,11 @@ test('an empty active slot never hides meaningful campaigns from sync protection
  const next=selectCharacter(state,3);
  assert.equal(next.hero.created,false);assert.equal(hasJourney(next),true);
 });
+import {deleteCharacter as removeSlot} from './characterSlots';
+test('excluir personagem esvazia só aquele espaço e mantém as configurações',()=>{
+ const base=freshSave();base.hero={...base.hero,created:true,name:'Primeiro'};base.settings={...base.settings,volume:.7};
+ const two=selectCharacter(base,1);two.hero={...two.hero,created:true,name:'Segundo'};
+ const afterOther=removeSlot(two,0);assert.equal(characterSlots(afterOther).slots[0],null);assert.equal(afterOther.hero.name,'Segundo','o ativo continua');
+ const afterActive=removeSlot(two,1);assert.equal(afterActive.hero.created,false,'o ativo vira espaço vazio');assert.equal(characterSlots(afterActive).slots[0]?.hero.name,'Primeiro');assert.equal(afterActive.settings.volume,.7);
+ assert.throws(()=>removeSlot(two,9));
+});
