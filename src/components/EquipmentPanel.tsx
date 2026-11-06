@@ -1,7 +1,7 @@
 "use client";
 import WorkshopServices from "./WorkshopServices";
 import {currency} from "@/lib/economy";
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useGame } from '@/lib/store';
 import {ItemArtwork} from './GameArtwork';
 import { ITEMS,CLASSES,stats } from '@/lib/game';
@@ -29,7 +29,8 @@ export default function EquipmentPanel({shop=false,vendor="borin"}:{shop?:boolea
  }).sort((a,b)=>a.minLevel-b.minLevel||a.name.localeCompare(b.name,'pt-BR'));
  const pages=Math.max(1,Math.ceil(matching.length/24)),safePage=Math.min(page,pages-1),entries=matching.slice(safePage*24,safePage*24+24);
  const inspectedItem=matching.find(item=>item.id===inspected);
- const inspect=(id:string)=>{setInspected(id);requestAnimationFrame(()=>{detail.current?.focus({preventScroll:true});detail.current?.scrollIntoView({block:'nearest'});});};
+ useEffect(()=>{if(!inspectedItem)return;detail.current?.focus({preventScroll:true});detail.current?.scrollIntoView({block:'center'});},[inspectedItem]);
+ const inspect=(id:string)=>setInspected(id);
  const select=(setter:(v:string)=>void)=>(e:React.ChangeEvent<HTMLSelectElement>)=>{setter(e.target.value);setPage(0);};
  const renderDetails=(item:typeof ITEMS[string])=>{const owned=countItem(inventory,item.id),equipped=hero.equipped.includes(item.id),reason=itemRequirement(hero,item);const previous=gear.find(i=>i.slot===item.slot||['weapon','twohand'].includes(i.slot)&&['weapon','twohand'].includes(item.slot));const fee=item.ingredients?Math.max(item.sellPrice+1,Math.ceil((item.craftGold??0)*(1-limits.craftDiscount/100))):0;const missing=Object.entries(item.ingredients??{}).some(([id,n])=>countItem(inventory,id)<n)||hero.materials<(item.recipe??0)||hero.gold<fee;return <><span className="eyebrow">{item.rarity} · {CATEGORY_NAMES[item.category]}</span><h4><button className="item-name" onClick={()=>inspect(item.id)}>{item.name}</button></h4><div className="item-requirements"><b className={hero.level<item.minLevel?'requirement-fail':''}>Nível {item.minLevel}+</b><span>{item.classId?CLASSES[item.classId].name:item.classes?item.classes.map(c=>CLASSES[c].name).join(' / '):'Universal'}</span><span>{SLOT_NAMES[item.slot]}{item.armor?` · ${item.armor}`:''}</span></div><p>{item.description}</p><div className="item-attributes">{item.power>0&&<span>+{item.power} ATQ</span>}{item.defense>0&&<span>+{item.defense} DEF</span>}{!!item.hp&&<span>+{item.hp} HP</span>}{!!item.mp&&<span>+{item.mp} MP</span>}{!!item.companion&&<span>+{item.companion} companheiro</span>}</div>{isEquipment(item)&&!equipped&&<small>Comparação: {item.power-(previous?.power??0)>=0?'+':''}{item.power-(previous?.power??0)} ATQ · {item.defense-(previous?.defense??0)>=0?'+':''}{item.defense-(previous?.defense??0)} DEF</small>}{isEquipment(item)&&owned>0&&<small>Condição: {hero.durability?.[item.id]??100}%</small>}{owned>0&&<small>{owned} na mochila{equipped?' · equipado':''}</small>}{reason&&<span className="requirement-fail">{reason}</span>}
  {view==='forge'&&<div className="recipe-list">{item.profession&&!hero.professions?.[item.profession]&&<small className="requirement-fail">Aprenda o ofício de aprendiz com Borin.</small>}{Object.entries(item.ingredients??{}).map(([id,n])=><small key={id} className={countItem(inventory,id)<n?'requirement-fail':''}>{ITEMS[id]?.name}: {countItem(inventory,id)} / {n}</small>)}{!!item.recipe&&<small>Fragmentos: {hero.materials} / {item.recipe}</small>}<small>Custo: {fee} bronze</small>{!completed.includes('arithmetic')&&<small>Conclua O armazém de Borin para usar a forja.</small>}</div>}

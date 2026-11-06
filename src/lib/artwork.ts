@@ -21,7 +21,7 @@ export function artworkForItem(item:Item):ArtCrop|undefined{
  if(weapons[v])return weapons[v];
  if(item.category==='armor'&&item.slot==='chest')return armor[item.classId??'warrior'];
  if(item.slot==='head')return item.classId==='mage'?equipment(415,470,170,98):item.classId==='hacker'?equipment(1020,478,147,127):equipment(208,99,139,123);
- if(item.slot==='feet')return equipment(18,337,156,91);
+ if(item.slot==='feet')return equipment(18,337,85,91);
  return undefined;
 }
 export const CLASS_CROPS:Record<ClassId,ArtCrop>=Object.fromEntries((['paladin','warrior','hunter','engineer','mage','hacker','prophet','duelist','shaman'] as ClassId[]).map((id,i)=>[id,{sheet:'classes',x:[95,500,900][i%3],y:[128,520,935][Math.floor(i/3)],w:210,h:210}])) as Record<ClassId,ArtCrop>;
