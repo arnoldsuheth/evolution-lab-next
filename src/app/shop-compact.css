@@ -1,0 +1,86 @@
+/* Loja: comprar e vender lado a lado, preços com moedas coloridas e comparação no card.
+   Telas baixas (celular deitado) ganham cabeçalho, abas e cards compactos para mostrar mais itens. */
+.shop-split{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:8px;min-height:0;height:100%}
+.shop-side{display:flex;flex-direction:column;min-height:0;border:1px solid #2f4a57;border-radius:10px;padding:6px;background:#0d1b23}
+.shop-side.shop-bag{background:#10211b;border-color:#2e5443}
+.shop-side h3{display:flex;align-items:baseline;gap:6px;margin:0 0 5px;font-size:13px;line-height:1.2;color:#f0e2bd}
+.shop-side h3 small{font-size:10.5px;font-weight:500;color:#9fb8c2}
+.shop-side .item-icon-grid{flex:1;min-height:0;overflow-y:auto}
+.equipment-icons .shop-browser,.equipment-icons .shop-browser.has-selection{grid-template-columns:1fr!important;position:relative}
+.equipment-icons .shop-browser .item-detail-panel{position:absolute!important;top:0;right:0;bottom:0;width:min(290px,62%);max-height:none!important;z-index:6;box-shadow:-10px 0 24px #02080ccc;border-radius:10px}
+.item-delta{display:inline-block;font-size:10px;font-weight:800;line-height:1.3;padding:0 4px;border-radius:5px;background:#08141bcc;white-space:nowrap}
+.item-delta.stat-good{color:#7ee08f}.item-delta.stat-bad{color:#ff8f80}.item-delta.stat-same{color:#b8c6cc}
+.equipment-icons .item-icon-price .aurora-currency{display:inline-flex;gap:3px;font-size:10.5px;font-weight:700}
+.equipment-icons .item-icon-price .aurora-currency svg{width:12px;height:12px;vertical-align:-2px}
+.item-actions .aurora-currency{display:inline-flex;gap:3px;vertical-align:middle}
+.item-actions .aurora-currency svg{width:14px;height:14px}
+.shop-quests{overflow:auto;min-height:0;padding:4px 2px}
+@media (max-width:620px) and (orientation:portrait){
+ .shop-split{grid-template-columns:1fr;grid-template-rows:minmax(0,1.2fr) minmax(0,1fr)}
+ .equipment-icons .shop-browser .item-detail-panel{width:100%;top:auto;height:70%}
+}
+@media (orientation:landscape) and (max-height:540px){
+ .modal:has(>.equipment-panel)>.modal-head{min-height:34px!important;padding:2px 8px 2px 12px!important}
+ .modal:has(>.equipment-panel)>.modal-head h2{font-size:15px!important}
+ .modal:not(.creator-modal):has(>.equipment-panel)>.modal-head .icon-button{min-width:34px!important;min-height:34px!important;width:34px!important;height:34px!important;flex:0 0 34px!important}
+ .equipment-icons .inventory-toolbar{min-height:0;gap:6px}
+ .equipment-icons .inventory-toolbar .tabs button{min-height:34px!important;padding:2px 8px!important}
+ .equipment-icons .inventory-toolbar .tabs button>span{font-size:15px}
+ .equipment-icons .inventory-toolbar .inventory-search{min-height:34px;min-width:34px;height:34px;width:34px}
+ .equipment-icons .catalogue-summary{display:none}
+ .equipment-icons .catalogue-pagination{min-height:0;padding:2px 0;gap:8px}
+ .equipment-icons .catalogue-pagination button{min-height:30px!important;padding:2px 10px!important;font-size:12px}
+ .equipment-icons .catalogue-pagination span{font-size:11px}
+ .equipment-icons .progression-help{display:none}
+ .equipment-icons .item-icon-grid{grid-template-columns:repeat(auto-fill,minmax(64px,1fr))!important;gap:5px!important}
+ .equipment-icons .item-icon{min-height:0!important;padding:3px 3px 4px!important;gap:1px!important}
+ .equipment-icons .item-icon-art{width:34px!important;height:34px!important}
+ .equipment-icons .item-icon-name{-webkit-line-clamp:1!important;height:1.3em!important;font-size:9.5px!important;line-height:1.3!important}
+ .equipment-icons .item-icon-stats{height:auto!important;font-size:9px!important;line-height:1.2}
+ .equipment-icons .item-icon-price{height:auto!important}
+ .equipment-icons .item-icon-price .aurora-currency{font-size:9.5px}
+ .equipment-icons .item-icon-price .aurora-currency svg{width:10px;height:10px}
+ .item-delta{font-size:9px}
+ .shop-side{padding:4px 5px}.shop-side h3{font-size:12px;margin-bottom:3px}
+ .equipment-icons .item-detail-panel{padding:30px 10px 10px!important}
+ .equipment-icons .item-detail-panel h4{font-size:14px!important}
+ .equipment-icons .item-detail-panel p{font-size:11.5px!important;margin:4px 0!important}
+}
+
+/* Quantidade e "equipado" ficam nos cantos, pequenos, sem cobrir a imagem do item. */
+.equipment-icons .item-icon{position:relative}
+.equipment-icons .item-icon .item-icon-count,.equipment-icons .item-icon .item-icon-equipped{top:2px;right:2px;left:auto;padding:0 3px;border-radius:4px;font-size:9px;line-height:1.35;font-weight:700;background:#0b1a24e6;box-shadow:0 0 0 1px #ffffff22;z-index:3}
+.equipment-icons .item-icon .item-icon-equipped{right:auto;left:2px;background:#2f6b45e6;color:#e9ffe9}
+.equipment-icons .item-icon-art{margin-top:4px}
+
+/* Diário e demais janelas em celular deitado: abas e avisos mais baixos, títulos menores. */
+@media (orientation:landscape) and (max-height:540px){
+ .modal>.modal-head{min-height:36px!important;padding-top:2px!important;padding-bottom:2px!important}
+ .modal>.modal-head h2{font-size:15px!important}
+ .modal .lesson-nav{padding:5px 8px!important;gap:6px!important}
+ .modal .lesson-nav>button{width:auto!important;max-width:170px;min-height:34px!important;padding:3px 8px!important;font-size:11px}
+ .modal .lesson-nav>button small{font-size:9.5px}
+ .modal .delivery-banner{padding:4px 10px!important;gap:8px;min-height:0!important}
+ .modal .delivery-banner b{font-size:18px!important}
+ .modal .delivery-banner p{font-size:12px!important;margin:0}
+ .modal .delivery-banner button{min-height:32px!important;padding:2px 10px!important;font-size:12px}
+ .modal:not(.creator-modal)>.modal-head .icon-button{min-width:34px!important;min-height:34px!important;width:34px!important;height:34px!important;flex:0 0 34px!important}
+ .modal .lesson-content{padding-top:8px!important}
+ .modal .lesson-content>.delivery-banner{margin:0 0 6px!important}
+ .modal .lesson-content>.eyebrow{margin:2px 0 0!important}
+ .modal .lesson-content>h3{font-size:19px!important;line-height:1.2;margin:2px 0 6px!important}
+}
+
+/* Categorias sempre visíveis e nível de uso em cada card. */
+.category-chips{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;flex:none;padding:2px 0 4px}
+.category-chips::-webkit-scrollbar{display:none}
+.category-chips button{flex:none;min-height:32px;padding:3px 11px;border-radius:999px;border:1px solid #3b5866;background:#102631;color:#cfe0e6;font-size:12px;font-weight:600;white-space:nowrap}
+.category-chips button.active{background:#e8c86a;border-color:#e8c86a;color:#1a1408}
+.item-icon-meta{display:flex;align-items:center;justify-content:center;gap:3px;flex-wrap:wrap;min-height:1.2em}
+.item-level{font-size:9.5px;font-weight:800;line-height:1.3;padding:0 4px;border-radius:5px;background:#203846;color:#d7e7ee;white-space:nowrap}
+.item-level.requirement-fail{background:#4a1f1f;color:#ffb3a8}
+@media (orientation:landscape) and (max-height:540px){
+ .category-chips{padding:0 0 3px;gap:4px}
+ .category-chips button{min-height:28px;padding:1px 9px;font-size:11px}
+ .item-level{font-size:8.5px}
+}
