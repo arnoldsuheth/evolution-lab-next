@@ -7,6 +7,7 @@ import "./adventure.css";
 import "./item-icons.css";
 import "./compact-hud.css";
 import "./combat-ui.css";
+import "./interface-refinement.css";
 import {CloudRuntime,CloudGate} from "@/components/CloudAccount";
 
 const base = process.env.GITHUB_PAGES === "true" ? "/evolution-lab-next" : "";
@@ -32,4 +33,5 @@ export default function RootLayout({
     </html>
   );
 }
+
 

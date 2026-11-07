@@ -1,0 +1,71 @@
+/* Equipment workspace: each column scrolls without displacing the selected item. */
+.modal:has(>.equipment-panel){display:flex;flex-direction:column;width:min(1120px,96vw)!important;height:min(760px,calc(100dvh - 36px));overflow:hidden;background:rgb(22 47 64 / .95);border:1px solid #d7c38b77;box-shadow:0 12px 40px #08151c66}
+.modal:has(>.equipment-panel)>.modal-head{position:relative;flex:none;min-height:52px;padding:6px 14px!important;border-bottom-width:1px}
+.modal:has(>.equipment-panel)>.modal-head .eyebrow{display:none}
+.modal:has(>.equipment-panel)>.modal-head h2{font-size:19px;margin:0}
+.modal>.equipment-panel{flex:1;display:flex;flex-direction:column;min-height:0;padding:10px 14px!important;overflow:hidden;gap:6px}
+.inventory-toolbar{display:flex;align-items:center;gap:10px;flex:none;min-width:0}
+.inventory-toolbar .tabs{margin:0;padding:0;border:0;gap:4px;flex-wrap:nowrap;min-width:0}
+.equipment-icons .inventory-toolbar .tabs button{display:flex;flex-direction:row;align-items:center;gap:5px;min-height:44px!important;min-width:44px!important;padding:5px 9px!important;border-radius:7px}
+.inventory-toolbar .tabs button>span{font-size:20px}.inventory-toolbar .tabs small{font-size:11px}
+.inventory-toolbar .currency{margin-left:auto;white-space:nowrap;font-size:12px}
+.inventory-search{flex:none;min-width:44px;min-height:44px;padding:0;font-size:26px;border:1px solid #d7c38b55;background:#18364999}
+.equipment-icons .inventory-filters{margin:0;flex:none;max-height:32dvh;overflow:auto;border:1px solid #a7bac144;border-radius:7px;padding:8px}
+.equipment-icons .inventory-filters[hidden]{display:none!important}
+.equipment-icons .catalogue-summary{flex:none;margin:0;padding:3px 0 5px;gap:6px;font-size:11px;border-bottom:1px solid #c4c9c52b}
+.equipment-icons .catalogue-summary>span:first-child{display:inline}
+.equipment-icons .unified-inventory{flex:1;min-height:0;min-width:0;overflow:hidden}
+.equipment-icons .unified-inventory.with-loadout{display:grid;grid-template-columns:174px minmax(0,1fr);gap:10px;align-items:stretch}
+.equipment-icons .inventory-loadout{position:relative;top:auto;min-height:0;overflow:auto;overscroll-behavior:contain;padding:6px;scrollbar-width:thin}
+.inventory-loadout .loadout-slots button{min-height:50px;border:1px solid #c1c8bd44;box-shadow:none}
+.inventory-loadout .loadout-slots small{font-size:9px;line-height:1.15}
+.slot-silhouette{display:block;width:28px;height:28px;margin:auto;color:#afc2cb;opacity:.8}
+.equipment-icons .item-browser{height:100%;min-height:0;gap:10px;align-items:stretch}
+.equipment-icons .item-browser.has-selection,.equipment-icons .with-loadout .item-browser.has-selection{grid-template-columns:minmax(150px,1fr) minmax(220px,260px)}
+.equipment-icons .item-icon-grid{min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:3px;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:7px;align-content:start}
+.equipment-icons .item-icon{min-height:134px;padding:5px;gap:4px;box-shadow:0 1px 3px #08151c33;align-self:start}
+.equipment-icons .item-icon-art{width:56px;height:56px;aspect-ratio:1;flex:none;max-width:100%}
+.equipment-icons .item-icon-name{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;height:2.7em;line-height:1.35;font-size:11px;overflow-wrap:normal;max-width:100%}
+.equipment-icons .item-icon-stats{font-size:10px;height:2.5em;display:flex;align-items:center;justify-content:center;line-height:1.25}
+.equipment-icons .item-icon-price{font-size:10px;height:1.3em;padding:0;line-height:1.3}
+.equipment-icons .item-detail-panel,.equipment-icons .with-loadout .item-detail-panel{grid-row:auto;position:relative;top:auto;max-height:100%;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:36px 10px 8px;background:#163049f2!important;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none}
+.equipment-icons .item-detail-panel h4{font-size:16px;margin:6px 0}.equipment-icons .item-detail-panel p{font-size:12px;line-height:1.4;margin:7px 0}
+.equipment-icons .item-detail-panel .item-attributes{gap:4px}.equipment-icons .item-detail-panel .item-requirements{font-size:11px;gap:5px}
+.equipment-icons .item-detail-art{width:72px;height:72px;margin-bottom:6px}
+.compare-pieces .game-artwork{width:52px;height:52px}.compare-pieces strong{font-size:11px}.compare-pieces>div{padding:4px}
+.compare-numbers>div{font-size:12px;font-variant-numeric:tabular-nums}
+.equipment-icons .item-actions:has(button){position:sticky;bottom:-8px;padding:4px 0;background:#163049;z-index:2}
+.equipment-icons .item-actions button{margin-top:0!important;min-height:44px!important}
+.equipment-icons .catalogue-pagination{flex:none;gap:12px;margin:0;padding:2px 0;font-size:11px}.catalogue-pagination button{min-height:44px;padding:4px 10px}
+.equipment-icons .progression-help{flex:none;max-height:100px;overflow:auto;margin:0;font-size:11px}.equipment-icons .progression-help summary{min-height:30px;cursor:pointer}
+.equipment-icons>.small-note{flex:none;max-height:44px;overflow:auto;margin:0}
+.equipment-icons>.character-sheet{overflow:auto;min-height:0}
+.equipment-icons .empty-state{grid-column:1/-1;font-size:13px;padding:18px 8px;line-height:1.5}
+/* Restrained exploration panels; the saved opacity preference still applies. */
+.game-shell .hero-card,.game-shell .quest-tracker{background:rgb(16 35 47 / calc(var(--panel-opacity,.92) * .78));border:1px solid #d7c38b66;box-shadow:0 3px 12px #07151c33;backdrop-filter:none}
+.game-shell .hero-card{padding:7px 9px;border-radius:10px}.hero-card-header .portrait{width:30px;height:30px}.hero-card-header{min-height:34px;padding-bottom:3px}.hero-card-header strong{font-size:13px}.hero-card-header small{font-size:10px}.hero-card>.meter{height:12px;margin:3px 0}.hero-card-footer{border:0;padding-top:3px}
+.game-shell .quest-tracker{padding:8px 10px;width:190px;border-radius:9px}.quest-tracker .quest-toggle{float:right;width:32px;min-width:32px;min-height:32px;padding:2px;margin:0 0 2px 4px;font-size:16px;border:0;box-shadow:none;background:#10233055}.quest-tracker h3{font-size:15px;margin:3px 0 5px}.quest-tracker p{font-size:12px;line-height:1.4;margin:4px 0}.quest-tracker .text-button{min-height:32px;font-size:11px;padding:2px 0}.quest-extra{clear:both;font-size:11px}.quest-extra>summary{cursor:pointer;min-height:32px;display:list-item;align-content:center;color:#d6e0df}.quest-extra .quest-counter{display:flex!important;padding:5px 0;font-size:10px}.quest-extra .quest-tracker-list{margin:3px 0;padding-top:4px}
+.game-shell:has(>.modal-shade)>.hud-block:not(.hud-editing){opacity:.2;pointer-events:none}
+@media(min-width:601px) and (orientation:landscape){
+ .modal:has(>.equipment-panel){width:min(1120px,calc(100dvw - env(safe-area-inset-left) - env(safe-area-inset-right) - 20px))!important;max-width:calc(100dvw - env(safe-area-inset-left) - env(safe-area-inset-right) - 20px)!important;height:min(760px,calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px))}
+}
+@media(max-height:540px) and (orientation:landscape){
+ .modal:has(>.equipment-panel)>.modal-head{min-height:44px!important;padding:3px 10px!important}.modal>.equipment-panel{padding:5px 8px!important;gap:3px}
+ .equipment-icons .unified-inventory.with-loadout{grid-template-columns:148px minmax(0,1fr);gap:7px}
+ .equipment-icons .item-browser.has-selection,.equipment-icons .with-loadout .item-browser.has-selection{grid-template-columns:minmax(135px,1fr) 215px;gap:7px}
+ .equipment-icons .inventory-toolbar .tabs button{padding:3px 6px!important;min-height:44px!important}.inventory-toolbar .tabs small{font-size:10px}.inventory-toolbar .currency{font-size:10px}
+ .equipment-icons .item-icon-grid{grid-template-columns:repeat(auto-fill,minmax(66px,1fr))!important;gap:5px}.equipment-icons .item-icon{min-height:122px!important;padding:4px}.equipment-icons .item-icon-art{width:44px;height:44px}.equipment-icons .item-icon-name{font-size:10px}
+ .inventory-loadout .loadout-slots button{min-height:44px}.inventory-loadout .loadout-slots .game-artwork,.slot-silhouette{width:25px;height:25px}.inventory-loadout .loadout-slots small{font-size:8px}
+ .equipment-icons .progression-help{display:none}.equipment-icons .catalogue-pagination button{min-height:36px}.equipment-icons .catalogue-summary{font-size:10px;padding:1px 0}
+ .game-shell .quest-tracker p{display:block!important;font-size:11px;line-height:1.3}.quest-tracker .quest-toggle{min-height:32px!important}.quest-extra>summary{min-height:32px}
+}
+@media(max-width:600px){
+ .inventory-toolbar{gap:4px;flex-wrap:wrap}.inventory-toolbar .currency{font-size:10px}.equipment-icons .inventory-toolbar .tabs button{padding:4px!important}.inventory-toolbar .tabs small{font-size:10px}
+ .equipment-icons .unified-inventory.with-loadout{grid-template-columns:120px minmax(0,1fr);gap:5px}
+ .equipment-icons .item-browser.has-selection,.equipment-icons .with-loadout .item-browser.has-selection{grid-template-columns:1fr;grid-template-rows:minmax(100px,1fr) minmax(140px,1fr)}
+ .equipment-icons .item-detail-panel{grid-row:2}.equipment-icons .catalogue-pagination{gap:5px}.equipment-icons .catalogue-pagination button{font-size:10px}
+}
+
+.inventory-workshop{flex:none;max-height:35dvh;overflow:auto;font-size:12px}.inventory-workshop>summary{min-height:44px;cursor:pointer;align-content:center}
+.inventory-loadout .loadout-slots .selected{outline-offset:-2px}
+@media(pointer:coarse){.equipment-icons .catalogue-pagination button,.equipment-icons .progression-help summary{min-height:44px}}

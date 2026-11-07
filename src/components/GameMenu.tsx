@@ -12,8 +12,7 @@ export const MENU_ITEMS:{id:MenuPanel;label:string;icon:string;hint:string}[]=[
  {id:'journey',label:'Jornada',icon:'◇',hint:'Missões, IA e promoção'},
  {id:'adventure',label:'Aventura',icon:'★',hint:'Do dia, conquistas, mascotes'},
  {id:'map',label:'Mapa',icon:'⌖',hint:'Atlas da Aurora'},
- {id:'bag',label:'Mochila',icon:'▣',hint:'Itens e equipamento'},
- {id:'character',label:'Personagem',icon:'♙',hint:'Atributos e aparência'},
+ {id:'bag',label:'Personagem',icon:'♙',hint:'Mochila, equipamento e atributos'},
  {id:'talents',label:'Talentos',icon:'✧',hint:'Habilidades da classe'},
  {id:'academy',label:'Estudos',icon:'⌘',hint:'Projetos de carreira'},
  {id:'ancestors',label:'Legado',icon:'♜',hint:'Antepassados'},
@@ -40,3 +39,4 @@ export default function GameMenu({hidden=false,open:openPanel,keys,rest,canRest,
   </div>}
  </div>;
 }
+
