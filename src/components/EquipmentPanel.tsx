@@ -34,9 +34,10 @@ function EquipmentComparison({item}:{item:Item}){
  const hero=useGame(s=>s.hero);
  if(!isEquipment(item))return null;
  const occupied=item.slot==='twohand'?['weapon','offhand','twohand']:item.slot==='weapon'||item.slot==='offhand'?[item.slot,'twohand']:[item.slot];
- const worn=activeEquipment(hero,ITEMS).filter(piece=>occupied.includes(piece.slot));
+ const worn=hero.equipped.filter(id=>hero.inventory.includes(id)).map(id=>ITEMS[id]).filter(piece=>piece&&occupied.includes(piece.slot));
+ const effective=activeEquipment(hero,ITEMS).filter(piece=>occupied.includes(piece.slot));
  const fields=[['power','ATQ'],['defense','DEF'],['hp','HP'],['mp','MP'],['companion','PET']] as const;
- return <section className="equipment-comparison" aria-label="Comparação com o equipamento atual"><div className="compare-pieces"><div><small>Equipado</small>{worn.length?worn.map(piece=><div key={piece.id}><ItemArtwork item={piece}/><strong>{piece.name}</strong></div>):<p>Slot vazio</p>}</div><div><small>Selecionado</small><ItemArtwork item={item}/><strong>{item.name}</strong></div></div><div className="compare-numbers">{fields.map(([key,label])=>{const before=worn.reduce((sum,piece)=>sum+(piece[key]??0),0),after=item[key]??0,delta=after-before;return <div key={key}><span>{label}</span><span>{before} → {after}</span><b className={delta>0?'stat-good':delta<0?'stat-bad':'stat-same'}>{delta>0?'+':''}{delta}</b></div>;})}</div>{item.slot==='twohand'&&<small>Esta arma substitui as duas mãos.</small>}</section>;
+ return <section className="equipment-comparison" aria-label="Comparação com o equipamento atual"><div className="compare-pieces"><div><small>Equipado</small>{worn.length?worn.map(piece=><div key={piece.id}><ItemArtwork item={piece}/><strong>{piece.name}</strong>{!effective.some(active=>active.id===piece.id)&&<small>Sem bônus ativo</small>}</div>):<p>Slot vazio</p>}</div><div><small>Selecionado</small><ItemArtwork item={item}/><strong>{item.name}</strong></div></div><div className="compare-numbers">{fields.map(([key,label])=>{const before=effective.reduce((sum,piece)=>sum+(piece[key]??0),0),after=item[key]??0,delta=after-before;return <div key={key}><span>{label}</span><span>{before} → {after}</span><b className={delta>0?'stat-good':delta<0?'stat-bad':'stat-same'}>{delta>0?'+':''}{delta}</b></div>;})}</div>{item.slot==='twohand'&&<small>Esta arma substitui as duas mãos.</small>}</section>;
 }
 
 export default function EquipmentPanel({shop=false,vendor="borin",edit=()=>{}}:{shop?:boolean;vendor?:"borin"|"elara"|"dorin"|"mira";edit?:()=>void}){
