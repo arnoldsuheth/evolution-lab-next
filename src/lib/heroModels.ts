@@ -21,6 +21,23 @@ export const HERO_PARTS: Record<HeroBase, { head: string; cape: string; helmet?:
 };
 export const HERO_HAT_MESHES = ['Knight_Helmet', 'Barbarian_Hat', 'Mage_Hat'];
 
+/** Peça 3D (de qualquer corpo-base: todos usam o mesmo esqueleto) que mostra o item igual ao ícone. */
+export interface BorrowedMesh { mesh: string; base: HeroBase }
+/** Arma da mão principal pelo desenho do item. Sem peça pronta (martelo, arco, arma de fogo...), usa o modelo simples. */
+export const WEAPON_MESH: Record<string, BorrowedMesh> = {
+  sword: { mesh: '1H_Sword', base: 'knight' }, greatsword: { mesh: '2H_Sword', base: 'knight' }, dagger: { mesh: 'Knife', base: 'rogue' },
+  axe: { mesh: '1H_Axe', base: 'barbarian' }, staff: { mesh: '2H_Staff', base: 'mage' }, wand: { mesh: '1H_Wand', base: 'mage' }, crossbow: { mesh: '2H_Crossbow', base: 'rogue' },
+};
+export const OFFHAND_MESH: Record<string, BorrowedMesh> = {
+  shield: { mesh: 'Badge_Shield', base: 'knight' }, sword: { mesh: '1H_Sword_Offhand', base: 'knight' }, dagger: { mesh: 'Knife_Offhand', base: 'rogue' },
+};
+/** Item de cabeça: chapéu de mago, capuz ou elmo de cavaleiro — a mesma regra do ícone. */
+export type HeadLook = 'mage_hat' | 'hood' | 'helmet';
+export function headLook(classId?: ClassId): HeadLook {
+  return classId && ['mage', 'prophet', 'shaman'].includes(classId) ? 'mage_hat' : classId && ['hacker', 'hunter', 'duelist'].includes(classId) ? 'hood' : 'helmet';
+}
+export const HEAD_MESH: Record<Exclude<HeadLook, 'hood'>, BorrowedMesh> = { mage_hat: { mesh: 'Mage_Hat', base: 'mage' }, helmet: { mesh: 'Knight_Helmet', base: 'knight' } };
+
 type HueRule = { hue: number; range: number; minSat: number; to: string };
 export interface HeroStyle {
   base: HeroBase;

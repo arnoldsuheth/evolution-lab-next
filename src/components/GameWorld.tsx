@@ -24,6 +24,7 @@ import CampaignWorld from "./CampaignWorld";
 import { questMarker } from "@/lib/journey";
 import { npcMarker, cleanLog } from "@/lib/quests";
 import TownDistrict from "./TownDistrict";
+import CodeSpots from "./CodeSpots";
 import GatherNodes, { WorldUnlocks } from "./GatherNodes";
 import ExplorationEncounters from "./ExplorationEncounters";
 import TerrainSurface from "./TerrainSurface";
@@ -183,7 +184,7 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.014, -4]} onClick={groundClick} receiveShadow><planeGeometry args={[4.8, 48]} /><meshStandardMaterial color="#e6cc92" roughness={1} /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.018, 0]} onClick={groundClick} receiveShadow><circleGeometry args={[5.8, 40]} /><meshStandardMaterial color="#efe6cc" roughness={1} /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[11, 0.025, -16]} onClick={groundClick}><planeGeometry args={[25, 3]} /><meshStandardMaterial color="#8e8b76" /></mesh>
-    <TownDistrict onGroundClick={groundClick}/><GatherNodes paused={paused} approach={approachGather}/><WorldUnlocks/><ExplorationEncounters paused={paused} interact={()=>interact("traveler")} report={report} /><WorldDetails night={light<0.4} low={low} reduced={reduced} />
+    <TownDistrict onGroundClick={groundClick}/><CodeSpots night={light<0.4}/><GatherNodes paused={paused} approach={approachGather}/><WorldUnlocks/><ExplorationEncounters paused={paused} interact={()=>interact("traveler")} report={report} /><WorldDetails night={light<0.4} low={low} reduced={reduced} />
     {BUILDINGS.map((b, i) => <House key={i} x={b.x} z={b.z} index={i%4} />)}
     {TREES.map((t, i) => <Tree key={i} {...t} />)}
     {[-1, 1].flatMap(side => [0, 1, 2, 3, 4].map(i => <Tree key={`${side}-${i}`} x={side * (17 + i % 2 * 3)} z={10 - i * 6} size={0.9 + i * 0.11} />))}

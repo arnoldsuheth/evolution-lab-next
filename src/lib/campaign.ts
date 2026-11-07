@@ -45,4 +45,5 @@ export function nextRegion(region:RegionId):RegionId|undefined{return({aurora:'r
 
 /** Monstros agressivos atacam quem chega perto: do nível 3 em diante e em todas as regiões de fora. Iniciantes e a vila são seguros. */
 export const AGGRO_RADIUS = 4.2, SAFE_TOWN_RADIUS = 12;
-export const isAggressive = (m: { region: RegionId; level: number }) => m.region !== 'aurora' || m.level >= 3;
+/** Só chefes e criaturas das masmorras (caverna e monastério) atacam quem chega perto; o resto luta só se for atacado. */
+export const isAggressive = (m: { boss: boolean; instance?: string }) => m.boss || !!m.instance;

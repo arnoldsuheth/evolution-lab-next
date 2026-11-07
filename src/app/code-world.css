@@ -1,0 +1,59 @@
+/* Modo Aprendiz e pontos de código: visual compacto, escuro e "tecnológico" (amostra do novo estilo dos painéis). */
+:root{--tech:#7fe3ff;--tech-dim:#7fe3ff33;--ok:#8be0a0;--bad:#ff9a8a;--glass:#0e1a24f2}
+.apprentice{display:flex;flex-direction:column;gap:10px;margin:14px 0}
+.apprentice-goal{margin:0;padding:10px 12px;border-radius:10px;background:linear-gradient(120deg,#13303d,#12222c);border:1px solid var(--tech-dim);color:#e6f6fb;font-size:13px;line-height:1.5}
+.apprentice-goal b{display:block;font-size:9px;letter-spacing:1.6px;color:var(--tech);margin-bottom:3px;text-transform:uppercase}
+.apprentice-words{display:flex;flex-wrap:wrap;gap:6px}
+.apprentice-words span{font-size:11px;color:#b9cdd3;background:#ffffff0a;border:1px solid #ffffff14;border-radius:999px;padding:3px 10px 3px 4px;display:flex;align-items:center;gap:6px}
+.apprentice-words code{background:#7fe3ff1f;color:var(--tech);border-radius:999px;padding:1px 7px;font-size:11px}
+.apprentice-code{margin:0;background:#0a131b;border:1px solid #ffffff12;border-radius:10px;padding:10px 0;font-family:Consolas,Monaco,monospace;font-size:14px;line-height:1.9;color:#cfe7df;white-space:pre-wrap;overflow-x:auto}
+.apprentice-line{display:grid;grid-template-columns:30px 1fr;align-items:baseline;padding:0 12px 0 0}
+.apprentice-line .ln{color:#4f6670;font-size:11px;text-align:right;padding-right:10px;user-select:none}
+.apprentice-line .explain{grid-column:2;display:block;font-family:Arial,sans-serif;font-size:11px;line-height:1.5;color:var(--ok);margin:0 0 4px}
+.apprentice .slot{display:inline-block;min-width:42px;padding:0 9px;margin:0 2px;border-radius:7px;border:1.5px dashed #7fe3ff88;background:#7fe3ff12;color:var(--tech);font-family:inherit;font-size:14px;line-height:1.6;animation:slotPulse 1.6s ease-in-out infinite}
+.apprentice .slot.filled{border-style:solid;animation:none;background:#7fe3ff22;color:#eafcff}
+.apprentice .slot.active{border-color:#ffd36b;box-shadow:0 0 0 3px #ffd36b33;color:#ffe9a8}
+.apprentice .slot.wrong{border-color:var(--bad);background:#ff9a8a1f;color:#ffd2ca}
+@keyframes slotPulse{50%{box-shadow:0 0 0 4px #7fe3ff22}}
+.apprentice-options{background:var(--glass);border:1px solid #ffffff12;border-radius:10px;padding:10px}
+.apprentice-options small{display:block;color:#9fb6bd;font-size:10px;letter-spacing:.6px;margin-bottom:7px}
+.apprentice-options>div{display:flex;flex-wrap:wrap;gap:8px}
+.apprentice-options button{padding:8px 14px;border-radius:9px;background:#16303b;border:1px solid #7fe3ff44;min-width:56px;transition:transform .12s,background .12s}
+.apprentice-options button:hover:not(:disabled){transform:translateY(-2px);background:#1c3e4b;border-color:var(--tech)}
+.apprentice-options button.chosen{background:#7fe3ff2e;border-color:var(--tech)}
+.apprentice-options code{font-size:14px;color:#eafcff}
+.apprentice-notes{display:flex;flex-direction:column;gap:6px}
+.apprentice-notes p{margin:0;font-size:12.5px;line-height:1.5;color:#ffe3c2;background:#3b2a1e;border:1px solid #ffb86b44;border-radius:9px;padding:8px 11px}
+.apprentice-locked{margin:0;font-size:12.5px;color:#ffe9b0;background:#3a321c;border:1px solid #ffd36b55;border-radius:9px;padding:9px 12px}
+.apprentice-actions{display:flex;flex-wrap:wrap;gap:8px}
+.apprentice-actions button{border-radius:9px;padding:9px 16px;font-size:13px}
+.apprentice-actions .primary{background:linear-gradient(135deg,#43d1f5,#7fe3ff);border-color:#b9f2ff;color:#062330}
+.mode-toggle{font-size:11px;padding:6px 10px;border-radius:8px;margin:2px 0 10px;align-self:flex-start}
+/* Painel do ponto de código */
+.spot-panel{padding:20px 22px}
+.spot-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.spot-chip{font-size:10px;letter-spacing:1px;color:var(--tech);background:#7fe3ff14;border:1px solid var(--tech-dim);border-radius:999px;padding:4px 10px}
+.spot-reward{font-size:11px;color:#ffd98a}
+.spot-panel h3{font-size:24px;margin:10px 0 6px}
+.spot-story{font-size:13px;line-height:1.6;color:#c4d3d6;margin:0 0 4px}
+.spot-done{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:#14301f;border:1px solid #8be0a066;border-radius:10px;padding:10px 12px}
+.spot-done p{margin:0;color:#d6ffe0;font-size:13px}
+/* No mapa */
+.spot-label{white-space:nowrap;font-size:11px;padding:5px 10px;border-radius:999px;background:#0d2a36e6;border:1px solid var(--tech);color:#eafcff;box-shadow:0 0 14px #7fe3ff55}
+.spot-label:hover:not(:disabled){background:#123a4a}
+.spot-tag{white-space:nowrap;font-size:10px;padding:3px 8px;border-radius:999px;background:#0d1d27cc;color:#e8f3f6;border:1px solid #ffffff22}
+@media (max-width:640px){.apprentice-code{font-size:13px}.apprentice .slot{min-width:36px}.spot-panel{padding:14px}}
+/* Nome do herói na criação: legível sobre o fundo claro */
+.creator-model .model-caption{display:flex;flex-direction:column;align-items:center;gap:2px;width:max-content;max-width:90%;margin:0 auto;padding:6px 18px 8px;border-radius:14px;background:#0d1d27cc;border:1px solid #ffffff1f;box-shadow:0 6px 18px #0b161e40}
+.creator-model .model-caption h3{color:#fff8e7;text-shadow:0 1px 2px #000a;margin:0}
+.creator-model .model-caption span,.creator-model .model-caption small{color:#ffd98a}
+/* Tela de personagens: nível e "Continuar" em linhas separadas */
+.character-slot>button>span,.character-slot>button>b{display:block}
+.character-slot>button>b{margin-top:4px}
+/* Raridade nos ícones de item: Comum sem brilho · Épico brilho leve · Mítico brilho + fogo (armadura: só a cor) */
+svg.game-artwork.fx-none{filter:drop-shadow(0 2px 3px #0005)!important}
+svg.game-artwork.fx-epic{filter:drop-shadow(0 0 2px #c4a2ff) drop-shadow(0 0 5px #9b6bff88)!important}
+svg.game-artwork.fx-mythic{filter:drop-shadow(0 0 3px #ffd36b) drop-shadow(0 0 9px #ff9a2ecc)!important;overflow:visible}
+.fx-flame{transform-box:fill-box;transform-origin:50% 100%;opacity:.85;animation:fxFlame 1.2s ease-in-out infinite}
+@keyframes fxFlame{0%{transform:translateY(0) scale(.8,.7);opacity:.35}45%{transform:translateY(-6%) scale(1,1.15);opacity:.95}100%{transform:translateY(-14%) scale(.6,.5);opacity:0}}
+@media (prefers-reduced-motion:reduce){.fx-flame{animation:none;opacity:.7}}

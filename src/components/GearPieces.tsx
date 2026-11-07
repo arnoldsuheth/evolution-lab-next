@@ -8,7 +8,8 @@ type Tier=keyof typeof RARITY_LOOK;
 let geometries:Record<PieceShape,THREE.BufferGeometry>|null=null;
 function shapes(){return geometries??={dome:new THREE.SphereGeometry(1,18,10,0,Math.PI*2,0,Math.PI/2),cuff:new THREE.CylinderGeometry(1,1.08,1,16),ring:new THREE.TorusGeometry(1,.13,8,28),gem:new THREE.OctahedronGeometry(1),plate:new THREE.BoxGeometry(1,1,1)};}
 const pieceMaterials=new Map<Tier,THREE.MeshStandardMaterial>();
-export function pieceMaterial(tier:Tier){let m=pieceMaterials.get(tier);if(!m){const l=RARITY_LOOK[tier];m=new THREE.MeshStandardMaterial({color:l.color,metalness:l.metalness,roughness:l.roughness,emissive:l.glow,emissiveIntensity:l.glowIntensity,flatShading:true});pieceMaterials.set(tier,m);}return m;}
+/** Armadura: só a cor muda com a raridade (sem brilho). */
+export function pieceMaterial(tier:Tier){let m=pieceMaterials.get(tier);if(!m){const l=RARITY_LOOK[tier];m=new THREE.MeshStandardMaterial({color:l.color,metalness:l.metalness,roughness:l.roughness,flatShading:true});pieceMaterials.set(tier,m);}return m;}
 
 /** Prende as peças equipadas aos ossos do modelo (nomes de osso chegam sem ponto após o carregamento). */
 export function attachGearPieces(model:THREE.Object3D,slots:{slot:GearSlot;tier:Tier}[]){

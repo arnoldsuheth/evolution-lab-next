@@ -15,7 +15,7 @@ test('veneno e fogo tiram vida por rodadas; lentidão e congelamento enfraquecem
  const poisoned=resolveCombat(hero(),{...enemy('spider'),heroStatus:{kind:'poison',turns:3,damage:7}});const clean=resolveCombat(hero(),enemy('spider'));assert.equal(poisoned.received-clean.received,7);assert.equal(poisoned.enemy.heroStatus?.turns,2);
  const charge=(()=>{let h=hero(),e=enemy('boar'),last=0;for(let i=0;i<3;i++){const r=resolveCombat(h,e);h=r.hero;e=r.enemy;last=r.received;}return last;})();assert.ok(charge>clean.received,'investida do javali bate mais forte');
 });
-test('iniciantes são pacíficos; a partir do nível 3 os monstros atacam quem chega perto',()=>{
- for(const m of MONSTERS.filter(m=>m.region==='aurora'&&m.level<=2))assert.equal(isAggressive(m),false,m.id);
- assert.ok(MONSTERS.filter(m=>m.region==='aurora'&&!m.instance).some(m=>isAggressive(m)));assert.ok(MONSTERS.filter(m=>m.region!=='aurora').every(isAggressive));
+test('só chefes e criaturas das masmorras atacam sozinhos; o resto só luta se for atacado',()=>{
+ for(const m of MONSTERS)assert.equal(isAggressive(m),m.boss||!!m.instance,m.id);
+ assert.ok(MONSTERS.some(m=>!m.boss&&!m.instance&&m.region!=='aurora'),'existem monstros comuns fora da vila');assert.ok(MONSTERS.filter(m=>!m.boss&&!m.instance).every(m=>!isAggressive(m)));
 });

@@ -4,10 +4,11 @@ import {useGLTF,useAnimations} from '@react-three/drei';
 import * as THREE from 'three';
 import {clone} from 'three/examples/jsm/utils/SkeletonUtils.js';
 import type {ClassId,Race} from '@/lib/game';
-import {BODY_WIDTH,HERO_BASE_FILES,HERO_HAT_MESHES,HERO_HIT,HERO_PARTS,HERO_PUNCH,HERO_STYLE,HERO_WALK,HERO_WEAPON_MESHES,heroDress,heroProportions,recolorAtlas,type HeroBase,type HeroGear,type RecolorOptions} from '@/lib/heroModels';
+import {HEAD_MESH,OFFHAND_MESH,WEAPON_MESH,headLook,BODY_WIDTH,HERO_BASE_FILES,HERO_HAT_MESHES,HERO_HIT,HERO_PARTS,HERO_PUNCH,HERO_STYLE,HERO_WALK,HERO_WEAPON_MESHES,heroDress,heroProportions,recolorAtlas,type HeroBase,type HeroGear,type RecolorOptions} from '@/lib/heroModels';
 import {useGame} from '@/lib/store';
 import {buildFaceKit,RACE_HEAD,type FaceOptions} from '@/lib/faceKit';
-import {gearLook} from '@/lib/gearPieces';
+import {gearLook,rarityTier} from '@/lib/gearPieces';
+import {BorrowedPiece,SimpleWeapon} from './HeroGear';
 import {attachGearPieces,GearAura} from './GearPieces';
 
 const base=process.env.NEXT_PUBLIC_GITHUB_PAGES==='true'?'/evolution-lab-next':'';
@@ -54,13 +55,17 @@ function ForeignHead({from,host,classId,skin,hair,eyes}:{from:HeroBase;host:THRE
  return null;
 }
 
-export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairStyle=0,body:bodyShape=2,face=NO_FACE,showHelmet=true,weaponRarity='Comum',gearItems=[],gear,armed,shielded,walking=false,animated=true,combatant=false,preview=false}:{classId:ClassId;race:Race;skin:string;hair?:string;eyes?:string;hairStyle?:number;body?:number;face?:FaceOptions['look'];showHelmet?:boolean;weaponRarity?:string;gearItems?:{slot:string;rarity:string}[];gear:HeroGear;armed:boolean;shielded:boolean;walking?:boolean;animated?:boolean;combatant?:boolean;preview?:boolean}){
+export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairStyle=0,body:bodyShape=2,face=NO_FACE,showHelmet=true,weaponRarity='Comum',gearItems=[],gear,armed,shielded,walking=false,animated=true,combatant=false,preview=false}:{classId:ClassId;race:Race;skin:string;hair?:string;eyes?:string;hairStyle?:number;body?:number;face?:FaceOptions['look'];showHelmet?:boolean;weaponRarity?:string;gearItems?:{slot:string;rarity:string;visual?:string;classId?:ClassId}[];gear:HeroGear;armed:boolean;shielded:boolean;walking?:boolean;animated?:boolean;combatant?:boolean;preview?:boolean}){
  const style=HERO_STYLE[classId],gltf=useGLTF(heroModelUrl(style.base));
  const eventTime=useGame(s=>combatant?s.battleEvent?.time??0:0),hurtTime=useGame(s=>combatant&&s.battleEvent?.received?s.battleEvent.time:0);
  const gearKey=gearItems.map(i=>`${i.slot}:${i.rarity}`).join('|'),equipmentLook=useMemo(()=>gearLook(gearKey?gearKey.split('|').map(e=>{const [slot,rarity]=e.split(':');return {slot,rarity};}):[]),[gearKey]);
- const dress=heroDress(classId,gear,hairStyle,showHelmet),{outfit,hat,cape,head,extra,covered}=dress,faceKey=JSON.stringify(face);
+ const dress=heroDress(classId,gear,hairStyle,showHelmet),{outfit,cape,head,extra,covered}=dress,faceKey=JSON.stringify(face);
+ // Item equipado manda: arma, escudo e elmo aparecem iguais ao ícone (peças nativas da classe só sem item).
+ const weaponItem=gearItems.find(i=>i.slot==='weapon'||i.slot==='twohand'),offItem=gearItems.find(i=>i.slot==='offhand'),headItem=gearItems.find(i=>i.slot==='head');
+ const headKind=headItem?headLook(headItem.classId??classId):null,wornHat=!!(dress.hat||dress.covered)&&headKind!==null&&headKind!=='hood'?HEAD_MESH[headKind]:null;
+ const hat=wornHat?null:dress.hat,ownWeapon=!!weaponItem,ownOffhand=!!offItem;
  const {scene,host}=useMemo(()=>{
-  const model=clone(gltf.scene) as THREE.Group,show=new Set([...(armed?style.weapon:[]),...(shielded?style.offhand:[])]),parts=HERO_PARTS[style.base];let host:THREE.SkinnedMesh|null=null;
+  const model=clone(gltf.scene) as THREE.Group,show=new Set([...(armed&&!ownWeapon?style.weapon:[]),...(shielded&&!ownOffhand?style.offhand:[])]),parts=HERO_PARTS[style.base];let host:THREE.SkinnedMesh|null=null;
   model.traverse(o=>{if(!(o instanceof THREE.Mesh))return;o.castShadow=true;o.receiveShadow=!preview;
    const weapon=(HERO_WEAPON_MESHES as readonly string[]).includes(o.name);
    if(weapon)o.visible=show.has(o.name);
@@ -82,9 +87,12 @@ export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairSty
   model.scale.set(scale*width,scale,scale*width);model.position.y=-(body.isEmpty()?0:body.min.y)*scale;
   attachGearPieces(model,equipmentLook.slots);
   return {scene:model,host};
- },[equipmentLook,gltf.scene,style,classId,race,skin,hair,eyes,bodyShape,armed,shielded,preview,outfit,hat,cape,head,extra,covered,faceKey,weaponRarity]);
- const idle=armed?style.idle:'Idle',move=walking?HERO_WALK:idle,attack=armed||CASTERS.has(classId)?style.attack:HERO_PUNCH;
- return <group><GearAura tier={equipmentLook.best} animated={animated}/><Rig key={scene.uuid} scene={scene} clips={headFreeClips(gltf.animations)} move={move} walking={walking} animated={animated} attack={attack} eventTime={eventTime} hurtTime={hurtTime}/>{host&&head!==style.base&&<Suspense fallback={null}><ForeignHead from={head} host={host} classId={classId} skin={skin} hair={hair} eyes={eyes}/></Suspense>}</group>;
+ },[equipmentLook,gltf.scene,style,classId,race,skin,hair,eyes,bodyShape,armed,shielded,preview,outfit,hat,cape,head,extra,covered,faceKey,weaponRarity,ownWeapon,ownOffhand]);
+ // Guerreiro com espada de uma mão segura e golpeia como espada de uma mão.
+ const oneHand=weaponItem?.slot==='weapon'&&style.idle==='2H_Melee_Idle';
+ const idle=armed?(oneHand?'Idle':style.idle):'Idle',move=walking?HERO_WALK:idle,attack=armed||CASTERS.has(classId)?(oneHand?'1H_Melee_Attack_Chop':style.attack):HERO_PUNCH;
+ const wv=weaponItem?.visual??'',ov=offItem?.visual??'';
+ return <group><GearAura tier={weaponItem&&rarityTier(weaponItem.rarity)==='mythic'?'mythic':'common'} animated={animated}/><Rig key={scene.uuid} scene={scene} clips={headFreeClips(gltf.animations)} move={move} walking={walking} animated={animated} attack={attack} eventTime={eventTime} hurtTime={hurtTime}/>{weaponItem&&(WEAPON_MESH[wv]?<Suspense fallback={null}><BorrowedPiece piece={WEAPON_MESH[wv]} bone="handslot.r" scene={scene} rarity={weaponItem.rarity} kind="weapon"/></Suspense>:wv&&<SimpleWeapon visual={wv} bone="handslot.r" scene={scene} rarity={weaponItem.rarity}/>)}{offItem&&(OFFHAND_MESH[ov]?<Suspense fallback={null}><BorrowedPiece piece={OFFHAND_MESH[ov]} bone="handslot.l" scene={scene} rarity={offItem.rarity} kind="weapon"/></Suspense>:ov&&<SimpleWeapon visual={ov} bone="handslot.l" scene={scene} rarity={offItem.rarity} small/>)}{wornHat&&headItem&&<Suspense fallback={null}><BorrowedPiece piece={wornHat} bone="head" scene={scene} rarity={headItem.rarity} kind="armor"/></Suspense>}{host&&head!==style.base&&<Suspense fallback={null}><ForeignHead from={head} host={host} classId={classId} skin={skin} hair={hair} eyes={eyes}/></Suspense>}</group>;
 }
 
 /** Animações presas a uma montagem do modelo; trocar roupa ou arma cria uma montagem nova (sem pose em T). */

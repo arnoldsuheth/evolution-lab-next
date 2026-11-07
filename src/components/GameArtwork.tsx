@@ -1,6 +1,7 @@
 "use client";
 import {artworkForItem} from '@/lib/artwork';
-import {ApprovedArtwork} from './ApprovedArtwork';
+import {ApprovedArtwork,FireFx,type ItemFx} from './ApprovedArtwork';
+import {rarityTier} from '@/lib/gearPieces';
 import {useId} from 'react';
 import {bandFor,type Item} from '@/lib/catalogue';
 import type {Skill} from '@/lib/skills';
@@ -44,7 +45,7 @@ const paths:Record<string,string>={
  book:'<path d="M6 12q15-5 26 4 11-9 26-4v39q-15-5-26 4-11-9-26-4Z" fill="#b6aa8b" stroke="#e8d6b1" stroke-width="2"/><path d="M32 16v39M13 23l12 2m-12 7 12 2m14-9 12-2m-12 11 12-2" stroke="#667a79" stroke-width="2"/>',
 };
 const aliases:Record<string,string>={tool:'hammer',focus:'crystal',gadget:'parts',wolf:'pet',boar:'pet',lynx:'pet',falcon:'pet',bear:'pet',spirit:'pet'};
-function Art({type,name,tone='#d6bb7c',tier=1,ink,hue=0}:{type:string;name:string;tone?:string;tier?:number;ink?:string;hue?:number}){const id=useId().replace(/:/g,'');return <svg viewBox="0 0 64 64" role="img" aria-label={name} className="game-artwork"><defs><radialGradient id={id}><stop stopColor="#ffffff"/><stop offset=".7" stopColor="#e4f0fb"/><stop offset="1" stopColor={tone} stopOpacity=".45"/></radialGradient></defs><rect x="1" y="1" width="62" height="62" rx="9" fill={`url(#${id})`} stroke={tone} strokeOpacity=".5"/><g style={hue ? {filter: `hue-rotate(${hue}deg)`} : undefined} transform="translate(3 1) scale(.9)" dangerouslySetInnerHTML={{__html:(paths[aliases[type]??type]??paths.trinket).replace('#c76a7a',ink??'#c76a7a')}}/><path d="m7 7 5-2m45 49-2 5" stroke={tone} opacity=".7"/>{tier>1&&<circle cx="55" cy="55" r="5" fill={tone}/>}</svg>;}
+function Art({type,name,tone='#d6bb7c',tier=1,ink,hue=0,fx}:{type:string;name:string;tone?:string;tier?:number;ink?:string;hue?:number;fx?:ItemFx}){const id=useId().replace(/:/g,'');return <svg viewBox="0 0 64 64" role="img" aria-label={name} className={fx?`game-artwork fx-${fx}`:'game-artwork'}><defs><radialGradient id={id}><stop stopColor="#ffffff"/><stop offset=".7" stopColor="#e4f0fb"/><stop offset="1" stopColor={tone} stopOpacity=".45"/></radialGradient></defs><rect x="1" y="1" width="62" height="62" rx="9" fill={`url(#${id})`} stroke={tone} strokeOpacity=".5"/>{fx==='mythic'&&<FireFx size={64}/>}<g style={hue ? {filter: `hue-rotate(${hue}deg)`} : undefined} transform="translate(3 1) scale(.9)" dangerouslySetInnerHTML={{__html:(paths[aliases[type]??type]??paths.trinket).replace('#c76a7a',ink??'#c76a7a')}}/><path d="m7 7 5-2m45 49-2 5" stroke={tone} opacity=".7"/>{tier>1&&<circle cx="55" cy="55" r="5" fill={tone}/>}</svg>;}
 const MATERIAL_PALETTE=['#7753ac','#247d86','#377947','#a95048','#4a629e','#8e437c','#b4762f','#514578','#1e859a','#a3542f','#646b80','#456d59','#8c3954'];
 
 function AmuletArtwork({name,band,guard}:{name:string;band:number;guard:boolean}){
@@ -76,6 +77,8 @@ export function ItemArtwork({item}:{item:Item}){const band=bandFor(item.minLevel
  const accent=(signature%12)*30;
  const crop=artworkForItem(item);
  const finish=item.rarity==='Épico'?24:item.rarity==='Mítico'?48:0;
- if(crop)return <ApprovedArtwork crop={crop} name={item.name} inset={6} hue={hue+finish+accent}/>;const type=item.id.includes('fruit')?'fruit':item.id.includes('stew')?'bowl':paths[item.visual]||aliases[item.visual]?item.visual:item.category==='companion'?'pet':item.category==='tool'?'parts':item.category==='trophy'?'trophy':item.category==='armor'?item.slot:item.category==='consumable'?'potion':item.category==='food'?'food':'trinket';return <Art hue={hue+finish} type={type} name={item.name} tier={item.minLevel} ink={item.id.includes("mana")?"#749ecb":item.id.includes("energy")||item.id==="tea"?"#8ab48b":item.id.includes("guard")?"#c6b276":undefined} tone={({Comum:'#c3bc9e',Incomum:'#96be86',Raro:'#88b9d5',Épico:'#b49bd4',Lendário:'#dfb873','Mítico':'#f2c14e'} as Record<string,string>)[item.rarity]}/>;}
+ // Raridade: Comum sem brilho; Épico brilha pouco; Mítico brilha e solta fogo. Armadura muda só a cor.
+ const fx:ItemFx=item.category==='armor'?'none':rarityTier(item.rarity)==='mythic'?'mythic':rarityTier(item.rarity)==='epic'?'epic':'none';
+ if(crop)return <ApprovedArtwork crop={crop} name={item.name} inset={6} hue={hue+finish+accent} fx={fx}/>;const type=item.id.includes('fruit')?'fruit':item.id.includes('stew')?'bowl':paths[item.visual]||aliases[item.visual]?item.visual:item.category==='companion'?'pet':item.category==='tool'?'parts':item.category==='trophy'?'trophy':item.category==='armor'?item.slot:item.category==='consumable'?'potion':item.category==='food'?'food':'trinket';return <Art fx={fx} hue={hue+finish} type={type} name={item.name} tier={item.minLevel} ink={item.id.includes("mana")?"#749ecb":item.id.includes("energy")||item.id==="tea"?"#8ab48b":item.id.includes("guard")?"#c6b276":undefined} tone={({Comum:'#c3bc9e',Incomum:'#96be86',Raro:'#88b9d5',Épico:'#b49bd4',Lendário:'#dfb873','Mítico':'#f2c14e'} as Record<string,string>)[item.rarity]}/>;}
 export function SkillArtwork({skill}:{skill:Skill}){const type=skill.heal?'heal':skill.buff?'charm':skill.guard?'shield':skill.classId==='engineer'?'parts':skill.classId==='hunter'?(skill.branch===1?'pet':'bow'):skill.classId==='mage'||skill.classId==='shaman'?(skill.branch===0?'flame':'crystal'):skill.classId==='hacker'?'dagger':skill.classId==='prophet'?'book':skill.classId==='duelist'?'sword':skill.branch===1?'shield':'greatsword';return <Art type={type} name={skill.name} tier={skill.tier+1} tone={skill.kind==='active'?'#b6a0d7':'#cdb981'}/>;}
 

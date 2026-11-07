@@ -1,5 +1,6 @@
 import type {Item} from './catalogue';
 import type {ClassId} from './game';
+import {headLook} from './heroModels';
 export const ART_BASE=process.env.NEXT_PUBLIC_GITHUB_PAGES==='true'?'/evolution-lab-next':'';
 export type ArtCrop={sheet:'items'|'equipment'|'classes';x:number;y:number;w:number;h:number;outline?:string};
 const itemCrop=(index:number):ArtCrop=>({sheet:'items',x:index%6*256+15,y:[94,345,551,754][Math.floor(index/6)],w:226,h:[202,166,166,178][Math.floor(index/6)]});
@@ -20,7 +21,8 @@ export function artworkForItem(item:Item):ArtCrop|undefined{
  if(v==='charm')return itemCrop(15);if(v==='ring')return itemCrop(16);if(v==='trinket')return itemCrop(17);if(v==='back')return itemCrop(18);
  if(weapons[v])return weapons[v];
  if(item.category==='armor'&&item.slot==='chest')return armor[item.classId??'warrior'];
- if(item.slot==='head')return item.classId==='mage'?equipment(415,470,170,98):item.classId==='hacker'?equipment(1020,478,147,127):equipment(208,99,139,123);
+ // Mesma regra do modelo 3D (headLook): chapéu de mago, capuz ou elmo.
+ if(item.slot==='head'){const look=headLook(item.classId);return look==='mage_hat'?equipment(415,470,170,98):look==='hood'?equipment(1020,478,147,127):equipment(208,99,139,123);}
  if(item.slot==='feet')return equipment(18,337,85,91);
  return undefined;
 }
