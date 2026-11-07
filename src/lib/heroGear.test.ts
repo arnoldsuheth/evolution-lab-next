@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import {strict as assert} from 'node:assert';
-import {readFileSync} from 'node:fs';
+import {existsSync,readFileSync} from 'node:fs';
 import {HEAD_MESH,HERO_BASE_FILES,OFFHAND_MESH,WEAPON_MESH,headLook} from './heroModels';
 import {artworkForItem} from './artwork';
 import {ITEMS} from './game';
@@ -8,7 +8,9 @@ import {ITEMS} from './game';
 /** Nomes das malhas dentro de um .glb (lê só o cabeçalho JSON). */
 function meshes(file:string){const b=readFileSync(`public/models/heroes/${file}`);const n=b.readUInt32LE(12);const j=JSON.parse(b.subarray(20,20+n).toString());return new Set((j.nodes as {name:string;mesh?:number}[]).filter(x=>x.mesh!==undefined).map(x=>x.name));}
 
-test('cada peça 3D usada para mostrar um item existe no arquivo do corpo-base indicado',()=>{
+test('cada peça 3D usada para mostrar um item existe no arquivo do corpo-base indicado',t=>{
+ // Os .glb são baixados no "prebuild" (scripts/fetch-heroes.mjs); no servidor os testes rodam antes disso.
+ if(!Object.values(HERO_BASE_FILES).every(f=>existsSync(`public/models/heroes/${f}`)))return t.skip('modelos 3D ainda não baixados');
  for(const piece of [...Object.values(WEAPON_MESH),...Object.values(OFFHAND_MESH),...Object.values(HEAD_MESH)])
   assert.ok(meshes(HERO_BASE_FILES[piece.base]).has(piece.mesh),`${piece.mesh} em ${piece.base}`);
 });
