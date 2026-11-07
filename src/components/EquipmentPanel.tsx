@@ -67,7 +67,7 @@ function upgradeDelta(hero:ReturnType<typeof useGame.getState>['hero'],item:Item
 }
 function DeltaBadge({info}:{info:ReturnType<typeof upgradeDelta>}){
  if(!info)return null;const {delta,label}=info;
- return <span className={`item-delta ${delta>0?'stat-good':delta<0?'stat-bad':'stat-same'}`} aria-label={delta>0?`Melhor que o equipado: +${delta} ${label}`:delta<0?`Pior que o equipado: ${delta} ${label}`:`Igual ao equipado em ${label}`}>{delta>0?'▲+':delta<0?'▼':'='}{delta!==0?delta:''} {label}</span>;
+ return <span className={`item-delta ${delta>0?'stat-good':delta<0?'stat-bad':'stat-same'}`} aria-label={delta>0?`Melhor que o equipado: +${delta} ${label}`:delta<0?`Pior que o equipado: ${delta} ${label}`:`Igual ao equipado em ${label}`}>{delta>0?'▲+':delta<0?'▼':'='}{delta!==0?delta:''}<small className="delta-label"> {label}</small></span>;
 }
 
 export default function EquipmentPanel({shop=false,vendor="borin",edit=()=>{}}:{shop?:boolean;vendor?:"borin"|"elara"|"dorin"|"mira";edit?:()=>void}){
