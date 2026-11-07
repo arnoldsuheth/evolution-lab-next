@@ -47,3 +47,13 @@
 .nexus-panel{margin:14px 16px 0;padding:12px;border-radius:14px;border:2px solid #9fdbe6;background:#123a4acc}.nexus-panel h4{margin:0 0 6px;color:#bff3ff}.nexus-panel p{font-size:13px!important;margin:0 0 8px}
 .nexus-bar{position:relative;height:22px;border-radius:99px;background:#0c2633;border:1px solid #9fdbe666;overflow:hidden;margin-bottom:10px}.nexus-bar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#4fb3c8,#ffd86b)}.nexus-bar span{position:relative;display:block;text-align:center;font-size:11px;line-height:22px;color:#fff;text-shadow:0 1px 2px #000}
 .buff-indicator.aura{color:#ffe28a;border-color:#ffd86b}
+
+/* Raridade com brilho: Épico pulsa em lilás; Mítico pulsa em dourado e recebe um reflexo que passa pelo ícone. */
+@keyframes rarity-pulse-epic{0%,100%{box-shadow:0 0 5px #b49bd455,inset 0 0 5px #b49bd433}50%{box-shadow:0 0 16px #c7a6ffcc,inset 0 0 9px #b49bd466}}
+@keyframes rarity-pulse-mythic{0%,100%{box-shadow:0 0 7px #f2c14e77,inset 0 0 6px #f2c14e44}50%{box-shadow:0 0 22px #ffd36bee,inset 0 0 12px #f2c14e88}}
+@keyframes rarity-shine{0%{transform:translateX(-160%) skewX(-20deg)}55%,100%{transform:translateX(320%) skewX(-20deg)}}
+:is(.item-icon.rarity-épico,.loot-art.rarity-épico,.sheet-equipment [data-rarity="Épico"],.forge-card.rarity-epico){animation:rarity-pulse-epic 2.4s ease-in-out infinite}
+:is(.item-icon.rarity-mítico,.loot-art.rarity-mítico,.sheet-equipment [data-rarity="Mítico"],.forge-card.rarity-mitico){animation:rarity-pulse-mythic 1.8s ease-in-out infinite;position:relative;overflow:hidden}
+:is(.item-icon.rarity-mítico,.loot-art.rarity-mítico,.sheet-equipment [data-rarity="Mítico"],.forge-card.rarity-mitico)::after{content:"";position:absolute;top:-10%;bottom:-10%;left:0;width:35%;background:linear-gradient(90deg,transparent,#fff7d6aa,transparent);animation:rarity-shine 2.8s ease-in-out infinite;pointer-events:none;z-index:2}
+.sheet-equipment [data-rarity="Épico"]{border-color:#b49bd4!important}.sheet-equipment [data-rarity="Mítico"]{border-color:#f2c14e!important}
+@media (prefers-reduced-motion:reduce){:is(.item-icon.rarity-épico,.loot-art.rarity-épico,.sheet-equipment [data-rarity="Épico"],.forge-card.rarity-epico,.item-icon.rarity-mítico,.loot-art.rarity-mítico,.sheet-equipment [data-rarity="Mítico"],.forge-card.rarity-mitico){animation:none!important}:is(.item-icon.rarity-mítico,.loot-art.rarity-mítico,.sheet-equipment [data-rarity="Mítico"],.forge-card.rarity-mitico)::after{display:none}}

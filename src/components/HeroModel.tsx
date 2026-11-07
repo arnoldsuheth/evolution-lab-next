@@ -7,6 +7,8 @@ import type {ClassId,Race} from '@/lib/game';
 import {BODY_WIDTH,HERO_BASE_FILES,HERO_HAT_MESHES,HERO_HIT,HERO_PARTS,HERO_PUNCH,HERO_STYLE,HERO_WALK,HERO_WEAPON_MESHES,heroDress,heroProportions,recolorAtlas,type HeroBase,type HeroGear,type RecolorOptions} from '@/lib/heroModels';
 import {useGame} from '@/lib/store';
 import {buildFaceKit,RACE_HEAD,type FaceOptions} from '@/lib/faceKit';
+import {gearLook} from '@/lib/gearPieces';
+import {attachGearPieces,GearAura} from './GearPieces';
 
 const base=process.env.NEXT_PUBLIC_GITHUB_PAGES==='true'?'/evolution-lab-next':'';
 export const heroModelUrl=(model:HeroBase)=>`${base}/models/heroes/${HERO_BASE_FILES[model]}`;
@@ -52,9 +54,10 @@ function ForeignHead({from,host,classId,skin,hair,eyes}:{from:HeroBase;host:THRE
  return null;
 }
 
-export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairStyle=0,body:bodyShape=2,face=NO_FACE,showHelmet=true,weaponRarity='Comum',gear,armed,shielded,walking=false,animated=true,combatant=false,preview=false}:{classId:ClassId;race:Race;skin:string;hair?:string;eyes?:string;hairStyle?:number;body?:number;face?:FaceOptions['look'];showHelmet?:boolean;weaponRarity?:string;gear:HeroGear;armed:boolean;shielded:boolean;walking?:boolean;animated?:boolean;combatant?:boolean;preview?:boolean}){
+export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairStyle=0,body:bodyShape=2,face=NO_FACE,showHelmet=true,weaponRarity='Comum',gearItems=[],gear,armed,shielded,walking=false,animated=true,combatant=false,preview=false}:{classId:ClassId;race:Race;skin:string;hair?:string;eyes?:string;hairStyle?:number;body?:number;face?:FaceOptions['look'];showHelmet?:boolean;weaponRarity?:string;gearItems?:{slot:string;rarity:string}[];gear:HeroGear;armed:boolean;shielded:boolean;walking?:boolean;animated?:boolean;combatant?:boolean;preview?:boolean}){
  const style=HERO_STYLE[classId],gltf=useGLTF(heroModelUrl(style.base));
  const eventTime=useGame(s=>combatant?s.battleEvent?.time??0:0),hurtTime=useGame(s=>combatant&&s.battleEvent?.received?s.battleEvent.time:0);
+ const gearKey=gearItems.map(i=>`${i.slot}:${i.rarity}`).join('|'),equipmentLook=useMemo(()=>gearLook(gearKey?gearKey.split('|').map(e=>{const [slot,rarity]=e.split(':');return {slot,rarity};}):[]),[gearKey]);
  const dress=heroDress(classId,gear,hairStyle,showHelmet),{outfit,hat,cape,head,extra,covered}=dress,faceKey=JSON.stringify(face);
  const {scene,host}=useMemo(()=>{
   const model=clone(gltf.scene) as THREE.Group,show=new Set([...(armed?style.weapon:[]),...(shielded?style.offhand:[])]),parts=HERO_PARTS[style.base];let host:THREE.SkinnedMesh|null=null;
@@ -74,10 +77,11 @@ export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairSty
   const body=new THREE.Box3();model.updateMatrixWorld(true);model.traverse(o=>{if(o instanceof THREE.Mesh&&!NOT_BODY(o.name))body.expandByObject(o);});
   const form=heroProportions(race),width=form.width*(BODY_WIDTH[bodyShape]??1),scale=HUMAN_HEIGHT*form.height/RIG_HEIGHT;
   model.scale.set(scale*width,scale,scale*width);model.position.y=-(body.isEmpty()?0:body.min.y)*scale;
+  attachGearPieces(model,equipmentLook.slots);
   return {scene:model,host};
- },[gltf.scene,style,classId,race,skin,hair,eyes,bodyShape,armed,shielded,preview,outfit,hat,cape,head,extra,covered,faceKey,weaponRarity]);
+ },[equipmentLook,gltf.scene,style,classId,race,skin,hair,eyes,bodyShape,armed,shielded,preview,outfit,hat,cape,head,extra,covered,faceKey,weaponRarity]);
  const idle=armed?style.idle:'Idle',move=walking?HERO_WALK:idle,attack=armed||CASTERS.has(classId)?style.attack:HERO_PUNCH;
- return <group><Rig key={scene.uuid} scene={scene} clips={headFreeClips(gltf.animations)} move={move} walking={walking} animated={animated} attack={attack} eventTime={eventTime} hurtTime={hurtTime}/>{host&&head!==style.base&&<Suspense fallback={null}><ForeignHead from={head} host={host} classId={classId} skin={skin} hair={hair} eyes={eyes}/></Suspense>}</group>;
+ return <group><GearAura tier={equipmentLook.best} animated={animated}/><Rig key={scene.uuid} scene={scene} clips={headFreeClips(gltf.animations)} move={move} walking={walking} animated={animated} attack={attack} eventTime={eventTime} hurtTime={hurtTime}/>{host&&head!==style.base&&<Suspense fallback={null}><ForeignHead from={head} host={host} classId={classId} skin={skin} hair={hair} eyes={eyes}/></Suspense>}</group>;
 }
 
 /** Animações presas a uma montagem do modelo; trocar roupa ou arma cria uma montagem nova (sem pose em T). */
