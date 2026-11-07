@@ -78,9 +78,9 @@ export function heroDress(classId: ClassId, gear: HeroGear, hairStyle: number, s
 
 /**
  * Tamanho por raça, igual para heróis e NPCs: humano, elfo e orc têm a mesma altura;
- * o anão é um pouco menor e o gnomo, um pouco menor que o anão. A largura dá a silhueta de cada raça.
+ * o anão tem silhueta baixa e larga; o gnomo é a menor raça. A largura dá a silhueta de cada raça.
  */
-export const RACE_SIZE: Record<Race, { height: number; width: number }> = { human: { height: 1, width: 1 }, elf: { height: 1, width: .94 }, orc: { height: 1, width: 1.14 }, dwarf: { height: .86, width: 1.16 }, gnome: { height: .76, width: 1 } };
+export const RACE_SIZE: Record<Race, { height: number; width: number }> = { human: { height: 1, width: 1 }, elf: { height: 1, width: .94 }, orc: { height: 1, width: 1.14 }, dwarf: { height: .68, width: 1.65 }, gnome: { height: .5, width: 1.05 } };
 export function heroProportions(race: Race) { return RACE_SIZE[race] ?? RACE_SIZE.human; }
 
 function hexToRgb(hex: string): [number, number, number] { const n = parseInt(hex.replace('#', ''), 16); return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255]; }

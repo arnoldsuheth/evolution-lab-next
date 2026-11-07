@@ -14,13 +14,13 @@ const base=process.env.NEXT_PUBLIC_GITHUB_PAGES==='true'?'/evolution-lab-next':'
 export const heroModelUrl=(model:HeroBase)=>`${base}/models/heroes/${HERO_BASE_FILES[model]}`;
 /** Altura do herói no mesmo referencial do avatar procedural (antes da escala .74 do mundo). */
 const HUMAN_HEIGHT=3;
-/** Altura do corpo KayKit sem chapéu (todas as classes usam o mesmo esqueleto): todos ficam do mesmo tamanho. */
-const RIG_HEIGHT=2.32;
+/** Ossos que definem as pernas compactas do anão. */
+const COMPACT_LEGS = new Set(["upperleg.l", "upperleg.r", "lowerleg.l", "lowerleg.r"]);
 const NOT_BODY=(name:string)=>HERO_HAT_MESHES.includes(name)||(HERO_WEAPON_MESHES as readonly string[]).includes(name)||name.endsWith('_Cape');
 const NO_FACE:FaceOptions['look']={beard:0,moustache:0,brows:0,nose:0,ears:0,scar:0,tattoo:0,accessory:0};
 /** As animações fixam a escala da cabeça em 1; sem essa trilha, a cabeça maior do gnomo e do anão é preservada. */
 const clipCache=new WeakMap<THREE.AnimationClip[],THREE.AnimationClip[]>();
-function headFreeClips(clips:THREE.AnimationClip[]){let out=clipCache.get(clips);if(!out){out=clips.map(c=>{const k=c.clone();k.tracks=k.tracks.filter(t=>t.name!=='head.scale');return k;});clipCache.set(clips,out);}return out;}
+function headFreeClips(clips:THREE.AnimationClip[]){let out=clipCache.get(clips);if(!out){out=clips.map(c=>{const k=c.clone();k.tracks=k.tracks.filter(t=>t.name!=='head.scale'&&!Array.from(COMPACT_LEGS).some(name=>t.name===name+'.scale'));return k;});clipCache.set(clips,out);}return out;}
 const CASTERS=new Set<ClassId>(['mage','prophet','shaman']);
 const materials=new Map<string,THREE.Material>();
 /** Arma Épica brilha em lilás; Mítica, em dourado. */
@@ -74,8 +74,11 @@ export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairSty
   if(host&&headBone){const skeleton=(host as THREE.SkinnedMesh).skeleton,index=skeleton.bones.indexOf(headBone),kit=buildFaceKit({look:JSON.parse(faceKey),race,covered,extra,hair,skin});
    const anchor=new THREE.Group();anchor.name='face-anchor';anchor.matrixAutoUpdate=false;anchor.matrix.copy(skeleton.boneInverses[index]);anchor.add(kit);headBone.add(anchor);
    headBone.scale.setScalar(RACE_HEAD[race]??1);}
-  const body=new THREE.Box3();model.updateMatrixWorld(true);model.traverse(o=>{if(o instanceof THREE.Mesh&&!NOT_BODY(o.name))body.expandByObject(o);});
-  const form=heroProportions(race),width=form.width*(BODY_WIDTH[bodyShape]??1),scale=HUMAN_HEIGHT*form.height/RIG_HEIGHT;
+  if(race==='dwarf')model.traverse(node=>{if(node instanceof THREE.Bone&&COMPACT_LEGS.has(node.name))node.scale.y*=.78;});
+  model.updateMatrixWorld(true);
+  model.traverse(node=>{if(node instanceof THREE.SkinnedMesh)node.skeleton.update();});
+  const body=new THREE.Box3();model.updateMatrixWorld(true);model.traverse(o=>{if(o instanceof THREE.Mesh&&!NOT_BODY(o.name)){if(o instanceof THREE.SkinnedMesh)o.computeBoundingBox();body.expandByObject(o);}});
+  const form=heroProportions(race),width=form.width*(BODY_WIDTH[bodyShape]??1),scale=HUMAN_HEIGHT*form.height/Math.max(.01,body.max.y-body.min.y);
   model.scale.set(scale*width,scale,scale*width);model.position.y=-(body.isEmpty()?0:body.min.y)*scale;
   attachGearPieces(model,equipmentLook.slots);
   return {scene:model,host};

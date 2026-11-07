@@ -21,7 +21,7 @@ export const ACCESSORIES = ['Nenhum', 'Brinco', 'Dois brincos', 'Tapa-olho', 'Fa
 /** Orelha usada quando a opção é “Da raça”. */
 export const RACE_EARS: Record<Race, number> = { human: 0, dwarf: 0, elf: 4, orc: 3, gnome: 2 };
 /** Raças com cabeça um pouco maior (o gnomo tem a cabeça proporcionalmente grande). */
-export const RACE_HEAD: Record<Race, number> = { human: 1, elf: 1, orc: 1.03, dwarf: 1.08, gnome: 1.2 };
+export const RACE_HEAD: Record<Race, number> = { human: 1, elf: 1, orc: 1.03, dwarf: 1.3, gnome: 1.2 };
 
 export type FacePart = { part: string; shape: 'sphere' | 'cone' | 'capsule' | 'box' | 'torus' | 'cylinder'; color: 'hair' | 'skin' | 'scar' | 'paint' | 'gold' | 'ivory' | 'dark'; position: [number, number, number]; scale: [number, number, number]; rotation?: [number, number, number] };
 export interface FaceOptions { look: Pick<Look, 'beard' | 'moustache' | 'brows' | 'nose' | 'ears' | 'scar' | 'tattoo' | 'accessory'>; race: Race; covered: boolean; extra?: 'ponytail' | 'bun' }
@@ -32,6 +32,10 @@ const braid = (x: number, top: number, links: number, z = .5): FacePart[] => [..
 /** Lista pura das peças (testável sem renderizar). */
 export function faceParts({ look, race, covered, extra }: FaceOptions): FacePart[] {
   const parts: FacePart[] = [], add = (...list: FacePart[]) => parts.push(...list), F = FACE;
+  if(race==='dwarf'){
+    add({part:'nose',shape:'sphere',color:'skin',position:[0,F.noseY-.02,.52],scale:[.12,.085,.11]},
+      ...mirror({part:'nose',shape:'sphere',color:'skin',position:[.3,1.34,.4],scale:[.13,.11,.1]}));
+  }
   // Barba: abaixo da boca, sem cobrir o sorriso.
   if (look.beard === 1) add({ part: 'beard', shape: 'sphere', color: 'hair', position: [0, 1.27, .44], scale: [.3, .11, .12] });
   if (look.beard >= 2) add({ part: 'beard', shape: 'sphere', color: 'hair', position: [0, 1.22, .43], scale: [.4, .19, .15] }, ...mirror({ part: 'beard', shape: 'sphere', color: 'hair', position: [.33, 1.37, .32], scale: [.11, .17, .12] }));

@@ -5,7 +5,7 @@ const none={beard:0,moustache:0,brows:0,nose:0,ears:0,scar:0,tattoo:0,accessory:
 test('humano sem escolhas não ganha peças: o rosto original fica intacto',()=>{assert.equal(faceParts({look:none,race:'human',covered:false}).length,0);});
 test('raça traz suas marcas: orelha de elfo, presas de orc e orelhas grandes de gnomo',()=>{
  const parts=(race:'elf'|'orc'|'gnome'|'dwarf')=>faceParts({look:none,race,covered:false}).map(p=>p.part);
- assert.equal(parts('elf').filter(p=>p==='ear').length,2);assert.equal(parts('orc').filter(p=>p==='tusk').length,2);assert.equal(parts('gnome').filter(p=>p==='ear').length,2);assert.equal(parts('dwarf').length,0);
+ assert.equal(parts('elf').filter(p=>p==='ear').length,2);assert.equal(parts('orc').filter(p=>p==='tusk').length,2);assert.equal(parts('gnome').filter(p=>p==='ear').length,2);assert.equal(parts('dwarf').filter(p=>p==='nose').length,3);
  assert.equal(RACE_EARS.elf,4);
 });
 test('cada opção do menu cria peças e o elmo esconde só o que fica por baixo dele',()=>{

@@ -7,7 +7,7 @@ test('cada classe tem corpo animado, arma e paleta próprias',()=>{
  const signatures=new Set(ids.map(id=>{const s=HERO_STYLE[id];return [s.base,s.weapon.join(),s.offhand.join(),s.recolor.map(r=>r.to).join()].join('|');}));
  assert.equal(signatures.size,ids.length,'duas classes não podem ser idênticas');
 });
-test('humano, elfo e orc têm a mesma altura; anão menor; gnomo menor que o anão',()=>{const h=(r:Parameters<typeof heroProportions>[0])=>heroProportions(r).height;assert.equal(h('elf'),h('human'));assert.equal(h('orc'),h('human'));assert.ok(h('dwarf')<h('human'));assert.ok(h('gnome')<h('dwarf'));assert.ok(h('gnome')>.6,'gnomo continua só um pouco menor');});
+test('humano, elfo e orc têm a mesma altura; anão menor; gnomo menor que o anão',()=>{const h=(r:Parameters<typeof heroProportions>[0])=>heroProportions(r).height;assert.equal(h('elf'),h('human'));assert.equal(h('orc'),h('human'));assert.ok(h('dwarf')<h('human'));assert.ok(h('gnome')<h('dwarf'));assert.equal(h('dwarf'),.68);assert.equal(h('gnome'),.5);assert.ok(heroProportions('dwarf').width>=1.5,'silhueta anã larga e compacta');});
 test('recoloração troca a pele e a roupa sem mexer no restante',()=>{
  const px=new Uint8ClampedArray([245,193,155,255, 76,104,130,255, 20,24,28,255]);
  assert.ok(isAtlasSkin(23,.37,.96));
