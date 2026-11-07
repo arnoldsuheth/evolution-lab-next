@@ -118,13 +118,15 @@
     min-height: 0;
     border: 0;
   }
-  .creator-modal .creator-model > .creator-stage {
+  .creator-modal .creator-model > div.creator-stage {
+    grid-row: 2;
     position: relative !important;
     inset: auto;
     min-height: 0;
     overflow: hidden;
   }
   .creator-modal .model-caption {
+    grid-row: 1;
     position: static;
     transform: none;
     width: 100%;
@@ -139,6 +141,7 @@
   .creator-modal .model-caption h3 { font-size: 15px; line-height: 1.15; }
   .creator-modal .model-caption .eyebrow { font-size: 9px; }
   .creator-modal .model-controls {
+    grid-row: 3;
     position: static;
     display: block;
     padding: 3px 5px;
