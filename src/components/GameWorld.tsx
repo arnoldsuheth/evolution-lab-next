@@ -1,7 +1,7 @@
 "use client";
 import {heroProportions} from "@/lib/heroModels";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
-import { Html, OrbitControls } from "@react-three/drei";
+import { Html, OrbitControls, useProgress } from "@react-three/drei";
 import { Component, Suspense, useEffect, useLayoutEffect, useRef, useState, type ReactNode, type ComponentRef, type RefObject } from "react";
 import * as THREE from "three";
 import KingdomDetails from './KingdomDetails';
@@ -99,6 +99,9 @@ function WorldFraming() {
   return null;
 }
 function Scene({ paused, interact, report }: { paused: boolean; interact: (id: NpcId) => void; report: (text: string) => void }) {
+  // Pausado (janela aberta) o mundo não desenha; só tira uma "foto" nova se algo terminar de carregar ou a tela mudar de tamanho.
+  const advance = useThree(s => s.advance), size = useThree(s => s.size), loading = useProgress(s => s.active);
+  useEffect(() => { if (!paused || loading) return; const id = requestAnimationFrame(t => advance(t)); return () => cancelAnimationFrame(id); }, [paused, loading, size, advance]);
   const controls = useRef<ComponentRef<typeof OrbitControls>>(null); const shadowRoot=useRef<THREE.Group>(null);const jump=useRef({height:0,velocity:0});const touch=useRef({x:0,z:0}); const heroRoot = useRef<THREE.Group>(null);
   const mounted=useGame(s=>s.mounted); const encounter=useGame(s=>s.encounter); const relocation=useGame(s=>s.relocation); const lastRelocation=useRef(relocation); const hero = useGame(s => s.hero); const riding=mounted&&hero.level>=MOUNT_LEVEL&&!hero.dead&&!encounter&&!hero.instance; const speed=4.5*(riding?mountSpeed(hero):1); const mountKind=mountSpeed(hero)>1.4?"boar":"wolf"; const adventure=adventureOf(hero); const title=titleOf(adventure); const doorNote=useRef(0); const look = useGame(s => s.look); const education = useGame(s => s.education.completed); const reduced = useGame(s => s.settings.reduceMotion);
   const low = useGame(s => s.settings.quality === "low"); const quality = useGame(s => s.settings.quality);

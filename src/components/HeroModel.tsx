@@ -23,35 +23,39 @@ const NO_FACE:FaceOptions['look']={beard:0,moustache:0,brows:0,nose:0,ears:0,sca
 const clipCache=new WeakMap<THREE.AnimationClip[],THREE.AnimationClip[]>();
 function headFreeClips(clips:THREE.AnimationClip[]){let out=clipCache.get(clips);if(!out){out=clips.map(c=>{const k=c.clone();k.tracks=k.tracks.filter(t=>t.name!=='head.scale'&&!Array.from(COMPACT_LEGS).some(name=>t.name===name+'.scale'));return k;});clipCache.set(clips,out);}return out;}
 const CASTERS=new Set<ClassId>(['mage','prophet','shaman']);
+/** Capuz (armadura): só a cor muda com a raridade. */
+const HOOD_TINT:Record<string,string|undefined>={common:undefined,epic:'#7a52c9',mythic:'#d9a531'};
 const materials=new Map<string,THREE.Material>();
 /** Arma Épica brilha em lilás; Mítica, em dourado. */
 const GLOW:Record<string,string>={'Épico':'#9b6bff','Mítico':'#ffc23a'};
 function glowing(source:THREE.Material,rarity:string){const color=GLOW[rarity];if(!color||!(source instanceof THREE.MeshStandardMaterial))return source;const key=source.uuid+'|glow|'+rarity;let m=materials.get(key);if(!m){const g=source.clone();g.emissive=new THREE.Color(color);g.emissiveIntensity=rarity==='Mítico'?.9:.6;m=g;materials.set(key,m);}return m;}
 
-function recolored(source:THREE.MeshStandardMaterial,key:string,classId:ClassId,skin:string,options:RecolorOptions){
+function recolored(source:THREE.MeshStandardMaterial,key:string,classId:ClassId,skin:string,options:RecolorOptions,tint?:string){
  const cached=materials.get(key);if(cached)return cached;
  const image=source.map?.image as CanvasImageSource&{width:number;height:number}|undefined;
  if(!image||typeof document==='undefined')return source;
  const canvas=document.createElement('canvas');canvas.width=image.width;canvas.height=image.height;
  const context=canvas.getContext('2d',{willReadFrequently:true});if(!context)return source;
  context.drawImage(image,0,0);const pixels=context.getImageData(0,0,canvas.width,canvas.height);
- recolorAtlas(pixels.data,HERO_STYLE[classId],skin,options);context.putImageData(pixels,0,0);
+ // tint: capuz com a cor da raridade (só o pano; pele e cabelo seguem as próprias regras).
+ const style=tint?{...HERO_STYLE[classId],recolor:HERO_STYLE[classId].recolor.map(r=>({...r,to:tint}))}:HERO_STYLE[classId];
+ recolorAtlas(pixels.data,style,skin,options);context.putImageData(pixels,0,0);
  const texture=new THREE.CanvasTexture(canvas);texture.flipY=false;texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=4;
  const material=source.clone();material.map=texture;material.needsUpdate=true;materials.set(key,material);return material;
 }
 
 /** Cabeça (penteado ou capuz) vinda de outro corpo-base; todos usam o mesmo esqueleto. */
-function ForeignHead({from,host,classId,skin,hair,eyes}:{from:HeroBase;host:THREE.SkinnedMesh;classId:ClassId;skin:string;hair:string;eyes?:string}){
+function ForeignHead({from,host,classId,skin,hair,eyes,tint}:{from:HeroBase;host:THREE.SkinnedMesh;classId:ClassId;skin:string;hair:string;eyes?:string;tint?:string}){
  const gltf=useGLTF(heroModelUrl(from));
  useLayoutEffect(()=>{
   let source:THREE.SkinnedMesh|undefined;gltf.scene.traverse(o=>{if(o instanceof THREE.SkinnedMesh&&o.name===HERO_PARTS[from].head)source=o;});
   const parent=host.parent;if(!source||!parent)return;
-  const material=source.material instanceof THREE.MeshStandardMaterial?recolored(source.material,`${from}|${classId}|${skin}|head|${hair}|${eyes}`,classId,skin,{hair:{base:from,color:hair},eyes}):source.material;
+  const material=source.material instanceof THREE.MeshStandardMaterial?recolored(source.material,`${from}|${classId}|${skin}|head|${hair}|${eyes}|${tint??''}`,classId,skin,{hair:{base:from,color:hair},eyes},tint):source.material;
   const head=new THREE.SkinnedMesh(source.geometry,material);head.name='foreign-head';head.castShadow=true;
   head.position.copy(host.position);head.quaternion.copy(host.quaternion);head.scale.copy(host.scale);
   head.bind(host.skeleton,source.bindMatrix);parent.add(head);
   return()=>{head.removeFromParent();};
- },[gltf.scene,from,host,classId,skin,hair,eyes]);
+ },[gltf.scene,from,host,classId,skin,hair,eyes,tint]);
  return null;
 }
 
@@ -92,7 +96,7 @@ export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairSty
  const oneHand=weaponItem?.slot==='weapon'&&style.idle==='2H_Melee_Idle';
  const idle=armed?(oneHand?'Idle':style.idle):'Idle',move=walking?HERO_WALK:idle,attack=armed||CASTERS.has(classId)?(oneHand?'1H_Melee_Attack_Chop':style.attack):HERO_PUNCH;
  const wv=weaponItem?.visual??'',ov=offItem?.visual??'';
- return <group><GearAura tier={weaponItem&&rarityTier(weaponItem.rarity)==='mythic'?'mythic':'common'} animated={animated}/><Rig key={scene.uuid} scene={scene} clips={headFreeClips(gltf.animations)} move={move} walking={walking} animated={animated} attack={attack} eventTime={eventTime} hurtTime={hurtTime}/>{weaponItem&&(WEAPON_MESH[wv]?<Suspense fallback={null}><BorrowedPiece piece={WEAPON_MESH[wv]} bone="handslot.r" scene={scene} rarity={weaponItem.rarity} kind="weapon"/></Suspense>:wv&&<SimpleWeapon visual={wv} bone="handslot.r" scene={scene} rarity={weaponItem.rarity}/>)}{offItem&&(OFFHAND_MESH[ov]?<Suspense fallback={null}><BorrowedPiece piece={OFFHAND_MESH[ov]} bone="handslot.l" scene={scene} rarity={offItem.rarity} kind="weapon"/></Suspense>:ov&&<SimpleWeapon visual={ov} bone="handslot.l" scene={scene} rarity={offItem.rarity} small/>)}{wornHat&&headItem&&<Suspense fallback={null}><BorrowedPiece piece={wornHat} bone="head" scene={scene} rarity={headItem.rarity} kind="armor"/></Suspense>}{host&&head!==style.base&&<Suspense fallback={null}><ForeignHead from={head} host={host} classId={classId} skin={skin} hair={hair} eyes={eyes}/></Suspense>}</group>;
+ return <group><GearAura tier={weaponItem&&rarityTier(weaponItem.rarity)==='mythic'?'mythic':'common'} animated={animated}/><Rig key={scene.uuid} scene={scene} clips={headFreeClips(gltf.animations)} move={move} walking={walking} animated={animated} attack={attack} eventTime={eventTime} hurtTime={hurtTime}/>{weaponItem&&(WEAPON_MESH[wv]?<Suspense fallback={null}><BorrowedPiece piece={WEAPON_MESH[wv]} bone="handslot.r" scene={scene} rarity={weaponItem.rarity} kind="weapon"/></Suspense>:wv&&<SimpleWeapon visual={wv} bone="handslot.r" scene={scene} rarity={weaponItem.rarity}/>)}{offItem&&(OFFHAND_MESH[ov]?<Suspense fallback={null}><BorrowedPiece piece={OFFHAND_MESH[ov]} bone="handslot.l" scene={scene} rarity={offItem.rarity} kind="weapon"/></Suspense>:ov&&<SimpleWeapon visual={ov} bone="handslot.l" scene={scene} rarity={offItem.rarity} small/>)}{wornHat&&headItem&&<Suspense fallback={null}><BorrowedPiece piece={wornHat} bone="head" scene={scene} rarity={headItem.rarity} kind="armor"/></Suspense>}{host&&head!==style.base&&<Suspense fallback={null}><ForeignHead from={head} host={host} classId={classId} skin={skin} hair={hair} eyes={eyes} tint={headKind==='hood'&&headItem?HOOD_TINT[rarityTier(headItem.rarity)]:undefined}/></Suspense>}</group>;
 }
 
 /** Animações presas a uma montagem do modelo; trocar roupa ou arma cria uma montagem nova (sem pose em T). */

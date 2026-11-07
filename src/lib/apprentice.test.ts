@@ -47,3 +47,15 @@ test('pontos de código: 8 temas, na grama da vila, em ordem', () => {
   assert.equal(spotAvailable([], CODE_SPOTS[0].id), true); assert.equal(spotAvailable([], CODE_SPOTS[1].id), false);
   assert.equal(spotAvailable([CODE_SPOTS[0].id], CODE_SPOTS[1].id), true); assert.equal(nextSpot([CODE_SPOTS[0].id])?.id, CODE_SPOTS[1].id);
 });
+
+test('portas das masmorras com botões: a resposta abre a porta, cada erro é explicado e recusado', async () => {
+  const { DOOR_APPRENTICE, answers: ans, checkPicks: check, fillCode: fill } = await import('./apprentice');
+  const { DOORS, tryDoor } = await import('./dungeon');
+  for (const d of DOORS) {
+    const b = DOOR_APPRENTICE[d.id];
+    assert.ok(b, `${d.id} tem modo com botões`);
+    assert.equal(tryDoor(d.id, fill(b, ans(b))).passed, true, `${d.id}: a resposta abre a porta`);
+    assert.equal(b.explain.length, b.code.split('\n').length, `${d.id}: uma explicação por linha`);
+    b.blanks.forEach((blank, i) => { for (const o of blank.options) if (o !== blank.answer) { assert.ok(blank.why[o], `${d.id}: "${o}" explicado`); const picks = ans(b); picks[i] = o; assert.equal(check(b, picks).ok, false); } });
+  }
+});

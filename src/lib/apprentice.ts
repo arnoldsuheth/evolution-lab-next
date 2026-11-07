@@ -120,3 +120,30 @@ export const APPRENTICE: Record<string, Builder> = {
     words: [['índice', 'a posição na lista, começando em 0'], ['bug', 'um erro no código']],
   },
 };
+
+/** Portas de código das masmorras (caverna e monastério), também montadas com botões. */
+export const DOOR_APPRENTICE: Record<string, Builder> = {
+  'cavern-1': { simple: 'A fechadura pede a chave número 3. Guarde 3 na variável chave.', code: 'let chave = {0};',
+    blanks: [blank('3', { '0': 'Com 0 a fechadura continua travada: ela pede a chave 3.', '"3"': 'Com aspas vira texto. A fechadura quer o número 3, sem aspas.' })],
+    explain: ['let cria a caixa chave e guarda o número 3: a fechadura gira.'], words: [['let', 'cria uma variável (caixa com nome)']] },
+  'cavern-2': { simple: 'Se houver 2 tochas ou mais, a porta abre (aberta = true).', code: 'const tochas = 2;\nlet aberta = false;\nif (tochas {0} 2) {\n  aberta = {1};\n}',
+    blanks: [blank('>=', { '<': 'Com < a porta só abriria com MENOS de 2 tochas: o contrário!', '==': 'Com == ela só abriria com exatamente 2. Com 3 tochas ficaria fechada.' }),
+      blank('true', { false: 'false deixaria a porta fechada mesmo com as tochas acesas.' })],
+    explain: ['Há 2 tochas acesas.', 'A porta começa fechada.', 'Se tochas for 2 ou mais...', '...a porta abre (true).', 'Fim do se.'], words: [['>=', 'maior ou igual'], ['if', 'se']] },
+  'cavern-3': { simple: 'Some todos os cristais da lista no total, um por volta da repetição.', code: 'const cristais = [4, 1, 5];\nlet total = 0;\nfor (let i = 0; i < cristais.length; i++) {\n  total {0} cristais[{1}];\n}',
+    blanks: [blank('+=', { '=': 'Com = o total guardaria só o último cristal (5), não a soma.', '-=': 'Com -= o total ficaria negativo.' }),
+      blank('i', { '0': 'Com [0] você somaria sempre o primeiro cristal (4), três vezes.', '1': 'Com [1] somaria sempre o mesmo cristal. Use i, que muda a cada volta.' })],
+    explain: ['Lista com 3 cristais: 4, 1 e 5.', 'O total começa em 0.', 'Repete uma vez para cada cristal (i = 0, 1, 2).', 'Soma o cristal da posição i ao total: 4 + 1 + 5 = 10.', 'Fim da repetição.'], words: [['+=', 'soma ao que já tem'], ['[i]', 'o item da posição i']] },
+  'monastery-1': { simple: 'Toque o sino 5 vezes: uma repetição que conta um toque por volta.', code: 'let toques = 0;\nfor (let i = 0; i < {0}; i++) {\n  toques{1};\n}',
+    blanks: [blank('5', { '4': 'Com 4 o sino toca só 4 vezes.', '6': 'Com 6 seriam 6 toques, um a mais.' }),
+      blank('++', { '--': 'toques-- diminui: terminaria em -5.' })],
+    explain: ['Começa com 0 toques.', 'Repete 5 vezes (i = 0, 1, 2, 3, 4).', 'Cada volta soma 1 toque.', 'Fim: 5 toques.'], words: [['for', 'repita'], ['++', 'aumenta 1']] },
+  'monastery-2': { simple: 'A função selo recebe um número e devolve esse número mais 10.', code: 'function selo(n) {\n  {0} n {1} 10;\n}',
+    blanks: [blank('return', { 'console.log': 'console.log só mostra na tela. A função precisa DEVOLVER o valor: return.', let: 'let cria uma variável. Para devolver um valor use return.' }),
+      blank('+', { '*': 'n * 10 daria 50 com n = 5. O selo pede n + 10 = 15.', '-': 'n - 10 daria -5 com n = 5.' })],
+    explain: ['Cria a função selo, que recebe um número n.', 'Devolve n mais 10 (com 5, devolve 15).', 'Fim da função.'], words: [['return', 'devolve o resultado'], ['função', 'receita com nome']] },
+  'monastery-3': { simple: 'Passa quem tem nível 25 ou mais E tem o selo (as duas coisas).', code: 'const nivel = 25;\nconst temSelo = true;\nconst passa = nivel {0} 25 {1} temSelo;',
+    blanks: [blank('>=', { '>': 'Com > quem tem exatamente nível 25 não passaria.', '<': 'Com < só passaria quem tem nível baixo: o contrário.' }),
+      blank('&&', { '||': 'Com || bastaria ter só uma das duas coisas. O abade exige as duas: &&.' })],
+    explain: ['O herói tem nível 25.', 'O herói tem o selo.', 'passa é verdadeiro só se o nível for 25 ou mais E tiver o selo.'], words: [['&&', 'e (as duas coisas)'], ['||', 'ou (basta uma)']] },
+};

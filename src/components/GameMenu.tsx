@@ -19,8 +19,10 @@ export const MENU_ITEMS:{id:MenuPanel;label:string;icon:string;hint:string}[]=[
 ];
 export const MENU_EDIT_EVENT='lions-cave-hud-edit';
 
-export default function GameMenu({hidden=false,open:openPanel,keys,rest,canRest,switchCharacter,location,version,error}:{hidden?:boolean;open:(panel:MenuPanel)=>void;keys:Record<string,string>;rest:()=>void;canRest:boolean;switchCharacter:()=>void;location:string;version:string;error:boolean}){
+export default function GameMenu({hidden=false,open:openPanel,keys,rest,canRest,switchCharacter,location,version,error,onOpenChange}:{onOpenChange?:(open:boolean)=>void;hidden?:boolean;open:(panel:MenuPanel)=>void;keys:Record<string,string>;rest:()=>void;canRest:boolean;switchCharacter:()=>void;location:string;version:string;error:boolean}){
  const [open,setOpen]=useState(false),root=useRef<HTMLDivElement>(null);
+ // Menu aberto também pausa o mundo atrás (avisa a página).
+ useEffect(()=>{onOpenChange?.(open&&!hidden);},[open,hidden,onOpenChange]);
  const level=useGame(s=>s.hero.level),mounted=useGame(s=>s.mounted),hearthAt=useGame(s=>adventureOf(s.hero).hearthAt),now=useGame(s=>s.now),hearthLeft=Math.max(0,Math.ceil((hearthAt-now)/60000));
  useEffect(()=>{if(!open)return;const close=(e:Event)=>{if(e instanceof KeyboardEvent?e.key==='Escape':!root.current?.contains(e.target as Node))setOpen(false);};window.addEventListener('keydown',close);window.addEventListener('pointerdown',close);return()=>{window.removeEventListener('keydown',close);window.removeEventListener('pointerdown',close);};},[open]);
  const choose=(action:()=>void)=>{setOpen(false);action();};
