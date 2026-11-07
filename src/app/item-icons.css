@@ -57,3 +57,11 @@
 :is(.item-icon.rarity-mítico,.loot-art.rarity-mítico,.sheet-equipment [data-rarity="Mítico"],.forge-card.rarity-mitico)::after{content:"";position:absolute;top:-10%;bottom:-10%;left:0;width:35%;background:linear-gradient(90deg,transparent,#fff7d6aa,transparent);animation:rarity-shine 2.8s ease-in-out infinite;pointer-events:none;z-index:2}
 .sheet-equipment [data-rarity="Épico"]{border-color:#b49bd4!important}.sheet-equipment [data-rarity="Mítico"]{border-color:#f2c14e!important}
 @media (prefers-reduced-motion:reduce){:is(.item-icon.rarity-épico,.loot-art.rarity-épico,.sheet-equipment [data-rarity="Épico"],.forge-card.rarity-epico,.item-icon.rarity-mítico,.loot-art.rarity-mítico,.sheet-equipment [data-rarity="Mítico"],.forge-card.rarity-mitico){animation:none!important}:is(.item-icon.rarity-mítico,.loot-art.rarity-mítico,.sheet-equipment [data-rarity="Mítico"],.forge-card.rarity-mitico)::after{display:none}}
+
+.equipment-icons .item-icon{gap:4px}
+.equipment-icons .item-icon-stats,.equipment-icons .item-icon-price{display:block;max-width:100%;font-size:10px;font-weight:650;line-height:1.25;text-align:center}
+.equipment-icons .item-icon-stats{overflow-wrap:anywhere}
+.equipment-icons .item-icon-price{margin-top:auto;padding-top:2px;opacity:.82;font-variant-numeric:tabular-nums}
+.equipment-icons .item-icon-price[title]{cursor:inherit}
+.world-container .town-sign,.world-container .gate-label:not(button){padding:3px 7px;box-shadow:none;font-size:10px}
+.game-shell:has(.game-menu) .minimap>span{display:none}

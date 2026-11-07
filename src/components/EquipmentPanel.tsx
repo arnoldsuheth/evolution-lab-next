@@ -7,8 +7,27 @@ import { useEffect, useRef, useState } from 'react';
 import { useGame } from '@/lib/store';
 import {ItemArtwork} from './GameArtwork';
 import { ITEMS,CLASSES,stats } from '@/lib/game';
-import { CATEGORY_NAMES,SLOT_NAMES,LEVEL_BANDS } from '@/lib/catalogue';
+import { CATEGORY_NAMES,SLOT_NAMES,LEVEL_BANDS,type Item } from '@/lib/catalogue';
 import { activeEquipment,bagCount,countItem,isEquipment,itemRequirement } from '@/lib/equipment';
+
+function itemStats(item:Item){
+ const values:[number|undefined,string][]=[
+  [item.power,'ATQ'],[item.defense,'DEF'],
+  [item.effect?.hp??item.hp,'HP'],[item.effect?.mp??item.mp,'MP'],
+  [item.effect?.stamina??item.stamina,'EST'],[item.companion,'PET'],
+ ];
+ const stats=values.filter(([value])=>!!value).map(([value,label])=>`${(value??0)>0?'+':''}${value} ${label}`);
+ if(item.effect?.buff&&item.effect.amount)stats.push(`+${item.effect.amount} ${{attack:'ATQ',defense:'DEF',regen:'REGEN'}[item.effect.buff]}`);
+ if(item.effect?.teleport)stats.push('Retorno');
+ return stats;
+}
+
+function compactPrice(value:number){
+ const parts:[[number,string],[number,string],[number,string]]=[
+  [Math.floor(value/10000),'O'],[Math.floor(value%10000/100),'P'],[value%100,'B'],
+ ];
+ return parts.filter(([amount])=>amount>0).map(([amount,suffix])=>`${amount}${suffix}`).join(' ')||'0B';
+}
 
 export default function EquipmentPanel({shop=false,vendor="borin"}:{shop?:boolean;vendor?:"borin"|"elara"|"dorin"|"mira"}){
  const mounted=useGame(s=>s.mounted);const hero=useGame(s=>s.hero),shopCut=repPercent(adventureOf(hero),'mercadores'),completed=useGame(s=>s.education.completed),encounter=useGame(s=>s.encounter);
@@ -46,7 +65,7 @@ export default function EquipmentPanel({shop=false,vendor="borin"}:{shop?:boolea
  <div className="catalogue-summary"><span>Clique em um ícone para ver detalhes e ações.</span><b>{matching.length.toLocaleString('pt-BR')} resultado(s)</b><span>{all.length.toLocaleString('pt-BR')} itens no acervo · seu nível: {hero.level}</span></div>
 
  <div className={`item-browser ${inspectedItem?'has-selection':''}`}>
- <div className="item-icon-grid" aria-label="Itens disponíveis">{entries.map(item=><button type="button" className={`item-icon rarity-${item.rarity.toLowerCase()} ${inspected===item.id?'is-inspected':''}`} key={item.id} id={`item-${item.id}`} aria-label={`Examinar ${item.name}`} aria-pressed={inspected===item.id} onClick={()=>inspect(item.id)}><span className="item-icon-art"><ItemArtwork item={item}/></span><span className="item-icon-name">{item.name}</span>{countItem(inventory,item.id)>0&&<span className="item-icon-count">×{(view==='bag'||view==='sell')?bagCount(hero,item.id):countItem(inventory,item.id)}</span>}{hero.equipped.includes(item.id)&&<span className="item-icon-equipped" aria-label="Equipado">✓</span>}</button>)}</div>
+ <div className="item-icon-grid" aria-label="Itens disponíveis">{entries.map(item=>{const stats=itemStats(item);const price=view==='sell'?item.sellPrice:view==='forge'?Math.max(item.sellPrice+1,Math.ceil((item.craftGold??0)*(1-limits.craftDiscount/100))):item.price;return <button type="button" className={`item-icon rarity-${item.rarity.toLowerCase()} ${inspected===item.id?'is-inspected':''}`} key={item.id} id={`item-${item.id}`} aria-label={`Examinar ${item.name}${stats.length ? `, ${stats.join(", ")}` : ""}${price>0 ? `, ${currency(price)}` : ""}`} aria-pressed={inspected===item.id} onClick={()=>inspect(item.id)}><span className="item-icon-art"><ItemArtwork item={item}/></span><span className="item-icon-name">{item.name}</span><span className="item-icon-stats" title={stats.join(' · ')}>{stats.length?stats.slice(0,2).join(' · '):`Nv. ${item.minLevel}`}</span>{price>0&&<span className="item-icon-price" title={`${view==='sell'?'Venda':view==='forge'?'Custo':'Valor'}: ${currency(price)}`} aria-label={`${view==='sell'?'Venda':view==='forge'?'Custo':'Valor'}: ${currency(price)}`}>◉ {compactPrice(price)}</span>}{countItem(inventory,item.id)>0&&<span className="item-icon-count">×{(view==='bag'||view==='sell')?bagCount(hero,item.id):countItem(inventory,item.id)}</span>}{hero.equipped.includes(item.id)&&<span className="item-icon-equipped" aria-label="Equipado">✓</span>}</button>;})}</div>
  {inspectedItem&&<section ref={detail} tabIndex={-1} className="item-detail-panel" aria-label={`Detalhes de ${inspectedItem.name}`}><button type="button" className="item-detail-close icon-button" aria-label="Fechar detalhes do item" onClick={()=>{const id=inspected;setInspected(null);requestAnimationFrame(()=>document.getElementById(`item-${id}`)?.focus());}}>×</button><div className="item-detail-art" data-rarity={inspectedItem.rarity}><ItemArtwork item={inspectedItem}/></div>{renderDetails(inspectedItem)}</section>}
  </div>
  {!entries.length&&<div className="empty-state">Nenhum item corresponde aos filtros. Altere a classe, a faixa ou o tipo.</div>}<div className="catalogue-pagination"><button disabled={safePage===0} onClick={()=>setPage(safePage-1)}>← Anterior</button><span>Página {safePage+1} de {pages}</span><button disabled={safePage>=pages-1} onClick={()=>setPage(safePage+1)}>Próxima →</button></div>

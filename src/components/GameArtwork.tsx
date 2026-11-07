@@ -2,7 +2,7 @@
 import {artworkForItem} from '@/lib/artwork';
 import {ApprovedArtwork} from './ApprovedArtwork';
 import {useId} from 'react';
-import type {Item} from '@/lib/catalogue';
+import {bandFor,type Item} from '@/lib/catalogue';
 import type {Skill} from '@/lib/skills';
 const paths:Record<string,string>={
  fruit:'<path d="M32 22q-13-12-22 1-11 18 5 33 10 8 17-2 7 10 17 2 16-15 5-33-9-13-22-1Z" fill="#bd7962" stroke="#ead4a2" stroke-width="2"/><path d="M32 22q0-12 10-17" fill="none" stroke="#ae895c" stroke-width="4"/><path d="M33 16q2-16-14-11 0 13 14 11Z" fill="#95b482"/>',
@@ -44,7 +44,35 @@ const paths:Record<string,string>={
  book:'<path d="M6 12q15-5 26 4 11-9 26-4v39q-15-5-26 4-11-9-26-4Z" fill="#b6aa8b" stroke="#e8d6b1" stroke-width="2"/><path d="M32 16v39M13 23l12 2m-12 7 12 2m14-9 12-2m-12 11 12-2" stroke="#667a79" stroke-width="2"/>',
 };
 const aliases:Record<string,string>={tool:'hammer',focus:'crystal',gadget:'parts',wolf:'pet',boar:'pet',lynx:'pet',falcon:'pet',bear:'pet',spirit:'pet'};
-function Art({type,name,tone='#d6bb7c',tier=1,ink}:{type:string;name:string;tone?:string;tier?:number;ink?:string}){const id=useId().replace(/:/g,'');return <svg viewBox="0 0 64 64" role="img" aria-label={name} className="game-artwork"><defs><radialGradient id={id}><stop stopColor="#ffffff"/><stop offset=".7" stopColor="#e4f0fb"/><stop offset="1" stopColor={tone} stopOpacity=".45"/></radialGradient></defs><rect x="1" y="1" width="62" height="62" rx="9" fill={`url(#${id})`} stroke={tone} strokeOpacity=".5"/><g transform="translate(3 1) scale(.9)" dangerouslySetInnerHTML={{__html:(paths[aliases[type]??type]??paths.trinket).replace('#c76a7a',ink??'#c76a7a')}}/><path d="m7 7 5-2m45 49-2 5" stroke={tone} opacity=".7"/>{tier>1&&<circle cx="55" cy="55" r="5" fill={tone}/>}</svg>;}
-export function ItemArtwork({item}:{item:Item}){const crop=artworkForItem(item);if(crop)return <ApprovedArtwork crop={crop} name={item.name} inset={6}/>;const type=item.id.includes('fruit')?'fruit':item.id.includes('stew')?'bowl':paths[item.visual]||aliases[item.visual]?item.visual:item.category==='companion'?'pet':item.category==='tool'?'parts':item.category==='trophy'?'trophy':item.category==='armor'?item.slot:item.category==='consumable'?'potion':item.category==='food'?'food':'trinket';return <Art type={type} name={item.name} tier={item.minLevel} ink={item.id.includes("mana")?"#749ecb":item.id.includes("energy")||item.id==="tea"?"#8ab48b":item.id.includes("guard")?"#c6b276":undefined} tone={({Comum:'#c3bc9e',Incomum:'#96be86',Raro:'#88b9d5',Épico:'#b49bd4',Lendário:'#dfb873','Mítico':'#f2c14e'} as Record<string,string>)[item.rarity]}/>;}
+function Art({type,name,tone='#d6bb7c',tier=1,ink,hue=0}:{type:string;name:string;tone?:string;tier?:number;ink?:string;hue?:number}){const id=useId().replace(/:/g,'');return <svg viewBox="0 0 64 64" role="img" aria-label={name} className="game-artwork"><defs><radialGradient id={id}><stop stopColor="#ffffff"/><stop offset=".7" stopColor="#e4f0fb"/><stop offset="1" stopColor={tone} stopOpacity=".45"/></radialGradient></defs><rect x="1" y="1" width="62" height="62" rx="9" fill={`url(#${id})`} stroke={tone} strokeOpacity=".5"/><g style={hue ? {filter: `hue-rotate(${hue}deg)`} : undefined} transform="translate(3 1) scale(.9)" dangerouslySetInnerHTML={{__html:(paths[aliases[type]??type]??paths.trinket).replace('#c76a7a',ink??'#c76a7a')}}/><path d="m7 7 5-2m45 49-2 5" stroke={tone} opacity=".7"/>{tier>1&&<circle cx="55" cy="55" r="5" fill={tone}/>}</svg>;}
+const MATERIAL_PALETTE=['#7753ac','#247d86','#377947','#a95048','#4a629e','#8e437c','#b4762f','#514578','#1e859a','#a3542f','#646b80','#456d59','#8c3954'];
+
+function AmuletArtwork({name,band,guard}:{name:string;band:number;guard:boolean}){
+ const gem=MATERIAL_PALETTE[(band+(guard?0:4))%MATERIAL_PALETTE.length];
+ const outline=guard?'M16 25 32 19 48 25 46 44Q42 53 32 58Q22 53 18 44Z':'M32 18 51 37 32 58 13 37Z';
+ return <svg viewBox="0 0 64 64" role="img" aria-label={name} className="game-artwork">
+  <path d="M17 6Q9 17 24 25M47 6Q55 17 40 25" fill="none" stroke="#694633" strokeWidth="4" strokeLinecap="round"/>
+  <path d={outline} fill={gem} stroke={guard?'#c9a153':'#e1ae6e'} strokeWidth="4" strokeLinejoin="round"/>
+  <path d={guard?'M32 28V48M24 35H40':'M35 25 23 39H32L29 50 42 35H33Z'} fill={guard?'none':'#fff1ce'} stroke="#fff1ce" strokeWidth={guard?3:1} strokeLinecap="round"/>
+  {band>0&&<path d={band%2?'M20 26 22 45M44 27 42 44':'M26 24 18 37 24 45M38 24 46 37 40 45'} fill="none" stroke="#fff6df" opacity=".45"/>}
+ </svg>;
+}
+
+function ClothArtwork({name,band}:{name:string;band:number}){
+ return <svg viewBox="0 0 64 64" role="img" aria-label={name} className="game-artwork">
+  <path d="M8 39 22 16H55L46 43 12 50Z" fill={MATERIAL_PALETTE[band]} stroke="#362b43" strokeWidth="2" strokeLinejoin="round"/>
+  <path d="M12 43 45 37 53 19M15 47 47 41" fill="none" stroke="#f2d18c" strokeWidth="2"/>
+  <path d={['M22 33 29 24 38 32 31 40Z','M20 34 33 24M27 39 41 27','M21 34Q32 21 41 30Q32 42 21 34Z'][band%3]} fill="none" stroke="#fff5ce" strokeWidth="2.5" strokeLinejoin="round"/>
+ </svg>;
+}
+export function ItemArtwork({item}:{item:Item}){const band=bandFor(item.minLevel);
+ const hue=[0,35,72,115,156,192,221,255,285,310,330,52,174][band];
+ const guard=item.id.startsWith('access-charm-1-');
+ const impetus=item.id.startsWith('access-charm-0-');
+ if(guard||impetus)return <AmuletArtwork name={item.name} band={band} guard={guard}/>;
+ if(item.id.startsWith('mat-cloth-'))return <ClothArtwork name={item.name} band={band}/>;
+ const crop=artworkForItem(item);
+ const finish=item.rarity==='Épico'?24:item.rarity==='Mítico'?48:0;
+ if(crop)return <ApprovedArtwork crop={crop} name={item.name} inset={6} hue={hue+finish}/>;const type=item.id.includes('fruit')?'fruit':item.id.includes('stew')?'bowl':paths[item.visual]||aliases[item.visual]?item.visual:item.category==='companion'?'pet':item.category==='tool'?'parts':item.category==='trophy'?'trophy':item.category==='armor'?item.slot:item.category==='consumable'?'potion':item.category==='food'?'food':'trinket';return <Art hue={hue+finish} type={type} name={item.name} tier={item.minLevel} ink={item.id.includes("mana")?"#749ecb":item.id.includes("energy")||item.id==="tea"?"#8ab48b":item.id.includes("guard")?"#c6b276":undefined} tone={({Comum:'#c3bc9e',Incomum:'#96be86',Raro:'#88b9d5',Épico:'#b49bd4',Lendário:'#dfb873','Mítico':'#f2c14e'} as Record<string,string>)[item.rarity]}/>;}
 export function SkillArtwork({skill}:{skill:Skill}){const type=skill.heal?'heal':skill.buff?'charm':skill.guard?'shield':skill.classId==='engineer'?'parts':skill.classId==='hunter'?(skill.branch===1?'pet':'bow'):skill.classId==='mage'||skill.classId==='shaman'?(skill.branch===0?'flame':'crystal'):skill.classId==='hacker'?'dagger':skill.classId==='prophet'?'book':skill.classId==='duelist'?'sword':skill.branch===1?'shield':'greatsword';return <Art type={type} name={skill.name} tier={skill.tier+1} tone={skill.kind==='active'?'#b6a0d7':'#cdb981'}/>;}
 

@@ -51,6 +51,11 @@ function Floodgate({open}:{open:boolean}){
  return <group><mesh position={[0,1.7,-1.9]} castShadow><boxGeometry args={[.5,3.4,.5]}/>{std(STONE)}</mesh><mesh position={[0,1.7,1.9]} castShadow><boxGeometry args={[.5,3.4,.5]}/>{std(STONE)}</mesh><mesh position={[0,3.5,0]}><boxGeometry args={[.6,.4,4.3]}/>{std(STONE)}</mesh>
   <group ref={gate}>{[-1.2,-.4,.4,1.2].map(z=><mesh key={z} position={[0,1.2,z]}><boxGeometry args={[.12,2.3,.14]}/>{std('#4b4f57',{metalness:.5})}</mesh>)}</group></group>;
 }
+function NearbySign({prop}:{prop:Prop}){
+ const nearby=useGame(s=>Math.hypot(s.hero.position[0]-prop.x,s.hero.position[1]-prop.z)<7);
+ return nearby?<Html zIndexRange={[5,0]} position={[0,2.05,0]} center style={{pointerEvents:'none'}}><span className="town-sign">{prop.label}</span></Html>:null;
+}
+
 function PropModel({prop,unlocked}:{prop:Prop;unlocked:boolean}){
  switch(prop.kind){
   case 'lamp':return <Lamp lit={unlocked}/>;
@@ -62,7 +67,7 @@ function PropModel({prop,unlocked}:{prop:Prop;unlocked:boolean}){
   case 'barrel':return <group>{[[0,0],[.6,.3],[.2,-.5]].map(([x,z],i)=><mesh key={i} position={[x,.4,z]} castShadow><cylinderGeometry args={[.3,.27,.8,10]}/>{std('#8a5a33')}</mesh>)}</group>;
   case 'cart':return <group><mesh position={[0,.75,0]} castShadow><boxGeometry args={[1.8,.5,1.1]}/>{std(WOOD)}</mesh>{[[-.6,.6],[.6,.6],[-.6,-.6],[.6,-.6]].map(([x,z],i)=><mesh key={i} position={[x,.35,z]} rotation={[Math.PI/2,0,0]}><cylinderGeometry args={[.35,.35,.12,12]}/>{std(WOOD_DARK)}</mesh>)}<mesh position={[0,1.15,0]}><sphereGeometry args={[.35,10,8]}/>{std('#e7c25a')}</mesh></group>;
   case 'bench':return <group><mesh position={[0,.45,0]} castShadow><boxGeometry args={[1.4,.12,.45]}/>{std(WOOD)}</mesh>{[-.55,.55].map(x=><mesh key={x} position={[x,.22,0]}><boxGeometry args={[.1,.45,.4]}/>{std(WOOD_DARK)}</mesh>)}</group>;
-  case 'sign':return <group><mesh position={[0,.9,0]}><cylinderGeometry args={[.06,.07,1.8,6]}/>{std(WOOD_DARK)}</mesh><mesh position={[0,1.6,0]}><boxGeometry args={[1.3,.36,.08]}/>{std(WOOD)}</mesh><Html zIndexRange={[5,0]} position={[0,2.05,0]} center style={{pointerEvents:'none'}}><span className="town-sign">{prop.label}</span></Html></group>;
+  case 'sign':return <group><mesh position={[0,.9,0]}><cylinderGeometry args={[.06,.07,1.8,6]}/>{std(WOOD_DARK)}</mesh><mesh position={[0,1.6,0]}><boxGeometry args={[1.3,.36,.08]}/>{std(WOOD)}</mesh><NearbySign prop={prop}/></group>;
   case 'gate':return <group>{[-3.1,3.1].map(x=><mesh key={x} position={[x,1.7,0]} castShadow><boxGeometry args={[.7,3.4,.7]}/>{std(STONE)}</mesh>)}<mesh position={[0,3.55,0]} castShadow><boxGeometry args={[7,.5,.8]}/>{std(WOOD)}</mesh><mesh position={[0,4.05,0]}><boxGeometry args={[2.6,.5,.12]}/>{std('#2f5d7e')}</mesh></group>;
   case 'board':return <group><mesh position={[0,1.2,0]} castShadow><boxGeometry args={[1.4,1,.12]}/>{std(WOOD)}</mesh>{[-.6,.6].map(x=><mesh key={x} position={[x,.6,0]}><boxGeometry args={[.1,1.2,.1]}/>{std(WOOD_DARK)}</mesh>)}{unlocked&&[[-.35,1.3],[.05,1.15],[.4,1.3]].map(([x,y],i)=><mesh key={i} position={[x,y,.07]}><planeGeometry args={[.3,.38]}/>{std(['#fff4d6','#f6e3a8','#e9f1ff'][i])}</mesh>)}</group>;
   case 'statue':return <group><mesh position={[0,.4,0]} castShadow><boxGeometry args={[1.3,.8,1.3]}/>{std(STONE)}</mesh><mesh position={[0,1.5,0]} castShadow><octahedronGeometry args={[.6]}/><meshStandardMaterial color="#9fdbe6" emissive="#3fa9b8" emissiveIntensity={.5} metalness={.3} roughness={.3}/></mesh></group>;
