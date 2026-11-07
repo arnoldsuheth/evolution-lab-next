@@ -11,21 +11,8 @@ export function HouseDetails({ index }: { index: number }) {
   const reduced = useGame(s => s.settings.reduceMotion);
   useFrame(state => { if (banner.current) banner.current.rotation.z = reduced ? 0 : Math.sin(state.clock.elapsedTime*1.25+index)*0.035; });
   const color = ['#607b77','#6b617e','#9a7855','#557966'][index];
-  return <group>
-    <mesh position={[-1.9,3.15,2.38]}><boxGeometry args={[0.08,0.72,0.1]} /><meshStandardMaterial color="#5b4b35" /></mesh>
-    <mesh position={[-1.9,2.85,2.47]} ref={banner}><planeGeometry args={[0.58,0.83]} /><meshStandardMaterial color={color} roughness={1} side={THREE.DoubleSide} /></mesh>
-    <mesh position={[-1.9,2.88,2.48]}><octahedronGeometry args={[0.11]} /><meshStandardMaterial color="#cbb98a" /></mesh>
-    {[-1.5,1.5].map(x=><group key={x} position={[x,1.65,2.45]}>
-      <mesh position={[0,0,0]}><boxGeometry args={[0.27,0.39,0.24]} /><meshStandardMaterial color="#b09962" emissive="#b68c43" emissiveIntensity={0.35} /></mesh>
-      <mesh position={[0,0.24,0]}><coneGeometry args={[0.22,0.2,4]} /><meshStandardMaterial color="#4d554e" /></mesh>
-      <mesh position={[0,-0.23,0]}><boxGeometry args={[0.3,0.06,0.27]} /><meshStandardMaterial color="#4d554e" /></mesh>
-    </group>)}
-    <group position={[2.08,0.68,1.73]}>
-      <mesh castShadow><cylinderGeometry args={[0.38,0.34,0.79,10]} /><meshStandardMaterial color="#7d6247" flatShading /></mesh>
-      {[-0.23,0.23].map(y=><mesh key={y} position={[0,y,0]}><cylinderGeometry args={[0.39,0.39,0.07,10]} /><meshStandardMaterial color="#4f5c57" metalness={0.3} roughness={0.7} /></mesh>)}
-    </group>
-    <mesh position={[0,0.22,2.65]} receiveShadow><boxGeometry args={[1.8,0.25,0.5]} /><meshStandardMaterial color="#8a8b78" /></mesh>
-  </group>;
+  // Só a bandeirinha (que balança) fica aqui; as outras peças da casa estão juntas em House.
+  return <mesh position={[-1.9,2.85,2.47]} ref={banner}><planeGeometry args={[0.58,0.83]} /><meshStandardMaterial color={color} roughness={1} side={THREE.DoubleSide} /></mesh>;
 }
 function Flowers({ low }: { low: boolean }) {
   const stems = useRef<THREE.InstancedMesh>(null); const heads = useRef<THREE.InstancedMesh>(null);

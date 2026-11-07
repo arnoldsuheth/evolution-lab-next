@@ -14,6 +14,8 @@ import ProfessionalPilot from "./ProfessionalPilot";
 import Character from "./Character";
 import SceneDressing from "./SceneDressing";
 import MonsterModel from "./MonsterModel";
+import { MergedParts, type Part } from "./MergedParts";
+import CityDog from "./CityDog";
 import PetFollower from "./PetFollower";
 import { adventureOf, titleOf, mountSpeed, MOUNT_LEVEL, type PetId } from "@/lib/adventure";
 import { doorBetween } from "@/lib/dungeon";
@@ -45,25 +47,45 @@ const DEFAULT_LOOK: Look = { body: 2, hair: 0, beard: 2, moustache: 1, skin: 1, 
 function Stone({ position, size = 1, color = "#777e79" }: { position: [number, number, number]; size?: number; color?: string }) { return <mesh position={position} scale={[size, size * 0.6, size * 0.8]} castShadow receiveShadow><icosahedronGeometry args={[1, 1]} /><meshStandardMaterial color={color} roughness={0.9} /></mesh>; }
 function Tree({ x, z, size = 1 }: { x: number; z: number; size?: number }) {
   const crown=useRef<THREE.Group>(null),ray=useRef(new THREE.Ray()),origin=useRef(new THREE.Vector3()),direction=useRef(new THREE.Vector3()),hit=useRef(new THREE.Vector3()),bounds=useRef(new THREE.Box3(new THREE.Vector3(x-2.1*size,1.2*size,z-2.1*size),new THREE.Vector3(x+2.1*size,5.8*size,z+2.1*size)));
-  useFrame(({camera},dt)=>{const state=useGame.getState(),enemy=MONSTERS.find(m=>m.id===state.encounter?.monsterId);const targets=[state.hero.position,...(enemy?[[enemy.x,enemy.z]]:[])];// Testa cabeça e pés do herói (e do inimigo): se a copa cobre qualquer parte, ela fica quase transparente.
- const covered=targets.some(p=>[.4,1.3,2.3].some(y=>{origin.current.set(p[0],y,p[1]);direction.current.copy(camera.position).sub(origin.current);const distance=direction.current.length();ray.current.set(origin.current,direction.current.normalize());return !!ray.current.intersectBox(bounds.current,hit.current)&&origin.current.distanceTo(hit.current)<distance;}));crown.current?.children.forEach(o=>{const m=(o as THREE.Mesh).material as THREE.MeshStandardMaterial;if(m){m.opacity=THREE.MathUtils.damp(m.opacity,covered?.12:1,10,Math.min(dt,.1));m.depthWrite=m.opacity>.95;}});});
+  useFrame(({camera},dt)=>{const state=useGame.getState(),enemy=MONSTERS.find(m=>m.id===state.encounter?.monsterId);const targets=[state.hero.position,...(enemy?[[enemy.x,enemy.z]]:[])];const near=targets.some(p=>Math.hypot(p[0]-x,p[1]-z)<9*size),crowns=crown.current?.children??[];if(!near&&crowns.every(o=>((o as THREE.Mesh).material as THREE.MeshStandardMaterial).opacity>=1))return; // longe do herói: nada a esconder
+// Testa cabeça e pés do herói (e do inimigo): se a copa cobre qualquer parte, ela fica quase transparente.
+ const covered=targets.some(p=>[.4,1.3,2.3].some(y=>{origin.current.set(p[0],y,p[1]);direction.current.copy(camera.position).sub(origin.current);const distance=direction.current.length();ray.current.set(origin.current,direction.current.normalize());return !!ray.current.intersectBox(bounds.current,hit.current)&&origin.current.distanceTo(hit.current)<distance;}));crown.current?.children.forEach(o=>{const m=(o as THREE.Mesh).material as THREE.MeshStandardMaterial;if(m){m.opacity=THREE.MathUtils.damp(m.opacity,covered?.12:1,10,Math.min(dt,.1));if(m.opacity>.995)m.opacity=1;m.depthWrite=m.opacity>.95;const see=m.opacity<1;if(m.transparent!==see){m.transparent=see;m.needsUpdate=true;}}});});
   return <group position={[x, 0, z]} scale={size}>
     <mesh position={[0, 1.6, 0]} castShadow><cylinderGeometry args={[0.2, 0.42, 3.2, 10]} /><meshStandardMaterial color="#a06a3f" roughness={0.9} /></mesh>
-    <group ref={crown}>{[0, 1, 2].map(i => <mesh key={i} position={[Math.sin(i*2)*.35,2.6+i*.8,Math.cos(i*2)*.25]} scale={[1,.8,1]} castShadow><icosahedronGeometry args={[1.65-i*.3,2]} /><meshStandardMaterial transparent color={["#4fa84a", "#6fc04e", "#9ad45e"][i]} roughness={0.85} /></mesh>)}</group>
+    <group ref={crown}>{[0, 1, 2].map(i => <mesh key={i} position={[Math.sin(i*2)*.35,2.6+i*.8,Math.cos(i*2)*.25]} scale={[1,.8,1]} castShadow={i===0}><icosahedronGeometry args={[1.65-i*.3,2]} /><meshStandardMaterial color={["#4fa84a", "#6fc04e", "#9ad45e"][i]} roughness={0.85} /></mesh>)}</group>
   </group>;
 }
+/** Peças paradas da casa, juntas em poucas malhas (mesma aparência, bem menos desenhos). */
+const WALLS = ["#f1d6a5", "#e7cbaa", "#e6d6bd", "#ebcc97"];
+const box = (w: number, h: number, d: number) => new THREE.BoxGeometry(w, h, d);
+const HOUSE_CAST = [0, 1, 2, 3].map(index => (): Part[] => [
+  { g: box(4.7, 3.2, 4.5), p: [0, 1.9, 0], c: WALLS[index] },
+  ...[-2.3, 0, 2.3].map((a): Part => ({ g: box(0.16, 3.3, 0.17), p: [a, 1.9, 2.28], c: "#4b4235" })),
+  { g: box(0.65, 2.3, 0.7), p: [1.4, 4.5, -1], c: "#797c74" },
+  { g: new THREE.CylinderGeometry(0.38, 0.34, 0.79, 10), p: [2.08, 0.68, 1.73], c: "#7d6247" },
+]);
+const HOUSE_FIXED = (): Part[] => [
+  { g: box(5.3, 0.65, 5), p: [0, 0.3, 0], c: "#77786d" },
+  { g: box(1.25, 2.7, 0.15), p: [0, 1.62, 2.3], c: "#4c4034" },
+  ...[-1.45, 1.45].flatMap((a): Part[] => [{ g: box(0.07, 0.99, 0.15), p: [a, 2.25, 2.31], c: "#554737" }, { g: box(0.84, 0.08, 0.15), p: [a, 2.25, 2.31], c: "#554737" }]),
+  { g: box(0.08, 0.72, 0.1), p: [-1.9, 3.15, 2.38], c: "#5b4b35" },
+  { g: new THREE.OctahedronGeometry(0.11), p: [-1.9, 2.88, 2.48], c: "#cbb98a" },
+  ...[-1.5, 1.5].flatMap((x): Part[] => [{ g: new THREE.ConeGeometry(0.22, 0.2, 4), p: [x, 1.89, 2.45], c: "#4d554e" }, { g: box(0.3, 0.06, 0.27), p: [x, 1.42, 2.45], c: "#4d554e" }]),
+  ...[-0.23, 0.23].map((y): Part => ({ g: new THREE.CylinderGeometry(0.39, 0.39, 0.07, 10), p: [2.08, 0.68 + y, 1.73], c: "#4f5c57" })),
+  { g: box(1.8, 0.25, 0.5), p: [0, 0.22, 2.65], c: "#8a8b78" },
+];
+const HOUSE_WINDOWS = (): Part[] => [-1.45, 1.45].map(a => ({ g: box(0.8, 0.95, 0.1), p: [a, 2.25, 2.31], c: "#efc483" }));
+const HOUSE_LANTERNS = (): Part[] => [-1.5, 1.5].map(x => ({ g: box(0.27, 0.39, 0.24), p: [x, 1.65, 2.45], c: "#b09962" }));
 function House({ x, z, index }: { x: number; z: number; index: number }) {
   const roofMaterial=useRef<THREE.MeshStandardMaterial>(null),ray=useRef(new THREE.Ray()),origin=useRef(new THREE.Vector3()),direction=useRef(new THREE.Vector3()),hit=useRef(new THREE.Vector3()),bounds=useRef(new THREE.Box3(new THREE.Vector3(x-3.1,3,z-3.1),new THREE.Vector3(x+3.1,5.8,z+3.1)));
   useFrame(({camera},dt)=>{if(!roofMaterial.current)return;const p=useGame.getState().hero.position;origin.current.set(p[0],1.7,p[1]);direction.current.copy(camera.position).sub(origin.current);const distance=direction.current.length();ray.current.set(origin.current,direction.current.normalize());const covered=ray.current.intersectBox(bounds.current,hit.current)&&origin.current.distanceTo(hit.current)<distance;roofMaterial.current.opacity=THREE.MathUtils.damp(roofMaterial.current.opacity,covered?.28:1,10,dt);roofMaterial.current.depthWrite=roofMaterial.current.opacity>.95;});
   return <group position={[x, 0, z]} rotation={[0, index % 2 ? -0.12 : 0.1, 0]}>
     <HouseDetails index={index} />
-    <mesh position={[0, 0.3, 0]} receiveShadow><boxGeometry args={[5.3, 0.65, 5]} /><meshStandardMaterial color="#77786d" flatShading /></mesh>
-    <mesh position={[0, 1.9, 0]} castShadow receiveShadow><boxGeometry args={[4.7, 3.2, 4.5]} /><meshStandardMaterial color={["#f1d6a5", "#e7cbaa", "#e6d6bd", "#ebcc97"][index]} roughness={1} /></mesh>
+    <MergedParts parts={HOUSE_CAST[index]} castShadow receiveShadow />
+    <MergedParts parts={HOUSE_FIXED} receiveShadow />
+    <MergedParts parts={HOUSE_WINDOWS} emissive="#e6a858" emissiveIntensity={0.4} />
+    <MergedParts parts={HOUSE_LANTERNS} emissive="#b68c43" emissiveIntensity={0.35} />
     <mesh position={[0, 4.1, 0]} rotation={[0, Math.PI / 4, 0]} castShadow><coneGeometry args={[4.05, 2.8, 4]} /><meshStandardMaterial ref={roofMaterial} transparent color={index % 2 ? "#386c93" : "#b2644b"} flatShading /></mesh>
-    {[-2.3, 0, 2.3].map(a => <mesh key={a} position={[a, 1.9, 2.28]} castShadow><boxGeometry args={[0.16, 3.3, 0.17]} /><meshStandardMaterial color="#4b4235" /></mesh>)}
-    <mesh position={[0, 1.62, 2.3]}><boxGeometry args={[1.25, 2.7, 0.15]} /><meshStandardMaterial color="#4c4034" /></mesh>
-    {[-1.45, 1.45].map(a => <group key={a} position={[a, 2.25, 2.31]}><mesh><boxGeometry args={[0.8, 0.95, 0.1]} /><meshStandardMaterial color="#efc483" emissive="#e6a858" emissiveIntensity={0.4} /></mesh><mesh><boxGeometry args={[0.07, 0.99, 0.15]} /><meshStandardMaterial color="#554737" /></mesh><mesh><boxGeometry args={[0.84, 0.08, 0.15]} /><meshStandardMaterial color="#554737" /></mesh></group>)}
-    <mesh position={[1.4, 4.5, -1]} castShadow><boxGeometry args={[0.65, 2.3, 0.7]} /><meshStandardMaterial color="#797c74" /></mesh>
     {[0, 1, 2].map(i => <mesh key={i} position={[1.4 + i * 0.16, 5.8 + i * 0.6, -1]} scale={0.25 + i * 0.14}><sphereGeometry args={[1, 7, 6]} /><meshBasicMaterial color="#c5c9c0" transparent opacity={0.12 - i * 0.025} depthWrite={false} /></mesh>)}
   </group>;
 }
@@ -187,7 +209,7 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.014, -4]} onClick={groundClick} receiveShadow><planeGeometry args={[4.8, 48]} /><meshStandardMaterial color="#e6cc92" roughness={1} /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.018, 0]} onClick={groundClick} receiveShadow><circleGeometry args={[5.8, 40]} /><meshStandardMaterial color="#efe6cc" roughness={1} /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[11, 0.025, -16]} onClick={groundClick}><planeGeometry args={[25, 3]} /><meshStandardMaterial color="#8e8b76" /></mesh>
-    <TownDistrict onGroundClick={groundClick}/><CodeSpots night={light<0.4}/><GatherNodes paused={paused} approach={approachGather}/><WorldUnlocks/><ExplorationEncounters paused={paused} interact={()=>interact("traveler")} report={report} /><WorldDetails night={light<0.4} low={low} reduced={reduced} />
+    <TownDistrict onGroundClick={groundClick}/><CodeSpots night={light<0.4}/><CityDog/><GatherNodes paused={paused} approach={approachGather}/><WorldUnlocks/><ExplorationEncounters paused={paused} interact={()=>interact("traveler")} report={report} /><WorldDetails night={light<0.4} low={low} reduced={reduced} />
     {BUILDINGS.map((b, i) => <House key={i} x={b.x} z={b.z} index={i%4} />)}
     {TREES.map((t, i) => <Tree key={i} {...t} />)}
     {[-1, 1].flatMap(side => [0, 1, 2, 3, 4].map(i => <Tree key={`${side}-${i}`} x={side * (17 + i % 2 * 3)} z={10 - i * 6} size={0.9 + i * 0.11} />))}

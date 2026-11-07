@@ -5,7 +5,7 @@ import { PROPS, onRoad, townBlocked } from './town';
 export type Decoration = { x: number; z: number; scale: number; turn: number; tone: number };
 function random(seed: number) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
 export function isClearGround(x: number, z: number) {
-  if (Math.hypot(x, z) < 6.6) return false; // praça do cristal
+  if (Math.hypot(x, z) < 8.2) return false; // praça do cristal (com folga: praça limpa)
   if (Math.abs(x) < 3.2 && z > -30 && z < 21) return false; // estrada principal
   if (Math.abs(z - 9 - x * .12) < 2.2 && Math.abs(x) > 7 && Math.abs(x) < 35) return false; // estradas laterais
   if (BUILDINGS.some(b => Math.abs(x - b.x) < b.w + 1.2 && Math.abs(z - b.z) < b.d + 1.2)) return false;
@@ -25,4 +25,4 @@ export function scatter(count: number, seed: number, radius = 34, cluster = 6): 
   }
   return result;
 }
-export const SCENERY_DENSITY = { low: { grass: 140, flowers: 50, pebbles: 20 }, medium: { grass: 300, flowers: 90, pebbles: 36 }, high: { grass: 520, flowers: 150, pebbles: 60 } } as const;
+export const SCENERY_DENSITY = { low: { grass: 90, flowers: 34, pebbles: 8 }, medium: { grass: 170, flowers: 60, pebbles: 14 }, high: { grass: 280, flowers: 95, pebbles: 22 } } as const;

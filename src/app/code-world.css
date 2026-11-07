@@ -65,3 +65,26 @@ svg.game-artwork.fx-mythic{filter:drop-shadow(0 0 3px #ffd36b) drop-shadow(0 0 9
 .guide-fold>summary::before{content:"▸ ";color:var(--tech)}
 .guide-fold[open]>summary::before{content:"▾ "}
 .guide-fold[open]{padding-bottom:10px}
+/* Caramelo: etiqueta no mapa e janela de amizade */
+.dog-tag{display:flex;flex-direction:column;align-items:center;gap:2px;padding:3px 9px 5px;border-radius:12px;background:#0d1d27d9;border:1px solid #e6b56a88;color:#fff4dd;box-shadow:0 4px 12px #0005;cursor:pointer;min-height:0}
+.dog-tag b{font-size:11px;letter-spacing:.3px}
+.dog-bubble{font-size:16px;line-height:1;animation:dogBob 1.6s ease-in-out infinite}
+.dog-bubble.begging{animation:dogBeg .9s ease-in-out infinite}
+.dog-meter{display:block;width:56px;height:5px;border-radius:9px;background:#ffffff22;overflow:hidden}
+.dog-meter>i{display:block;height:100%;background:linear-gradient(90deg,#f0a64a,#ffd36b);border-radius:9px}
+@keyframes dogBob{50%{transform:translateY(-3px)}}
+@keyframes dogBeg{0%,100%{transform:rotate(-8deg) scale(1)}50%{transform:rotate(8deg) scale(1.15)}}
+.dog-panel{display:flex;flex-direction:column;gap:12px}
+.dog-head{display:flex;gap:14px;align-items:center}
+.dog-face{font-size:44px;width:72px;height:72px;display:grid;place-items:center;border-radius:18px;background:radial-gradient(circle at 40% 35%,#f6d49d,#c8843f);box-shadow:0 0 0 2px #e6b56a66,0 8px 20px #0005}
+.dog-head h3{margin:2px 0 4px;font-size:24px}.dog-head h3 small{font-size:13px;color:#ffd98a;margin-left:6px}
+.dog-mood{margin:0;font-size:13px;color:#d6e4e6}
+.dog-friend{background:#ffffff08;border:1px solid #ffffff14;border-radius:12px;padding:10px 12px}
+.dog-friend-top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px}.dog-friend-top span{color:#ffd98a}
+.dog-friend-bar{position:relative;height:12px;border-radius:9px;background:#0a161d;border:1px solid #ffffff18;overflow:hidden}
+.dog-friend-bar>i{display:block;height:100%;background:linear-gradient(90deg,#d9873a,#f6c25a,#ffe6a0);border-radius:9px;transition:width .5s ease}
+.dog-friend-bar>em{position:absolute;top:0;bottom:0;width:1px;background:#ffffff40}
+.dog-friend small{display:block;margin-top:6px}
+.dog-line{margin:0;padding:10px 12px;border-radius:12px;background:#3a2a1ee6;border:1px solid #e6b56a44;color:#ffe9c9;font-size:13px;line-height:1.5}
+.dog-actions{display:flex;flex-wrap:wrap;gap:8px}.dog-actions button small{opacity:.75;margin-left:4px}
+@media (prefers-reduced-motion:reduce){.dog-bubble,.dog-bubble.begging{animation:none}}

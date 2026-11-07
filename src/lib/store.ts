@@ -1,4 +1,5 @@
 "use client";
+import { dogFood, feedDog as feedDogRule, TREAT_PRICE } from './dog';
 import {ATTRIBUTE_KEYS,attributePoints,cleanAttributes,type AttributeKey} from "./attributes";
 import {packCharacters,selectCharacter,deleteCharacter} from './characterSlots';
 import {INSTANCES,instanceRequirement,type InstanceId} from "./instances";
@@ -60,7 +61,7 @@ interface GameStore extends SaveData {
   acceptQuest:(id:string)=>void; turnInQuest:(id:string)=>void; questEvent:(event:QuestEvent)=>void; gather:(id:string)=>void;
   challenge: Challenge|null;
   /** 1.10: missões do dia, pedra de retorno, especialização, títulos, mascotes e portas de código. */
-  claimDaily:(index:number)=>void; buildSpot:(id:string)=>{ok:boolean;message:string}; hearth:()=>void; chooseSpec:(id:string)=>void; setTitle:(id:string)=>void; setPet:(id:string)=>void; openDoor:(id:string,code:string)=>ReturnType<typeof tryDoor>; rareSeen:number;restPending:number;
+  claimDaily:(index:number)=>void; buildSpot:(id:string)=>{ok:boolean;message:string}; feedDog:(kind:'food'|'treat')=>{ok:boolean;message:string}; hearth:()=>void; chooseSpec:(id:string)=>void; setTitle:(id:string)=>void; setPet:(id:string)=>void; openDoor:(id:string,code:string)=>ReturnType<typeof tryDoor>; rareSeen:number;restPending:number;
   beginPromotion:()=>void; beginChest:(id:string)=>void; beginAI:(id:string)=>void; answerChallenge:(answer:string)=>void; cancelChallenge:()=>void;
   deliverQuest:(kind:"main"|"ai")=>void;
   draftAI:(id:string,code:string)=>void; reviewProject:(index:number)=>void;
@@ -230,6 +231,12 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
   },
   cancelChallenge:()=>set({challenge:null}),
   claimDaily:index=>{const s=get();if(s.hero.dead)return;const adv=currentAdventure(s),t=DAILY_POOL.find(t=>t.id===adv.daily.ids[index]);if(!t||adv.daily.claimed[index]||adv.daily.progress[index]<t.count)return;const r=dailyReward(s.hero.level),xp=r.xp+Math.round(r.xp*repPercent(adv,'sabios')/100);set({hero:{...withXp(s.hero,xp),gold:s.hero.gold+r.gold,adventure:{...addRep(adv,t.faction,r.rep),daily:{...adv.daily,claimed:adv.daily.claimed.map((c,i)=>c||i===index)},dailyDone:adv.dailyDone+1}},notice:`Missão do dia concluída! +${xp} XP · +${r.gold} bronze · +${r.rep} reputação.`});},
+  feedDog:kind=>{const s=get(),adv=adventureOf(s.hero),now=Date.now();if(s.hero.dead)return{ok:false,message:'Seu herói precisa estar vivo para brincar com o Caramelo.'};
+   const food=kind==='food'?dogFood(s.hero.inventory):undefined;
+   if(kind==='food'&&!food)return{ok:false,message:'Não há comida na mochila. Compre pão, ensopado ou frutas com Mira, ou dê um petisco.'};
+   if(kind==='treat'&&s.hero.gold<TREAT_PRICE)return{ok:false,message:`O petisco custa ${TREAT_PRICE} moedas e você ainda não tem.`};
+   const r=feedDogRule(adv.dog,now,kind);if(!r.ok)return{ok:false,message:r.message};
+   set({hero:{...s.hero,inventory:food?(removeItems(s.hero.inventory,{[food]:1})??s.hero.inventory):s.hero.inventory,gold:kind==='treat'?s.hero.gold-TREAT_PRICE:s.hero.gold,adventure:{...adv,dog:r.dog}},notice:r.message});return{ok:true,message:r.message};},
   buildSpot:id=>{const s=get(),spot=CODE_SPOTS.find(x=>x.id===id),adv=adventureOf(s.hero);if(!spot)return{ok:false,message:'Ponto desconhecido.'};if(s.hero.dead)return{ok:false,message:'Seu herói precisa estar vivo.'};if(adv.built.includes(id))return{ok:true,message:spot.done};if(!spotAvailable(adv.built,id))return{ok:false,message:'Faça o ponto anterior primeiro.'};
     set({hero:{...withXp(s.hero,spot.xp),gold:s.hero.gold+spot.gold,adventure:{...addRep(progressDaily(currentAdventure(s),{type:'code'}),'sabios',30),built:[...adv.built,id]}},notice:`✨ ${spot.done} +${spot.xp} XP · +${spot.gold} bronze.`});return{ok:true,message:spot.done};},
   hearth:()=>{const s=get(),now=Date.now(),adv=adventureOf(s.hero);if(s.hero.dead||!s.hero.created)return;if(s.encounter||s.challenge){set({notice:'A pedra de retorno não funciona em combate.'});return;}if(adv.hearthAt>now){set({notice:`A pedra de retorno recarrega em ${Math.ceil((adv.hearthAt-now)/60000)} min.`});return;}set({mounted:false,target:null,queued:null,relocation:s.relocation+1,hero:{...s.hero,instance:null,region:'aurora',position:[0,5],adventure:{...adv,hearthAt:now+HEARTH_MS}},notice:'A pedra de retorno brilhou. Você está na praça da Aurora.'});},
