@@ -7,6 +7,7 @@ import { useGame } from '@/lib/store';
 import { adventureOf } from '@/lib/adventure';
 import { DOG_NAME, dogHungry, dogLevel } from '@/lib/dog';
 import { cursorOn } from '@/lib/cursor';
+import { walkable } from '@/lib/navigation';
 
 /**
  * Caramelo, o vira-lata da Pedra da Aurora: segue o herói pelas ruas da cidade, senta quando ele para,
@@ -16,6 +17,8 @@ const HOME = new THREE.Vector3(4.4, 0, 9.6);
 const CARAMEL = '#c8843f', LIGHT = '#ecc489', CREAM = '#f6e2bb', DARK = '#2a1d16';
 const openDog = () => window.dispatchEvent(new CustomEvent('lions-cave-dog'));
 const inTown = (x: number, z: number) => Math.abs(x) < 34 && z > -14 && z < 22;
+/** Mesmo mapa de obstáculos do herói (casas, bancas, árvores, poço...). */
+const free = (x: number, z: number) => walkable(x, z, true, true);
 function M({ color, rough = .9, ...rest }: { color: string; rough?: number } & Partial<THREE.MeshStandardMaterialParameters>) { return <meshStandardMaterial color={color} roughness={rough} {...rest} />; }
 
 function DogBody({ friendship, legs, tail, head, rear, tongue }: { friendship: number; legs: RefObject<(THREE.Group | null)[]>; tail: RefObject<THREE.Group | null>; head: RefObject<THREE.Group | null>; rear: RefObject<THREE.Group | null>; tongue: boolean }) {
@@ -75,13 +78,19 @@ export default function CityDog() {
     const follow = s.hero.region === 'aurora' && !s.hero.instance && inTown(hx, hz) && !s.hero.dead;
     // Tímido no começo (fica mais longe); amigo anda colado.
     const gap = friendship < 20 ? 3 : friendship < 45 ? 2.2 : 1.5;
-    if (follow) { const dx = m.pos.x - hx, dz = m.pos.z - hz, d = Math.hypot(dx, dz) || 1; want.set(hx + dx / d * gap, 0, hz + dz / d * gap); }
+    if (follow) { // procura um lugar livre ao redor do herói, começando pelo lado em que ele já está
+      const base = Math.atan2(m.pos.x - hx, m.pos.z - hz); want.set(hx, 0, hz);
+      for (const k of [0, 1, -1, 2, -2, 3, -3, 4]) { const a = base + k * .6, x = hx + Math.sin(a) * gap, z = hz + Math.cos(a) * gap; if (free(x, z)) { want.set(x, 0, z); break; } } }
     else want.copy(HOME);
     const ox = want.x - m.pos.x, oz = want.z - m.pos.z, dist = Math.hypot(ox, oz);
     const target = dist > .15 ? Math.min(7, dist * 2.4) : 0;
     m.speed = THREE.MathUtils.damp(m.speed, target, 6, dt);
     if (dist > 25) { m.pos.copy(want); m.speed = 0; } // teleporte do herói: ele reaparece perto
-    else if (m.speed > .02 && dist > .01) { const step = Math.min(dist, m.speed * dt); m.pos.x += ox / dist * step; m.pos.z += oz / dist * step; }
+    else if (m.speed > .02 && dist > .01) {
+      // Anda desviando: em frente; se bater, desliza pelo lado; se não der, contorna em ângulo.
+      const step = Math.min(dist, m.speed * dt), ux = ox / dist, uz = oz / dist, stuck = !free(m.pos.x, m.pos.z);
+      const tries: [number, number][] = [[ux, uz], [ux, 0], [0, uz], [ux * .5 - uz * .87, uz * .5 + ux * .87], [ux * .5 + uz * .87, uz * .5 - ux * .87], [-uz, ux], [uz, -ux]];
+      for (const [tx, tz] of tries) { const len = Math.hypot(tx, tz); if (len < .01) continue; const nx = m.pos.x + tx / len * step, nz = m.pos.z + tz / len * step; if (stuck || free(nx, nz)) { m.pos.x = nx; m.pos.z = nz; break; } } }
     // Olha para onde anda; parado, olha para o herói.
     const lookX = m.speed > .3 ? ox : hx - m.pos.x, lookZ = m.speed > .3 ? oz : hz - m.pos.z;
     if (Math.hypot(lookX, lookZ) > .05) { const h = Math.atan2(lookX, lookZ); let diff = h - m.heading; diff = Math.atan2(Math.sin(diff), Math.cos(diff)); m.heading += diff * Math.min(1, dt * 8); }

@@ -59,3 +59,15 @@ test('portas das masmorras com botões: a resposta abre a porta, cada erro é ex
     b.blanks.forEach((blank, i) => { for (const o of blank.options) if (o !== blank.answer) { assert.ok(blank.why[o], `${d.id}: "${o}" explicado`); const picks = ans(b); picks[i] = o; assert.equal(check(b, picks).ok, false); } });
   }
 });
+
+test('desafios extras com botões: a resposta passa nos testes do desafio e cada erro é explicado', async () => {
+  const { EXTRA_APPRENTICE, answers: ans, checkPicks: check, fillCode: fill } = await import('./apprentice');
+  const { EXTRA_CHALLENGES, evaluateExtra } = await import('./game');
+  for (const id of Object.keys(EXTRA_CHALLENGES)) {
+    const b = EXTRA_APPRENTICE[id];
+    assert.ok(b, `${id} tem desafio extra com botões`);
+    assert.equal(evaluateExtra(id, fill(b, ans(b))).passed, true, `${id}: a resposta passa`);
+    assert.equal(b.explain.length, b.code.split('\n').length, `${id}: uma explicação por linha`);
+    b.blanks.forEach((blank, i) => { for (const o of blank.options) if (o !== blank.answer) { assert.ok(blank.why[o], `${id}: "${o}" explicado`); const picks = ans(b); picks[i] = o; assert.equal(check(b, picks).ok, false); } });
+  }
+});
