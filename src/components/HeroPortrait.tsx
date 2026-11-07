@@ -12,7 +12,7 @@ import { ClassPortrait } from './ApprovedArtwork';
  * Tira uma foto por aparência, uma de cada vez (um só contexto WebGL extra), e guarda no navegador.
  * Enquanto a foto não fica pronta, mostra a arte da classe.
  */
-type Props = { classId: ClassId; race: Race; look: Look; equipped: string[]; level: number };
+type Props = { classId: ClassId; race: Race; look: Look; equipped: string[]; level: number; selection?: boolean };
 const PREFIX = 'lc-portrait-v4:';
 const cache = new Map<string, string>(), failed = new Set<string>(), queue: string[] = [], subs = new Set<() => void>();
 let owner: string | null = null, version = 0;
@@ -50,8 +50,10 @@ function Snap({ id, head }: { id: string; head: number }) {
   return null;
 }
 
-function Studio({ id, classId, race, look, equipped, level }: Props & { id: string }) {
-  const h = heroProportions(race).height, head = 2.5 * h, distance = Math.max(3, 4.8 * h);
+function Studio({ id, classId, race, look, equipped, level, selection }: Props & { id: string }) {
+  const height = heroProportions(race).height;
+  const head = (selection ? 2.35 : 2.5) * height;
+  const distance = selection ? Math.max(4.8, 7.2 * height) : Math.max(3, 4.8 * height);
   return <div aria-hidden style={{ position: 'fixed', left: -4000, top: 0, width: 192, height: 192, pointerEvents: 'none' }}>
     <Canvas dpr={1} gl={{ preserveDrawingBuffer: true, alpha: true, antialias: true }} camera={{ position: [distance * .07, head + .06, distance], fov: 30 }}>
       <ambientLight intensity={1.15} /><hemisphereLight args={['#c8dce4', '#504130', 1.7]} />
@@ -64,12 +66,12 @@ function Studio({ id, classId, race, look, equipped, level }: Props & { id: stri
 
 export default function HeroPortrait(props: Props) {
   const { classId, race, look, equipped, level } = props;
-  const id = hash(JSON.stringify([race, classId, look, [...equipped].sort()]));
+  const id = hash(JSON.stringify([race, classId, look, [...equipped].sort(), props.selection ? 'selection' : 'hud']));
   const live = useSyncExternalStore(subscribe, () => version + 1, () => 0) > 0; // 0 no servidor e na hidratação
   const url = live ? stored(id) : null, shooting = live && owner === id;
   useEffect(() => { request(id); return () => release(id); }, [id]);
   return <>
     {url ? <svg className="class-portrait hero-portrait" viewBox="0 0 100 100" role="img" aria-label={`Retrato do herói (${race})`}><image href={url} width="100" height="100" /></svg> : <ClassPortrait classId={classId} />}
-    {!url && shooting && <Studio id={id} classId={classId} race={race} look={look} equipped={equipped} level={level} />}
+    {!url && shooting && <Studio id={id} selection={props.selection} classId={classId} race={race} look={look} equipped={equipped} level={level} />}
   </>;
 }
