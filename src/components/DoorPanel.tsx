@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { useGame } from '@/lib/store';
 import { DOORS, type tryDoor } from '@/lib/dungeon';
 import { adventureOf } from '@/lib/adventure';
-import { DOOR_APPRENTICE } from '@/lib/apprentice';
+import { CONCEPT_OF, DOOR_APPRENTICE } from '@/lib/apprentice';
+import ConceptCard from './ConceptCard';
 import ApprenticeCode from './ApprenticeCode';
 
 /** Porta de código da masmorra: monte com botões (ou digite) e a sala seguinte se abre. */
@@ -17,6 +18,7 @@ export default function DoorPanel({ id, close }: { id: string; close: () => void
     <span className="eyebrow">SALA {door.room} DE 3 · PORTA DE CÓDIGO</span>
     <h3>{open ? '🔓' : '🔒'} {door.title}</h3>
     {builder && !typing ? <>
+      <ConceptCard key={`${id}-pense`} concept={CONCEPT_OF[id]} startOpen={!open} />
       <ApprenticeCode key={id} builder={builder} done={open} run={run} />
       <button className="quiet mode-toggle" onClick={() => setTyping(true)}>⌨ Prefiro digitar o código (Modo Desafio)</button>
     </> : <>

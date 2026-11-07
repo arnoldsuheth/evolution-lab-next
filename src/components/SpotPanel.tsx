@@ -3,6 +3,8 @@ import { useGame } from '@/lib/store';
 import { adventureOf } from '@/lib/adventure';
 import { CODE_SPOTS, spotAvailable } from '@/lib/codeSpots';
 import ApprenticeCode from './ApprenticeCode';
+import ConceptCard from './ConceptCard';
+import { CONCEPT_OF } from '@/lib/apprentice';
 
 /** Ponto de código no mapa: monte o código e veja o mundo mudar. */
 export default function SpotPanel({ id, close }: { id: string; close: () => void }) {
@@ -14,6 +16,7 @@ export default function SpotPanel({ id, close }: { id: string; close: () => void
     <div className="spot-head"><span className="spot-chip">{index + 1}/{CODE_SPOTS.length} · {spot.theme}</span><span className="spot-reward">+{spot.xp} XP · {spot.gold} ◉</span></div>
     <h3>{done ? '✓ ' : '✦ '}{spot.title}</h3>
     <p className="spot-story">{spot.story}</p>
+    <ConceptCard key={`${id}-pense`} concept={CONCEPT_OF[id]} startOpen={!done} />
     <ApprenticeCode key={id} builder={spot.builder} done={done} locked={locked} run={() => useGame.getState().buildSpot(id).ok} />
     {done && <div className="spot-done"><p>✨ {spot.done}</p><button className="primary" onClick={close}>Ver no mapa →</button></div>}
   </div>;

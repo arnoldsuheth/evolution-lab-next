@@ -71,3 +71,13 @@ test('desafios extras com botões: a resposta passa nos testes do desafio e cada
     b.blanks.forEach((blank, i) => { for (const o of blank.options) if (o !== blank.answer) { assert.ok(blank.why[o], `${id}: "${o}" explicado`); const picks = ans(b); picks[i] = o; assert.equal(check(b, picks).ok, false); } });
   }
 });
+
+test('para iniciantes: toda peça diz o que significa e todo tema tem um cartão "Pense assim" com resposta certa', async () => {
+  const { APPRENTICE: runes, DOOR_APPRENTICE, EXTRA_APPRENTICE, CONCEPTS, CONCEPT_OF, meaningOf } = await import('./apprentice');
+  const all = [...Object.values(runes), ...Object.values(DOOR_APPRENTICE), ...Object.values(EXTRA_APPRENTICE), ...CODE_SPOTS.map(s => s.builder)];
+  for (const b of all) for (const blank of b.blanks) for (const o of blank.options) assert.ok(meaningOf(o), `peça sem significado: ${o}`);
+  for (const lesson of LESSONS) assert.ok(CONCEPTS[lesson.id], `cartão para ${lesson.id}`);
+  for (const [id, c] of Object.entries(CONCEPTS)) assert.ok(c.options.includes(c.answer), `${id}: resposta entre as opções`);
+  for (const [place, concept] of Object.entries(CONCEPT_OF)) assert.ok(CONCEPTS[concept], `${place} aponta para um cartão que existe`);
+  assert.equal(meaningOf('>='), 'maior ou igual'); assert.equal(meaningOf('"Olá, "'), 'texto (com aspas)'); assert.equal(meaningOf('42'), 'número');
+});

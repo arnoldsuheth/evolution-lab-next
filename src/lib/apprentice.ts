@@ -179,3 +179,48 @@ export const EXTRA_APPRENTICE: Record<string, Builder> = {
       blank('50', { '90': 'O ouro já cuidou do 90. Aqui é a prata: 50 ou mais.', '0': 'Com 0 quem tem 10 pontos ganharia prata.' })],
     explain: ['95 pontos.', 'Começa sem medalha.', 'Se tiver 90 ou mais...', '...ganha ouro.', 'Senão, se tiver 50 ou mais...', '...ganha prata.', 'Senão...', '...ganha bronze.', 'Fim.'], words: [['bug', 'erro no código']] },
 };
+
+/** O que cada peça quer dizer, em português (aparece embaixo do botão). */
+const MEANINGS: Record<string, string> = {
+  '>=': 'maior ou igual', '<=': 'menor ou igual', '>': 'maior que', '<': 'menor que', '==': 'igual a', '===': 'igual a', '=': 'guarda na caixa',
+  '+': 'mais / junta', '-': 'menos', '*': 'vezes', '/': 'dividido por', '%': 'resto da divisão', '&&': 'e (as duas coisas)', '||': 'ou (basta uma)',
+  '++': 'aumenta 1', '--': 'diminui 1', '+=': 'soma ao que já tem', '-=': 'tira do que já tem', true: 'verdadeiro (sim)', false: 'falso (não)',
+  return: 'devolve o resultado', 'console.log': 'só mostra na tela', let: 'cria uma caixa', function: 'cria uma receita', push: 'coloca na lista',
+  pop: 'tira da lista', includes: 'pergunta se tem', i: 'a volta atual', length: 'tamanho da lista', acender: 'liga a luz', apagar: 'desliga a luz',
+  regar: 'usa a receita regar', canteiro: 'nome dentro da receita', preco: 'campo preço', nome: 'campo nome', vida: 'campo vida',
+  '+ 2': 'soma 2', '* 2': 'vezes 2', '* valor': 'vezes o valor', size: 'não existe em listas (use length)', recursos: 'a lista inteira', 'recursos[i]': 'o item da volta i',
+};
+export function meaningOf(option: string) {
+  if (MEANINGS[option]) return MEANINGS[option];
+  if (/^".*"$/.test(option)) return 'texto (com aspas)';
+  if (/^-?\d+(\.\d+)?$/.test(option)) return 'número';
+  if (/[\s,]/.test(option.trim()) || /[À-ú]/.test(option)) return 'texto sem aspas';
+  if (/^[A-Za-z_]\w*$/.test(option)) return 'nome de uma caixa';
+  return '';
+}
+
+export interface ConceptCard { emoji: string; title: string; idea: string; example: string; result: string; question: string; options: string[]; answer: string; right: string; wrong: string }
+/** "Pense assim": a ideia de cada tema com uma comparação do dia a dia e uma perguntinha de um clique. */
+export const CONCEPTS: Record<string, ConceptCard> = {
+  variables: { emoji: '📦', title: 'Variável = caixa com etiqueta', idea: 'Você dá um nome para a caixa (a etiqueta) e guarda um valor dentro. Depois é só chamar pelo nome.', example: 'let moedas = 5;', result: 'Caixa "moedas" com o número 5 dentro.',
+    question: 'let frutas = 3;  O que tem DENTRO da caixa frutas?', options: ['3', 'frutas', 'nada'], answer: '3', right: 'Isso! "frutas" é a etiqueta; o 3 é o que fica dentro.', wrong: 'Quase: "frutas" é só a etiqueta. Dentro da caixa está o número 3.' },
+  arithmetic: { emoji: '🧮', title: 'O computador faz as contas', idea: 'Use + para somar, - para tirar, * para multiplicar (vezes) e / para dividir. Ele calcula e guarda o resultado.', example: 'const total = 2 * 3;', result: 'total vale 6 (2 vezes 3).',
+    question: 'const paes = 4 + 1;  Quanto vale paes?', options: ['5', '41', '4'], answer: '5', right: 'Isso! 4 + 1 = 5.', wrong: 'Com números, + soma: 4 + 1 = 5.' },
+  conditions: { emoji: '🚦', title: 'Condição = pergunta de sim ou não', idea: 'if quer dizer "se". Se a resposta for sim, o código de dentro acontece. else quer dizer "senão": o que fazer quando for não.', example: 'if (chovendo) { abrirGuardaChuva(); }', result: 'Só abre o guarda-chuva SE estiver chovendo.',
+    question: 'if (energia >= 10) a porta abre.  Com energia 12, a porta abre?', options: ['Sim', 'Não'], answer: 'Sim', right: 'Isso! 12 é maior ou igual a 10, então a resposta é sim.', wrong: '12 é maior que 10, então a pergunta "energia >= 10?" dá sim: a porta abre.' },
+  loops: { emoji: '🔁', title: 'Repetição = fazer várias vezes', idea: 'for quer dizer "repita". Em vez de escrever a mesma linha 5 vezes, você manda repetir 5 vezes. O i conta as voltas: 0, 1, 2...', example: 'for (let i = 0; i < 3; i++) { plantar(); }', result: 'Planta 3 vezes (i vale 0, 1 e 2).',
+    question: 'for (let i = 0; i < 4; i++) planta uma flor.  Quantas flores nascem?', options: ['4', '3', '5'], answer: '4', right: 'Isso! i vale 0, 1, 2 e 3: são 4 voltas.', wrong: 'Conte as voltas: i vale 0, 1, 2 e 3 (para antes do 4). São 4 flores.' },
+  functions: { emoji: '📜', title: 'Função = receita com nome', idea: 'Você escreve a receita uma vez e usa quantas vezes quiser, só chamando o nome. return é o que a receita devolve.', example: 'function dobro(n) { return n * 2; }', result: 'dobro(5) devolve 10.',
+    question: 'function mais1(n) { return n + 1; }  Quanto dá mais1(7)?', options: ['8', '7', '71'], answer: '8', right: 'Isso! A receita pega o 7 e devolve 7 + 1 = 8.', wrong: 'A receita recebe n = 7 e devolve n + 1, ou seja, 8.' },
+  arrays: { emoji: '🎒', title: 'Lista = vários valores em fila', idea: 'Uma lista (array) guarda várias coisas em ordem. Atenção: a contagem começa no 0, não no 1.', example: 'const cores = ["rosa", "azul"];', result: 'cores[0] é "rosa" e cores[1] é "azul".',
+    question: 'const frutas = ["maçã", "uva", "pera"];  O que é frutas[1]?', options: ['uva', 'maçã', 'pera'], answer: 'uva', right: 'Isso! Posição 0 é maçã, posição 1 é uva.', wrong: 'A contagem começa no 0: frutas[0] é maçã, frutas[1] é uva.' },
+  objects: { emoji: '🗂️', title: 'Objeto = ficha com campos', idea: 'Um objeto é uma ficha. Cada campo tem um nome e um valor, como um cadastro. Para ler um campo use ponto: ficha.campo.', example: 'const heroi = { nome: "Ana", nivel: 3 };', result: 'heroi.nivel é 3 e heroi.nome é "Ana".',
+    question: 'const gato = { cor: "preto", idade: 2 };  O que é gato.idade?', options: ['2', 'preto', 'idade'], answer: '2', right: 'Isso! O campo idade da ficha do gato vale 2.', wrong: 'gato.idade lê o campo idade da ficha: vale 2.' },
+  debug: { emoji: '🔍', title: 'Depurar = procurar o erro', idea: 'Compare o que você esperava com o que aconteceu. A diferença mostra a linha culpada. Erros no limite (< ou <=) são os mais comuns.', example: 'Esperava 4 tábuas, apareceram 5.', result: 'Olhe o limite da repetição: <= vai uma volta a mais que <.',
+    question: 'for (let i = 0; i <= 3; i++)  repete quantas vezes?', options: ['4', '3'], answer: '4', right: 'Isso! i vale 0, 1, 2 e 3: o <= inclui o 3, então são 4 voltas.', wrong: 'O <= inclui o 3: i vale 0, 1, 2 e 3. São 4 voltas.' },
+};
+/** Tema de cada ponto da cidade e de cada porta, para mostrar o cartão certo. */
+export const CONCEPT_OF: Record<string, string> = {
+  'spot-lantern': 'variables', 'spot-flowers': 'arithmetic', 'spot-nightlamp': 'conditions', 'spot-trees': 'loops', 'spot-water': 'functions', 'spot-garden': 'arrays', 'spot-fountain': 'objects', 'spot-bridge': 'debug',
+  'cavern-1': 'variables', 'cavern-2': 'conditions', 'cavern-3': 'loops', 'monastery-1': 'loops', 'monastery-2': 'functions', 'monastery-3': 'conditions',
+};
