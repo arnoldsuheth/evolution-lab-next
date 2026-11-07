@@ -1,0 +1,68 @@
+/*
+ * Janelas do jogo · tema "tecnológico" do Lion's Cave.
+ * Só aparência (cores, bordas, cabeçalho, abas, botões, campos); tamanhos e posições de cada janela continuam
+ * nos arquivos de cada painel. Vidro escuro + azul-tecnologia, com o dourado do jogo nos destaques.
+ */
+:root{--pt-tech:#7fe3ff;--pt-tech-soft:#7fe3ff26;--pt-gold:#e6c67f;--pt-text:#e9f2f3;--pt-muted:#a3b7bd;--pt-card:#ffffff08;--pt-card-line:#ffffff14}
+
+.modal-shade{background:radial-gradient(circle at 50% 30%,#0b1a2266,#050c10b3);backdrop-filter:blur(3px)}
+.modal{background:linear-gradient(165deg,#112530f7,#0a161df9 70%)!important;border:1px solid #7fe3ff3a!important;border-radius:14px!important;box-shadow:0 0 0 1px #0006,0 24px 70px #000a,inset 0 1px 0 #ffffff12!important;color:var(--pt-text);scrollbar-width:thin;scrollbar-color:#7fe3ff55 transparent}
+.modal::-webkit-scrollbar{width:8px}.modal::-webkit-scrollbar-thumb{background:#7fe3ff40;border-radius:8px}
+
+/* Cabeçalho compacto e fixo ao rolar, com uma linha de luz azul→dourada */
+.modal>.modal-head{position:sticky;top:0;z-index:6;min-height:50px;padding:8px 14px 8px 18px!important;gap:12px;background:linear-gradient(100deg,#163545f2,#0f2330f2 60%,#132a36f2)!important;border-bottom:1px solid #7fe3ff24!important;backdrop-filter:blur(6px)}
+.modal>.modal-head::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,var(--pt-tech) 25%,var(--pt-gold) 75%,transparent);opacity:.55;pointer-events:none}
+.modal>.modal-head .eyebrow{color:var(--pt-tech);font-size:8.5px;letter-spacing:2.2px;opacity:.85}
+.modal>.modal-head h2{font-size:19px!important;line-height:1.2;margin:1px 0 0!important;color:#f4ecd8;letter-spacing:.2px}
+.modal>.modal-head .icon-button{border-radius:10px;background:#ffffff0d;border:1px solid #ffffff1f;box-shadow:none;transition:background .15s,border-color .15s,transform .15s}
+.modal>.modal-head .icon-button:hover{background:#ff8a7a22;border-color:#ff8a7a66;transform:rotate(90deg)}
+
+/* Abas em pílula */
+.modal .tabs{gap:6px;border-bottom:1px solid #ffffff12;padding-bottom:8px}
+.modal .tabs>button{border-radius:999px!important;border:1px solid transparent!important;padding:7px 14px;color:var(--pt-muted);font-size:12px;transition:background .15s,color .15s,border-color .15s}
+.modal .tabs>button:hover{background:#ffffff0a;color:var(--pt-text)}
+.modal .tabs>button.active,.modal .tabs>button[aria-selected="true"]{background:#7fe3ff18;border-color:#7fe3ff66!important;color:#eafcff;box-shadow:0 0 12px #7fe3ff22}
+
+/* Textos */
+.modal h3{color:#f4ecd8;letter-spacing:.1px}
+.modal p{line-height:1.55}
+.modal .eyebrow{color:var(--pt-tech)}
+.modal small,.modal .small-note{color:var(--pt-muted)}
+
+/* Botões: vidro; o principal mantém o dourado do jogo, mais limpo */
+.modal button:not(.primary):not(.slot):not(.icon-button):not(.spot-label){border-radius:9px;border-color:#ffffff1c;background:linear-gradient(160deg,#1d3542,#15262f);box-shadow:none}
+.modal button:not(.primary):not(.slot):not(.icon-button):not(:disabled):hover{border-color:#7fe3ff66;background:linear-gradient(160deg,#21404f,#182c36)}
+.modal .primary{border-radius:9px;background:linear-gradient(150deg,#f1dca9,#d1ad62)!important;border:1px solid #f6e3b4!important;color:#1b2328!important;box-shadow:0 4px 14px #d1ad6233,inset 0 1px 0 #fff8!important;text-shadow:none}
+.modal .primary:not(:disabled):hover{filter:brightness(1.06);transform:translateY(-1px)}
+.modal button:disabled{opacity:.5;cursor:not-allowed}
+.modal button:focus-visible,.modal input:focus-visible,.modal select:focus-visible,.modal textarea:focus-visible,.modal summary:focus-visible{outline:2px solid var(--pt-tech);outline-offset:2px}
+
+/* Campos */
+.modal input:not([type=checkbox]):not([type=radio]):not([type=range]),.modal select,.modal textarea{border-radius:9px;background:#08131acc;border:1px solid #ffffff1f;color:var(--pt-text)}
+.modal input:not([type=checkbox]):not([type=radio]):not([type=range]):focus,.modal select:focus,.modal textarea:focus{border-color:#7fe3ff88;box-shadow:0 0 0 3px #7fe3ff1f}
+.modal input[type=range]{accent-color:var(--pt-tech)}
+.modal input[type=checkbox],.modal input[type=radio]{accent-color:var(--pt-tech)}
+
+/* Blocos que se abrem e código */
+.modal details{border-radius:10px}
+.modal summary{cursor:pointer;color:#d8e8eb}
+.modal summary:hover{color:#eafcff}
+.modal pre:not(.apprentice-code),.modal .code-editor,.modal textarea.code{border-radius:10px!important;border:1px solid #ffffff14;background:#071118!important}
+
+/* Avisos de entrega e destaques */
+.modal .delivery-banner{border-radius:12px;border:1px solid #e6c67f66;background:linear-gradient(120deg,#3a3016e6,#251f12e6);box-shadow:0 0 18px #e6c67f1a}
+
+@media (prefers-reduced-motion:reduce){.modal>.modal-head .icon-button:hover{transform:none}.modal .primary:not(:disabled):hover{transform:none}}
+@media (max-width:640px){.modal>.modal-head{min-height:46px;padding:6px 10px 6px 14px!important}.modal>.modal-head h2{font-size:17px!important}.modal .tabs>button{padding:6px 11px}}
+
+/* Menu do jogo no mesmo visual das janelas */
+.game-menu-panel{background:linear-gradient(165deg,#112530f7,#0a161df9 70%)!important;border:1px solid #7fe3ff3a!important;border-radius:16px!important;box-shadow:0 0 0 1px #0006,0 18px 50px #000a,inset 0 1px 0 #ffffff12!important;backdrop-filter:blur(6px);scrollbar-width:thin}
+.game-menu-grid button{background:linear-gradient(160deg,#1a3340,#13252f)!important;color:var(--pt-text)!important;border:1px solid #ffffff1c!important;border-radius:12px!important;box-shadow:none!important;transition:border-color .15s,background .15s,transform .15s}
+.game-menu-grid button:hover:not(:disabled){background:linear-gradient(160deg,#20404f,#172d38)!important;border-color:#7fe3ff77!important;transform:translateY(-2px)}
+.game-menu-grid .menu-icon{color:var(--pt-tech);filter:drop-shadow(0 0 6px #7fe3ff55)}
+.game-menu-grid b{color:#f4ecd8}
+.game-menu-grid small{color:var(--pt-muted)!important}
+.game-menu-grid kbd{background:#7fe3ff22!important;color:#bff3ff!important;border:1px solid #7fe3ff44}
+.game-menu-panel button:not(.game-menu-grid button){border-radius:9px;background:#ffffff0d;border:1px solid #ffffff1f;color:var(--pt-text);box-shadow:none}
+.game-menu-panel button:not(.game-menu-grid button):hover{border-color:#7fe3ff66}
+@media (prefers-reduced-motion:reduce){.game-menu-grid button:hover:not(:disabled){transform:none}}

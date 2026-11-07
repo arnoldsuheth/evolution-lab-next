@@ -13,7 +13,7 @@ import { activeEquipment } from "./equipment";
 import { passiveBonuses, SKILLS } from "./skills";
 import { cleanAdventure, specOf, SPEC_EFFECT, type AdventureState } from "./adventure";
 
-export const RELEASE = "1.12.0";
+export const RELEASE = "1.12.1";
 export type Race = "human" | "orc" | "dwarf" | "elf" | "gnome";
 export type ClassId = "paladin" | "warrior" | "hunter" | "engineer" | "mage" | "hacker" | "prophet" | "duelist" | "shaman";
 export type NpcId = "borin" | "eldrin" | "pip" | "lion" | "traveler" | "elara" | "dorin" | "mira";
