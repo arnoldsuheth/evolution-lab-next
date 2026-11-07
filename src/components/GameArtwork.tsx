@@ -48,10 +48,11 @@ const aliases:Record<string,string>={tool:'hammer',focus:'crystal',gadget:'parts
 function Art({type,name,tone='#d6bb7c',tier=1,ink,hue=0,fx}:{type:string;name:string;tone?:string;tier?:number;ink?:string;hue?:number;fx?:ItemFx}){const id=useId().replace(/:/g,'');return <svg viewBox="0 0 64 64" role="img" aria-label={name} className={fx?`game-artwork fx-${fx}`:'game-artwork'}><defs><radialGradient id={id}><stop stopColor="#ffffff"/><stop offset=".7" stopColor="#e4f0fb"/><stop offset="1" stopColor={tone} stopOpacity=".45"/></radialGradient></defs><rect x="1" y="1" width="62" height="62" rx="9" fill={`url(#${id})`} stroke={tone} strokeOpacity=".5"/>{fx==='mythic'&&<FireFx size={64}/>}<g style={hue ? {filter: `hue-rotate(${hue}deg)`} : undefined} transform="translate(3 1) scale(.9)" dangerouslySetInnerHTML={{__html:(paths[aliases[type]??type]??paths.trinket).replace('#c76a7a',ink??'#c76a7a')}}/><path d="m7 7 5-2m45 49-2 5" stroke={tone} opacity=".7"/>{tier>1&&<circle cx="55" cy="55" r="5" fill={tone}/>}</svg>;}
 const MATERIAL_PALETTE=['#7753ac','#247d86','#377947','#a95048','#4a629e','#8e437c','#b4762f','#514578','#1e859a','#a3542f','#646b80','#456d59','#8c3954'];
 
-function AmuletArtwork({name,band,guard}:{name:string;band:number;guard:boolean}){
+function AmuletArtwork({name,band,guard,fx}:{name:string;band:number;guard:boolean;fx?:ItemFx}){
  const gem=MATERIAL_PALETTE[(band+(guard?0:4))%MATERIAL_PALETTE.length];
  const outline=guard?'M16 25 32 19 48 25 46 44Q42 53 32 58Q22 53 18 44Z':'M32 18 51 37 32 58 13 37Z';
- return <svg viewBox="0 0 64 64" role="img" aria-label={name} className="game-artwork">
+ return <svg viewBox="0 0 64 64" role="img" aria-label={name} className={fx?`game-artwork fx-${fx}`:'game-artwork'}>
+  {fx==='mythic'&&<FireFx size={64}/>}
   <path d="M17 6Q9 17 24 25M47 6Q55 17 40 25" fill="none" stroke="#694633" strokeWidth="4" strokeLinecap="round"/>
   <path d={outline} fill={gem} stroke={guard?'#c9a153':'#e1ae6e'} strokeWidth="4" strokeLinejoin="round"/>
   <path d={guard?'M32 28V48M24 35H40':'M35 25 23 39H32L29 50 42 35H33Z'} fill={guard?'none':'#fff1ce'} stroke="#fff1ce" strokeWidth={guard?3:1} strokeLinecap="round"/>
@@ -70,15 +71,15 @@ export function ItemArtwork({item}:{item:Item}){const band=bandFor(item.minLevel
  const hue=[0,35,72,115,156,192,221,255,285,310,330,52,174][band];
  const guard=item.id.startsWith('access-charm-1-');
  const impetus=item.id.startsWith('access-charm-0-');
- if(guard||impetus)return <AmuletArtwork name={item.name} band={band} guard={guard}/>;
+ // Raridade: Comum sem brilho; Épico brilha pouco; Mítico brilha e solta fogo. Armadura muda só a cor.
+ const fx:ItemFx=item.category==='armor'?'none':rarityTier(item.rarity)==='mythic'?'mythic':rarityTier(item.rarity)==='epic'?'epic':'none';
+ if(guard||impetus)return <AmuletArtwork name={item.name} band={band} guard={guard} fx={fx}/>;
  if(item.id.startsWith('mat-cloth-'))return <ClothArtwork name={item.name} band={band}/>;
  // Stable per-item accents distinguish pieces sharing the same atlas silhouette.
  const signature=Array.from(item.id).reduce((hash,char)=>(hash*31+char.charCodeAt(0))>>>0,0);
  const accent=(signature%12)*30;
  const crop=artworkForItem(item);
  const finish=item.rarity==='Épico'?24:item.rarity==='Mítico'?48:0;
- // Raridade: Comum sem brilho; Épico brilha pouco; Mítico brilha e solta fogo. Armadura muda só a cor.
- const fx:ItemFx=item.category==='armor'?'none':rarityTier(item.rarity)==='mythic'?'mythic':rarityTier(item.rarity)==='epic'?'epic':'none';
  if(crop)return <ApprovedArtwork crop={crop} name={item.name} inset={6} hue={hue+finish+accent} fx={fx}/>;const type=item.id.includes('fruit')?'fruit':item.id.includes('stew')?'bowl':paths[item.visual]||aliases[item.visual]?item.visual:item.category==='companion'?'pet':item.category==='tool'?'parts':item.category==='trophy'?'trophy':item.category==='armor'?item.slot:item.category==='consumable'?'potion':item.category==='food'?'food':'trinket';return <Art fx={fx} hue={hue+finish} type={type} name={item.name} tier={item.minLevel} ink={item.id.includes("mana")?"#749ecb":item.id.includes("energy")||item.id==="tea"?"#8ab48b":item.id.includes("guard")?"#c6b276":undefined} tone={({Comum:'#c3bc9e',Incomum:'#96be86',Raro:'#88b9d5',Épico:'#b49bd4',Lendário:'#dfb873','Mítico':'#f2c14e'} as Record<string,string>)[item.rarity]}/>;}
 export function SkillArtwork({skill}:{skill:Skill}){const type=skill.heal?'heal':skill.buff?'charm':skill.guard?'shield':skill.classId==='engineer'?'parts':skill.classId==='hunter'?(skill.branch===1?'pet':'bow'):skill.classId==='mage'||skill.classId==='shaman'?(skill.branch===0?'flame':'crystal'):skill.classId==='hacker'?'dagger':skill.classId==='prophet'?'book':skill.classId==='duelist'?'sword':skill.branch===1?'shield':'greatsword';return <Art type={type} name={skill.name} tier={skill.tier+1} tone={skill.kind==='active'?'#b6a0d7':'#cdb981'}/>;}
 

@@ -49,7 +49,7 @@ function Tree({ x, z, size = 1 }: { x: number; z: number; size?: number }) {
  const covered=targets.some(p=>[.4,1.3,2.3].some(y=>{origin.current.set(p[0],y,p[1]);direction.current.copy(camera.position).sub(origin.current);const distance=direction.current.length();ray.current.set(origin.current,direction.current.normalize());return !!ray.current.intersectBox(bounds.current,hit.current)&&origin.current.distanceTo(hit.current)<distance;}));crown.current?.children.forEach(o=>{const m=(o as THREE.Mesh).material as THREE.MeshStandardMaterial;if(m){m.opacity=THREE.MathUtils.damp(m.opacity,covered?.12:1,10,Math.min(dt,.1));m.depthWrite=m.opacity>.95;}});});
   return <group position={[x, 0, z]} scale={size}>
     <mesh position={[0, 1.6, 0]} castShadow><cylinderGeometry args={[0.2, 0.42, 3.2, 10]} /><meshStandardMaterial color="#a06a3f" roughness={0.9} /></mesh>
-    <group ref={crown}>{[0, 1, 2].map(i => <mesh key={i} position={[Math.sin(i*2)*.35,2.6+i*.8,Math.cos(i*2)*.25]} scale={[1,.8,1]} castShadow><icosahedronGeometry args={[1.65-i*.3,3]} /><meshStandardMaterial transparent color={["#4fa84a", "#6fc04e", "#9ad45e"][i]} roughness={0.85} /></mesh>)}</group>
+    <group ref={crown}>{[0, 1, 2].map(i => <mesh key={i} position={[Math.sin(i*2)*.35,2.6+i*.8,Math.cos(i*2)*.25]} scale={[1,.8,1]} castShadow><icosahedronGeometry args={[1.65-i*.3,2]} /><meshStandardMaterial transparent color={["#4fa84a", "#6fc04e", "#9ad45e"][i]} roughness={0.85} /></mesh>)}</group>
   </group>;
 }
 function House({ x, z, index }: { x: number; z: number; index: number }) {
@@ -208,7 +208,7 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
 }
 export default function GameWorld(props: { paused: boolean; interact: (id: NpcId) => void; report: (text: string) => void }) {
   const quality = useGame(s => s.settings.quality);
-  return <WorldBoundary><Canvas frameloop={props.paused ? "demand" : "always"} orthographic dpr={quality === "high" ? [1, 1.75] : [1, 1.25]} camera={{ position: [14, 18, 14], zoom: 42, left:-840, right:840, top:420, bottom:-420, near:.1, far:220 }} shadows={quality !== "low" ? "percentage" : false} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} fallback={<div className="world-fallback">Seu navegador não disponibilizou o WebGL. Os painéis continuam disponíveis.</div>}><Suspense fallback={null}><WorldFraming /><Scene {...props} /></Suspense></Canvas></WorldBoundary>;
+  return <WorldBoundary><Canvas frameloop={props.paused ? "never" : "always"} orthographic dpr={quality === "high" ? [1, 1.75] : [1, 1.25]} camera={{ position: [14, 18, 14], zoom: 42, left:-840, right:840, top:420, bottom:-420, near:.1, far:220 }} shadows={quality !== "low" ? "percentage" : false} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} fallback={<div className="world-fallback">Seu navegador não disponibilizou o WebGL. Os painéis continuam disponíveis.</div>}><Suspense fallback={null}><WorldFraming /><Scene {...props} /></Suspense></Canvas></WorldBoundary>;
 }
 function CharacterPreview({ classId, race, look, equipped, level,organic=false,fullGear=false }: { classId: ClassId; race: Race; look: Look; equipped: string[]; level: number;organic?:boolean;fullGear?:boolean }) {
   return <Character classId={classId} race={race} look={look} equipped={equipped} level={level} preview animated={true} organic={organic} fullGear={fullGear} />;

@@ -1,5 +1,5 @@
 "use client";
-import {useMemo,useRef} from 'react';
+import {useLayoutEffect,useMemo,useRef,type ReactNode} from 'react';
 import {useFrame,type ThreeEvent} from '@react-three/fiber';
 import {Html} from '@react-three/drei';
 import * as THREE from 'three';
@@ -15,13 +15,19 @@ function Roads({onClick}:{onClick:(e:ThreeEvent<MouseEvent>)=>void}){
   return <group key={r.id}><mesh position={[(ax+bx)/2,y,(az+bz)/2]} rotation={[-Math.PI/2,0,angle]} onClick={onClick} receiveShadow><planeGeometry args={[r.width,len]}/>{std(color,{roughness:1})}</mesh>
    {[r.a,r.b].map((p,i)=><mesh key={i} position={[p[0],y-.001,p[1]]} rotation={[-Math.PI/2,0,0]} onClick={onClick} receiveShadow><circleGeometry args={[r.width/2,20]}/>{std(color,{roughness:1})}</mesh>)}</group>;})}</group>;
 }
-function Lamp({lit}:{lit:boolean}){
- const glow=useRef<THREE.Mesh>(null);
- useFrame(({clock})=>{if(glow.current&&lit)glow.current.scale.setScalar(1+Math.sin(clock.elapsedTime*3)*.06);});
- return <group><mesh position={[0,1.1,0]} castShadow><cylinderGeometry args={[.07,.1,2.2,8]}/>{std('#3d4350',{metalness:.4})}</mesh>
-  <mesh position={[0,2.3,0]}><boxGeometry args={[.32,.4,.32]}/>{std(lit?'#ffe08a':'#6c6f74',{emissive:lit?'#ffb43a':'#000000',emissiveIntensity:lit?1.6:0})}</mesh>
-  <mesh position={[0,2.58,0]}><coneGeometry args={[.28,.22,4]}/>{std('#3d4350')}</mesh>
-  {lit&&<mesh ref={glow} position={[0,2.3,0]}><sphereGeometry args={[.55,12,10]}/><meshBasicMaterial color="#ffd36b" transparent opacity={.22} depthWrite={false}/></mesh>}</group>;
+/** Todos os postes da cidade num só desenho por peça (poste, lanterna, tampa e brilho): bem mais leve. */
+const LAMP_PARTS:{y:number;geo:THREE.BufferGeometry;lit?:boolean}[]=[
+ {y:1.1,geo:new THREE.CylinderGeometry(.07,.1,2.2,8)},{y:2.3,geo:new THREE.BoxGeometry(.32,.4,.32),lit:true},{y:2.58,geo:new THREE.ConeGeometry(.28,.22,4)}];
+const LAMP_GLOW=new THREE.SphereGeometry(.55,12,10);
+function InstancedParts({points,geo,y,children}:{points:{x:number;z:number}[];geo:THREE.BufferGeometry;y:number;children:ReactNode}){
+ const ref=useRef<THREE.InstancedMesh>(null);
+ useLayoutEffect(()=>{const m=ref.current;if(!m)return;const o=new THREE.Object3D();points.forEach((p,i)=>{o.position.set(p.x,y,p.z);o.updateMatrix();m.setMatrixAt(i,o.matrix);});m.instanceMatrix.needsUpdate=true;m.computeBoundingSphere();},[points,y]);
+ return <instancedMesh ref={ref} args={[geo,undefined,points.length]} raycast={()=>null}>{children}</instancedMesh>;
+}
+function LampPosts({lit}:{lit:boolean}){
+ const points=useMemo(()=>PROPS.filter(p=>p.kind==='lamp'),[]);
+ return <group>{LAMP_PARTS.map((part,i)=><InstancedParts key={i} points={points} geo={part.geo} y={part.y}>{part.lit?std(lit?'#ffe08a':'#6c6f74',{emissive:lit?'#ffb43a':'#000000',emissiveIntensity:lit?1.6:0}):std('#3d4350',i===0?{metalness:.4}:{})}</InstancedParts>)}
+  {lit&&<InstancedParts points={points} geo={LAMP_GLOW} y={2.3}><meshBasicMaterial color="#ffd36b" transparent opacity={.22} depthWrite={false}/></InstancedParts>}</group>;
 }
 function Stall({open,index}:{open:boolean;index:number}){
  const goods=['#e05d4f','#f2c14e','#7fbf5a','#7a8fe0','#e58fc0'];
@@ -58,7 +64,7 @@ function NearbySign({prop}:{prop:Prop}){
 
 function PropModel({prop,unlocked}:{prop:Prop;unlocked:boolean}){
  switch(prop.kind){
-  case 'lamp':return <Lamp lit={unlocked}/>;
+  case 'lamp':return null; // desenhados juntos em LampPosts
   case 'stall':return <Stall open={unlocked} index={Number(prop.id.slice(-1))}/>;
   case 'well':return <Well flowing={unlocked}/>;
   case 'beacon':return <Beacon lit={unlocked}/>;
@@ -78,14 +84,15 @@ function PropModel({prop,unlocked}:{prop:Prop;unlocked:boolean}){
 /** Horta cercada: cerca baixa com canteiros coloridos. */
 function Garden({x,z,w,d}:{x:number;z:number;w:number;d:number}){
  const posts=useMemo(()=>{const list:[number,number][]=[];for(let i=-w;i<=w+.01;i+=.55){list.push([i,-d],[i,d]);}for(let j=-d+.55;j<d;j+=.55){list.push([-w,j],[w,j]);}return list;},[w,d]);
- return <group position={[x,0,z]}>{posts.map(([px,pz],i)=><mesh key={i} position={[px,.35,pz]}><boxGeometry args={[.09,.7,.09]}/>{std(WOOD)}</mesh>)}
+ const points=useMemo(()=>posts.map(([px,pz])=>({x:px,z:pz})),[posts]),post=useMemo(()=>new THREE.BoxGeometry(.09,.7,.09),[]);
+ return <group position={[x,0,z]}><InstancedParts points={points} geo={post} y={.35}>{std(WOOD)}</InstancedParts>
   {[-1,1].map(s=><mesh key={s} position={[0,.5,s*d]}><boxGeometry args={[w*2,.07,.06]}/>{std(WOOD)}</mesh>)}{[-1,1].map(s=><mesh key={s} position={[s*w,.5,0]}><boxGeometry args={[.06,.07,d*2]}/>{std(WOOD)}</mesh>)}
   {[-1,0,1].map(i=><group key={i}><mesh position={[i*w*.6,.08,0]}><boxGeometry args={[w*.5,.14,d*1.6]}/>{std('#7a5236',{roughness:1})}</mesh>{[-.5,0,.5].map(j=><mesh key={j} position={[i*w*.6,.28,j*d]}><sphereGeometry args={[.16,8,6]}/>{std(['#7cc45a','#e7774f','#f3d35a'][i+1])}</mesh>)}</group>)}</group>;
 }
 
 export default function TownDistrict({onGroundClick}:{onGroundClick:(e:ThreeEvent<MouseEvent>)=>void}){
  const completed=useGame(s=>s.education.completed);
- return <group><Roads onClick={onGroundClick}/>
+ return <group><Roads onClick={onGroundClick}/><LampPosts lit={completed.includes('variables')}/>
   {PROPS.map(p=><group key={p.id} position={[p.x,0,p.z]} rotation={[0,p.turn??(p.kind==='floodgate'?0:0),0]}><PropModel prop={p} unlocked={!p.unlock||completed.includes(p.unlock)}/></group>)}
   {FENCES.map(f=><Garden key={f.id} {...f}/>)}</group>;
 }

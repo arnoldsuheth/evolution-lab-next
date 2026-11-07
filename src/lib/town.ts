@@ -38,7 +38,7 @@ export type Prop = { id: string; kind: PropKind; x: number; z: number; turn?: nu
 const lamp = (id: string, x: number, z: number, unlock = 'variables'): Prop => ({ id, kind: 'lamp', x, z, radius: .3, unlock });
 export const PROPS: Prop[] = [
   // Lanternas da praça: acendem com a primeira runa (variáveis).
-  lamp('lamp-ne', 6.2, 2.2), lamp('lamp-se', 2.4, 6.2), lamp('lamp-sw', -2.4, 6.2), lamp('lamp-w', -5.2, 4.4), lamp('lamp-nw', -6.4, -2.4), lamp('lamp-n1', -2.4, -6.2), lamp('lamp-n2', 2.4, -6.2), lamp('lamp-e', 6.2, -2.2),
+  lamp('lamp-ne', 6.2, 2.2), lamp('lamp-se', 2.4, 6.2), lamp('lamp-sw', -2.4, 6.2), lamp('lamp-w', -5.2, 4.4), lamp('lamp-n1', -2.4, -6.2), lamp('lamp-n2', 2.4, -6.2),
   // Lanternas da avenida e da entrada sul.
   lamp('lamp-av1', -14, 13.9), lamp('lamp-av2', -26, 13.9), lamp('lamp-av3', 14.5, 10.1), lamp('lamp-av4', 26, 10.1), lamp('lamp-sul1', -3.1, 17), lamp('lamp-sul2', 3.1, 17),
   // Portões da cidade.
