@@ -13,7 +13,7 @@ import { ClassPortrait } from './ApprovedArtwork';
  * Enquanto a foto não fica pronta, mostra a arte da classe.
  */
 type Props = { classId: ClassId; race: Race; look: Look; equipped: string[]; level: number };
-const PREFIX = 'lc-portrait-v3:';
+const PREFIX = 'lc-portrait-v4:';
 const cache = new Map<string, string>(), failed = new Set<string>(), queue: string[] = [], subs = new Set<() => void>();
 let owner: string | null = null, version = 0;
 const emit = () => { version++; subs.forEach(f => f()); };
@@ -51,9 +51,9 @@ function Snap({ id, head }: { id: string; head: number }) {
 }
 
 function Studio({ id, classId, race, look, equipped, level }: Props & { id: string }) {
-  const h = heroProportions(race).height, head = 2.15 * h, distance = 3.1 * h;
+  const h = heroProportions(race).height, head = 2.5 * h, distance = Math.max(3, 4.8 * h);
   return <div aria-hidden style={{ position: 'fixed', left: -4000, top: 0, width: 192, height: 192, pointerEvents: 'none' }}>
-    <Canvas dpr={1} gl={{ preserveDrawingBuffer: true, alpha: true, antialias: true }} camera={{ position: [distance * .2, head + .06, distance], fov: 30 }}>
+    <Canvas dpr={1} gl={{ preserveDrawingBuffer: true, alpha: true, antialias: true }} camera={{ position: [distance * .07, head + .06, distance], fov: 30 }}>
       <ambientLight intensity={1.15} /><hemisphereLight args={['#c8dce4', '#504130', 1.7]} />
       <directionalLight position={[2.5, 4, 5]} intensity={2.2} color="#f3e9da" /><directionalLight position={[-4, 3, -2]} intensity={1} color="#94b3d1" />
       <Suspense fallback={null}><Character classId={classId} race={race} look={look} equipped={equipped} level={level} preview animated={false} /></Suspense>

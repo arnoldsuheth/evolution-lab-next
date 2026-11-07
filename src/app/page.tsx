@@ -105,14 +105,14 @@ function SettingsPanel() {
 }
 export default function Home() {
   const cloudStatus=useCloud(s=>s.status),cloudReload=useCloud(s=>s.reload);const cloudBlocked=["loading","choose","conflict"].includes(cloudStatus);
-  const challenge = useGame(s => s.challenge); const ready = useGame(s => s.ready); const hero = useGame(s => s.hero); const look = useGame(s => s.look); const [menuOpen, setMenuOpen] = useState(false); const completed = useGame(s => s.education.completed); const encounter = useGame(s => s.encounter); const notice = useGame(s => s.notice); const buff = useGame(s => s.buff); const effects = useGame(s => s.effects); const settings = useGame(s => s.settings); const error = useGame(s => s.saveError); const ancestors = useGame(s => s.ancestors);
+  const challenge = useGame(s => s.challenge); const ready = useGame(s => s.ready); const hero = useGame(s => s.hero); const look = useGame(s => s.look); const [menuOpen, setMenuOpen] = useState(false); const completed = useGame(s => s.education.completed); const encounter = useGame(s => s.encounter); const buff = useGame(s => s.buff); const effects = useGame(s => s.effects); const settings = useGame(s => s.settings); const error = useGame(s => s.saveError); const ancestors = useGame(s => s.ancestors);
   const [entered,setEntered]=useState(false);
   const [portrait,setPortrait]=useState(false);
   useEffect(()=>{const media=window.matchMedia('(pointer:coarse) and (orientation:portrait)'),sync=()=>setPortrait(media.matches);sync();media.addEventListener('change',sync);return()=>media.removeEventListener('change',sync);},[]);
   useEffect(()=>{installCursors(document.documentElement);},[]);
   const [editingHud,setEditingHud]=useState(false);
   const [questsCollapsed,setQuestsCollapsed]=useState(false);
-  const [panel, setPanel] = useState<Panel>("none"); const [npc, setNpc] = useState<NpcId>("lion"); const [collapsed, setCollapsed] = useState(false); const [clock, setClock] = useState("Brasília"); const [worldMessage, setWorldMessage] = useState(""); const audio = useRef<KingdomAudio | null>(null);
+  const [panel, setPanel] = useState<Panel>("none"); const [npc, setNpc] = useState<NpcId>("lion"); const [collapsed, setCollapsed] = useState(false); const [clock, setClock] = useState("Brasília"); const audio = useRef<KingdomAudio | null>(null);
   // Com uma página do menu aberta, o tempo do jogo para: sem recuperar vida e sem gastar a duração de poções e bônus.
   const [door, setDoor] = useState("");
   useEffect(() => { const on = (e: Event) => { const id = (e as CustomEvent<string>).detail; if (typeof id === "string") { setDoor(id); setPanel("door"); } }; window.addEventListener("lions-cave-door", on); return () => window.removeEventListener("lions-cave-door", on); }, []);
@@ -122,7 +122,45 @@ export default function Home() {
   const pausedForPanel = !!challenge || panel !== "none"; const pauseRef = useRef(false);
   useEffect(() => { pauseRef.current = pausedForPanel; }, [pausedForPanel]);
   useEffect(() => { const id = setInterval(() => { useGame.getState().tick(pauseRef.current ? 0 : 1); setClock(new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" }).format(new Date())); }, 1000); return () => clearInterval(id); }, []);
-  useEffect(() => { if (notice) { const id = setTimeout(() => useGame.getState().clearNotice(), 8000); return () => clearTimeout(id); } }, [notice]);
+  const [actionLog, setActionLog] = useState<{ id: number; text: string; expires: number }[]>([]);
+  const nextLogId = useRef(0);
+  const reportAction = useCallback((text: string) => {
+    if (!text.trim()) return;
+    const now = Date.now();
+    const entry = { id: ++nextLogId.current, text, expires: now + 5000 };
+    setActionLog(entries => [...entries.filter(item => item.expires > now), entry].slice(-4));
+  }, []);
+
+  useEffect(() => {
+    let clearTimer: ReturnType<typeof setTimeout> | undefined;
+    const showNotice = (notice: string) => {
+      clearTimeout(clearTimer);
+      if (!notice) return;
+      reportAction(notice);
+      clearTimer = setTimeout(() => {
+        const state = useGame.getState();
+        if (state.notice === notice) state.clearNotice();
+      }, 5000);
+    };
+    showNotice(useGame.getState().notice);
+    const unsubscribe = useGame.subscribe((state, previous) => {
+      if (state.notice !== previous.notice) showNotice(state.notice);
+    });
+    return () => {
+      unsubscribe();
+      clearTimeout(clearTimer);
+    };
+  }, [reportAction]);
+
+  useEffect(() => {
+    const first = actionLog[0];
+    if (!first) return;
+    const timer = setTimeout(() => {
+      const now = Date.now();
+      setActionLog(entries => entries.filter(item => item.expires > now));
+    }, Math.max(0, first.expires - Date.now()));
+    return () => clearTimeout(timer);
+  }, [actionLog]);
   useEffect(() => { const music=new KingdomAudio();audio.current=music;return ()=>{music.close();audio.current=null;}; }, []);
   useEffect(()=>{
     const music=audio.current;if(!music)return;
@@ -149,11 +187,13 @@ export default function Home() {
   const limits = stats(hero); const next = LESSONS.find(l => !completed.includes(l.id)); const activePanel = challenge ? "challenge" : !hero.created && panel !== "settings" ? "creator" : panel;
   const titles: Record<Panel, string> = {adventure:"Aventura", door:"Porta de código", spot:"Ponto de código", dog:"Caramelo · vira-lata da Aurora", map:"Atlas da Aurora", none: "", journey: "Caminhos da Aurora", challenge:"Chave do conhecimento", character: "Personagem e mochila", creator: "Editar personagem", journal: "O Código Perdido", bag: "Personagem e mochila", talents: "Árvore de talentos", academy: "Biblioteca do conhecimento", settings: "Configurações & recuperação", ancestors: "Arquivo de antepassados", npc: npc === "elara" ? "Elara · artesãos élficos" : npc === "dorin" ? "Dorin · salões anões" : npc === "mira" ? "Mira · boticária" : npc === "traveler" ? "Viajantes do Conhecimento" : npc === "borin" ? "Borin · mercador e ferreiro" : npc === "eldrin" ? "Eldrin · Mestre das Runas" : npc === "pip" ? "Pip · viajante improvável" : "Lion · guardião cristalino" };
   return <HudLayout onEditingChange={setEditingHud}><main className={`game-shell ${activePanel === "creator" ? "creating" : ""}`} style={{ "--panel-opacity": settings.panelOpacity, "--ui-scale": settings.uiScale } as CSSProperties}>
-    <aside className="rotate-device" role="status"><span aria-hidden="true">↻</span><h2>Gire o celular</h2><p>Jogue com o aparelho deitado para visualizar o mundo e os controles.</p></aside><div className="world-container">{activePanel !== "creator" && <World key={cloudReload} paused={activePanel !== "none"||menuOpen||editingHud||cloudBlocked||portrait} interact={id => { setNpc(id); setPanel("npc"); useGame.getState().questEvent({ type: "talk", npc: id }); }} report={text => { setWorldMessage(text); setTimeout(() => setWorldMessage(""), 6000); }} />}</div><div className="world-vignette" />
+    <aside className="rotate-device" role="status"><span aria-hidden="true">↻</span><h2>Gire o celular</h2><p>Jogue com o aparelho deitado para visualizar o mundo e os controles.</p></aside><div className="world-container">{activePanel !== "creator" && <World key={cloudReload} paused={activePanel !== "none"||menuOpen||editingHud||cloudBlocked||portrait} interact={id => { setNpc(id); setPanel("npc"); useGame.getState().questEvent({ type: "talk", npc: id }); }} report={reportAction} />}</div><div className="world-vignette" />
     <GameMenu onOpenChange={setMenuOpen} hidden={activePanel !== "none"} open={id=>setPanel(id)} keys={cleanBindings(settings.keybindings) as Record<string,string>} rest={()=>useGame.getState().rest()} canRest={!encounter && !hero.dead && !hero.instance && hero.region==="aurora" && Math.hypot(...hero.position) <= 11} switchCharacter={()=>{if(!encounter&&!challenge){setPanel("none");setEntered(false);}else useGame.setState({notice:"Termine o combate ou exercício antes de trocar de campanha."});}} location={`${hero.instance?INSTANCES[hero.instance].name:hero.region!=="aurora"?REGIONS[hero.region].name:hero.position[0] > 15 && hero.position[1] < -12 ? "Minas das Condições" : hero.position[1] < -12 ? "Floresta das Variáveis" : "Pedra da Aurora"} · ${clock}`} version={RELEASE} error={!!error}/>
     <HudBlock id="map" label="Minimapa" className="map-hud"><button className="map-open" aria-label="Abrir mapa grande" onClick={()=>setPanel("map")}><Minimap /></button></HudBlock><HudBlock id="hero" label="Personagem" className="left-hud"><div className={`hero-card ${collapsed ? "collapsed" : ""}`}><button className="hero-card-header" onClick={() => setCollapsed(!collapsed)} aria-expanded={!collapsed}><div className="portrait"><HeroPortrait classId={hero.classId} race={hero.race} look={look} equipped={activeEquipment(hero,ITEMS).map(i=>i.id)} level={hero.level}/>{hero.dead&&"♜"}<b>{hero.level}</b></div><div><strong>{hero.name}{titleOf(adventureOf(hero)) && <em className="hero-title"> «{titleOf(adventureOf(hero))}»</em>}</strong><small>{RACES[hero.race]} · {classTitle(hero)} · {CLASSES[hero.classId].name}</small></div><span>{collapsed ? "+" : "−"}</span></button>{!collapsed && <><Meter label="HP" value={hero.hp} max={limits.maxHp} tone="linear-gradient(90deg,#743d45,#b76462)" /><Meter label="MP" value={hero.mp} max={limits.maxMp} tone="linear-gradient(90deg,#385d82,#709bbc)" /><Meter label="STM" value={hero.stamina} max={limits.maxStamina} tone="linear-gradient(90deg,#627349,#9cae6c)" /><div className="hero-card-footer"><Currency value={hero.gold}/></div></> }</div>{(hero.nexus?.aura ?? 0) > 0 && <div className="buff-indicator aura">✦ Aura do Herói · {Math.floor((hero.nexus?.aura ?? 0) / 60)}:{String((hero.nexus?.aura ?? 0) % 60).padStart(2, "0")}</div>}{buff > 0 && <div className="buff-indicator">✧ Chá de Lion · proteção +5 · {Math.ceil(buff)}s</div>}{effects.map(e=><div key={e.kind} className="buff-indicator">✧ {e.kind==='attack'?'Ímpeto':'Proteção'} +{e.amount} · {Math.ceil(e.remaining)}s</div>)}{hero.mode === "hardcore" && <span className="hardcore-tag">HARDCORE · morte permanente</span>}</HudBlock>
     <HudBlock id="quests" label="Missões" className={`quest-tracker ${questsCollapsed?"quest-folded":""}`}><button className="quest-toggle" aria-expanded={!questsCollapsed} onClick={()=>setQuestsCollapsed(!questsCollapsed)} aria-label={questsCollapsed?"Mostrar missão atual":"Recolher missão atual"}>{questsCollapsed?"+ Missão":"−"}</button><h3>{next ? next.title : "As runas foram restauradas"}</h3><p>{next ? next.id === "variables" ? "Encontre Eldrin, o Mestre das Runas, na praça." : "Volte a Eldrin para continuar seu aprendizado." : "Explore a floresta, vença o guardião e construa seu portfólio."}</p><button className="text-button" onClick={() => setPanel("journal")}>Abrir diário <span>↗</span></button><details className="quest-extra"><summary>Outras missões e progresso</summary><div className="quest-counter"><span>{completed.filter(id => LESSONS.some(l => l.id === id)).length} / 8 runas</span><span>{hero.kills} vitórias</span></div><QuestTrackerList/></details></HudBlock>
-    {(notice || worldMessage) && <div className="toast" role="status"><span>◆</span>{worldMessage || notice}</div>}
+    <div className="action-log" role="log" aria-label="Avisos recentes" aria-live="polite">
+      {actionLog.map(entry => <p key={entry.id}>{entry.text}</p>)}
+    </div>
     {error && <button className="save-alert" onClick={() => setPanel("settings")}>Salvamento precisa de atenção · exportar e recuperar ↗</button>}
     {hero.dead && <div className="death-banner"><span className="eyebrow">A JORNADA DE {hero.name.toUpperCase()} TERMINOU</span><h2>O conhecimento permanece.</h2><button className="primary" onClick={() => setPanel("ancestors")}>Ver antepassados e recomeçar</button></div>}
     {hero.defeatedBosses.includes("boss-master")&&<div className="campaign-victory" role="status"><b>O Código Perdido foi restaurado.</b><span>Nullarion foi vencido. Seu conhecimento e sua aventura permanecem.</span><button onClick={()=>setPanel("academy")}>Ver meu portfólio</button></div>}

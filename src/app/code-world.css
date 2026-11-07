@@ -70,8 +70,6 @@ svg.game-artwork.fx-mythic{filter:drop-shadow(0 0 3px #ffd36b) drop-shadow(0 0 9
 .dog-tag b{font-size:11px;letter-spacing:.3px}
 .dog-bubble{font-size:16px;line-height:1;animation:dogBob 1.6s ease-in-out infinite}
 .dog-bubble.begging{animation:dogBeg .9s ease-in-out infinite}
-.dog-meter{display:block;width:56px;height:5px;border-radius:9px;background:#ffffff22;overflow:hidden}
-.dog-meter>i{display:block;height:100%;background:linear-gradient(90deg,#f0a64a,#ffd36b);border-radius:9px}
 @keyframes dogBob{50%{transform:translateY(-3px)}}
 @keyframes dogBeg{0%,100%{transform:rotate(-8deg) scale(1)}50%{transform:rotate(8deg) scale(1.15)}}
 .dog-panel{display:flex;flex-direction:column;gap:12px}
@@ -88,3 +86,71 @@ svg.game-artwork.fx-mythic{filter:drop-shadow(0 0 3px #ffd36b) drop-shadow(0 0 9
 .dog-line{margin:0;padding:10px 12px;border-radius:12px;background:#3a2a1ee6;border:1px solid #e6b56a44;color:#ffe9c9;font-size:13px;line-height:1.5}
 .dog-actions{display:flex;flex-wrap:wrap;gap:8px}.dog-actions button small{opacity:.75;margin-left:4px}
 @media (prefers-reduced-motion:reduce){.dog-bubble,.dog-bubble.begging{animation:none}}
+
+/* Mensagens de ação na lateral, sem competir com o personagem no centro. */
+.action-log {
+  position: fixed;
+  right: max(14px, env(safe-area-inset-right));
+  bottom: calc(env(safe-area-inset-bottom) + 44px);
+  z-index: 80;
+  width: min(240px, 28vw);
+  max-height: 34dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 5px;
+  pointer-events: none;
+  color: #fff;
+  text-align: right;
+  text-shadow: 0 1px 3px #000, 0 0 4px #000;
+  font: 600 12px/1.35 system-ui, sans-serif;
+}
+.action-log p { margin: 0; overflow-wrap: anywhere; }
+@media (orientation: landscape) and (max-height: 540px) {
+  .action-log { width: min(200px, 27vw); bottom: calc(env(safe-area-inset-bottom) + 36px); font-size: 11px; }
+}
+
+/* No mundo, o texto tem contorno de sombra sem caixas sobre a cena. */
+.world-container :is(.dog-tag, .spot-label, .spot-tag, .npc-label) {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: #fff;
+  text-shadow: 0 1px 3px #000, 0 0 4px #000;
+}
+.world-container .dog-tag {
+  flex-direction: row;
+  justify-content: center;
+  gap: 3px;
+  padding: 2px 4px;
+  min-height: 0;
+  white-space: nowrap;
+}
+.world-container .dog-tag b { font-size: 10px; letter-spacing: 0; }
+.world-container .dog-tag .dog-bubble { font-size: 10px; animation: none; }
+.world-container :is(.spot-label, .spot-tag) { padding: 2px 4px; }
+.modal :is(.npc-dialogue, .quest-dialog) {
+  background: none;
+  box-shadow: none;
+}
+
+/* Conversas simples exibem o texto direto, sem a moldura das lojas e dos editores. */
+.modal:has(> .npc-dialogue) {
+  background: none !important;
+  border: 0 !important;
+  outline: 0;
+  box-shadow: none !important;
+  color: #fff;
+  text-shadow: 0 1px 3px #000, 0 0 4px #000;
+}
+.modal:has(> .npc-dialogue) > .modal-head {
+  background: none !important;
+  border: 0 !important;
+  backdrop-filter: none;
+}
+.modal:has(> .npc-dialogue) > .modal-head::after { display: none; }
+.modal-shade:has(> .modal > .npc-dialogue) {
+  background: none;
+  backdrop-filter: none;
+}

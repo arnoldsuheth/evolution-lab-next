@@ -110,11 +110,10 @@ export default function CityDog() {
   const bubble = justFed ? '❤️' : hungryNow ? '🍖?' : level.face;
   return <group ref={root} position={HOME.toArray()} scale={1.35} {...cursorOn('point')} onClick={e => { if (e.delta > 6 || e.button !== 0) return; e.stopPropagation(); openDog(); }}>
     <DogBody friendship={friendship} legs={legs} tail={tail} head={head} rear={rear} tongue={friendship >= 45 || justFed} />
-    {near && <Html position={[0, 1.35, 0]} center zIndexRange={[6, 0]}>
+    {near && <Html position={[0, 1.18, 0]} center zIndexRange={[6, 0]}>
       <button className="dog-tag" onClick={openDog} aria-label={`${DOG_NAME}: amizade ${friendship} de 100`}>
         <span className={`dog-bubble ${hungryNow ? 'begging' : ''}`}>{bubble}</span>
         <b>{DOG_NAME}</b>
-        <i className="dog-meter"><i style={{ width: `${friendship}%` }} /></i>
       </button>
     </Html>}
   </group>;
