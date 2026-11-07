@@ -135,25 +135,6 @@ svg.game-artwork.fx-mythic{filter:drop-shadow(0 0 3px #ffd36b) drop-shadow(0 0 9
   box-shadow: none;
 }
 
-/* Conversas simples exibem o texto direto, sem a moldura das lojas e dos editores. */
-.modal:has(> .npc-dialogue):not(:has(> .quest-dialog)) {
-  background: none !important;
-  border: 0 !important;
-  outline: 0;
-  box-shadow: none !important;
-  color: #fff;
-  text-shadow: 0 1px 3px #000, 0 0 4px #000;
-}
-.modal:has(> .npc-dialogue):not(:has(> .quest-dialog)) > .modal-head {
-  background: none !important;
-  border: 0 !important;
-  backdrop-filter: none;
-}
-.modal:has(> .npc-dialogue):not(:has(> .quest-dialog)) > .modal-head::after { display: none; }
-.modal-shade:has(> .modal:has(> .npc-dialogue):not(:has(> .quest-dialog))) {
-  background: none;
-  backdrop-filter: none;
-}
 /* Iniciantes: como montar, significado das peças, cartão "Pense assim" */
 .apprentice-how{margin:0;font-size:12px;color:#cfe4ea}.apprentice-how b{display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:6px;border:1.5px dashed #ffd36b;color:#ffe9a8;font-size:11px}
 .apprentice-options button{display:flex;flex-direction:column;align-items:center;gap:2px}
