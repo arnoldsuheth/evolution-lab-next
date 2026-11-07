@@ -57,3 +57,11 @@ svg.game-artwork.fx-mythic{filter:drop-shadow(0 0 3px #ffd36b) drop-shadow(0 0 9
 .fx-flame{transform-box:fill-box;transform-origin:50% 100%;opacity:.85;animation:fxFlame 1.2s ease-in-out infinite}
 @keyframes fxFlame{0%{transform:translateY(0) scale(.8,.7);opacity:.35}45%{transform:translateY(-6%) scale(1,1.15);opacity:.95}100%{transform:translateY(-14%) scale(.6,.5);opacity:0}}
 @media (prefers-reduced-motion:reduce){.fx-flame{animation:none;opacity:.7}}
+/* Diário no Modo Aprendiz: montar primeiro, explicação longa recolhida */
+.apprentice-reward{margin:2px 0 0;font-size:12px;color:#ffd98a}
+.guide-fold{margin:4px 0 10px;border:1px solid #7fe3ff33;border-radius:10px;background:#7fe3ff0a;padding:0 12px}
+.guide-fold>summary{padding:10px 0;font-size:13px;color:#cfeff7;list-style:none}
+.guide-fold>summary::-webkit-details-marker{display:none}
+.guide-fold>summary::before{content:"▸ ";color:var(--tech)}
+.guide-fold[open]>summary::before{content:"▾ "}
+.guide-fold[open]{padding-bottom:10px}
