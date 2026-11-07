@@ -244,7 +244,9 @@ function PreviewCamera({ race }: { race: Race }) {
   const camera = useThree(s => s.camera);
   const controls = useRef<ComponentRef<typeof OrbitControls>>(null);
   void race; // Mesmo enquadramento para comparar as alturas reais das raças.
-  const target=1.5, distance=7.4;
+  const aspect = useThree(s => s.size.width / Math.max(1, s.size.height));
+  const target = 1.5;
+  const distance = 7.4 / Math.max(.55, Math.min(1, aspect));
   useEffect(()=>{camera.position.set(0,target+.08,distance);controls.current?.target.set(0,target,0);controls.current?.update();},[camera,target,distance]);
   return <OrbitControls ref={controls} target={[0,target,0]} enablePan={false} enableZoom={false} autoRotate={false} enableDamping={false} minDistance={distance} maxDistance={distance} minPolarAngle={Math.PI/2-.035} maxPolarAngle={Math.PI/2-.035} touches={{ONE:THREE.TOUCH.ROTATE}} />;
 }

@@ -1,0 +1,259 @@
+/* Fit the browser viewport and keep interactive content inside the safe area. */
+@media (max-width: 760px), (max-height: 540px) and (orientation: landscape), (pointer: coarse) and (max-width: 1000px) {
+  :root {
+    --screen-top: max(8px, env(safe-area-inset-top));
+    --screen-right: max(8px, env(safe-area-inset-right));
+    --screen-bottom: max(8px, env(safe-area-inset-bottom));
+    --screen-left: max(8px, env(safe-area-inset-left));
+    --panel-height: calc(100dvh - var(--screen-top) - var(--screen-bottom));
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  .game-shell { height: 100dvh; min-height: 0; }
+  .game-shell > .modal-shade:has(> .modal) {
+    padding: var(--screen-top) var(--screen-right) var(--screen-bottom) var(--screen-left);
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+  .modal-shade > .modal {
+    width: min(100%, 1000px) !important;
+    max-width: 100% !important;
+    max-height: var(--panel-height) !important;
+    min-width: 0;
+    overscroll-behavior: contain;
+    overflow-x: hidden;
+    overflow-wrap: anywhere;
+    outline-offset: 0;
+  }
+  .modal > .modal-head {
+    flex: none;
+    gap: 8px;
+    min-height: 48px !important;
+    padding: 2px 8px 2px 12px !important;
+  }
+  .modal > .modal-head > div { min-width: 0; }
+  .modal > .modal-head h2 { font-size: clamp(15px, 2.5vw, 19px) !important; }
+  .modal > .modal-head .icon-button {
+    flex: 0 0 44px;
+    width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+  }
+  .modal .panel-body, .modal .lesson-content, .modal .spot-panel, .modal .quest-dialog {
+    min-width: 0;
+    padding: 8px 10px !important;
+  }
+  .modal :is(button, input, select, textarea, fieldset) { max-width: 100%; }
+  :is(.modal, .character-select, .cloud-gate) :is(input:not([type]), input[type="text"], input[type="number"], input[type="email"], input[type="password"], select, textarea) {
+    min-width: 0;
+    font-size: 16px !important;
+  }
+  .modal :is(pre, table) { max-width: 100%; }
+  .modal pre { overflow-x: auto; }
+  .modal .tabs { min-width: 0; flex-wrap: wrap; gap: 4px; }
+  .modal .tabs > button { min-height: 44px; }
+  .modal :is(.journal-grid, .academy-grid, .ai-quest-grid) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  .modal :is(.journal-grid, .academy-grid, .ai-quest-grid, .character-sheet, .creator-grid) > * { min-width: 0; }
+  .modal :is(.lesson-nav, .academy-nav, .ai-quest-grid nav) {
+    display: flex;
+    flex-direction: row;
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 6px;
+    gap: 5px;
+  }
+  .modal :is(.lesson-nav, .academy-nav, .ai-quest-grid nav) > button {
+    flex: 0 0 auto;
+    width: min(145px, 45vw);
+    min-height: 44px;
+  }
+  .modal :is(.quest-offer, .adventure-card) > div { min-width: 0; }
+  .modal .quest-offer { padding: 9px; gap: 8px; }
+  .modal .quest-offer p { line-height: 1.4; }
+  .modal .skill-tree { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 8px; }
+  .modal .skill-branch { min-width: 0; margin: 0; padding: 8px; }
+  .modal .skill-bar { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .modal .promotion-path { grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr)); }
+
+  .modal:has(> .equipment-panel) { height: var(--panel-height); }
+  .modal > .equipment-panel { overflow-y: auto; }
+  .equipment-icons .unified-inventory { min-height: 128px; }
+  .equipment-icons .inventory-toolbar { flex-wrap: nowrap; gap: 5px; }
+  .equipment-icons .inventory-toolbar .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; }
+  .equipment-icons .inventory-toolbar .tabs button { flex: none; }
+  .equipment-icons .unified-inventory.with-loadout { grid-template-columns: clamp(90px, 20%, 138px) minmax(0, 1fr); }
+  .equipment-icons .item-browser { position: relative; }
+  .equipment-icons .item-browser.has-selection,
+  .equipment-icons .with-loadout .item-browser.has-selection {
+    grid-template-columns: minmax(0, 1fr) min(40%, 220px);
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .equipment-icons .item-detail-panel { grid-row: 1; }
+  .equipment-icons .catalogue-controls { grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr)); }
+  .equipment-icons .character-sheet { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .equipment-icons .sheet-model { min-height: 170px !important; }
+  .equipment-icons .sheet-equipment { grid-template-columns: repeat(3, minmax(0, 68px)); }
+
+  .modal-shade > .creator-modal { height: var(--panel-height); overflow: hidden; }
+  .creator-modal .creator-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 39%) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    min-height: 0;
+    overflow: hidden;
+  }
+  .creator-modal .creator-model {
+    position: relative;
+    inset: auto;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-area: 1 / 1;
+    height: auto;
+    min-height: 0;
+    border: 0;
+  }
+  .creator-modal .creator-model > .creator-stage {
+    position: relative !important;
+    inset: auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .creator-modal .model-caption {
+    position: static;
+    transform: none;
+    width: 100%;
+    max-width: none;
+    padding: 3px 6px;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    text-align: center;
+    gap: 0;
+  }
+  .creator-modal .model-caption h3 { font-size: 15px; line-height: 1.15; }
+  .creator-modal .model-caption .eyebrow { font-size: 9px; }
+  .creator-modal .model-controls {
+    position: static;
+    display: block;
+    padding: 3px 5px;
+    background: #132632;
+    text-align: center;
+  }
+  .creator-modal .model-toggles { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; }
+  .creator-modal .model-toggles button {
+    flex: 1 1 85px;
+    min-height: 44px;
+    padding: 3px;
+    font-size: 11px;
+    color: #eff7ff;
+  }
+  .creator-modal .model-controls > span { font-size: 10px; margin-top: 2px; color: #d8e6ec; }
+  .creator-modal .creator-editor {
+    grid-area: 1 / 2;
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+  .creator-modal :is(.creator-identity, .creator-options) { display: block; padding: 8px 10px; }
+  .creator-modal :is(.creator-identity, .creator-options) > :is(h3, .eyebrow) { display: none; }
+  .creator-modal .creator-identity label { margin-top: 6px; }
+  .creator-modal .class-choices button { min-width: min(95px, 100%); min-height: 44px; }
+  .creator-modal .creator-options .tabs { position: static; }
+  .creator-modal .appearance-choice { min-height: 44px; min-width: 44px; }
+
+  .character-select {
+    min-height: 100dvh;
+    padding: var(--screen-top) var(--screen-right) var(--screen-bottom) var(--screen-left);
+  }
+  .character-select > header { margin: 8px auto 12px; }
+  .character-select h1 { font-size: clamp(22px, 5vw, 32px); margin: 5px 0; }
+  .character-select > header > p { margin: 6px 0; font-size: 13px; }
+  .character-select .character-slots { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap: 8px; }
+  .character-select .character-slot { min-width: 0; }
+  .character-select .character-slot > button:first-child { min-width: 0; min-height: 132px; padding: 8px; }
+  .character-select .character-slot h2 { margin: 3px 0; font-size: 17px; overflow-wrap: anywhere; }
+  .character-select .character-slot p { margin: 2px 0; font-size: 12px; }
+  .character-select .character-slot .class-portrait { width: 58px; height: 58px; }
+  .character-select .character-slot .empty-character { font-size: 32px; line-height: 1.2; }
+}
+
+@media (max-width: 600px) {
+  .equipment-icons .item-browser.has-selection,
+  .equipment-icons .with-loadout .item-browser.has-selection { grid-template-columns: minmax(0, 1fr); }
+  .equipment-icons .item-browser.has-selection > .item-detail-panel {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+  }
+}
+
+@media (orientation: portrait) and (max-width: 760px) {
+  .creator-modal .creator-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(155px, 40%) minmax(0, 1fr);
+  }
+  .creator-modal .creator-model { grid-area: 1 / 1; }
+  .creator-modal .creator-editor { grid-area: 2 / 1; }
+}
+
+@media (orientation: landscape) and (max-height: 540px) {
+  .creator-modal .model-controls > span { display: none; }
+  .game-shell .map-hud:not(.hud-editing) {
+    top: var(--screen-top) !important;
+    right: var(--screen-right) !important;
+    width: 56px !important;
+  }
+  .game-shell .map-hud .minimap { width: 54px !important; height: 54px !important; }
+  .game-shell .game-menu {
+    top: var(--screen-top);
+    right: calc(var(--screen-right) + 62px);
+    gap: 3px;
+  }
+  .game-shell .game-menu .zone-name { display: none; }
+  .game-shell .game-menu-panel {
+    width: min(490px, calc(100dvw - var(--screen-left) - var(--screen-right) - 62px));
+    max-height: calc(var(--panel-height) - 48px);
+    padding: 7px;
+  }
+  .game-menu-grid { grid-template-columns: repeat(auto-fit, minmax(72px, 1fr)); gap: 5px; }
+  .game-menu-grid button { min-height: 53px; padding: 4px 2px; }
+  .game-menu-grid .menu-icon { font-size: 17px; }
+  .game-menu-grid b { font-size: 11px; }
+  .game-menu-grid kbd { display: none; }
+  .game-shell .quest-tracker:not(.hud-editing) {
+    left: var(--screen-left) !important;
+    top: var(--screen-top) !important;
+    width: min(155px, 27vw) !important;
+    max-height: min(104px, 33dvh) !important;
+    overflow: auto;
+  }
+  .game-shell .left-hud:not(.hud-editing) {
+    left: var(--screen-left) !important;
+    bottom: calc(var(--screen-bottom) + 25px) !important;
+    width: min(150px, 26vw) !important;
+  }
+  .game-shell .skills-hud:not(.hud-editing) { bottom: var(--screen-bottom) !important; }
+  .game-shell .experience-hud { width: calc(100dvw - var(--screen-left) - var(--screen-right)); }
+  .game-shell .experience-track { height: 21px; }
+  .game-shell .experience-inline { padding-inline: 4px; font-size: clamp(8px, 1.5vw, 10px); }
+}
+
+@media (orientation: landscape) and (max-height: 320px) {
+  .game-shell {
+    --combat-control-size: 42px;
+    --combat-attack-size: 52px;
+    --combat-gap: 5px;
+    --combat-bottom: calc(var(--screen-bottom) + 24px);
+  }
+  .game-shell:has(.combat-console) .game-menu {
+    right: 50%;
+    transform: translateX(50%);
+  }
+  .game-shell:has(.combat-console) .loot-feed { top: 60px; max-height: 26dvh; }
+}
