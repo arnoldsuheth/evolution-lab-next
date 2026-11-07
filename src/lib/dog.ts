@@ -39,3 +39,20 @@ export function feedDog(dog: DogState, now: number, kind: 'food' | 'treat') {
   const up = after.min !== before.min;
   return { ok: true as const, dog: next, levelUp: up, message: up ? `${after.face} ${DOG_NAME} agora é seu ${after.name.toLowerCase()}! ${after.line}` : `❤ ${DOG_NAME} comeu tudo e abanou o rabo! Amizade ${friendship}/100.` };
 }
+
+let barkContext: AudioContext | null = null;
+/** "Au-au" curtinho feito na hora (sem arquivo de som). Respeita volume e mudo do jogo. */
+export function bark(volume: number, times = 2) {
+  if (typeof window === 'undefined' || volume <= 0) return;
+  try {
+    barkContext ??= new AudioContext();
+    const ctx = barkContext, start = ctx.currentTime + .02;
+    for (let i = 0; i < times; i++) {
+      const t = start + i * .2, osc = ctx.createOscillator(), filter = ctx.createBiquadFilter(), gain = ctx.createGain();
+      osc.type = 'sawtooth'; osc.frequency.setValueAtTime(560, t); osc.frequency.exponentialRampToValueAtTime(240, t + .12);
+      filter.type = 'lowpass'; filter.frequency.value = 1400;
+      gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(.32 * volume, t + .015); gain.gain.exponentialRampToValueAtTime(.001, t + .14);
+      osc.connect(filter).connect(gain).connect(ctx.destination); osc.start(t); osc.stop(t + .16);
+    }
+  } catch { /* navegador sem áudio: segue sem latido */ }
+}

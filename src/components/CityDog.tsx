@@ -65,7 +65,7 @@ export default function CityDog() {
   const friendship = useGame(s => adventureOf(s.hero).dog.friendship), fedAt = useGame(s => adventureOf(s.hero).dog.fedAt);
   const reduced = useGame(s => s.settings.reduceMotion);
   const root = useRef<THREE.Group>(null), legs = useRef<(THREE.Group | null)[]>([]), tail = useRef<THREE.Group>(null), head = useRef<THREE.Group>(null), rear = useRef<THREE.Group>(null);
-  const motion = useRef({ pos: HOME.clone(), heading: 0, still: 0, phase: 0, speed: 0 }), want = useMemo(() => new THREE.Vector3(), []);
+  const trick = useRef<THREE.Group>(null), motion = useRef({ pos: HOME.clone(), heading: 0, still: 0, phase: 0, speed: 0, party: -9, roll: -9 }), want = useMemo(() => new THREE.Vector3(), []);
   const [near, setNear] = useState(false), [hungryNow, setHungry] = useState(false), [justFed, setJustFed] = useState(false), nearRef = useRef(false), hungryRef = useRef(false), fedRef = useRef(false);
   const level = dogLevel(friendship);
 
@@ -104,12 +104,19 @@ export default function CityDog() {
     const hungry = dogHungry({ friendship, fedAt, meals: 0 }, Date.now()) && friendship < 100;
     if (hungry !== hungryRef.current) { hungryRef.current = hungry; setHungry(hungry); }
     const recent = fedAt > 0 && Date.now() - fedAt < 5000;
-    if (recent !== fedRef.current) { fedRef.current = recent; setJustFed(recent); }
+    if (recent !== fedRef.current) { if (recent) m.party = t; fedRef.current = recent; setJustFed(recent); }
+    // Truques: comeu = pulinho (amigo gira junto); melhor amigo sentado rola no chão de vez em quando.
+    if (friendship >= 75 && sitting && m.still > 6 && t - m.roll > 9) m.roll = t;
+    const tr = trick.current;
+    if (tr) { const pp = (t - m.party) / 1.2, pr = (t - m.roll) / 1.3, party = !reduced && pp >= 0 && pp < 1, roll = !reduced && pr >= 0 && pr < 1;
+      tr.position.y = party ? Math.sin(Math.min(1, pp * 2) * Math.PI) * (friendship >= 75 ? .45 : .28) : roll ? Math.sin(pr * Math.PI) * .12 : 0;
+      tr.rotation.y = party && friendship >= 45 ? pp * Math.PI * 2 : 0;
+      tr.rotation.z = roll ? pr * Math.PI * 2 : 0; }
   });
 
   const bubble = justFed ? '❤️' : hungryNow ? '🍖?' : level.face;
   return <group ref={root} position={HOME.toArray()} scale={1.35} {...cursorOn('point')} onClick={e => { if (e.delta > 6 || e.button !== 0) return; e.stopPropagation(); openDog(); }}>
-    <DogBody friendship={friendship} legs={legs} tail={tail} head={head} rear={rear} tongue={friendship >= 45 || justFed} />
+    <group ref={trick}><DogBody friendship={friendship} legs={legs} tail={tail} head={head} rear={rear} tongue={friendship >= 45 || justFed} /></group>
     {near && <Html position={[0, 1.18, 0]} center zIndexRange={[6, 0]}>
       <button className="dog-tag" onClick={openDog} aria-label={`${DOG_NAME}: amizade ${friendship} de 100`}>
         <span className={`dog-bubble ${hungryNow ? 'begging' : ''}`}>{bubble}</span>

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useGame } from '@/lib/store';
 import { adventureOf } from '@/lib/adventure';
 import { ITEMS } from '@/lib/game';
-import { DOG_FULL_MS, DOG_LEVELS, DOG_NAME, FOOD_GAIN, TREAT_GAIN, TREAT_PRICE, dogFood, dogHungry, dogLevel, nextDogLevel } from '@/lib/dog';
+import { DOG_FULL_MS, DOG_LEVELS, bark, DOG_NAME, FOOD_GAIN, TREAT_GAIN, TREAT_PRICE, dogFood, dogHungry, dogLevel, nextDogLevel } from '@/lib/dog';
 
 /** Janela do Caramelo: amizade, humor e comida. */
 export default function DogPanel() {
@@ -11,7 +11,7 @@ export default function DogPanel() {
   const dog = adventureOf({ adventure: raw }).dog, [now] = useState(() => Date.now()), [say, setSay] = useState('');
   const level = dogLevel(dog.friendship), next = nextDogLevel(dog.friendship), food = dogFood(inventory);
   const hungry = dogHungry(dog, now), full = dog.friendship >= 100, wait = Math.max(0, Math.ceil((dog.fedAt + DOG_FULL_MS - now) / 1000));
-  const feed = (kind: 'food' | 'treat') => setSay(useGame.getState().feedDog(kind).message);
+  const feed = (kind: 'food' | 'treat') => { const g = useGame.getState(), r = g.feedDog(kind); setSay(r.message); if (r.ok && !g.settings.muted) bark(g.settings.volume, r.message.includes('agora é seu') ? 3 : 2); };
   const mood = full ? 'Companheiro fiel: ele te protege com o olhar.' : hungry ? 'Está com fome e te olha com aqueles olhos de pidão. 🍖' : `Barriga cheia! Pede de novo em uns ${wait}s.`;
   return <div className="panel-body dog-panel">
     <div className="dog-head">

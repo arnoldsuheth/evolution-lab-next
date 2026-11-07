@@ -35,3 +35,32 @@ export function MergedParts({ parts, castShadow = false, receiveShadow = false, 
     <meshStandardMaterial vertexColors flatShading roughness={1} emissive={emissive ?? '#000000'} emissiveIntensity={emissiveIntensity} />
   </mesh>;
 }
+
+const bakedMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .84 });
+/**
+ * Junta, depois de montadas, as peças paradas de um modelo (cores simples, um lado só) numa malha só.
+ * As originais ficam escondidas (não são desenhadas). Devolve a função que desfaz a junção.
+ */
+export function bakeStatic(root: THREE.Object3D) {
+  root.updateMatrixWorld(true);
+  const inverse = new THREE.Matrix4().copy(root.matrixWorld).invert(), local = new THREE.Matrix4(), pieces: THREE.BufferGeometry[] = [], hidden: THREE.Mesh[] = [];
+  root.traverse(o => {
+    if (!(o instanceof THREE.Mesh) || o.userData.baked) return;
+    const m = o.material;
+    if (!(m instanceof THREE.MeshStandardMaterial) || m.side !== THREE.FrontSide || m.transparent || m.map || m.emissiveIntensity > 0 && m.emissive.getHex() !== 0) return;
+    const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone();
+    if (g.attributes.uv) g.deleteAttribute('uv');
+    g.applyMatrix4(local.multiplyMatrices(inverse, o.matrixWorld));
+    const n = g.attributes.position.count, colors = new Float32Array(n * 3), c = m.color;
+    for (let i = 0; i < n; i++) colors.set([c.r, c.g, c.b], i * 3);
+    g.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    pieces.push(g); hidden.push(o);
+  });
+  if (pieces.length < 2) { pieces.forEach(g => g.dispose()); return () => {}; }
+  const merged = mergeGeometries(pieces); pieces.forEach(g => g.dispose());
+  if (!merged) return () => {};
+  const mesh = new THREE.Mesh(merged, bakedMaterial); mesh.userData.baked = true; mesh.castShadow = hidden.some(h => h.castShadow);
+  hidden.forEach(h => { h.visible = false; });
+  root.add(mesh);
+  return () => { mesh.removeFromParent(); merged.dispose(); hidden.forEach(h => { h.visible = true; }); };
+}
