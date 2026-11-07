@@ -84,3 +84,12 @@
  .category-chips button{min-height:28px;padding:1px 9px;font-size:11px}
  .item-level{font-size:8.5px}
 }
+
+/* Celular deitado: card só com imagem, nome, nível/comparação e preço (atributos completos ficam nos detalhes). */
+@media (orientation:landscape) and (max-height:540px){
+ .equipment-icons .item-icon .item-icon-stats{display:none!important}
+ .equipment-icons .item-icon-meta{flex-wrap:nowrap;gap:2px;min-height:0;overflow:hidden;max-width:100%}
+ .equipment-icons .item-icon-meta .item-delta{font-size:8.5px;padding:0 2px}
+ .equipment-icons .item-icon-meta .delta-label{display:none}
+ .equipment-icons .item-icon-art{margin-top:2px}
+}
