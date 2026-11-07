@@ -69,7 +69,7 @@ function Crystal({ small = false }: { small?: boolean }) {
   const root = useRef<THREE.Group>(null); const motion = useGame(s => !s.settings.reduceMotion);
   useFrame((state, dt) => { if (root.current && motion) { root.current.rotation.y += dt * 0.3; root.current.position.y = 1.65 + Math.sin(state.clock.elapsedTime * 1.5) * 0.12; } });
   return <group scale={small ? 0.4 : 1}>
-    <mesh position={[0, 0.15, 0]} receiveShadow><cylinderGeometry args={[1.4, 1.65, 0.3, 12]} /><meshStandardMaterial color="#677a79" /></mesh>
+    <mesh position={[0, 0.15, 0]} receiveShadow><cylinderGeometry args={[1.4, 1.65, 0.3, 12]} /><meshStandardMaterial color="#c9d6d2" /></mesh>
     <group ref={root} position={[0, 1.65, 0]}>
       <mesh castShadow><octahedronGeometry args={[0.65]} /><meshStandardMaterial color="#8acdd4" emissive="#3f9ba9" emissiveIntensity={0.5} metalness={0.4} roughness={0.2} flatShading /></mesh>
       {[0, 1, 2].map(i => <mesh key={i} position={[Math.cos(i * 2.094) * 0.8, -0.45, Math.sin(i * 2.094) * 0.8]}><octahedronGeometry args={[0.21]} /><meshStandardMaterial color="#d0bde8" emissive="#8c70bb" emissiveIntensity={0.5} /></mesh>)}
@@ -180,7 +180,7 @@ function Scene({ paused, interact, report }: { paused: boolean; interact: (id: N
     <KingdomDetails region={hero.region} low={low}/><CombatFeedback />
     <TerrainSurface onClick={groundClick} color={REGIONS[hero.region].color}/><CampaignWorld paused={paused} approach={approachMonster}/>{!hero.instance&&hero.region==="aurora"&&<BiomeDetails region="aurora"/>}{!hero.instance&&hero.region==="aurora"&&<SceneDressing quality={low?"low":quality==="high"?"high":"medium"} groundColor={REGIONS.aurora.color}/>}{hero.region==="aurora"&&!hero.instance&&<>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.014, -4]} onClick={groundClick} receiveShadow><planeGeometry args={[4.8, 48]} /><meshStandardMaterial color="#e6cc92" roughness={1} /></mesh>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.018, 0]} onClick={groundClick} receiveShadow><circleGeometry args={[5.8, 40]} /><meshStandardMaterial color="#d9d3b4" roughness={1} /></mesh>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.018, 0]} onClick={groundClick} receiveShadow><circleGeometry args={[5.8, 40]} /><meshStandardMaterial color="#efe6cc" roughness={1} /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[11, 0.025, -16]} onClick={groundClick}><planeGeometry args={[25, 3]} /><meshStandardMaterial color="#8e8b76" /></mesh>
     <TownDistrict onGroundClick={groundClick}/><GatherNodes paused={paused} approach={approachGather}/><WorldUnlocks/><ExplorationEncounters paused={paused} interact={()=>interact("traveler")} report={report} /><WorldDetails night={light<0.4} low={low} reduced={reduced} />
     {BUILDINGS.map((b, i) => <House key={i} x={b.x} z={b.z} index={i%4} />)}
