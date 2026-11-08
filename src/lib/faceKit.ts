@@ -11,6 +11,10 @@ import type { Look, Race } from './game';
 export const FACE = { eyeY: 1.606, eyeX: .17, faceZ: .47, noseY: 1.5, mouthY: 1.39, chinY: 1.22, earX: .54, earY: 1.53, browY: 1.735, crownY: 2.12 } as const;
 
 export const BEARDS = ['Sem barba', 'Curta', 'Cheia', 'Trança central', 'Duas tranças', 'Quatro tranças'];
+/** Anão nunca fica sem barba: as 6 opções são próprias da raça. */
+export const DWARF_BEARDS = ['Barba de forja', 'Bifurcada', 'Longa até o cinto', 'Duas tranças grossas', 'Anéis de ouro', 'Larga e cheia'];
+/** Cabelos próprios do anão (o índice é o mesmo campo `hair` do visual). */
+export const DWARF_HAIR = ['Careca de forja', 'Coroa trançada', 'Moicano de pedra', 'Tranças nas têmporas', 'Coque de ferreiro', 'Juba longa'];
 export const MOUSTACHES = ['Sem bigode', 'Fino', 'Cheio', 'Pontas para cima', 'Longo caído', 'Grosso'];
 export const BROWS = ['Pintadas', 'Finas', 'Grossas', 'Arqueadas', 'Bravas', 'Unidas'];
 export const NOSES = ['Do modelo', 'Pequeno', 'Redondo', 'Grande', 'Pontudo', 'Batata'];
@@ -22,33 +26,55 @@ export const ACCESSORIES = ['Nenhum', 'Brinco', 'Dois brincos', 'Tapa-olho', 'Fa
 export const RACE_EARS: Record<Race, number> = { human: 0, dwarf: 0, elf: 4, orc: 3, gnome: 2 };
 /** Raças com cabeça um pouco maior (o gnomo tem a cabeça proporcionalmente grande). */
 export const RACE_HEAD: Record<Race, number> = { human: 1, elf: 1, orc: 1.03, dwarf: 1.3, gnome: 1.2 };
+/** Formato da cabeça (largura, altura, profundidade): o anão tem rosto largo e baixo. */
+export const RACE_HEAD_SHAPE: Record<Race, [number, number, number]> = { human: [1, 1, 1], elf: [1, 1, 1], orc: [1.03, 1.03, 1.03], dwarf: [1.4, 1.2, 1.28], gnome: [1.2, 1.2, 1.2] };
 
-export type FacePart = { part: string; shape: 'sphere' | 'cone' | 'capsule' | 'box' | 'torus' | 'cylinder'; color: 'hair' | 'skin' | 'scar' | 'paint' | 'gold' | 'ivory' | 'dark'; position: [number, number, number]; scale: [number, number, number]; rotation?: [number, number, number] };
-export interface FaceOptions { look: Pick<Look, 'beard' | 'moustache' | 'brows' | 'nose' | 'ears' | 'scar' | 'tattoo' | 'accessory'>; race: Race; covered: boolean; extra?: 'ponytail' | 'bun' }
+export type FacePart = { part: string; shape: 'sphere' | 'cone' | 'capsule' | 'box' | 'torus' | 'cylinder'; color: 'hair' | 'skin' | 'scar' | 'paint' | 'gold' | 'ivory' | 'dark' | 'blush'; position: [number, number, number]; scale: [number, number, number]; rotation?: [number, number, number] };
+export interface FaceOptions { look: Pick<Look, 'beard' | 'moustache' | 'brows' | 'nose' | 'ears' | 'scar' | 'tattoo' | 'accessory'>; race: Race; covered: boolean; extra?: 'ponytail' | 'bun'; dwarfHair?: number }
 
 const mirror = (p: FacePart): FacePart[] => [p, { ...p, position: [-p.position[0], p.position[1], p.position[2]], rotation: p.rotation ? [p.rotation[0], -p.rotation[1], -p.rotation[2]] : undefined }];
 const braid = (x: number, top: number, links: number, z = .5): FacePart[] => [...Array.from({ length: links }, (_, i): FacePart => ({ part: 'beard', shape: 'sphere', color: 'hair', position: [x, top - i * .11, z - i * .015], scale: [.075 - i * .006, .07, .07] })), { part: 'beard', shape: 'torus', color: 'gold', position: [x, top - links * .11 + .03, z - links * .015], scale: [.05, .05, .05], rotation: [Math.PI / 2, 0, 0] }];
 
 /** Lista pura das peças (testável sem renderizar). */
-export function faceParts({ look, race, covered, extra }: FaceOptions): FacePart[] {
+export function faceParts({ look, race, covered, extra, dwarfHair }: FaceOptions): FacePart[] {
   const parts: FacePart[] = [], add = (...list: FacePart[]) => parts.push(...list), F = FACE;
-  if(race==='dwarf'){
-    add({part:'nose',shape:'sphere',color:'skin',position:[0,F.noseY-.02,.52],scale:[.12,.085,.11]},
-      ...mirror({part:'nose',shape:'sphere',color:'skin',position:[.3,1.34,.4],scale:[.13,.11,.1]}));
+  if (race === 'dwarf') {
+    // Traços do anão: nariz de batata, testa marcada e bochechas coradas.
+    add({ part: 'nose', shape: 'sphere', color: 'skin', position: [0, F.noseY - .03, .53], scale: [.13, .1, .12] },
+      { part: 'brow-ridge', shape: 'capsule', color: 'skin', position: [0, F.browY - .015, .445], scale: [.05, .12, .05], rotation: [0, 0, Math.PI / 2] },
+      ...mirror({ part: 'cheek', shape: 'sphere', color: 'blush', position: [.27, 1.47, .445], scale: [.075, .045, .025] }));
+    const B = (position: [number, number, number], scale: [number, number, number], shape: FacePart['shape'] = 'sphere'): FacePart => ({ part: 'beard', shape, color: 'hair', position, scale });
+    const jaw = [B([0, 1.24, .42], [.5, .24, .2]), ...mirror(B([.4, 1.38, .28], [.14, .24, .16]))];
+    const ring = (y: number, z: number, r: number): FacePart => ({ part: 'beard', shape: 'torus', color: 'gold', position: [0, y, z], scale: [r, r, r], rotation: [Math.PI / 2, 0, 0] });
+    const beards: FacePart[][] = [
+      [...jaw, B([0, 1.02, .42], [.36, .2, .17])],
+      [...jaw, ...mirror(B([.15, .96, .42], [.14, .24, .13]))],
+      [...jaw, B([0, 1.0, .43], [.34, .22, .17]), B([0, .8, .42], [.25, .18, .14]), B([0, .64, .4], [.15, .12, .11])],
+      [...jaw, ...braid(-.2, 1.06, 4, .47), ...braid(.2, 1.06, 4, .47)],
+      [...jaw, B([0, 1.0, .43], [.34, .22, .17]), B([0, .84, .42], [.22, .16, .14]), ring(1.02, .47, .2), ring(.86, .45, .16)],
+      [...jaw, B([0, 1.04, .42], [.5, .24, .19]), B([-.22, .88, .42], [.17, .13, .14]), B([0, .87, .43], [.18, .13, .14]), B([.22, .88, .42], [.17, .13, .14])],
+    ];
+    add(...(beards[look.beard] ?? beards[0]));
+    if (!covered) {
+      const crown = Array.from({ length: 12 }, (_, i): FacePart => { const a = i / 12 * Math.PI * 2; return { part: 'hair', shape: 'sphere', color: 'hair', position: [Math.sin(a) * .42, 2.07, Math.cos(a) * .4 - .03], scale: [.09, .08, .09] }; });
+      const mohawk = [0, 1, 2, 3, 4].map((i): FacePart => ({ part: 'hair', shape: 'sphere', color: 'hair', position: [0, 2.13 - Math.abs(i - 2) * .025, .28 - i * .16], scale: [.09, .15 - Math.abs(i - 2) * .02, .11] }));
+      const hairs: FacePart[][] = [[], [...crown, { part: 'hair', shape: 'torus', color: 'gold', position: [0, 2.07, .4], scale: [.07, .07, .07], rotation: [0, 0, 0] }], mohawk, [...braid(-.52, 1.62, 4, .12), ...braid(.52, 1.62, 4, .12)].map((p): FacePart => ({ ...p, part: 'hair' })), [], []];
+      add(...(hairs[dwarfHair ?? 0] ?? []));
+    }
   }
   // Barba: abaixo da boca, sem cobrir o sorriso.
-  if (look.beard === 1) add({ part: 'beard', shape: 'sphere', color: 'hair', position: [0, 1.27, .44], scale: [.3, .11, .12] });
-  if (look.beard >= 2) add({ part: 'beard', shape: 'sphere', color: 'hair', position: [0, 1.22, .43], scale: [.4, .19, .15] }, ...mirror({ part: 'beard', shape: 'sphere', color: 'hair', position: [.33, 1.37, .32], scale: [.11, .17, .12] }));
-  if (look.beard === 3) add(...braid(0, 1.0, 3));
-  if (look.beard === 4) add(...braid(-.17, 1.02, 3), ...braid(.17, 1.02, 3));
-  if (look.beard === 5) add(...braid(-.27, 1.05, 2, .46), ...braid(-.09, 1.0, 3), ...braid(.09, 1.0, 3), ...braid(.27, 1.05, 2, .46));
+  if (race !== 'dwarf' && look.beard === 1) add({ part: 'beard', shape: 'sphere', color: 'hair', position: [0, 1.27, .44], scale: [.3, .11, .12] });
+  if (race !== 'dwarf' && look.beard >= 2) add({ part: 'beard', shape: 'sphere', color: 'hair', position: [0, 1.22, .43], scale: [.4, .19, .15] }, ...mirror({ part: 'beard', shape: 'sphere', color: 'hair', position: [.33, 1.37, .32], scale: [.11, .17, .12] }));
+  if (race !== 'dwarf' && look.beard === 3) add(...braid(0, 1.0, 3));
+  if (race !== 'dwarf' && look.beard === 4) add(...braid(-.17, 1.02, 3), ...braid(.17, 1.02, 3));
+  if (race !== 'dwarf' && look.beard === 5) add(...braid(-.27, 1.05, 2, .46), ...braid(-.09, 1.0, 3), ...braid(.09, 1.0, 3), ...braid(.27, 1.05, 2, .46));
   // Bigode: logo abaixo do nariz.
   if (look.moustache === 1) add(...mirror({ part: 'moustache', shape: 'capsule', color: 'hair', position: [.09, 1.43, .53], scale: [.028, .09, .028], rotation: [0, 0, 1.25] }));
   if (look.moustache >= 2 && look.moustache <= 4) add(...mirror({ part: 'moustache', shape: 'sphere', color: 'hair', position: [.09, 1.425, .53], scale: [.11, .045, .05], rotation: [0, 0, -.15] }));
   if (look.moustache === 3) add(...mirror({ part: 'moustache', shape: 'cone', color: 'hair', position: [.21, 1.46, .51], scale: [.03, .08, .03], rotation: [0, 0, -.5] }));
   if (look.moustache === 4) add(...mirror({ part: 'moustache', shape: 'capsule', color: 'hair', position: [.19, 1.33, .5], scale: [.03, .1, .03], rotation: [0, 0, .12] }));
   if (look.moustache === 5) add({ part: 'moustache', shape: 'sphere', color: 'hair', position: [0, 1.42, .53], scale: [.22, .065, .065] });
-  // Nariz: “Do modelo” mantém o rosto original.
+  // Nariz: “Do modelo” mantém o rosto original (o anão já tem o nariz da raça).
   const nose: Record<number, FacePart> = {
     1: { part: 'nose', shape: 'sphere', color: 'skin', position: [0, F.noseY, .515], scale: [.045, .045, .045] },
     2: { part: 'nose', shape: 'sphere', color: 'skin', position: [0, F.noseY, .515], scale: [.075, .07, .07] },
@@ -56,7 +82,7 @@ export function faceParts({ look, race, covered, extra }: FaceOptions): FacePart
     4: { part: 'nose', shape: 'cone', color: 'skin', position: [0, F.noseY, .56], scale: [.045, .13, .045], rotation: [Math.PI / 2, 0, 0] },
     5: { part: 'nose', shape: 'sphere', color: 'skin', position: [0, F.noseY - .03, .52], scale: [.1, .085, .085] },
   };
-  if (nose[look.nose]) add(nose[look.nose]);
+  if (nose[look.nose] && race !== 'dwarf') add(nose[look.nose]);
   if (race === 'orc') add(...mirror({ part: 'tusk', shape: 'cone', color: 'ivory', position: [.13, 1.345, .5], scale: [.035, .09, .035], rotation: [-.25, 0, -.12] }));
   if (!covered) {
     // Orelhas por cima das originais.
@@ -118,7 +144,7 @@ const paint = (color: string, metal = false) => { const key = color + metal; let
 export function buildFaceKit(options: FaceOptions & { hair: string; skin: string }): THREE.Group {
   const group = new THREE.Group(); group.name = 'face-kit';
   const hair = new THREE.Color(options.hair).multiplyScalar(.92).getStyle(), skin = new THREE.Color(options.skin).multiplyScalar(.97).getStyle();
-  const colors: Record<FacePart['color'], THREE.MeshStandardMaterial> = { hair: paint(hair), skin: paint(skin), scar: paint('#b4544c'), paint: paint('#2f5f93'), gold: paint('#e2b54f', true), ivory: paint('#f3ead2'), dark: paint('#2a2522') };
+  const colors: Record<FacePart['color'], THREE.MeshStandardMaterial> = { hair: paint(hair), skin: paint(skin), scar: paint('#b4544c'), paint: paint('#2f5f93'), gold: paint('#e2b54f', true), ivory: paint('#f3ead2'), dark: paint('#2a2522'), blush: paint('#d97a6c') };
   for (const p of faceParts(options)) {
     const mesh = new THREE.Mesh(unit(p.shape), colors[p.color]);
     mesh.name = 'face-' + p.part; mesh.position.set(...p.position); mesh.scale.set(...p.scale); if (p.rotation) mesh.rotation.set(...p.rotation);
