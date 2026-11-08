@@ -70,6 +70,7 @@ export const HERO_ANIMATIONS = [...new Set(['Idle', HERO_WALK, HERO_PUNCH, HERO_
 /** Penteados: cada opção usa a cabeça (com cabelo) de um corpo-base, às vezes com um prendedor. 0 = o da classe. */
 export const HERO_HAIRSTYLES: { label: string; base: HeroBase | null; extra?: 'ponytail' | 'bun' }[] = [
   { label: 'Da classe', base: null }, { label: 'Curto', base: 'knight' }, { label: 'Longo', base: 'rogue' }, { label: 'Repartido', base: 'mage' }, { label: 'Rabo de cavalo', base: 'knight', extra: 'ponytail' }, { label: 'Coque', base: 'mage', extra: 'bun' },
+  { label: 'Longo preso', base: 'rogue', extra: 'ponytail' }, { label: 'Coque baixo', base: 'knight', extra: 'bun' }, { label: 'Selvagem', base: 'barbarian' }, { label: 'Longo com coque', base: 'rogue', extra: 'bun' },
 ];
 /** Estrutura corporal muda a largura do herói. */
 export const BODY_WIDTH = [.9, .95, 1, 1.05, 1.1, 1.15];

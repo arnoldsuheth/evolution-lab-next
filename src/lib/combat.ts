@@ -58,6 +58,6 @@ export function battleRewards(hero:HeroData,enemy:EnemyState){
  if(enemy.elite)drops.push(`trophy-${Math.min(7,Math.floor((level-1)/7))}`);
  if(enemy.instanceId&&enemy.instanceId===hero.instance)drops.push(INSTANCES[enemy.instanceId].material);
  const instanceBonus=enemy.instanceId&&enemy.instanceId===hero.instance?2:1;const penalty=level<hero.level-5?.2:1;
- return{xp:Math.max(1,Math.round((25+level*18)*(enemy.elite?2.2:1)*penalty*instanceBonus)),gold:Math.max(1,Math.round((8+level*3)*(enemy.elite?2:1)*penalty)),fragments:enemy.elite?3:1,drops};
+ return{xp:Math.max(1,Math.round((25+level*18)*(enemy.elite?2.2:1)*penalty*instanceBonus)),gold:Math.max(1,Math.round((30+level*12)*(enemy.elite?2:1)*penalty)),fragments:enemy.elite?3:1,drops};
 }
 

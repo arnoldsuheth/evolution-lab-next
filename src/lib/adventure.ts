@@ -1,3 +1,4 @@
+import { cleanBank, type BankState } from './bank';
 import { cleanDog, type DogState } from './dog';
 import type { ClassId, HeroData, NpcId } from './game';
 import { MONSTERS, type MonsterKind, type RegionId } from './campaign';
@@ -17,6 +18,8 @@ export interface AdventureState {
   built: string[];
   /** Caramelo, o vira-lata da cidade: amizade, última refeição e quantas vezes comeu. */
   dog: DogState;
+  /** Banco da Aurora: saldo guardado e desde quando rende juros. */
+  bank: BankState;
 }
 const num = (v: unknown, min = 0, max = Number.MAX_SAFE_INTEGER) => typeof v === 'number' && Number.isFinite(v) ? Math.min(max, Math.max(min, v)) : min;
 const rec = (v: unknown) => v && typeof v === 'object' && !Array.isArray(v) ? v as Record<string, unknown> : {};
@@ -32,7 +35,7 @@ export function cleanAdventure(input: unknown): AdventureState {
     title: typeof a.title === 'string' && ACHIEVEMENTS.some(x => x.id === a.title) ? a.title : '',
     rep: { mercadores: Math.floor(num(rep.mercadores, 0, REP_MAX)), ferreiros: Math.floor(num(rep.ferreiros, 0, REP_MAX)), sabios: Math.floor(num(rep.sabios, 0, REP_MAX)) },
     spec: typeof a.spec === 'string' && Object.values(SPECS).some(list => list.some(s => s.id === a.spec)) ? a.spec : '',
-    doors: strs(a.doors), dog: cleanDog(a.dog), built: strs(a.built).filter(id => id.startsWith('spot-')).slice(0, 32), pet: typeof a.pet === 'string' && Object.hasOwn(PETS, a.pet) ? a.pet : '',
+    doors: strs(a.doors), dog: cleanDog(a.dog), bank: cleanBank(a.bank), built: strs(a.built).filter(id => id.startsWith('spot-')).slice(0, 32), pet: typeof a.pet === 'string' && Object.hasOwn(PETS, a.pet) ? a.pet : '',
   };
 }
 export const adventureOf = (hero: Pick<HeroData, 'adventure'>) => cleanAdventure(hero.adventure);

@@ -3,7 +3,7 @@ import { dogFood, feedDog as feedDogRule, TREAT_PRICE, hasDogJoy, DOG_NAME } fro
 import {ATTRIBUTE_KEYS,attributePoints,cleanAttributes,type AttributeKey} from "./attributes";
 import {packCharacters,selectCharacter,deleteCharacter} from './characterSlots';
 import {INSTANCES,instanceRequirement,type InstanceId} from "./instances";
-import {PROFESSIONS,repairCost,forgeCost,type Profession} from "./economy";
+import {PROFESSIONS,repairCost,forgeCost,currency,type Profession} from "./economy";
 import {forgeStep,forgeId,bandFor,LEVEL_BANDS} from "./catalogue";
 import {recoverResources} from "./recovery";
 import { HOTBAR_SIZE } from './controls';
@@ -14,6 +14,8 @@ import { CODE_SPOTS, spotAvailable } from "./codeSpots";
 import { friendlyLock } from "./apprentice";
 import { AI_COURSE, CHESTS, aiRequirement, travelerFor, pendingDelivery, makeChallenge, mainRequirement, projectRequirement, promotionRequirement, promotionRank, type Challenge } from "./journey";
 import { create } from "zustand";
+import { deposit as bankDeposit, withdraw as bankWithdraw } from "./bank";
+import { WAGON_PRICE, WAGON_STOP_RADIUS } from "./wagon";
 import { PRACTICE_CONCEPTS, nextMastery, BLITZ_PASS, dayKey, blitzReward, battleBuff, BATTLE_COOLDOWN_MS, BATTLE_MISS_COOLDOWN_MS, BATTLE_BUFF_SECONDS } from "./practice";
 import { persist } from "zustand/middleware";
 import { SKILLS, skillRank, skillRequirement, passiveBonuses } from "./skills";
@@ -23,6 +25,8 @@ import { ATTACK_RANGE, type CombatAction } from "./combatEffects";
 import { NEXUS_SECONDS, cleanNexus, nexusFull } from "./nexus";
 import { QUESTS, GATHER_NODES, GATHER_RESPAWN_MS, MONSTER_RESPAWN_MS, acceptQuest as acceptLog, progressQuests, turnInQuest as turnInLog, cleanLog, goal, type QuestEvent } from "./quests";
 import { CLASSES, ITEMS, LESSONS, evaluateLesson, freshHero, freshSave, migrateSave, stats, withXp, type SaveData, type ClassId, type Look, type Settings, type Race, validRaceClass, raceForClass } from "./game";
+/** Serviços da vila (banco, carroça): só dentro da Pedra da Aurora, fora de masmorra. */
+const atTownService=(hero:{region:string;instance?:string|null;position:[number,number]})=>hero.region==='aurora'&&!hero.instance&&Math.hypot(hero.position[0],hero.position[1])<=SAFE_TOWN_RADIUS+4;
 export const SAVE_KEY = "genesis-reborn-rpg-v3";
 export const BACKUP_KEY = SAVE_KEY + "-before-lions-cave-1.3.1";
 let blocked = false; let storageIssue = ""; let snapshotAt = 0;
@@ -71,6 +75,7 @@ interface GameStore extends SaveData {
   createCharacter: (name: string, classId: ClassId, mode: "normal" | "hardcore", race?: Race) => void;
   customize: (look: Partial<Look>) => void; chooseClass: (id: ClassId, race?: Race) => void; move: (p: [number, number]) => void;
   /** Treino rápido (missão relâmpago e perguntas de batalha). */
+  bankDeposit:(amount:number)=>void; bankWithdraw:(amount:number)=>void; wagonTravel:(region:RegionId)=>void;
   practiceAnswer:(concept:string,correct:boolean)=>void; finishBlitz:(concept:string,score:number)=>{xp:number;gold:number}|null; battleInsight:(correct:boolean)=>void;
   draft: (id: string, code: string) => void; solve: (id: string, code: string) => ReturnType<typeof evaluateLesson>; project: (id: string, code: string) => void;
   allocateAttribute:(key:AttributeKey)=>void;
@@ -143,6 +148,9 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     const limits = stats(hero); set({ hero: { ...hero, hp: Math.min(hero.hp, limits.maxHp), mp: Math.min(hero.mp, limits.maxMp),stamina:Math.min(hero.stamina,limits.maxStamina) }, notice: "Novo caminho. Educação, itens, XP e bronze preservados; talentos devolvidos." });
   },
   move: position => { const s = get(); if (!s.hero.dead && !s.encounter) set({ hero: { ...s.hero, position } }); },
+  bankDeposit:amount=>{const s=get();if(s.encounter||s.hero.dead)return;if(!atTownService(s.hero)){set({notice:'O Banco da Aurora fica na vila.'});return;}const adv=adventureOf(s.hero),r=bankDeposit(adv.bank,s.hero.gold,amount,Date.now());if(!r.ok){set({notice:r.message});return;}set({hero:{...s.hero,gold:r.wallet,adventure:{...adv,bank:r.bank}},notice:`🏦 Guardado no banco. Saldo: ${currency(r.bank.balance)}.`});},
+  bankWithdraw:amount=>{const s=get();if(s.encounter||s.hero.dead)return;if(!atTownService(s.hero)){set({notice:'O Banco da Aurora fica na vila.'});return;}const adv=adventureOf(s.hero),r=bankWithdraw(adv.bank,s.hero.gold,amount,Date.now());if(!r.ok){set({notice:r.message});return;}set({hero:{...s.hero,gold:r.wallet,adventure:{...adv,bank:r.bank}},notice:`🏦 Saque feito. Na bolsa: ${currency(r.wallet)}.`});},
+  wagonTravel:region=>{const s=get();if(s.encounter||s.challenge||s.hero.instance||s.hero.dead)return;if(region===s.hero.region){set({notice:'Você já está aqui.'});return;}const atStop=s.hero.region==='aurora'?atTownService(s.hero):Math.hypot(s.hero.position[0],s.hero.position[1]-7)<=WAGON_STOP_RADIUS;if(!atStop){set({notice:s.hero.region==='aurora'?'A carroça sai da vila.':'A carroça espera na chegada da região.'});return;}const reason=regionRequirement(s.hero,s.education,region);if(reason){set({notice:reason});return;}if(s.hero.gold<WAGON_PRICE){set({notice:`A viagem custa ${currency(WAGON_PRICE)}.`});return;}set({hero:{...s.hero,gold:s.hero.gold-WAGON_PRICE,region,position:region==='aurora'?[0,5]:[0,7]},notice:`🐴 A carroça te levou para ${REGIONS[region].name}.`});},
   practiceAnswer:(concept,correct)=>{if(!PRACTICE_CONCEPTS.includes(concept))return;set(s=>({education:{...s.education,practice:{...s.education.practice,[concept]:nextMastery(s.education.practice?.[concept],correct)}}}));},
   finishBlitz:(concept,score)=>{const s=get();if(!PRACTICE_CONCEPTS.includes(concept)||s.hero.dead)return null;if(score<BLITZ_PASS){set({notice:'Quase! Acerte 2 de 3 para ganhar a recompensa. O treino fica mais fácil quando você erra.'});return null;}
    const today=dayKey(Date.now());if(s.education.blitz?.[concept]===today){set({notice:'Missão relâmpago concluída. A recompensa desta runa volta amanhã; o treino continua valendo.'});return null;}
