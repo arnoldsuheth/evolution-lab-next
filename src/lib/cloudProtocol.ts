@@ -17,9 +17,11 @@ export function validateCloudState(value:unknown):SaveData{
  return migrateSave(value);
 }
 export function hasJourney(state:SaveData){return characterSlots(state).slots.some(s=>s&&(s.hero.created||s.hero.xp>0||s.hero.inventory.length>0||s.education.completed.length>0||Object.keys(s.education.projects).length>0));}
-export function decideSync({base,localHash,remoteHash,remoteRevision,owned,meaningful}:{base:SyncBase|null;localHash:string;remoteHash:string|null;remoteRevision:number;owned:boolean;meaningful:boolean}):SyncDecision{
+export function decideSync({base,localHash,remoteHash,remoteRevision,owned,meaningful,remoteMeaningful=true}:{base:SyncBase|null;localHash:string;remoteHash:string|null;remoteRevision:number;owned:boolean;meaningful:boolean;remoteMeaningful?:boolean}):SyncDecision{
  if(remoteHash===localHash)return'same';
- if(!meaningful&&remoteHash!==null)return'download';
+ // Aparelho sem jornada baixa a da conta. Se a nuvem também só tem um personagem em criação
+ // neste mesmo aparelho, as escolhas do criador são enviadas em vez de desfeitas.
+ if(!meaningful&&remoteHash!==null&&(remoteMeaningful||!owned||!base))return'download';
  if(!owned||!base)return'choose';
  if(remoteHash===null)return base.revision===0?'upload':'conflict';
  const localChanged=base.hash!==localHash,remoteChanged=base.revision!==remoteRevision;
