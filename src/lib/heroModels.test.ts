@@ -57,3 +57,11 @@ test('poda de animações preserva malhas e animações mantidas',()=>{
  assert.equal(data.readFloatLE(views[accessors[0].bufferView].byteOffset),1,'malha intacta');
  assert.throws(()=>pruneAnimations(writeGlb(json,bin),['Voar']),/ausentes/);
 });
+
+test('anão usa penteados próprios',()=>{
+ const naked={head:false,chest:false,back:false};
+ assert.equal(heroDress('paladin',naked,0,true,'dwarf').head,'barbarian','careca de forja');
+ assert.equal(heroDress('paladin',naked,5,true,'dwarf').head,'rogue','juba longa');
+ assert.equal(heroDress('paladin',naked,4,true,'dwarf').extra,'bun');
+ assert.equal(heroDress('paladin',naked,0,true,'human').head,'knight','humano continua igual');
+});
