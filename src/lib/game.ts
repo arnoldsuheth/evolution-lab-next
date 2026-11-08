@@ -1,3 +1,4 @@
+import { hasDogJoy, DOG_JOY_HP } from './dog';
 import { cleanMastery, PRACTICE_CONCEPTS, type Mastery } from './practice';
 import {cleanAttributes} from './attributes';
 import type {AttributeKey} from './attributes';
@@ -74,7 +75,7 @@ export const ITEMS = buildCatalogue(LEGACY_ITEMS);
 export function stats(hero: HeroData) {
   const a=cleanAttributes(hero.attributeAllocation,hero.level);
   const s=CLASSES[hero.classId].stats, promotion=promotionRank(hero), gear=activeEquipment(hero,ITEMS), pass=passiveBonuses(hero);
-  const out = { strength:s[0]+hero.level+a.strength,attack:a.attack+a.strength*.5+a.dexterity*.25+(["mage","prophet","shaman"].includes(hero.classId)?a.intelligence*.5:0)+7+s[1]+hero.level*2+promotion*3+gear.reduce((n,g)=>n+g.power,0)+hero.talents[0]*2+pass.attack,defense:a.defense+s[2]+promotion*3+gear.reduce((n,g)=>n+g.defense,0)+hero.talents[1]*2+pass.defense,agility:s[3]+a.agility,dexterity:s[4]+a.dexterity,intelligence:s[5]+a.intelligence,maxHp:a.defense*2+90+hero.level*10+s[2]*2+gear.reduce((n,g)=>n+(g.hp??0),0)+pass.hp,maxMp:a.intelligence*5+40+s[5]*5+gear.reduce((n,g)=>n+(g.mp??0),0)+pass.mp,maxStamina:a.agility+100+hero.talents[2]*10+pass.stamina,companion:gear.reduce((n,g)=>n+(g.companion??0),0)+pass.companion,craftDiscount:pass.craftDiscount,lifesteal:pass.lifesteal };
+  const out = { strength:s[0]+hero.level+a.strength,attack:a.attack+a.strength*.5+a.dexterity*.25+(["mage","prophet","shaman"].includes(hero.classId)?a.intelligence*.5+(a.mentality??0)*.75:0)+7+s[1]+hero.level*2+promotion*3+gear.reduce((n,g)=>n+g.power,0)+hero.talents[0]*2+pass.attack,defense:a.defense+s[2]+promotion*3+gear.reduce((n,g)=>n+g.defense,0)+hero.talents[1]*2+pass.defense,agility:s[3]+a.agility,dexterity:s[4]+a.dexterity,intelligence:s[5]+a.intelligence,mentality:a.mentality??0,maxHp:Math.round((a.defense*2+90+hero.level*10+s[2]*2+gear.reduce((n,g)=>n+(g.hp??0),0)+pass.hp)*(hasDogJoy(hero)?1+DOG_JOY_HP:1)),maxMp:a.intelligence*5+(a.mentality??0)*3+40+s[5]*5+gear.reduce((n,g)=>n+(g.mp??0),0)+pass.mp,maxStamina:a.agility+100+hero.talents[2]*10+pass.stamina,companion:gear.reduce((n,g)=>n+(g.companion??0),0)+pass.companion,craftDiscount:pass.craftDiscount,lifesteal:pass.lifesteal };
   // Aura do Herói (Nexus): bônus temporário.
   if ((hero.nexus?.aura ?? 0) > 0) { out.attack = Math.round(out.attack * NEXUS_BONUS.attack); out.defense = Math.round(out.defense * NEXUS_BONUS.defense); out.maxHp = Math.round(out.maxHp * NEXUS_BONUS.maxHp); }
   // Especialização (nível 10): Guardião ou Fúria.

@@ -16,7 +16,7 @@ export const DOG_LEVELS = [
   { min: 20, name: 'Curioso', face: '👀', line: 'Ele chega mais perto e cheira sua mochila. O rabo já balança mais rápido!' },
   { min: 45, name: 'Amigo', face: '😊', line: 'Ele te segue pelas ruas e late feliz quando você chega. Ganhou uma bandana!' },
   { min: 75, name: 'Melhor amigo', face: '💛', line: 'Ele pula, rola no chão e não sai do seu lado. Vocês são inseparáveis.' },
-  { min: 100, name: 'Companheiro fiel', face: '🏅', line: 'Caramelo é o seu fiel escudeiro na Pedra da Aurora. Amizade completa!' },
+  { min: 100, name: 'Companheiro fiel', face: '🏅', line: 'Amizade completa! Alegria do Caramelo: +10% de HP máximo e, se você cair, ele te põe de pé no mesmo lugar.' },
 ] as const;
 
 export function cleanDog(input: unknown): DogState {
@@ -39,6 +39,11 @@ export function feedDog(dog: DogState, now: number, kind: 'food' | 'treat') {
   const up = after.min !== before.min;
   return { ok: true as const, dog: next, levelUp: up, message: up ? `${after.face} ${DOG_NAME} agora é seu ${after.name.toLowerCase()}! ${after.line}` : `❤ ${DOG_NAME} comeu tudo e abanou o rabo! Amizade ${friendship}/100.` };
 }
+
+/** Alegria do Caramelo: com a amizade completa ele dá +10% de HP máximo e, se você cair,
+ *  te põe de pé no mesmo lugar (em vez de voltar para a vila). */
+export const DOG_JOY_HP = 0.1;
+export const hasDogJoy = (hero: { adventure?: { dog?: { friendship?: number } } }) => (hero.adventure?.dog?.friendship ?? 0) >= 100;
 
 let barkContext: AudioContext | null = null;
 /** "Au-au" curtinho feito na hora (sem arquivo de som). Respeita volume e mudo do jogo. */

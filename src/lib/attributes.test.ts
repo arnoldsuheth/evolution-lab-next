@@ -19,7 +19,7 @@ test('alocação persiste, altera atributos reais e não excede o orçamento',()
  const after=migrateSave({...save,hero}).hero;assert.equal(attributePoints(after),6);
  assert.equal(stats(after).defense,stats(base).defense+2);assert.equal(stats(after).maxHp,stats(base).maxHp+4);
  assert.equal(stats(after).maxMp,stats(base).maxMp+15);assert.equal(stats(after).attack,stats(base).attack+.5);
- assert.deepEqual(cleanAttributes({attack:999,defense:-3,intelligence:Infinity,wrong:22},2),{strength:0,attack:3,defense:0,agility:0,dexterity:0,intelligence:0});
+ assert.deepEqual(cleanAttributes({attack:999,defense:-3,intelligence:Infinity,wrong:22},2),{strength:0,attack:3,defense:0,agility:0,dexterity:0,intelligence:0,mentality:0});
 });
 test('distribuição não gasta duas vezes e é bloqueada em combate',()=>{
  const original=useGame.getState();try{

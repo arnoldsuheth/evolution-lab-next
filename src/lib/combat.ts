@@ -1,3 +1,4 @@
+import {isCaster,BASIC_ATTACK_COST} from './attributes';
 import type {MonsterKind} from './campaign';
 import {INSTANCES} from './instances';
 import { ITEMS,stats, type HeroData } from './game';
@@ -18,7 +19,7 @@ export interface EnemyState{kind?:MonsterKind;turn?:number;heroStatus?:HeroStatu
 export function resolveCombat(hero:HeroData,enemy:EnemyState,options:{skillId?:string;starter?:boolean;attackBuff?:number;defenseBuff?:number;criticalRoll?:number}={}){
  const st=stats(hero),skill=options.skillId?SKILLS[options.skillId]:undefined;const rank=skill?effectiveSkillRank(hero,skill.id):1;
  if(options.skillId&&(!skill||skill.classId!==hero.classId||skill.kind!=='active'||!rank||hero.level<skill.minLevel))return{hero,enemy,error:'Habilidade indisponível',won:false,dead:false,damage:0,received:0};
- const resource=skill?.resource??(options.starter?'mp':'stamina');const cost=skill?.cost??(options.starter?18:9);
+ const casterBasic=!skill&&!options.starter&&isCaster(hero.classId);const resource=skill?.resource??(options.starter||casterBasic?'mp':'stamina');const cost=skill?.cost??(options.starter?18:casterBasic?BASIC_ATTACK_COST.mp:BASIC_ATTACK_COST.stamina);
  if(hero[resource]<cost)return{hero,enemy,error:resource==='mp'?'MP insuficiente':'Estamina insuficiente',won:false,dead:false,damage:0,received:0};
  const power=st.attack+(options.attackBuff??0);const scale=1+(rank-1)*.14;
  const ranged=hero.classId==='hunter'&&activeEquipment(hero,ITEMS).some(i=>i.category==='weapon');

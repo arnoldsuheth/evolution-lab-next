@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { hasDogJoy as joy } from './dog';
+import { freshSave as fresh, stats as heroStats } from './game';
 import { DOG_FULL_MS, FOOD_GAIN, FRESH_DOG, cleanDog, dogFood, dogHungry, dogLevel, feedDog } from './dog';
 
 test('Caramelo: comida enche a amizade, ele fica satisfeito por um tempo e sobe de nível', () => {
@@ -22,4 +24,11 @@ test('Caramelo: save estranho vira estado válido e ele só aceita comida de ver
   assert.deepEqual(cleanDog(null), FRESH_DOG);
   assert.equal(dogFood(['consume-life-1', 'food-bread-1']), 'food-bread-1');
   assert.equal(dogFood(['consume-life-1']), undefined);
+});
+
+test('Alegria do Caramelo: amizade completa dá +10% de HP máximo', () => {
+  const hero = { ...fresh().hero, created: true };
+  const friend = { ...hero, adventure: { ...(hero.adventure ?? {}), dog: { friendship: 100, fedAt: 0, meals: 9 } } } as typeof hero;
+  assert.equal(joy(hero), false); assert.equal(joy(friend), true);
+  assert.equal(heroStats(friend).maxHp, Math.round(heroStats(hero).maxHp * 1.1));
 });

@@ -93,12 +93,15 @@ export function faceParts({ look, race, covered, extra, dwarfHair }: FaceOptions
     if (ear === 4) add(...mirror({ part: 'ear', shape: 'cone', color: 'skin', position: [F.earX + .1, F.earY + .14, -.04], scale: [.06, .36, .06], rotation: [-.35, 0, -1.0] }));
     if (ear === 5) add(...mirror({ part: 'ear', shape: 'sphere', color: 'skin', position: [F.earX + .07, F.earY, .03], scale: [.04, .14, .12], rotation: [0, -.7, 0] }));
     // Sobrancelhas acima das pintadas.
-    const brow = (y: number, sx: number, sy: number, tilt: number): FacePart[] => mirror({ part: 'brow', shape: 'box', color: 'hair', position: [F.eyeX, y, .465], scale: [sx, sy, .035], rotation: [0, 0, tilt] });
-    if (look.brows === 1) add(...brow(F.browY, .17, .028, -.05));
-    if (look.brows === 2) add(...brow(F.browY, .2, .06, -.05));
-    if (look.brows === 3) add(...brow(F.browY + .02, .18, .04, -.3));
-    if (look.brows === 4) add(...brow(F.browY - .01, .2, .05, .35));
-    if (look.brows === 5) add({ part: 'brow', shape: 'box', color: 'hair', position: [0, F.browY, .47], scale: [.54, .05, .035] });
+    // O modelo já tem sobrancelhas esculpidas. As opções ficam por cima delas, um pouco maiores,
+    // para cobrir as originais (antes ficava uma sobrancelha em cima da outra).
+    const brow = (y: number, sx: number, sy: number, tilt: number): FacePart[] => mirror({ part: 'brow', shape: 'box', color: 'hair', position: [F.eyeX + .02, y, .474], scale: [sx + .03, sy, .05], rotation: [0, 0, tilt] });
+    const by = F.browY - .03;
+    if (look.brows === 1) add(...brow(by, .26, .072, -.04));
+    if (look.brows === 2) add(...brow(by - .004, .27, .1, -.04));
+    if (look.brows === 3) add(...brow(by + .008, .26, .075, -.2));
+    if (look.brows === 4) add(...brow(by - .006, .26, .078, .26));
+    if (look.brows === 5) { add(...brow(by, .26, .075, 0)); add({ part: 'brow', shape: 'box', color: 'hair', position: [0, by, .482], scale: [.16, .06, .045] }); }
   }
   // Marcas pintadas sobre a pele.
   const scar: Record<number, FacePart[]> = {
