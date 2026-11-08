@@ -129,3 +129,15 @@
  .shop-layout>.inventory-toolbar .tabs{flex-direction:row!important}
 }
 .item-icon-foot{display:flex;align-items:center;justify-content:center;gap:3px;flex-wrap:nowrap;min-height:1.2em;max-width:100%;overflow:hidden}
+
+/* Botões nunca quebram uma palavra no meio (antes "Engenheir/o", "Silenci/ar"). */
+button,[role=tab],summary,button *,[role=tab] *{overflow-wrap:normal!important;word-break:normal!important;hyphens:manual}
+.class-choices button{min-width:0;padding-left:6px!important;padding-right:6px!important;gap:4px}
+.audio-controls button{width:100%!important;min-width:max-content;white-space:nowrap}
+.audio-controls>div{min-width:190px}
+/* Quadradinhos de equipamento: um pouco maiores e com nomes curtos. */
+.inventory-loadout .loadout-slots small{white-space:nowrap;font-size:8.5px!important}
+@media (orientation:landscape) and (max-height:540px){
+ .unified-inventory.with-loadout{grid-template-columns:168px minmax(0,1fr)!important}
+ .class-choices button{font-size:12px!important}
+}
