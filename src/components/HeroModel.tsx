@@ -6,7 +6,7 @@ import {clone} from 'three/examples/jsm/utils/SkeletonUtils.js';
 import type {ClassId,Race} from '@/lib/game';
 import {HEAD_MESH,OFFHAND_MESH,WEAPON_MESH,headLook,BODY_WIDTH,HERO_BASE_FILES,HERO_HAT_MESHES,HERO_HIT,HERO_PARTS,HERO_PUNCH,HERO_STYLE,HERO_WALK,HERO_WEAPON_MESHES,heroDress,heroProportions,recolorAtlas,type HeroBase,type HeroGear,type RecolorOptions} from '@/lib/heroModels';
 import {useGame} from '@/lib/store';
-import {buildFaceKit,RACE_HEAD,type FaceOptions} from '@/lib/faceKit';
+import {buildFaceKit,RACE_HEAD_SHAPE,type FaceOptions} from '@/lib/faceKit';
 import {gearLook,rarityTier} from '@/lib/gearPieces';
 import {BorrowedPiece,SimpleWeapon} from './HeroGear';
 import {attachGearPieces,GearAura} from './GearPieces';
@@ -63,7 +63,7 @@ export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairSty
  const style=HERO_STYLE[classId],gltf=useGLTF(heroModelUrl(style.base));
  const eventTime=useGame(s=>combatant?s.battleEvent?.time??0:0),hurtTime=useGame(s=>combatant&&s.battleEvent?.received?s.battleEvent.time:0);
  const gearKey=gearItems.map(i=>`${i.slot}:${i.rarity}`).join('|'),equipmentLook=useMemo(()=>gearLook(gearKey?gearKey.split('|').map(e=>{const [slot,rarity]=e.split(':');return {slot,rarity};}):[]),[gearKey]);
- const dress=heroDress(classId,gear,hairStyle,showHelmet),{outfit,cape,head,extra,covered}=dress,faceKey=JSON.stringify(face);
+ const dress=heroDress(classId,gear,hairStyle,showHelmet,race),{outfit,cape,head,extra,covered}=dress,faceKey=JSON.stringify(face);
  // Item equipado manda: arma, escudo e elmo aparecem iguais ao ícone (peças nativas da classe só sem item).
  const weaponItem=gearItems.find(i=>i.slot==='weapon'||i.slot==='twohand'),offItem=gearItems.find(i=>i.slot==='offhand'),headItem=gearItems.find(i=>i.slot==='head');
  const headKind=headItem?headLook(headItem.classId??classId):null,wornHat=!!(dress.hat||dress.covered)&&headKind!==null&&headKind!=='hood'?HEAD_MESH[headKind]:null;
@@ -80,9 +80,9 @@ export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairSty
    else{const rags=outfit==='rags'&&!weapon;o.material=recolored(o.material,`${style.base}|${classId}|${skin}|${rags?'rags':'class'}`,classId,skin,{rags});if(weapon&&o.visible)o.material=glowing(o.material,weaponRarity);}});
   // Peças de rosto presas ao osso da cabeça, no mesmo referencial em que a malha foi modelada.
   const headBone=host?(host as THREE.SkinnedMesh).skeleton.bones.find(b=>b.name==='head'):undefined;
-  if(host&&headBone){const skeleton=(host as THREE.SkinnedMesh).skeleton,index=skeleton.bones.indexOf(headBone),kit=buildFaceKit({look:JSON.parse(faceKey),race,covered,extra,hair,skin});
+  if(host&&headBone){const skeleton=(host as THREE.SkinnedMesh).skeleton,index=skeleton.bones.indexOf(headBone),kit=buildFaceKit({look:JSON.parse(faceKey),race,covered,extra,hair,skin,dwarfHair:race==='dwarf'?hairStyle:undefined});
    const anchor=new THREE.Group();anchor.name='face-anchor';anchor.matrixAutoUpdate=false;anchor.matrix.copy(skeleton.boneInverses[index]);anchor.add(kit);headBone.add(anchor);
-   headBone.scale.setScalar(RACE_HEAD[race]??1);}
+   headBone.scale.set(...(RACE_HEAD_SHAPE[race]??[1,1,1]));}
   if(race==='dwarf')model.traverse(node=>{if(node instanceof THREE.Bone&&COMPACT_LEGS.has(node.name))node.scale.y*=.78;});
   model.updateMatrixWorld(true);
   model.traverse(node=>{if(node instanceof THREE.SkinnedMesh)node.skeleton.update();});
@@ -91,7 +91,7 @@ export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairSty
   model.scale.set(scale*width,scale,scale*width);model.position.y=-(body.isEmpty()?0:body.min.y)*scale;
   attachGearPieces(model,equipmentLook.slots);
   return {scene:model,host};
- },[equipmentLook,gltf.scene,style,classId,race,skin,hair,eyes,bodyShape,armed,shielded,preview,outfit,hat,cape,head,extra,covered,faceKey,weaponRarity,ownWeapon,ownOffhand]);
+ },[equipmentLook,gltf.scene,style,classId,race,skin,hair,eyes,bodyShape,armed,shielded,preview,outfit,hat,cape,head,extra,covered,faceKey,hairStyle,weaponRarity,ownWeapon,ownOffhand]);
  // Guerreiro com espada de uma mão segura e golpeia como espada de uma mão.
  const oneHand=weaponItem?.slot==='weapon'&&style.idle==='2H_Melee_Idle';
  const idle=armed?(oneHand?'Idle':style.idle):'Idle',move=walking?HERO_WALK:idle,attack=armed||CASTERS.has(classId)?(oneHand?'1H_Melee_Attack_Chop':style.attack):HERO_PUNCH;
