@@ -40,8 +40,8 @@ import { classTitle, mainRequirement, projectRequirement, pendingDelivery } from
 import LionMark from "@/components/LionMark";
 import CombatPanel from "@/components/CombatPanel";
 import { RACE_SKIN, RACE_FORM, appearanceLabel } from "@/lib/visual";
-import { HERO_HAIRSTYLES } from "@/lib/heroModels";
-import { BEARDS, MOUSTACHES, BROWS, NOSES, EARS, SCARS, PAINTS, ACCESSORIES } from "@/lib/faceKit";
+import { HERO_HAIRSTYLES, DWARF_HAIRSTYLES } from "@/lib/heroModels";
+import { BEARDS, DWARF_BEARDS, MOUSTACHES, BROWS, NOSES, EARS, SCARS, PAINTS, ACCESSORIES } from "@/lib/faceKit";
 import { installCursors } from "@/lib/cursor";
 const World = dynamic(() => import("@/components/GameWorld"), { ssr: false, loading: () => <div className="world-fallback">Abrindo o caminho para Pedra da Aurora…</div> });
 const Stage = dynamic(() => import("@/components/GameWorld").then(m => m.CreatorStage), { ssr: false, loading: () => <div className="world-fallback">Preparando seu personagem…</div> });
@@ -62,9 +62,9 @@ function Creator({ close }: { close: () => void }) {
   const fresh = !hero.created || hero.dead; const info = CLASSES[selected];
   const option = (key: keyof Look, title: string, labels: string[]) => ({ key, title, count: labels.length, labels });
   const groups: Record<string, { key: keyof Look; title: string; count: number; colors?: string[]; labels?: string[] }[]> = {
-    Cabelo: [option("hair", "Penteado", HERO_HAIRSTYLES.map(h => h.label)), { key: "hairColor", title: "Cor dos fios", count: HAIR.length, colors: HAIR }],
+    Cabelo: [option("hair", "Penteado", (race === "dwarf" ? DWARF_HAIRSTYLES : HERO_HAIRSTYLES).map(h => h.label)), { key: "hairColor", title: "Cor dos fios", count: HAIR.length, colors: HAIR }],
     Rosto: [{ key: "eyes", title: "Cor dos olhos", count: EYES.length, colors: ["#1f2b33", ...EYES.slice(1)] }, option("brows", "Sobrancelhas", BROWS), option("nose", "Nariz", NOSES), option("ears", "Orelhas", EARS)],
-    Barba: [option("beard", "Barba", BEARDS), option("moustache", "Bigode", MOUSTACHES)],
+    Barba: [option("beard", "Barba", race === "dwarf" ? DWARF_BEARDS : BEARDS), option("moustache", "Bigode", MOUSTACHES)],
     Marcas: [option("scar", "Cicatriz", SCARS), option("tattoo", "Pintura", PAINTS), option("accessory", "Acessório", ACCESSORIES)],
     Corpo: [{ key: "skin", title: "Tom de pele", count: RACE_SKIN[race].length, colors: [...RACE_SKIN[race]] }, { key: "body", title: "Estrutura corporal", count: 6 }],
   };
