@@ -21,7 +21,7 @@ async function reconcile(initial=false){
   const local=savedState(useGame.getState()),localHash=await fingerprint(local),remote=await readCloud();if(gen!==generation)return;
   const remoteHash=remote?await fingerprint(remote.state):null;if(gen!==generation)return;
   if(useGame.getState().saveError){useCloud.setState({status:'choose',remote,message:'A cópia local precisa de recuperação. Ela será preservada antes de carregar a nuvem.'});return;}
-  const decision=decideSync({base,localHash,remoteHash,remoteRevision:remote?.revision??0,owned:owner===uid,meaningful:hasJourney(local)});
+  const decision=decideSync({base,localHash,remoteHash,remoteRevision:remote?.revision??0,owned:owner===uid,meaningful:hasJourney(local),remoteMeaningful:remote?hasJourney(remote.state):false});
   if(decision==='choose'||decision==='conflict'){useCloud.setState({status:decision,remote,message:decision==='conflict'?'Os dois aparelhos têm alterações. Escolha qual jornada continuar.':'Escolha a jornada que deseja usar nesta nuvem.'});return;}
   if(decision==='download'&&remote){if(!initial&&(useGame.getState().encounter||useGame.getState().challenge)){useCloud.setState({status:'conflict',remote,message:'A nuvem foi atualizada em outro aparelho. Termine ou revise sua jornada antes de continuar.'});return;}await pull(uid,remote,gen,false,canonical(local));}
   else if(decision==='upload'){const posted=await writeCloud(local,base?.revision??0);if(gen!==generation)return;acknowledge(uid,posted,localHash);}
