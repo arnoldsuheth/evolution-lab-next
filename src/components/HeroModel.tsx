@@ -13,6 +13,8 @@ import {attachGearPieces,GearAura} from './GearPieces';
 
 const base=process.env.NEXT_PUBLIC_GITHUB_PAGES==='true'?'/evolution-lab-next':'';
 export const heroModelUrl=(model:HeroBase)=>`${base}/models/heroes/${HERO_BASE_FILES[model]}`;
+// Baixa todos os modelos uma vez: trocar raça ou classe no criador não mostra o boneco antigo enquanto carrega.
+if(typeof window!=='undefined')for(const model of Object.keys(HERO_BASE_FILES) as HeroBase[])useGLTF.preload(heroModelUrl(model));
 /** Altura do herói no mesmo referencial do avatar procedural (antes da escala .74 do mundo). */
 const HUMAN_HEIGHT=3;
 /** Ossos que definem as pernas compactas do anão. */

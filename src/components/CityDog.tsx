@@ -16,7 +16,7 @@ import { walkable } from '@/lib/navigation';
 const HOME = new THREE.Vector3(4.4, 0, 9.6);
 const CARAMEL = '#c8843f', LIGHT = '#ecc489', CREAM = '#f6e2bb', DARK = '#2a1d16';
 const openDog = () => window.dispatchEvent(new CustomEvent('lions-cave-dog'));
-const inTown = (x: number, z: number) => Math.abs(x) < 34 && z > -14 && z < 22;
+const inTown = (x: number, z: number) => Math.hypot(x, z) < 16; // só dentro da vila (raio seguro + calçadas)
 /** Mesmo mapa de obstáculos do herói (casas, bancas, árvores, poço...). */
 const free = (x: number, z: number) => walkable(x, z, true, true);
 function M({ color, rough = .9, ...rest }: { color: string; rough?: number } & Partial<THREE.MeshStandardMaterialParameters>) { return <meshStandardMaterial color={color} roughness={rough} {...rest} />; }
