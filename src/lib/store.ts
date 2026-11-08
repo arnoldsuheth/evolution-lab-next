@@ -14,6 +14,7 @@ import { CODE_SPOTS, spotAvailable } from "./codeSpots";
 import { friendlyLock } from "./apprentice";
 import { AI_COURSE, CHESTS, aiRequirement, travelerFor, pendingDelivery, makeChallenge, mainRequirement, projectRequirement, promotionRequirement, promotionRank, type Challenge } from "./journey";
 import { create } from "zustand";
+import { PRACTICE_CONCEPTS, nextMastery, BLITZ_PASS, dayKey, blitzReward, battleBuff, BATTLE_COOLDOWN_MS, BATTLE_MISS_COOLDOWN_MS, BATTLE_BUFF_SECONDS } from "./practice";
 import { persist } from "zustand/middleware";
 import { SKILLS, skillRank, skillRequirement, passiveBonuses } from "./skills";
 import { isEquipment, itemRequirement, removeItems, countItem } from "./equipment";
@@ -69,6 +70,8 @@ interface GameStore extends SaveData {
   selectCharacter: (slot:number)=>boolean;
   createCharacter: (name: string, classId: ClassId, mode: "normal" | "hardcore", race?: Race) => void;
   customize: (look: Partial<Look>) => void; chooseClass: (id: ClassId, race?: Race) => void; move: (p: [number, number]) => void;
+  /** Treino rápido (missão relâmpago e perguntas de batalha). */
+  practiceAnswer:(concept:string,correct:boolean)=>void; finishBlitz:(concept:string,score:number)=>{xp:number;gold:number}|null; battleInsight:(correct:boolean)=>void;
   draft: (id: string, code: string) => void; solve: (id: string, code: string) => ReturnType<typeof evaluateLesson>; project: (id: string, code: string) => void;
   allocateAttribute:(key:AttributeKey)=>void;
   buy: (id: string) => void; equip: (id: string) => void; useItem: (id: string) => void; craft: (id: string) => void; talent: (branch: number) => void;
@@ -140,6 +143,13 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     const limits = stats(hero); set({ hero: { ...hero, hp: Math.min(hero.hp, limits.maxHp), mp: Math.min(hero.mp, limits.maxMp),stamina:Math.min(hero.stamina,limits.maxStamina) }, notice: "Novo caminho. Educação, itens, XP e bronze preservados; talentos devolvidos." });
   },
   move: position => { const s = get(); if (!s.hero.dead && !s.encounter) set({ hero: { ...s.hero, position } }); },
+  practiceAnswer:(concept,correct)=>{if(!PRACTICE_CONCEPTS.includes(concept))return;set(s=>({education:{...s.education,practice:{...s.education.practice,[concept]:nextMastery(s.education.practice?.[concept],correct)}}}));},
+  finishBlitz:(concept,score)=>{const s=get();if(!PRACTICE_CONCEPTS.includes(concept)||s.hero.dead)return null;if(score<BLITZ_PASS){set({notice:'Quase! Acerte 2 de 3 para ganhar a recompensa. O treino fica mais fácil quando você erra.'});return null;}
+   const today=dayKey(Date.now());if(s.education.blitz?.[concept]===today){set({notice:'Missão relâmpago concluída. A recompensa desta runa volta amanhã; o treino continua valendo.'});return null;}
+   const reward=blitzReward(s.education.practice?.[concept]?.level??1);set({hero:{...withXp(s.hero,reward.xp),gold:s.hero.gold+reward.gold},education:{...s.education,blitz:{...s.education.blitz,[concept]:today}},notice:`⚡ Missão relâmpago: +${reward.xp} XP e +${reward.gold} bronze.`});return reward;},
+  battleInsight:correct=>{const s=get(),now=Date.now();if(!s.encounter||s.hero.dead||(s.cooldowns.insight??0)>now)return;
+   if(!correct){set({cooldowns:{...s.cooldowns,insight:now+BATTLE_MISS_COOLDOWN_MS},notice:'Não foi dessa vez. Leia a explicação e tente de novo em instantes.'});return;}
+   const amount=battleBuff(stats(s.hero).attack);set({cooldowns:{...s.cooldowns,insight:now+BATTLE_COOLDOWN_MS},effects:[...s.effects,{kind:'attack',amount,remaining:BATTLE_BUFF_SECONDS}],notice:`🧠 Golpe do saber! +${amount} de ataque por ${BATTLE_BUFF_SECONDS} segundos.`});},
   draft: (id, code) => set(s => ({ education: { ...s.education, drafts: { ...s.education.drafts, [id]: code } } })),
   solve: (id, code) => {
     const s = get(); const lesson = LESSONS.find(l => l.id === id); const result = evaluateLesson(id, code);
