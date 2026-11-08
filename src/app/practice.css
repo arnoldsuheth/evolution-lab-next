@@ -1,0 +1,53 @@
+/* Treino rápido: missão relâmpago (cursos) e pergunta de batalha (combate). Tudo por toque. */
+.practice-card{margin:12px 0;padding:12px 14px;border:2px solid #e8c86a;border-radius:14px;background:linear-gradient(180deg,#22384a,#172a38);color:#fff4cd;display:flex;flex-direction:column;gap:8px}
+.practice-card header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.practice-card header b{font-size:15px;color:#ffd978}
+.practice-card header span{font-size:12px;opacity:.9}
+.practice-card p{margin:0;font-size:13px;line-height:1.4}
+.practice-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.practice-actions small{font-size:11.5px;opacity:.85}
+.practice-level{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11px!important;font-weight:800;white-space:nowrap}
+.practice-level.level-1{background:#2f6b45;color:#e9ffe9}.practice-level.level-2{background:#8a6a12;color:#fff4cd}.practice-level.level-3{background:#7a2a2a;color:#ffe1d6}
+.practice-progress{display:flex;gap:6px}.practice-progress i{flex:1;height:5px;border-radius:3px;background:#2f4a57}.practice-progress i.done{background:#e8c86a}.practice-progress i.now{background:#8dd4de}
+.practice-summary p+p{margin-top:4px}
+
+.practice-question{display:flex;flex-direction:column;gap:8px}
+.practice-meta{display:flex;gap:6px;align-items:center}
+.practice-kind{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#8dd4de}
+.practice-prompt{font-size:14px!important;font-weight:700;color:#fff}
+.practice-code,.practice-answer{margin:0;padding:8px 10px;border-radius:9px;background:#0d1a24;border:1px solid #2f4a57;font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#d9f3ff;white-space:pre-wrap;overflow-wrap:anywhere;display:flex;flex-direction:column}
+.practice-code mark{background:#e8c86a;color:#1a1408;border-radius:4px;padding:0 4px}
+.practice-options,.practice-lines{display:flex;flex-wrap:wrap;gap:6px}
+.practice-options button,.practice-lines button{flex:1 1 140px;min-height:40px;padding:6px 10px;border-radius:10px;border:2px solid #2f4a57;background:#fff6df;color:#173246;font-weight:700;font-size:13px;text-align:left;cursor:pointer;overflow-wrap:normal;word-break:normal}
+.practice-lines{flex-direction:column}
+.practice-lines button{flex:none;display:flex;gap:8px;align-items:center;width:100%}
+.practice-lines button small{font-size:10.5px;color:#5a6b78;white-space:nowrap}
+.practice-options code,.practice-lines code{font:12.5px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+.practice-options button:disabled,.practice-lines button:disabled{opacity:.55;cursor:default}
+.practice-options button.right,.practice-lines button.right{opacity:1;background:#d9f7dd;border-color:#2f6b45}
+.practice-built{margin:0;padding:6px 10px 6px 28px;border-radius:9px;border:1px dashed #8dd4de;min-height:34px;font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#d9f3ff}
+.practice-built .empty{list-style:none;margin-left:-18px;font-family:inherit;opacity:.75}
+.practice-hint{font-size:12.5px!important;color:#ffe9a8}
+.practice-hint-btn,.practice-undo{align-self:flex-start;font-size:12px}
+.practice-feedback{padding:8px 10px;border-radius:10px;display:flex;flex-direction:column;gap:6px}
+.practice-feedback.ok{background:#1f4a32}.practice-feedback.miss{background:#4a2a1f}
+.practice-feedback b{font-size:14px}.practice-feedback p{font-size:12.5px!important}
+.practice-feedback .primary{align-self:flex-start}
+
+/* Pergunta de batalha: botão redondo junto das poções e um cartão por cima da luta. */
+.combat-tools .combat-insight{background:#e9f3ff;border-color:#2a5a8a}
+.combat-tools .combat-insight:disabled{opacity:.45}
+.battle-question{position:fixed;z-index:60;left:50%;top:50%;transform:translate(-50%,-50%);width:min(520px,calc(100vw - 32px));max-height:calc(100dvh - 24px);overflow-y:auto;padding:10px 12px;border-radius:14px;border:2px solid #e8c86a;background:#172a38;color:#fff4cd;box-shadow:0 12px 40px #0009}
+.battle-question header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.combat-tools .battle-question button{position:static;width:auto;height:auto;min-height:36px;border-radius:10px;display:block;font-size:13px;padding:6px 10px}
+.combat-tools .battle-question .practice-lines button{display:flex;width:100%}
+.combat-tools .battle-question header button{min-height:30px;padding:0 10px;background:transparent;color:#fff4cd;border:1px solid #2f4a57;font-size:18px}
+.combat-tools .battle-question .primary{background:#e8c86a;color:#1a1408;border-color:#e8c86a}
+
+@media (orientation:landscape) and (max-height:540px){
+ .practice-card{padding:8px 10px;gap:6px;margin:8px 0}
+ .practice-options button,.practice-lines button{min-height:34px;padding:4px 8px;font-size:12px}
+ .practice-code,.practice-answer{font-size:11.5px;padding:6px 8px}
+ .practice-prompt{font-size:13px!important}
+ .battle-question{width:min(560px,calc(100vw - 120px));padding:8px 10px}
+}

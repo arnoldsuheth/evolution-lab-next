@@ -12,6 +12,7 @@ import "./code-world.css";
 import "./panel-tech.css";
 import "./mobile-layout.css";
 import "./shop-compact.css";
+import "./practice.css";
 import {CloudRuntime,CloudGate} from "@/components/CloudAccount";
 
 const base = process.env.GITHUB_PAGES === "true" ? "/evolution-lab-next" : "";
