@@ -37,7 +37,7 @@ export default function GameMenu({hidden=false,open:openPanel,keys,rest,canRest,
     <button role="menuitem" disabled={level<MOUNT_LEVEL} title={level<MOUNT_LEVEL?`Montaria no nível ${MOUNT_LEVEL}`:'Andar mais rápido'} onClick={()=>choose(()=>useGame.getState().toggleMount())}><span className="menu-icon" aria-hidden>🐺</span><b>{mounted?'Desmontar':'Montar'}</b><small>{level<MOUNT_LEVEL?`Nível ${MOUNT_LEVEL}`:'Mais rápido'}</small></button></div>
    <div className="game-menu-row"><AudioControls/><button onClick={()=>choose(switchCharacter)}>Trocar personagem</button><button onClick={()=>choose(()=>openPanel('settings'))}>⚙ Configurações</button><button onClick={()=>choose(()=>window.dispatchEvent(new Event(MENU_EDIT_EVENT)))}>▦ Organizar a tela</button></div>
    <p className="game-menu-help">Clique no chão para andar · clique no monstro para lutar · roda ou pinça dá zoom</p>
-   <footer><span>CARAMELO’S CAVE {version}</span><span>{error?'Exportação necessária':<CloudIndicator/>}</span></footer>
+   <footer><span>LION’S CAVE {version}</span><span>{error?'Exportação necessária':<CloudIndicator/>}</span></footer>
   </div>}
  </div>;
 }
