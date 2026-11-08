@@ -80,9 +80,14 @@ export interface HeroDress { outfit: 'rags' | 'class'; hat: string | null; cape:
  * O iniciante veste roupas remendadas: sem elmo, sem capa e sem as cores da classe.
  * Peitoral traz as cores da classe; item de cabeça mostra o elmo (se o jogador quiser); capa vem com peitoral ou costas.
  */
-export function heroDress(classId: ClassId, gear: HeroGear, hairStyle: number, showHelmet: boolean): HeroDress {
+/** Cabelos do anão: careca e penteados sobre a cabeça do bárbaro; a juba usa a cabeça de cabelo longo. */
+export const DWARF_HAIRSTYLES: { label: string; base: HeroBase; extra?: 'ponytail' | 'bun' }[] = [
+  { label: 'Careca de forja', base: 'barbarian' }, { label: 'Coroa trançada', base: 'barbarian' }, { label: 'Moicano de pedra', base: 'barbarian' },
+  { label: 'Tranças nas têmporas', base: 'barbarian' }, { label: 'Coque de ferreiro', base: 'barbarian', extra: 'bun' }, { label: 'Juba longa', base: 'rogue' },
+];
+export function heroDress(classId: ClassId, gear: HeroGear, hairStyle: number, showHelmet: boolean, race?: Race): HeroDress {
   const base = HERO_STYLE[classId].base, parts = HERO_PARTS[base], helmet = gear.head && showHelmet;
-  const style = HERO_HAIRSTYLES[hairStyle], chosen = style?.base ?? base;
+  const style = race === 'dwarf' ? DWARF_HAIRSTYLES[hairStyle] ?? DWARF_HAIRSTYLES[0] : HERO_HAIRSTYLES[hairStyle], chosen = style?.base ?? base;
   return {
     outfit: gear.chest ? 'class' : 'rags',
     hat: helmet ? parts.helmet ?? null : null,
