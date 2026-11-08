@@ -141,3 +141,21 @@ button,[role=tab],summary,button *,[role=tab] *{overflow-wrap:normal!important;w
  .unified-inventory.with-loadout{grid-template-columns:168px minmax(0,1fr)!important}
  .class-choices button{font-size:12px!important}
 }
+
+/* Cards de item: a imagem tem tamanho próprio (não % da largura). Com % + aspect-ratio o Safari
+   calcula a linha da grade menor que o card e uma linha de itens sobe por cima da outra. */
+.equipment-icons .item-icon{height:auto!important}
+.equipment-icons .item-icon>*{flex-shrink:0}
+.equipment-icons .item-icon-art{width:clamp(40px,6.5vw,64px)!important;height:clamp(40px,6.5vw,64px)!important;aspect-ratio:auto}
+@media (orientation:landscape) and (max-height:540px){.equipment-icons .item-icon-art{width:38px!important;height:38px!important}}
+
+/* Telas de missão, runas, talentos e jornada mais compactas no celular. */
+@media (orientation:landscape) and (max-height:540px), (max-width:960px){
+ .modal .panel-body h3,.modal .lesson-content h3,.modal .section-line h3{font-size:18px!important;line-height:1.2!important;margin:2px 0 4px!important}
+ .modal .panel-body h4{font-size:14px!important}
+ .modal .panel-body p,.modal .lesson-content p,.modal .panel-body li{font-size:12.5px!important;line-height:1.4!important}
+ .modal .panel-body .eyebrow,.modal .lesson-content .eyebrow{font-size:10px!important;letter-spacing:.12em!important}
+ .modal .section-line{gap:8px!important;margin:6px 0!important}
+ .modal .section-line>b,.modal .section-line>strong,.modal .skill-points{font-size:15px!important}
+ .modal .panel-body small{font-size:11px}
+}
