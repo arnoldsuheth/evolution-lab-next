@@ -9,6 +9,7 @@
  width:100%;min-height:58px;padding:6px 34px 6px 8px;border:1px solid #d6b06a55;border-radius:8px;background:linear-gradient(90deg,#1f2e4c,#111b30);color:#fff3d6}
 .lk-select .lk-roster .character-slot>button:first-child>small{display:none}
 .lk-select .lk-roster .character-slot>button:first-child :is(.hero-portrait,.portrait-photo,img,canvas,.class-portrait,.empty-character){grid-row:1/3;width:44px!important;height:44px!important;border-radius:50%;overflow:hidden;border:2px solid var(--lk-gold);font-size:20px;display:grid;place-items:center}
+.lk-select .lk-roster .character-slot>button:first-child > .empty-character{line-height:1;color:#ffe2a0}
 .lk-select .lk-roster .character-slot>button:first-child h2{margin:0;font:600 14px/1.2 Georgia,serif;color:#fff3d6}
 .lk-select .lk-roster .character-slot>button:first-child p{margin:0;font-size:11px;color:#e9d7ad}
 .lk-select .lk-roster .character-slot.chosen>button:first-child{border:2px solid #ffd27a;box-shadow:0 0 14px #ffd27a55,inset 0 0 18px #e5aa5333}
@@ -107,8 +108,8 @@
 .creator-modal .appearance-options fieldset{margin:0 0 8px;padding:6px 8px}
 .creator-modal .option-row{gap:5px}
 .creator-modal .appearance-choice{min-height:34px;padding:4px 8px;font-size:12px}
-.creator-modal .option-row:has(.beard-icon){display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr))}
-.creator-modal .appearance-choice:has(.beard-icon){display:flex;align-items:center;gap:6px;min-height:52px;text-align:left;border-radius:8px}
-.creator-modal .appearance-choice:has(.beard-icon).chosen{border-color:#ffd27a;box-shadow:0 0 0 2px #ffd27a66}
-.beard-icon{flex:none;width:40px;height:40px;border-radius:6px;background:#2b3a56}
-@media (orientation:landscape) and (max-height:540px){.creator-modal .appearance-choice:has(.beard-icon){min-height:44px}.beard-icon{width:32px;height:32px}}
+.creator-modal .option-row:has(:is(.beard-icon,.appearance-icon)){display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr))}
+.creator-modal .appearance-choice:has(:is(.beard-icon,.appearance-icon)){display:flex;align-items:center;gap:6px;min-height:52px;text-align:left;border-radius:8px}
+.creator-modal .appearance-choice:has(:is(.beard-icon,.appearance-icon)).chosen{border-color:#ffd27a;box-shadow:0 0 0 2px #ffd27a66}
+:is(.beard-icon,.appearance-icon){flex:none;width:40px;height:40px;border-radius:6px;background:#2b3a56}
+@media (orientation:landscape) and (max-height:540px){.creator-modal .appearance-choice:has(:is(.beard-icon,.appearance-icon)){min-height:44px}:is(.beard-icon,.appearance-icon){width:32px;height:32px}}
