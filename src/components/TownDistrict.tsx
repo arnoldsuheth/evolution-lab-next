@@ -4,7 +4,7 @@ import {useFrame,type ThreeEvent} from '@react-three/fiber';
 import {Html} from '@react-three/drei';
 import * as THREE from 'three';
 import {useGame} from '@/lib/store';
-import {FENCES,PROPS,ROADS,type Prop} from '@/lib/town';
+import {CITADEL_SECTORS,FENCES,PROPS,ROADS,type Prop} from '@/lib/town';
 
 const ROAD='#a5adba',TRAIL='#c4a36e',WOOD='#9a6a40',WOOD_DARK='#6e4a2c',STONE='#b9b4a2',ROOF=['#d9644f','#3f86b8','#e1a73b'];
 const std=(color:string,extra:Partial<THREE.MeshStandardMaterialParameters>={})=><meshStandardMaterial color={color} roughness={.85} {...extra}/>;
@@ -94,5 +94,22 @@ export default function TownDistrict({onGroundClick}:{onGroundClick:(e:ThreeEven
  const completed=useGame(s=>s.education.completed);
  return <group><Roads onClick={onGroundClick}/><LampPosts lit={completed.includes('variables')}/>
   {PROPS.map(p=><group key={p.id} position={[p.x,0,p.z]} rotation={[0,p.turn??(p.kind==='floodgate'?0:0),0]}><PropModel prop={p} unlocked={!p.unlock||completed.includes(p.unlock)}/></group>)}
-  {FENCES.map(f=><Garden key={f.id} {...f}/>)}</group>;
+  {FENCES.map(f=><Garden key={f.id} {...f}/>)}<CitadelSigns/></group>;
+}
+
+/** Lovelace (prévia 4): placas com o nome de cada prédio e um poste de setas na entrada da praça. */
+const SIGNPOST:[number,number]=[3.4,9.2];
+const SECTOR_ICON:Record<string,string>={Biblioteca:'📖',Arquivo:'📜',Oficina:'⚙',Academia:'🎓','Pátio':'✦'};
+function CitadelSigns(){
+ const near=useGame(s=>Math.hypot(s.hero.position[0],s.hero.position[1])<26&&s.hero.region==='aurora'&&!s.hero.instance);
+ return <group>
+  <group position={[SIGNPOST[0],0,SIGNPOST[1]]}>
+   <mesh position={[0,1.35,0]} castShadow><cylinderGeometry args={[.08,.1,2.7,8]}/>{std('#2a2f45')}</mesh>
+   <mesh position={[0,2.78,0]}><sphereGeometry args={[.13,10,8]}/>{std('#d6b06a',{metalness:.6,roughness:.4})}</mesh>
+   {CITADEL_SECTORS.slice(0,4).map((sec,i)=>{const turn=Math.atan2(-(sec.z-SIGNPOST[1]),sec.x-SIGNPOST[0]);
+    return <group key={sec.name} position={[0,2.35-i*.38,0]} rotation={[0,turn,0]}><mesh position={[.55,0,0]}><boxGeometry args={[1.1,.3,.06]}/>{std('#1d2a4a')}</mesh><mesh position={[1.14,0,0]} rotation={[0,0,Math.PI/4]}><boxGeometry args={[.21,.21,.06]}/>{std('#1d2a4a')}</mesh></group>;})}
+   {near&&<Html zIndexRange={[5,0]} position={[0,3.1,0]} center style={{pointerEvents:'none'}}><div className="citadel-signpost">{CITADEL_SECTORS.slice(0,4).map(sec=><span key={sec.name}><i>{SECTOR_ICON[sec.short]}</i>{sec.short}</span>)}</div></Html>}
+  </group>
+  {near&&CITADEL_SECTORS.map(sec=><Html key={sec.name} zIndexRange={[4,0]} position={[sec.x,4.3,sec.z]} center style={{pointerEvents:'none'}}><span className="citadel-plaque"><i>{SECTOR_ICON[sec.short]}</i>{sec.short.toUpperCase()}</span></Html>)}
+ </group>;
 }

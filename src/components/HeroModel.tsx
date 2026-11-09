@@ -4,7 +4,7 @@ import {useGLTF,useAnimations} from '@react-three/drei';
 import * as THREE from 'three';
 import {clone} from 'three/examples/jsm/utils/SkeletonUtils.js';
 import type {ClassId,Race} from '@/lib/game';
-import {HEAD_MESH,OFFHAND_MESH,WEAPON_MESH,headLook,BODY_WIDTH,HERO_BASE_FILES,HERO_HAT_MESHES,HERO_HIT,HERO_PARTS,HERO_PUNCH,HERO_STYLE,HERO_WALK,HERO_WEAPON_MESHES,heroDress,heroProportions,recolorAtlas,type HeroBase,type HeroGear,type RecolorOptions} from '@/lib/heroModels';
+import {HEAD_MESH,OFFHAND_MESH,WEAPON_MESH,headLook,BODY_WIDTH,BODY_HEIGHT,HERO_BASE_FILES,HERO_HAT_MESHES,HERO_HIT,HERO_PARTS,HERO_PUNCH,HERO_STYLE,HERO_WALK,HERO_WEAPON_MESHES,heroDress,heroProportions,recolorAtlas,type HeroBase,type HeroGear,type RecolorOptions} from '@/lib/heroModels';
 import {useGame} from '@/lib/store';
 import {buildFaceKit,RACE_HEAD_SHAPE,type FaceOptions} from '@/lib/faceKit';
 import {gearLook,rarityTier} from '@/lib/gearPieces';
@@ -83,14 +83,14 @@ export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairSty
   // Peças de rosto presas ao osso da cabeça, no mesmo referencial em que a malha foi modelada.
   const headBone=host?(host as THREE.SkinnedMesh).skeleton.bones.find(b=>b.name==='head'):undefined;
   if(host&&headBone){const skeleton=(host as THREE.SkinnedMesh).skeleton,index=skeleton.bones.indexOf(headBone),kit=buildFaceKit({look:JSON.parse(faceKey),race,covered,extra,hair,skin,dwarfHair:race==='dwarf'?hairStyle:undefined});
-   const anchor=new THREE.Group();anchor.name='face-anchor';anchor.matrixAutoUpdate=false;anchor.matrix.copy(skeleton.boneInverses[index]);anchor.add(kit);headBone.add(anchor);
+   const anchor=new THREE.Group();anchor.name='face-anchor';anchor.matrixAutoUpdate=false;anchor.matrix.copy(skeleton.boneInverses[index]);anchor.add(kit);if(classId==='prophet'&&!covered){const halo=new THREE.Mesh(new THREE.TorusGeometry(.5,.035,8,40),new THREE.MeshStandardMaterial({color:'#f2c75c',emissive:'#a8741c',emissiveIntensity:.6,metalness:.7,roughness:.35}));halo.name='prophet-halo';halo.position.set(0,1.82,-.42);kit.add(halo);}headBone.add(anchor);
    headBone.scale.set(...(RACE_HEAD_SHAPE[race]??[1,1,1]));}
   if(race==='dwarf')model.traverse(node=>{if(node instanceof THREE.Bone&&COMPACT_LEGS.has(node.name))node.scale.y*=.78;});
   model.updateMatrixWorld(true);
   model.traverse(node=>{if(node instanceof THREE.SkinnedMesh)node.skeleton.update();});
   const body=new THREE.Box3();model.updateMatrixWorld(true);model.traverse(o=>{if(o instanceof THREE.Mesh&&!NOT_BODY(o.name)){if(o instanceof THREE.SkinnedMesh)o.computeBoundingBox();body.expandByObject(o);}});
   const form=heroProportions(race),width=form.width*(BODY_WIDTH[bodyShape]??1),scale=HUMAN_HEIGHT*form.height/Math.max(.01,body.max.y-body.min.y);
-  model.scale.set(scale*width,scale,scale*width);model.position.y=-(body.isEmpty()?0:body.min.y)*scale;
+  const tall=BODY_HEIGHT[bodyShape]??1;model.scale.set(scale*width,scale*tall,scale*width);model.position.y=-(body.isEmpty()?0:body.min.y)*scale*tall;
   attachGearPieces(model,equipmentLook.slots);
   return {scene:model,host};
  },[equipmentLook,gltf.scene,style,classId,race,skin,hair,eyes,bodyShape,armed,shielded,preview,outfit,hat,cape,head,extra,covered,faceKey,hairStyle,weaponRarity,ownWeapon,ownOffhand]);
