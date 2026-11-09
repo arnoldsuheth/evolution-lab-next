@@ -1,0 +1,47 @@
+/* Lovelace · HUD de toque em roda (prévia 6): Atacar no centro, 3 habilidades em volta,
+   Poder, Auto, Correr/Andar, Sentar, comida e poção. No computador fica escondido. */
+.radial-hud{display:none}
+@media (pointer:coarse), (max-width:960px){
+ .combat-console>.combat-console-head,.combat-console>.combat-console-grid{display:none!important}
+ .combat-console{background:none!important;border:0!important;box-shadow:none!important;padding:0!important;pointer-events:none}
+ .radial-hud{display:block;position:fixed;z-index:30;pointer-events:none;
+  right:calc(env(safe-area-inset-right,0px) + 8px);bottom:calc(env(safe-area-inset-bottom,0px) + 8px);width:250px;height:214px}
+ .radial-hud>button{pointer-events:auto;position:absolute;display:grid;place-items:center;align-content:center;gap:0;padding:0;
+  border-radius:50%;border:2px solid #c9a24a;background:radial-gradient(circle at 35% 30%,#2b4a63,#122233 70%);color:#fff4cd;
+  box-shadow:0 3px 10px #0008, inset 0 0 0 2px #0a1622;font-weight:800;line-height:1;touch-action:manipulation}
+ .radial-hud>button small{font-size:9px;letter-spacing:.02em;margin-top:2px;color:#ffe9a8}
+ .radial-hud>button:disabled{opacity:.5}
+ .radial-hud>button[aria-pressed=true]{border-color:#ffb43a;box-shadow:0 0 0 3px #ffb43a66,0 3px 10px #0008;color:#ffd27a}
+ .radial-hud img,.radial-hud svg{width:60%;height:60%;object-fit:contain}
+ .radial-attack{width:96px;height:96px;right:30px;bottom:44px;border-width:3px!important;
+  background:radial-gradient(circle at 35% 30%,#3a5f7d,#13283a 72%)!important}
+ .radial-attack span{font-size:34px}.radial-attack b{font-size:13px;margin-top:2px;color:#ffe9a8}
+ .radial-skill{width:54px;height:54px}
+ .radial-skill small{position:absolute;right:-2px;bottom:-2px;background:#0d1a24;border:1px solid #c9a24a;border-radius:9px;padding:1px 4px}
+ .radial-skill .cooldown-cover{position:absolute;inset:0;display:grid;place-items:center;border-radius:50%;background:#000a;font-size:13px}
+ .radial-skill-1{right:136px;bottom:30px}.radial-skill-2{right:132px;bottom:94px}.radial-skill-3{right:96px;bottom:150px}
+ .radial-power{width:48px;height:48px;right:36px;bottom:160px;font-size:18px}
+ .radial-auto{width:48px;height:48px;right:-2px;bottom:146px;font-size:18px}
+ .radial-run{width:44px;height:44px;right:-4px;bottom:0;font-size:16px}
+ .radial-sit{width:44px;height:44px;right:54px;bottom:-6px;font-size:16px}
+ .radial-food,.radial-potion{width:44px;height:44px;font-size:16px}
+ .radial-food{right:196px;bottom:4px}.radial-potion{right:198px;bottom:56px}
+ .radial-food small,.radial-potion small{position:absolute;bottom:-3px;right:-4px;background:#0d1a24;border-radius:8px;padding:0 3px}
+}
+@media (pointer:coarse) and (orientation:landscape) and (max-height:430px), (max-width:960px) and (max-height:430px){
+ .radial-hud{transform:scale(.86);transform-origin:bottom right}
+}
+
+/* Painéis agrupados (prévia 7): abas douradas no topo. */
+.panel-group-tabs{display:flex;gap:6px;margin:0 0 10px;padding:4px;border-radius:12px;background:#0d1a24;border:1px solid #c9a24a55}
+.panel-group-tabs button{flex:1;min-height:38px;border-radius:9px;border:1px solid transparent;background:transparent;color:#d8c9a0;font-weight:800;font-size:13px}
+.panel-group-tabs button.active{background:linear-gradient(180deg,#2b4a63,#173246);border-color:#c9a24a;color:#ffe9a8;box-shadow:inset 0 -2px 0 #ffcf5a}
+
+/* Montarias */
+.mount-list{display:grid;gap:8px;margin:8px 0 12px}
+.mount-card{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:10px;border-radius:12px;border:1px solid #c9a24a66;background:linear-gradient(90deg,#173246,#0f1f2c)}
+.mount-card.locked{filter:grayscale(.7);opacity:.75}
+.mount-card.active{border-color:#ffcf5a;box-shadow:0 0 0 2px #ffcf5a44}
+.mount-icon{font-size:34px;text-align:center}
+.mount-card h4{margin:0 0 2px;color:#ffe9a8}.mount-card p{margin:0;font-size:12px!important}.mount-card small{font-size:11px;color:#8dd4de}
+.mount-level{font-size:12px;padding:3px 8px;border-radius:8px;border:1px solid #c9a24a;color:#ffe9a8;white-space:nowrap}

@@ -14,6 +14,7 @@ import "./mobile-layout.css";
 import "./shop-compact.css";
 import "./practice.css";
 import "./desktop-hud.css";
+import "./lovelace-hud.css";
 import {CloudRuntime,CloudGate} from "@/components/CloudAccount";
 
 const base = "";
