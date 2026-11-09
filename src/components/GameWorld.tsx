@@ -21,7 +21,7 @@ import CityDog from "./CityDog";
 import PetFollower from "./PetFollower";
 import { adventureOf, titleOf, mountSpeed, MOUNT_LEVEL, type PetId } from "@/lib/adventure";
 import { doorBetween } from "@/lib/dungeon";
-import { CITADEL_SECTORS, TOWN_SERVICES, type TownService } from "@/lib/town";
+import { ARCHIVE, ARCHIVE_DESK, ARCHIVE_READING_SPOT, CITADEL_SECTORS, TOWN_SERVICES, type TownService } from "@/lib/town";
 import { frameWorld } from "@/lib/worldCamera";
 import WorldDetails, { HouseDetails } from "./WorldDetails";
 import {MONSTERS,REGIONS,AGGRO_RADIUS,SAFE_TOWN_RADIUS,isAggressive} from "@/lib/campaign";
@@ -114,6 +114,36 @@ function House({ x, z, index, citadel }: { x: number; z: number; index: number; 
     </>}
   </group>;
 }
+function ArchiveInterior({ onGroundClick, read }: {
+  onGroundClick: (event: ThreeEvent<MouseEvent>) => void;
+  read: () => void;
+}) {
+  const near = useGame(s => Math.hypot(s.hero.position[0] - ARCHIVE_DESK[0], s.hero.position[1] - ARCHIVE_DESK[1]) < 5);
+  return <group position={[ARCHIVE.x, 0, ARCHIVE.z]}>
+    <mesh position={[0,.04,0]} receiveShadow onClick={onGroundClick}>
+      <boxGeometry args={[5.6,.08,5]} /><meshStandardMaterial color="#534638" />
+    </mesh>
+    <MergedParts parts={() => [
+      { g: box(5.6,2.4,.35), p: [0,1.2,-2.3], c: "#626e88" },
+      ...[-1,1].flatMap((side): Part[] => [
+        { g: box(.35,1.25,4.6), p: [side*2.6,.625,0], c: "#626e88" },
+        { g: box(1.8,.7,.3), p: [side*1.7,.35,2.35], c: "#626e88" },
+        { g: box(1.65,1.5,.28), p: [side*1.55,.9,-2.03], c: "#513927" },
+        ...Array.from({length:6},(_,i): Part => ({g:box(.19,.32,.22),p:[side*(.88+i*.23),1.13,-1.83],c:["#b88b58","#547f87","#884a59"][i%3]})),
+      ]),
+    ]} castShadow receiveShadow />
+    <group position={[ARCHIVE_DESK[0]-ARCHIVE.x,0,ARCHIVE_DESK[1]-ARCHIVE.z]} {...cursorOn("point")} onClick={event=>{
+      if(event.button!==0||event.delta>6)return;
+      event.stopPropagation();
+      read();
+    }}>
+      <mesh position={[0,.55,0]}><boxGeometry args={[1.45,1.1,.65]} /><meshStandardMaterial color="#784e2f" /></mesh>
+      <mesh position={[0,1.12,0]}><boxGeometry args={[.74,.09,.42]} /><meshStandardMaterial color="#f6dfab" emissive="#684d31" emissiveIntensity={.25}/></mesh>
+      {near&&<Html center position={[0,1.65,0]} style={{pointerEvents:"none"}}><span className="town-sign">Consultar o Códice</span></Html>}
+    </group>
+  </group>;
+}
+
 function CitadelSectors() {
   return <>{CITADEL_SECTORS.map(sector => <CitadelSign key={sector.name} {...sector} />)}</>;
 }
@@ -177,7 +207,7 @@ function WorldFraming() {
   useLayoutEffect(()=>{if(camera instanceof THREE.OrthographicCamera)frameWorld(camera,size.width,size.height);},[camera,size.width,size.height]);
   return null;
 }
-function Scene({ paused, interact, openService, report, thirdPerson }: { thirdPerson: boolean; paused: boolean; interact: (id: NpcId) => void; openService: (id: TownService) => void; report: (text: string) => void }) {
+function Scene({ paused, interact, openService, report, thirdPerson }: { thirdPerson: boolean; paused: boolean; interact: (id: NpcId) => void; openService: (id: TownService | "codex") => void; report: (text: string) => void }) {
   // Pausado (janela aberta) o mundo não desenha; só tira uma "foto" nova se algo terminar de carregar ou a tela mudar de tamanho.
   const advance = useThree(s => s.advance), size = useThree(s => s.size), loading = useProgress(s => s.active);
   useEffect(() => { if (!paused || loading) return; const id = requestAnimationFrame(t => advance(t)); return () => cancelAnimationFrame(id); }, [paused, loading, size, advance]);
@@ -301,7 +331,22 @@ function Scene({ paused, interact, openService, report, thirdPerson }: { thirdPe
     </group>
     <CitadelSectors />
     <TownDistrict onGroundClick={groundClick} onService={serviceClick}/><CodeSpots night={light<0.4}/><CityDog/><GatherNodes paused={paused} approach={approachGather}/><WorldUnlocks/><ExplorationEncounters paused={paused} interact={()=>interact("traveler")} report={report} /><WorldDetails night={light<0.4} low={low} reduced={reduced} />
-    {BUILDINGS.map((b, i) => <House key={i} x={b.x} z={b.z} index={i%4} citadel={i >= 4} />)}
+    {BUILDINGS.map((b, i) => b===ARCHIVE ? <ArchiveInterior key="archive" onGroundClick={groundClick} read={()=>{
+      if(paused||useGame.getState().encounter)return;
+      const {x,z}=player.current;
+      if(z < ARCHIVE.z + 1.6 && Math.hypot(x-ARCHIVE_DESK[0],z-ARCHIVE_DESK[1]) < 1.6){
+        path.current=[];
+        pending.current=null;
+        useGame.getState().move([x,z]);
+        openService("codex");
+      }else{
+        pending.current=null;
+        monsterTarget.current=null;
+        gatherTarget.current=null;
+        useGame.getState().setTarget(null);
+        travel(...ARCHIVE_READING_SPOT);
+      }
+    }} /> : <House key={i} x={b.x} z={b.z} index={i%4} citadel={i >= 4} />)}
     {TREES.map((t, i) => <Tree key={i} {...t} />)}
     {[-1, 1].flatMap(side => [0, 1, 2, 3, 4].map(i => <Tree key={`${side}-${i}`} x={side * (17 + i % 2 * 3)} z={10 - i * 6} size={0.9 + i * 0.11} />))}
     {Array.from({ length: 22 }, (_, i) => <Stone key={i} position={[Math.sin(i * 7.3) * 25, 0.2, -30 + Math.cos(i * 4.1) * 4]} size={1.6 + i % 3} color="#697879" />)}
@@ -322,7 +367,7 @@ function Scene({ paused, interact, openService, report, thirdPerson }: { thirdPe
     <OrbitControls ref={controls} enablePan={false} enabled={!paused} enableDamping={!reduced} dampingFactor={0.08} minZoom={24} maxZoom={65} minDistance={desktopCamera ? 4.5 : 6.5} maxDistance={desktopCamera ? 23 : 13} minPolarAngle={desktopCamera ? .38 : thirdPerson ? 1.04 : .84} maxPolarAngle={desktopCamera ? 1.46 : thirdPerson ? 1.32 : .84} mouseButtons={{ LEFT: undefined, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE }} touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }} />
   </>;
 }
-export default function GameWorld(props: { paused: boolean; interact: (id: NpcId) => void; openService: (id: TownService) => void; report: (text: string) => void }) {
+export default function GameWorld(props: { paused: boolean; interact: (id: NpcId) => void; openService: (id: TownService | "codex") => void; report: (text: string) => void }) {
   const quality = useGame(s => s.settings.quality);
   const thirdPerson = useGame(s => s.hero.region === "aurora" && !s.hero.instance);
   return <WorldBoundary><Canvas key={thirdPerson ? "citadel" : "region"} frameloop={props.paused ? "never" : "always"} orthographic={!thirdPerson} dpr={quality === "high" ? [1, 1.75] : [1, 1.25]} camera={thirdPerson ? { position: [0, 4.4, 9.3], fov: 52, near: 0.15, far: 135 } : { position: [14, 18, 14], zoom: 42, left:-840, right:840, top:420, bottom:-420, near:.1, far:220 }} shadows={quality !== "low" ? "percentage" : false} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} fallback={<div className="world-fallback">Seu navegador não disponibilizou o WebGL. Os painéis continuam disponíveis.</div>}><Suspense fallback={null}><WorldFraming /><Scene {...props} thirdPerson={thirdPerson} /></Suspense></Canvas></WorldBoundary>;

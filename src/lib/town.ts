@@ -7,6 +7,19 @@ import { INSTANCES } from "./instances";
 
 export type Point = [number, number];
 export type Road = { id: string; a: Point; b: Point; width: number; kind: 'road' | 'trail' };
+export const ARCHIVE = { x: -8, z: -6, w: 2.8, d: 2.5 };
+export const ARCHIVE_DESK: Point = [ARCHIVE.x, ARCHIVE.z - 1.1];
+export const ARCHIVE_READING_SPOT: Point = [ARCHIVE.x, ARCHIVE.z];
+
+export function archiveBlocks(x: number, z: number) {
+  const dx = Math.abs(x - ARCHIVE.x);
+  const dz = z - ARCHIVE.z;
+  if (dx >= ARCHIVE.w + .4 || Math.abs(dz) >= ARCHIVE.d + .4) return false;
+  // The front wall has a doorway, and the desk leaves a clear reading aisle.
+  return dx >= 1.85 || dz <= -1.6 || (dz >= 1.6 && dx >= .85) ||
+    (dx < .8 && dz >= -1.5 && dz <= -.75);
+}
+
 export const ROADS: Road[] = [
   { id: 'eixo-cidadela', a: [0, -28], b: [0, 20], width: 4.8, kind: 'road' },
   // Avenida das Guildas: liga os postos de Elara (oeste) e Dorin (leste) passando pela entrada da praça.
@@ -14,7 +27,8 @@ export const ROADS: Road[] = [
   // Caminhos das portas até a avenida e até a praça.
   { id: 'porta-oficina', a: [-9, 8.3], b: [-9, 12], width: 1.6, kind: 'road' },
   { id: 'porta-pousada', a: [9, 7.1], b: [9, 12], width: 1.6, kind: 'road' },
-  { id: 'porta-arquivo', a: [-8, -2.7], b: [-3.8, -2.9], width: 1.6, kind: 'road' },
+  { id: 'soleira-arquivo', a: [ARCHIVE.x, ARCHIVE.z + ARCHIVE.d], b: [ARCHIVE.x, -3], width: 1.6, kind: 'road' },
+  { id: 'porta-arquivo', a: [ARCHIVE.x, -3], b: [-3.8, -2.9], width: 1.6, kind: 'road' },
   { id: 'porta-casa', a: [9, -3.7], b: [3.8, -2.9], width: 1.6, kind: 'road' },
   // Trilhas de terra até os campos de caça.
   { id: 'trilha-javalis', a: [-20, 12], b: [-24.5, 7.5], width: 1.4, kind: 'trail' },
@@ -27,7 +41,7 @@ export const ROADS: Road[] = [
 ];
 export const CITADEL_SECTORS = [
   { name: "Biblioteca ancestral", short: "Biblioteca", x: -3, z: -9.3, entrance: [0, -9] },
-  { name: "Arquivo histórico", short: "Arquivo", x: -8, z: -5, entrance: [-6, -2.8] },
+  { name: "Arquivo histórico", short: "Arquivo", x: ARCHIVE.x, z: ARCHIVE.z + 1.4, entrance: [ARCHIVE.x, -3] },
   { name: "Oficina de mecanismos", short: "Oficina", x: -8.6, z: 4.3, entrance: [-9, 9] },
   { name: "Academia de programação", short: "Academia", x: 8.5, z: -4, entrance: [6, -2.9] },
   { name: "Pátio de cálculos", short: "Pátio", x: 8.5, z: 5.8, entrance: [9, 9] },

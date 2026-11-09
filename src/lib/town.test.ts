@@ -1,5 +1,5 @@
 import {test} from 'node:test';import {strict as assert} from 'node:assert';
-import {PROPS,ROADS,WORLD_UNLOCKS,onRoad,townBlocked} from './town';
+import {ARCHIVE,ARCHIVE_READING_SPOT,PROPS,ROADS,WORLD_UNLOCKS,onRoad,townBlocked} from './town';
 import {walkable,findPath,BUILDINGS} from './navigation';
 import {MONSTERS} from './campaign';
 import {NPCS_LIVE,LESSONS} from './game';
@@ -23,3 +23,5 @@ test('monstros ficam em acampamentos fora da cidade e todos podem ser alcançado
  assert.ok(camps('boar',1,2)>=3&&camps('spider',1,2)>=3&&camps('wolf',3,4)>=3,'grupos de iniciantes');
 });
 test('cada uma das oito runas muda algo no mapa',()=>{assert.deepEqual(WORLD_UNLOCKS.map(u=>u.lesson),LESSONS.map(l=>l.id));for(const u of WORLD_UNLOCKS)assert.ok(u.lesson==='loops'||PROPS.some(p=>p.unlock===u.lesson),u.lesson);});
+
+test('Arquivo tem entrada, passagem interna e paredes sólidas',()=>{const {x,z}=ARCHIVE;assert.ok(findPath([0,5],ARCHIVE_READING_SPOT,false,false).length);assert.ok(findPath(ARCHIVE_READING_SPOT,[x,z+4],false,false).length);assert.equal(walkable(x+2,z,true,true),false);assert.equal(walkable(x,z-2,true,true),false);assert.equal(walkable(x+1,z+2,true,true),false);assert.equal(walkable(x,z-1,true,true),false);});
