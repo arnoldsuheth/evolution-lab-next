@@ -1,16 +1,16 @@
 /*
- * Janelas do jogo · tema "tecnológico" do Lion's Cave.
+ * Janelas do jogo · fantasia medieval e tecnologia arcana.
  * Só aparência (cores, bordas, cabeçalho, abas, botões, campos); tamanhos e posições de cada janela continuam
- * nos arquivos de cada painel. Vidro escuro + azul-tecnologia, com o dourado do jogo nos destaques.
+ * nos arquivos de cada painel. Azul-abismo nas superfícies, ouro nas bordas e ciano rúnico no foco.
  */
-:root{--pt-tech:#7fe3ff;--pt-tech-soft:#7fe3ff26;--pt-gold:#e6c67f;--pt-text:#e9f2f3;--pt-muted:#a3b7bd;--pt-card:#ffffff08;--pt-card-line:#ffffff14}
+:root{--pt-tech:#00d6d6;--pt-tech-soft:#00d6d626;--pt-gold:#d4af37;--pt-abyss:#0b1f3b;--pt-arcane:#6a3fc9;--pt-text:#e9f2f3;--pt-muted:#a3b7bd;--pt-card:#ffffff08;--pt-card-line:#ffffff14}
 
 .modal-shade{background:radial-gradient(circle at 50% 30%,#0b1a2266,#050c10b3);backdrop-filter:blur(3px)}
-.modal{background:linear-gradient(165deg,#112530f7,#0a161df9 70%)!important;border:1px solid #7fe3ff3a!important;border-radius:14px!important;box-shadow:0 0 0 1px #0006,0 24px 70px #000a,inset 0 1px 0 #ffffff12!important;color:var(--pt-text);scrollbar-width:thin;scrollbar-color:#7fe3ff55 transparent}
+.modal{background:linear-gradient(165deg,var(--pt-abyss),#090f22 75%)!important;border:1px solid #d4af3766!important;border-radius:14px!important;box-shadow:0 0 0 1px #0006,0 24px 70px #000a,inset 0 1px 0 #ffffff12!important;color:var(--pt-text);scrollbar-width:thin;scrollbar-color:#7fe3ff55 transparent}
 .modal::-webkit-scrollbar{width:8px}.modal::-webkit-scrollbar-thumb{background:#7fe3ff40;border-radius:8px}
 
 /* Cabeçalho compacto e fixo ao rolar, com uma linha de luz azul→dourada */
-.modal>.modal-head{position:sticky;top:0;z-index:6;min-height:50px;padding:8px 14px 8px 18px!important;gap:12px;background:linear-gradient(100deg,#163545f2,#0f2330f2 60%,#132a36f2)!important;border-bottom:1px solid #7fe3ff24!important;backdrop-filter:blur(6px)}
+.modal>.modal-head{position:sticky;top:0;z-index:6;min-height:50px;padding:8px 14px 8px 18px!important;gap:12px;background:linear-gradient(100deg,#171a3c,var(--pt-abyss) 60%,#241a3e)!important;border-bottom:1px solid #7fe3ff24!important;backdrop-filter:blur(6px)}
 .modal>.modal-head::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,var(--pt-tech) 25%,var(--pt-gold) 75%,transparent);opacity:.55;pointer-events:none}
 .modal>.modal-head .eyebrow{color:var(--pt-tech);font-size:8.5px;letter-spacing:2.2px;opacity:.85}
 .modal>.modal-head h2{font-size:19px!important;line-height:1.2;margin:1px 0 0!important;color:#f4ecd8;letter-spacing:.2px}
@@ -32,7 +32,7 @@
 /* Botões: vidro; o principal mantém o dourado do jogo, mais limpo */
 .modal button:not(.primary):not(.slot):not(.icon-button):not(.spot-label){border-radius:9px;border-color:#ffffff1c;background:linear-gradient(160deg,#1d3542,#15262f);box-shadow:none}
 .modal button:not(.primary):not(.slot):not(.icon-button):not(:disabled):hover{border-color:#7fe3ff66;background:linear-gradient(160deg,#21404f,#182c36)}
-.modal .primary{border-radius:9px;background:linear-gradient(150deg,#f1dca9,#d1ad62)!important;border:1px solid #f6e3b4!important;color:#1b2328!important;box-shadow:0 4px 14px #d1ad6233,inset 0 1px 0 #fff8!important;text-shadow:none}
+.modal .primary{border-radius:9px;background:linear-gradient(150deg,var(--pt-arcane),#39206c)!important;border:1px solid var(--pt-gold)!important;color:#fff5dc!important;box-shadow:0 4px 14px #d1ad6233,inset 0 1px 0 #fff8!important;text-shadow:none}
 .modal .primary:not(:disabled):hover{filter:brightness(1.06);transform:translateY(-1px)}
 .modal button:disabled{opacity:.5;cursor:not-allowed}
 .modal button:focus-visible,.modal input:focus-visible,.modal select:focus-visible,.modal textarea:focus-visible,.modal summary:focus-visible{outline:2px solid var(--pt-tech);outline-offset:2px}

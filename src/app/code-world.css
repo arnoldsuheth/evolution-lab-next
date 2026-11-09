@@ -150,3 +150,17 @@ svg.game-artwork.fx-mythic{filter:drop-shadow(0 0 3px #ffd36b) drop-shadow(0 0 9
 .concept-quiz>div{display:flex;flex-wrap:wrap;gap:7px}.concept-quiz button{min-width:54px;padding:7px 14px!important;border-radius:9px!important}
 .concept-quiz button.right{border-color:#8be0a0!important;background:#1d4a2c!important}.concept-quiz button.wrong{border-color:#ff9a8a!important;background:#4a2420!important}
 .concept-answer{margin:8px 0 0!important;font-size:12.5px}.concept-answer.right{color:#bff2cc}.concept-answer.wrong{color:#ffd9b0}
+
+
+.world-container .npc-label:not(.near) { visibility: hidden; }
+.world-container .npc-label.near strong,
+.world-container :is(.town-sign, .gate-label, .monster-vitals, .monster-vitals strong, .monster-vitals strong small) {
+  color: #fff !important;
+  text-shadow: 0 1px 3px #000, 0 0 4px #000;
+}
+.world-container :is(.npc-label, .town-sign, .gate-label, .monster-vitals) {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  filter: none;
+}

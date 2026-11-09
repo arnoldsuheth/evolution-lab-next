@@ -138,12 +138,12 @@
 }
 .combat-console .quick-item select option { color: white; background: #142c41; }
 
-.game-shell:has(.combat-console) .combat-tools {
+.game-shell:has(.combat-console:not(.without-target)) .combat-tools {
   right: calc(var(--combat-right) + var(--combat-width) + 12px);
   bottom: var(--combat-bottom);
   flex-direction: row;
 }
-.game-shell:has(.combat-console) .action-log {
+.game-shell:has(.combat-console:not(.without-target)) .action-log {
   right: calc(var(--combat-right) + var(--combat-width) + 14px);
   bottom: calc(var(--combat-bottom) + 53px);
 }

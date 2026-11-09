@@ -13,18 +13,19 @@ import "./panel-tech.css";
 import "./mobile-layout.css";
 import "./shop-compact.css";
 import "./practice.css";
+import "./desktop-hud.css";
 import {CloudRuntime,CloudGate} from "@/components/CloudAccount";
 
-const base = process.env.GITHUB_PAGES === "true" ? "/evolution-lab-next" : "";
+const base = "";
 
-export const viewport:Viewport={width:"device-width",initialScale:1,viewportFit:"cover",themeColor:"#263650"};
+export const viewport:Viewport={width:"device-width",initialScale:1,viewportFit:"cover",themeColor:"#0B1F3B"};
 export const metadata: Metadata = {
-  title: "Lion’s Cave RPG Programador",
-  applicationName: "Lion’s Cave RPG Programador",
-  icons: { icon: [{url:`${base}/lion-emblem.svg?v=20261106`,type:"image/svg+xml"},{url:`${base}/lion-icon-192.png?v=20261106`,sizes:"192x192",type:"image/png"}], apple: [{url:`${base}/apple-touch-icon.png?v=20261106`,sizes:"180x180",type:"image/png"}] },
+  title: "Lovelace Kingdom",
+  applicationName: "Lovelace Kingdom",
+  icons: { icon: [{url:`${base}/lovelace-icon-192.png`,sizes:"192x192",type:"image/png"}] },
   manifest: `${base}/manifest.webmanifest`,
-  appleWebApp: { capable: true, title: "Lion’s Cave", statusBarStyle: "black-translucent" },
-  description: "O Código Perdido — aprenda programação explorando Pedra da Aurora.",
+  appleWebApp: { capable: true, title: "Lovelace Kingdom", statusBarStyle: "black-translucent" },
+  description: "Explore a Pedra da Aurora, domine as runas da programação e descubra O Legado dos Precursores.",
 };
 
 export default function RootLayout({

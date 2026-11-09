@@ -60,7 +60,7 @@
     gap: 8px;
   }
   .modal :is(.journal-grid, .academy-grid, .ai-quest-grid, .character-sheet, .creator-grid) > * { min-width: 0; }
-  .modal :is(.lesson-nav, .academy-nav, .ai-quest-grid nav) {
+  .modal :is(.lesson-nav, .curriculum-nav, .ai-quest-grid nav) {
     display: flex;
     flex-direction: row;
     max-width: 100%;
@@ -68,7 +68,7 @@
     padding: 6px;
     gap: 5px;
   }
-  .modal :is(.lesson-nav, .academy-nav, .ai-quest-grid nav) > button {
+  .modal :is(.lesson-nav, .curriculum-nav, .ai-quest-grid nav) > button {
     flex: 0 0 auto;
     width: min(145px, 45vw);
     min-height: 44px;
@@ -254,9 +254,86 @@
     --combat-gap: 5px;
     --combat-bottom: calc(var(--screen-bottom) + 24px);
   }
-  .game-shell:has(.combat-console) .game-menu {
+  .game-shell:has(.combat-console:not(.without-target)) .game-menu {
     right: 50%;
     transform: translateX(50%);
   }
-  .game-shell:has(.combat-console) .loot-feed { top: 60px; max-height: 26dvh; }
+  .game-shell:has(.combat-console:not(.without-target)) .loot-feed { top: 60px; max-height: 26dvh; }
 }
+
+.lesson-picker { display: none; }
+
+@media (max-width: 760px), (orientation: landscape) and (max-height: 540px), (pointer: coarse) and (max-width: 1000px) {
+  .modal .lesson-picker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    margin: 0;
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+  .modal .lesson-picker select { flex: 1; min-height: 44px; padding: 5px 8px; }
+  .modal .journal-grid > .lesson-nav { display: none; }
+  .modal .lesson-content h3 { margin-block: 4px 8px; font-size: clamp(20px, 4vw, 26px); }
+  .modal .lesson-content .delivery-banner { margin: 0 0 8px; padding: 4px 8px; gap: 6px; }
+  .modal .delivery-banner > b { font-size: 18px; }
+  .modal .delivery-banner > p { flex: 1 1 130px; margin: 0; font-size: 12px; line-height: 1.35; }
+  .modal .delivery-banner > button { min-height: 44px; padding: 4px 8px; font-size: 12px; }
+
+  .equipment-icons .item-browser { grid-template-rows: minmax(0, 1fr); }
+  .equipment-icons .item-icon-grid { grid-area: 1 / 1; }
+  .equipment-icons .item-detail-panel { grid-area: 1 / 2; }
+  .equipment-icons .item-detail-close { min-width: 44px; min-height: 44px; }
+  .equipment-icons .item-detail-art { width: 48px; height: 48px; margin: 0; }
+  .equipment-icons .item-detail-art .game-artwork { max-width: 100%; max-height: 100%; }
+  .equipment-icons .item-detail-panel,
+  .equipment-icons .with-loadout .item-detail-panel { padding-top: 8px; }
+  .equipment-icons .item-actions:has(button) { position: static; }
+
+  .creator-modal .creator-editor { touch-action: pan-y; }
+  .creator-modal .creator-options .tabs { margin: 0 0 8px; }
+  .creator-modal .creator-options .tabs button { flex: 1 1 auto; padding: 4px 7px; }
+  .creator-modal .appearance-options fieldset { margin: 0 0 12px; }
+  .creator-modal .appearance-options legend { margin-bottom: 5px; }
+  .creator-modal .appearance-options .option-row { gap: 5px; }
+  .creator-modal .appearance-choice { padding: 4px 7px; font-size: 12px; }
+}
+
+@media (max-width: 600px) {
+  .equipment-icons .item-browser.has-selection > .item-detail-panel {
+    grid-area: 1 / 1;
+    max-height: none;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 540px) {
+  .modal .journal-grid { gap: 0; }
+  .equipment-icons .item-icon { min-height: 88px !important; }
+  .equipment-icons .item-icon-art { width: 30px; height: 30px; }
+  .creator-modal .creator-grid { grid-template-columns: minmax(0, 32%) minmax(0, 1fr); }
+}
+
+@media (orientation: landscape) and (max-height: 540px) and (min-width: 601px) {
+  .equipment-icons .item-browser.has-selection,
+  .equipment-icons .with-loadout .item-browser.has-selection {
+    grid-template-columns: minmax(0, 1fr) clamp(180px, 34%, 230px);
+  }
+}
+
+.precursor-panel { display: grid; gap: 12px; }
+.precursor-panel p { margin-block: 0 8px; }
+.precursor-challenge { min-width: 0; }
+.precursor-options { display: grid; gap: 8px; }
+.precursor-options button, .precursor-challenge > button { min-height: 44px; white-space: normal; }
+.precursor-challenge .code-editor { width: 100%; min-height: 7rem; }
+
+.lovelace-brand-banner {
+  width: min(100%, 580px);
+  margin: 0 auto 12px;
+  aspect-ratio: 1536 / 597;
+  overflow: hidden;
+  border: 1px solid #b9974b;
+  border-radius: 14px;
+}
+.lovelace-brand-banner img { display: block; width: 100%; height: auto; }
