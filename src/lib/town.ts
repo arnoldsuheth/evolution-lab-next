@@ -33,6 +33,12 @@ export const CITADEL_SECTORS = [
   { name: "Pátio de cálculos", short: "Pátio", x: 8.5, z: 5.8, entrance: [9, 9] },
 ] satisfies { name: string; short: string; x: number; z: number; entrance: Point }[];
 
+export type TownService = 'bank' | 'wagon';
+export const TOWN_SERVICES = [
+  { id: 'bank', name: 'Banco da Aurora', short: 'Banco', x: -7, z: 9.5, entrance: [-7, 12] },
+  { id: 'wagon', name: 'Carroça de Tobias', short: 'Carroça', x: 5.5, z: 10.5, entrance: [5, 13] },
+] satisfies { id: TownService; name: string; short: string; x: number; z: number; entrance: Point }[];
+
 export function distanceToRoad(x: number, z: number, road: Road) {
   const [ax, az] = road.a, [bx, bz] = road.b, dx = bx - ax, dz = bz - az, len = dx * dx + dz * dz;
   const t = len ? Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / len)) : 0;
@@ -45,8 +51,8 @@ export function onRoad(x: number, z: number, margin = 0) {
   return ROADS.some(r => distanceToRoad(x, z, r) < r.width / 2 + margin);
 }
 
-export type PropKind = 'lamp' | 'well' | 'stall' | 'bench' | 'crate' | 'barrel' | 'sign' | 'gate' | 'board' | 'beacon' | 'fence' | 'garden' | 'cart' | 'statue' | 'floodgate';
-export type Prop = { id: string; kind: PropKind; x: number; z: number; turn?: number; radius: number; label?: string; unlock?: string };
+export type PropKind = 'lamp' | 'well' | 'stall' | 'bench' | 'crate' | 'barrel' | 'sign' | 'gate' | 'board' | 'beacon' | 'fence' | 'garden' | 'cart' | 'bank' | 'statue' | 'floodgate';
+export type Prop = { id: string; kind: PropKind; x: number; z: number; turn?: number; radius: number; label?: string; unlock?: string; service?: TownService };
 const lamp = (id: string, x: number, z: number, unlock = 'variables'): Prop => ({ id, kind: 'lamp', x, z, radius: .3, unlock });
 export const PROPS: Prop[] = [
   // Lanternas da praça: acendem com a primeira runa (variáveis).
@@ -59,7 +65,7 @@ export const PROPS: Prop[] = [
   // Armazém de Borin: caixas se enchem com a runa das operações.
   { id: 'crates', kind: 'crate', x: -9.4, z: .3, radius: .9, unlock: 'arithmetic' },
   { id: 'barrels', kind: 'barrel', x: -11.6, z: 9.2, radius: .7 },
-  { id: 'cart', kind: 'cart', x: 6.4, z: 15.2, radius: 1.1, turn: .4 },
+  ...TOWN_SERVICES.map(({ id, x, z, name }): Prop => ({ id, x, z, label: name, service: id, kind: id === 'bank' ? 'bank' : 'cart', radius: 1.25, turn: id === 'wagon' ? .4 : 0 })),
   // Comporta das minas: abre com a runa das condições (as minas já abrem por ela).
   { id: 'floodgate', kind: 'floodgate', x: 14.2, z: -16, radius: 0, unlock: 'conditions' },
   // Poço dos ecos: a água volta a correr com a runa das funções.

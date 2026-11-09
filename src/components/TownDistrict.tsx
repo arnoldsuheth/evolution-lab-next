@@ -4,7 +4,9 @@ import {useFrame,type ThreeEvent} from '@react-three/fiber';
 import {Html} from '@react-three/drei';
 import * as THREE from 'three';
 import {useGame} from '@/lib/store';
-import {CITADEL_SECTORS,FENCES,PROPS,ROADS,type Prop} from '@/lib/town';
+import {CITADEL_SECTORS,FENCES,PROPS,ROADS,type Prop,type TownService} from '@/lib/town';
+
+import {cursorOn} from '@/lib/cursor';
 
 const ROAD='#a5adba',TRAIL='#c4a36e',WOOD='#9a6a40',WOOD_DARK='#6e4a2c',STONE='#b9b4a2',ROOF=['#d9644f','#3f86b8','#e1a73b'];
 const std=(color:string,extra:Partial<THREE.MeshStandardMaterialParameters>={})=><meshStandardMaterial color={color} roughness={.85} {...extra}/>;
@@ -71,6 +73,12 @@ function PropModel({prop,unlocked}:{prop:Prop;unlocked:boolean}){
   case 'floodgate':return <Floodgate open={unlocked}/>;
   case 'crate':return <group>{(unlocked?[[0,0,0],[.7,0,.2],[.3,.6,.1],[-.6,0,-.3],[-.2,.6,-.2],[.1,1.2,0]]:[[0,0,0]]).map(([x,y,z],i)=><mesh key={i} position={[x,.3+y,z]} rotation={[0,i*.4,0]} castShadow><boxGeometry args={[.6,.6,.6]}/>{std(i%2?'#b07d48':'#c08d55')}</mesh>)}</group>;
   case 'barrel':return <group>{[[0,0],[.6,.3],[.2,-.5]].map(([x,z],i)=><mesh key={i} position={[x,.4,z]} castShadow><cylinderGeometry args={[.3,.27,.8,10]}/>{std('#8a5a33')}</mesh>)}</group>;
+  case 'bank':return <group>
+   <mesh position={[0,.65,0]}><boxGeometry args={[2,1.3,1.25]}/>{std(STONE)}</mesh>
+   <mesh position={[0,1.38,0]}><boxGeometry args={[2.15,.16,1.4]}/>{std(WOOD_DARK)}</mesh>
+   <mesh position={[0,.68,.64]}><boxGeometry args={[.86,.78,.12]}/>{std('#39465d',{metalness:.5})}</mesh>
+   <mesh position={[0,.68,.74]} rotation={[Math.PI/2,0,0]}><cylinderGeometry args={[.19,.19,.1,8]} />{std('#d6b06a',{metalness:.55})}</mesh>
+  </group>;
   case 'cart':return <group><mesh position={[0,.75,0]} castShadow><boxGeometry args={[1.8,.5,1.1]}/>{std(WOOD)}</mesh>{[[-.6,.6],[.6,.6],[-.6,-.6],[.6,-.6]].map(([x,z],i)=><mesh key={i} position={[x,.35,z]} rotation={[Math.PI/2,0,0]}><cylinderGeometry args={[.35,.35,.12,12]}/>{std(WOOD_DARK)}</mesh>)}<mesh position={[0,1.15,0]}><sphereGeometry args={[.35,10,8]}/>{std('#e7c25a')}</mesh></group>;
   case 'bench':return <group><mesh position={[0,.45,0]} castShadow><boxGeometry args={[1.4,.12,.45]}/>{std(WOOD)}</mesh>{[-.55,.55].map(x=><mesh key={x} position={[x,.22,0]}><boxGeometry args={[.1,.45,.4]}/>{std(WOOD_DARK)}</mesh>)}</group>;
   case 'sign':return <group><mesh position={[0,.9,0]}><cylinderGeometry args={[.06,.07,1.8,6]}/>{std(WOOD_DARK)}</mesh><mesh position={[0,1.6,0]}><boxGeometry args={[1.3,.36,.08]}/>{std(WOOD)}</mesh><NearbySign prop={prop}/></group>;
@@ -90,10 +98,18 @@ function Garden({x,z,w,d}:{x:number;z:number;w:number;d:number}){
   {[-1,0,1].map(i=><group key={i}><mesh position={[i*w*.6,.08,0]}><boxGeometry args={[w*.5,.14,d*1.6]}/>{std('#7a5236',{roughness:1})}</mesh>{[-.5,0,.5].map(j=><mesh key={j} position={[i*w*.6,.28,j*d]}><sphereGeometry args={[.16,8,6]}/>{std(['#7cc45a','#e7774f','#f3d35a'][i+1])}</mesh>)}</group>)}</group>;
 }
 
-export default function TownDistrict({onGroundClick}:{onGroundClick:(e:ThreeEvent<MouseEvent>)=>void}){
+export default function TownDistrict({onGroundClick,onService}:{onGroundClick:(e:ThreeEvent<MouseEvent>)=>void;onService:(id:TownService)=>void}){
  const completed=useGame(s=>s.education.completed);
  return <group><Roads onClick={onGroundClick}/><LampPosts lit={completed.includes('variables')}/>
-  {PROPS.map(p=><group key={p.id} position={[p.x,0,p.z]} rotation={[0,p.turn??(p.kind==='floodgate'?0:0),0]}><PropModel prop={p} unlocked={!p.unlock||completed.includes(p.unlock)}/></group>)}
+  {PROPS.map(p => {
+    const service = p.service;
+    return <group key={p.id} position={[p.x,0,p.z]} rotation={[0,p.turn??0,0]}
+      {...(service ? cursorOn('point') : {})}
+      onClick={service ? e => { if (e.button === 0 && e.delta <= 6) { e.stopPropagation(); onService(service); } } : undefined}>
+      <PropModel prop={p} unlocked={!p.unlock||completed.includes(p.unlock)}/>
+      {service && <NearbySign prop={p}/>}
+    </group>;
+  })}
   {FENCES.map(f=><Garden key={f.id} {...f}/>)}<CitadelSigns/></group>;
 }
 

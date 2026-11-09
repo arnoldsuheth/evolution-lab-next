@@ -3,7 +3,7 @@
 import { INSTANCES } from "@/lib/instances";
 import { MONSTERS } from "@/lib/campaign";
 import { BUILDINGS } from "@/lib/navigation";
-import { CITADEL_SECTORS, ROADS, type Point } from "@/lib/town";
+import { CITADEL_SECTORS, ROADS, TOWN_SERVICES, type Point } from "@/lib/town";
 
 export function CitadelMap({ position, local = false, route = [], selected }: {
   position?: Point;
@@ -36,6 +36,13 @@ export function CitadelMap({ position, local = false, route = [], selected }: {
           {!local && <text x={x + (x < 0 ? -1.5 : 1.5)} y={z + .45} textAnchor={x < 0 ? "end" : "start"}>{short}</text>}
         </g>;
       })}
+      {TOWN_SERVICES.map(({ id, name, short, x, z }) => (
+        <g key={id} transform={`translate(${x},${z})`}>
+          <title>{name}</title>
+          <rect x="-.65" y="-.65" width="1.3" height="1.3" rx=".2" fill={selected === name ? "#72e5eb" : "#f0d199"} />
+          {!local && <text x={x < 0 ? -1.3 : 1.3} y=".45" textAnchor={x < 0 ? "end" : "start"}>{short}</text>}
+        </g>
+      ))}
       {!local && MONSTERS.filter(monster => monster.region === "aurora" && !monster.instance).map(monster => (
         <circle key={monster.id} cx={monster.x} cy={monster.z} r={monster.boss ? 1 : .55} fill={monster.boss ? "#efbd65" : "#df756d"}>
           <title>{monster.name} · nível {monster.level}</title>

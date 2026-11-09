@@ -21,7 +21,7 @@ import CityDog from "./CityDog";
 import PetFollower from "./PetFollower";
 import { adventureOf, titleOf, mountSpeed, MOUNT_LEVEL, type PetId } from "@/lib/adventure";
 import { doorBetween } from "@/lib/dungeon";
-import { CITADEL_SECTORS } from "@/lib/town";
+import { CITADEL_SECTORS, TOWN_SERVICES, type TownService } from "@/lib/town";
 import { frameWorld } from "@/lib/worldCamera";
 import WorldDetails, { HouseDetails } from "./WorldDetails";
 import {MONSTERS,REGIONS,AGGRO_RADIUS,SAFE_TOWN_RADIUS,isAggressive} from "@/lib/campaign";
@@ -177,7 +177,7 @@ function WorldFraming() {
   useLayoutEffect(()=>{if(camera instanceof THREE.OrthographicCamera)frameWorld(camera,size.width,size.height);},[camera,size.width,size.height]);
   return null;
 }
-function Scene({ paused, interact, report, thirdPerson }: { thirdPerson: boolean; paused: boolean; interact: (id: NpcId) => void; report: (text: string) => void }) {
+function Scene({ paused, interact, openService, report, thirdPerson }: { thirdPerson: boolean; paused: boolean; interact: (id: NpcId) => void; openService: (id: TownService) => void; report: (text: string) => void }) {
   // Pausado (janela aberta) o mundo não desenha; só tira uma "foto" nova se algo terminar de carregar ou a tela mudar de tamanho.
   const advance = useThree(s => s.advance), size = useThree(s => s.size), loading = useProgress(s => s.active);
   useEffect(() => { if (!paused || loading) return; const id = requestAnimationFrame(t => advance(t)); return () => cancelAnimationFrame(id); }, [paused, loading, size, advance]);
@@ -186,7 +186,7 @@ function Scene({ paused, interact, report, thirdPerson }: { thirdPerson: boolean
   const low = useGame(s => s.settings.quality === "low"); const quality = useGame(s => s.settings.quality);
   const worldRegion=hero.instance?"instance":hero.region;const forest = !!hero.instance||hero.region!=="aurora"||education.includes("variables"); const mines = !!hero.instance||hero.region!=="aurora"||education.includes("conditions")&&hero.defeatedBosses.includes("boss-forest");
   const lastRegion=useRef(hero.region); const player = useRef(new THREE.Vector3(hero.position[0], 0, hero.position[1])); // Position belongs to the simulation; save checkpoints do not recreate it.
-  const monsterTarget=useRef<string|null>(null); const aggroCheck=useRef(0); const gatherTarget=useRef<{id:string;x:number;z:number}|null>(null); const path = useRef<[number, number][]>([]); const pending = useRef<NpcId | null>(null); const keys = useRef(new Set<string>()); const checkpoint = useRef(0); const wasWalking = useRef(false); const [walking, setWalking] = useState(false);
+  const monsterTarget=useRef<string|null>(null); const aggroCheck=useRef(0); const gatherTarget=useRef<{id:string;x:number;z:number}|null>(null); const path = useRef<[number, number][]>([]); const pending = useRef<{ x: number; z: number; open: () => void } | null>(null); const keys = useRef(new Set<string>()); const checkpoint = useRef(0); const wasWalking = useRef(false); const [walking, setWalking] = useState(false);
   const desktopCamera = thirdPerson && size.width >= 1000;
   const camera = useThree(s => s.camera);const invalidate=useThree(s=>s.invalidate); const canvas=useThree(s=>s.gl.domElement);
   useEffect(()=>{bindCursor(canvas);return()=>bindCursor(null);},[canvas]); useEffect(()=>{setCombatCursor(!!encounter);},[encounter]); const temp = useRef(new THREE.Vector3()); const offset = useRef(new THREE.Vector3());
@@ -225,12 +225,29 @@ function Scene({ paused, interact, report, thirdPerson }: { thirdPerson: boolean
     if(Math.hypot(player.current.x-x,player.current.z-z)<3){useGame.getState().move([player.current.x,player.current.z]);useGame.getState().gather(id);gatherTarget.current=null;return;}
     gatherTarget.current={id,x,z};travelNear(x,z);
   }
+  function approachInteraction(x: number, z: number, open: () => void) {
+    const state = useGame.getState();
+    if (paused || hero.dead || state.encounter) return;
+    state.setTarget(null);
+    monsterTarget.current = null;
+    gatherTarget.current = null;
+    pending.current = null;
+    path.current = [];
+    if (Math.hypot(player.current.x - x, player.current.z - z) < 3.5) {
+      useGame.getState().move([player.current.x, player.current.z]);
+      open();
+      return;
+    }
+    pending.current = { x, z, open };
+    travelNear(x, z);
+  }
   function npcClick(id: NpcId) {
-    monsterTarget.current=null;gatherTarget.current=null;
-    if (paused) return;
-    const npc = NPCS_LIVE.find(n => n.id === id)!;
-    if (Math.hypot(player.current.x - npc.x, player.current.z - npc.z) < 3.5) { useGame.getState().move([player.current.x, player.current.z]); interact(id); return; }
-    pending.current = id; travelNear(npc.x,npc.z);
+    const npc = NPCS_LIVE.find(n => n.id === id);
+    if (npc) approachInteraction(npc.x, npc.z, () => interact(id));
+  }
+  function serviceClick(id: TownService) {
+    const service = TOWN_SERVICES.find(entry => entry.id === id);
+    if (service) approachInteraction(service.x, service.z, () => openService(id));
   }
   useFrame((_, delta) => {
     const dt = Math.min(delta, 0.05); let moving = false;
@@ -241,11 +258,17 @@ function Scene({ paused, interact, report, thirdPerson }: { thirdPerson: boolean
       // Masmorra: a porta de código fechada segura o herói na sala atual.
       if (hero.instance && moving) { const sealed = doorBetween(hero.instance, adventure.doors, fromZ, player.current.z); if (sealed) { player.current.z = sealed.z + .6; path.current = []; monsterTarget.current = null; if (useGame.getState().queued) useGame.setState({ queued: null }); if (Date.now() - doorNote.current > 4000) { doorNote.current = Date.now(); report(`🔒 ${sealed.title}: clique na porta e resolva o código.`); } } }
       if (heroRoot.current && moving) heroRoot.current.rotation.y = Math.atan2(temp.current.x, temp.current.z);
-      if (pending.current) { const npc = NPCS_LIVE.find(n => n.id === pending.current)!; if (Math.hypot(player.current.x - npc.x, player.current.z - npc.z) < 3.2) { path.current = []; const id = pending.current; pending.current = null; useGame.getState().move([player.current.x, player.current.z]); interact(id); } }
+      const interaction = pending.current;
+      if (interaction && Math.hypot(player.current.x - interaction.x, player.current.z - interaction.z) < 3.2) {
+        path.current = [];
+        pending.current = null;
+        useGame.getState().move([player.current.x, player.current.z]);
+        interaction.open();
+      }
       {const st=useGame.getState();if(st.queued&&st.target){const m=MONSTERS.find(m=>m.id===st.target);const range=ATTACK_RANGE[st.hero.classId]??4;if(!m||(st.slain[m.id]??0)>Date.now()){useGame.setState({queued:null,target:null});monsterTarget.current=null;}else if(Math.hypot(player.current.x-m.x,player.current.z-m.z)<=range){path.current=[];monsterTarget.current=null;if(heroRoot.current)heroRoot.current.rotation.y=Math.atan2(m.x-player.current.x,m.z-player.current.z);const action=st.queued;st.move([player.current.x,player.current.z]);st.startEncounter(m.boss,m.level,m.id);useGame.setState({queued:null});if(useGame.getState().encounter)useGame.getState().act(action);}else if(monsterTarget.current!==m.id||!path.current.length){monsterTarget.current=m.id;travelNear(m.x,m.z);}}}
       if(gatherTarget.current){const g=gatherTarget.current;if(Math.hypot(player.current.x-g.x,player.current.z-g.z)<3){path.current=[];gatherTarget.current=null;useGame.getState().move([player.current.x,player.current.z]);useGame.getState().gather(g.id);}}
       if (k.has("e")) { k.delete("e"); const npc = NPCS_LIVE.find(n => Math.hypot(player.current.x - n.x, player.current.z - n.z) < 3.3); if (npc) { useGame.getState().move([player.current.x, player.current.z]); interact(npc.id); } }
-    } else { keys.current.clear(); path.current = []; }
+    } else { keys.current.clear(); path.current = []; pending.current = null; }
     if(!paused&&!hero.dead&&!useGame.getState().encounter){if(keys.current.delete("jump")&&jump.current.height===0)jump.current.velocity=6.2;jump.current=advanceJump(jump.current.height,jump.current.velocity,dt);}else{keys.current.delete("jump");touch.current={x:0,z:0};}
     if (moving !== wasWalking.current) { setWalking(moving); wasWalking.current = moving; }
     if(heroRoot.current){heroRoot.current.position.copy(player.current);heroRoot.current.position.y=jump.current.height;}if(shadowRoot.current){shadowRoot.current.position.set(player.current.x,.045,player.current.z);shadowRoot.current.scale.setScalar(1-jump.current.height*.13);}
@@ -277,7 +300,7 @@ function Scene({ paused, interact, report, thirdPerson }: { thirdPerson: boolean
       <mesh rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[4.05, 4.1, 48]} /><meshBasicMaterial color="#5aabb1" side={THREE.DoubleSide} /></mesh>
     </group>
     <CitadelSectors />
-    <TownDistrict onGroundClick={groundClick}/><CodeSpots night={light<0.4}/><CityDog/><GatherNodes paused={paused} approach={approachGather}/><WorldUnlocks/><ExplorationEncounters paused={paused} interact={()=>interact("traveler")} report={report} /><WorldDetails night={light<0.4} low={low} reduced={reduced} />
+    <TownDistrict onGroundClick={groundClick} onService={serviceClick}/><CodeSpots night={light<0.4}/><CityDog/><GatherNodes paused={paused} approach={approachGather}/><WorldUnlocks/><ExplorationEncounters paused={paused} interact={()=>interact("traveler")} report={report} /><WorldDetails night={light<0.4} low={low} reduced={reduced} />
     {BUILDINGS.map((b, i) => <House key={i} x={b.x} z={b.z} index={i%4} citadel={i >= 4} />)}
     {TREES.map((t, i) => <Tree key={i} {...t} />)}
     {[-1, 1].flatMap(side => [0, 1, 2, 3, 4].map(i => <Tree key={`${side}-${i}`} x={side * (17 + i % 2 * 3)} z={10 - i * 6} size={0.9 + i * 0.11} />))}
@@ -299,7 +322,7 @@ function Scene({ paused, interact, report, thirdPerson }: { thirdPerson: boolean
     <OrbitControls ref={controls} enablePan={false} enabled={!paused} enableDamping={!reduced} dampingFactor={0.08} minZoom={24} maxZoom={65} minDistance={desktopCamera ? 4.5 : 6.5} maxDistance={desktopCamera ? 23 : 13} minPolarAngle={desktopCamera ? .38 : thirdPerson ? 1.04 : .84} maxPolarAngle={desktopCamera ? 1.46 : thirdPerson ? 1.32 : .84} mouseButtons={{ LEFT: undefined, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE }} touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }} />
   </>;
 }
-export default function GameWorld(props: { paused: boolean; interact: (id: NpcId) => void; report: (text: string) => void }) {
+export default function GameWorld(props: { paused: boolean; interact: (id: NpcId) => void; openService: (id: TownService) => void; report: (text: string) => void }) {
   const quality = useGame(s => s.settings.quality);
   const thirdPerson = useGame(s => s.hero.region === "aurora" && !s.hero.instance);
   return <WorldBoundary><Canvas key={thirdPerson ? "citadel" : "region"} frameloop={props.paused ? "never" : "always"} orthographic={!thirdPerson} dpr={quality === "high" ? [1, 1.75] : [1, 1.25]} camera={thirdPerson ? { position: [0, 4.4, 9.3], fov: 52, near: 0.15, far: 135 } : { position: [14, 18, 14], zoom: 42, left:-840, right:840, top:420, bottom:-420, near:.1, far:220 }} shadows={quality !== "low" ? "percentage" : false} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} fallback={<div className="world-fallback">Seu navegador não disponibilizou o WebGL. Os painéis continuam disponíveis.</div>}><Suspense fallback={null}><WorldFraming /><Scene {...props} thirdPerson={thirdPerson} /></Suspense></Canvas></WorldBoundary>;
