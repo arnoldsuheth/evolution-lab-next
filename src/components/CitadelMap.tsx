@@ -1,5 +1,6 @@
 "use client";
 
+import { INSTANCES } from "@/lib/instances";
 import { MONSTERS } from "@/lib/campaign";
 import { BUILDINGS } from "@/lib/navigation";
 import { CITADEL_SECTORS, ROADS, type Point } from "@/lib/town";
@@ -10,11 +11,12 @@ export function CitadelMap({ position, local = false, route = [], selected }: {
   route?: Point[];
   selected?: string;
 }) {
-  const view = local && position ? `${position[0] - 13} ${position[1] - 13} 26 26` : "-37 -34 74 57";
+  const cave = INSTANCES.cavern;
+  const view = local && position ? `${position[0] - 13} ${position[1] - 13} 26 26` : "-37 -43 74 66";
   return (
     <svg viewBox={view} role="img" aria-label={local ? "Minimapa da Cidadela" : "Mapa da Cidadela"}>
       <rect x="-110" y="-110" width="220" height="220" fill="#16283b" />
-      <path d="M-44 -36H17L12 -21L-44 -16ZM18 -26H40V-8H19Z" fill="#253b46" />
+      <path d="M-44 -44H17L12 -21L-44 -16ZM18 -26H40V-8H19Z" fill="#253b46" />
       <g strokeLinecap="round">
         <path d="M-1.5 -16H23.5" stroke="#85795d" strokeWidth="3" />
         {ROADS.map(({ id, a, b, width, kind }) => (
@@ -39,6 +41,10 @@ export function CitadelMap({ position, local = false, route = [], selected }: {
           <title>{monster.name} · nível {monster.level}</title>
         </circle>
       ))}
+      <g transform={`translate(${cave.x},${cave.z})`}>
+        <path d="M-1.2 .65 0 -1.2 1.2 .65Z" fill={selected === cave.name ? "#72e5eb" : "#ebca87"} />
+        {!local && <text x="2" y=".5">Caverna · {cave.level}+</text>}
+      </g>
       {!local && <g>
         <text x="0" y="-29.5" textAnchor="middle">Floresta</text>
         <text x="23.5" y="-18" textAnchor="middle">Minas</text>

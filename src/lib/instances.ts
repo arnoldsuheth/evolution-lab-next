@@ -1,6 +1,6 @@
 import type {RegionId} from './campaign';
 export const INSTANCES={
- cavern:{name:'Caverna dos Fragmentos',region:'aurora' as RegionId,x:-23,z:-17,level:8,lesson:'variables',material:'instance-crystal',description:'Cristais antigos atraem criaturas mais resistentes. Recompensa de XP dobrada e cristal exclusivo.'},
+ cavern:{name:'Caverna dos Fragmentos',region:'aurora' as RegionId,x:-23,z:-37,level:8,lesson:'variables',material:'instance-crystal',description:'Cristais antigos atraem criaturas mais resistentes. Recompensa de XP dobrada e cristal exclusivo.'},
  monastery:{name:'Monastério dos Ecos',region:'ruins' as RegionId,x:19,z:-15,level:25,lesson:'functions',material:'instance-seal',description:'Uma ordem perdida protege os selos da memória. Recompensa de XP dobrada e selo exclusivo.'},
 } as const;
 export type InstanceId=keyof typeof INSTANCES;

@@ -3,6 +3,8 @@
  * e objetos de cidade com colisão. Tudo é dado puro (testado) e o mundo 3D só desenha.
  * Cada runa de programação acende ou destrava algo real neste mapa (WORLD_UNLOCKS).
  */
+import { INSTANCES } from "./instances";
+
 export type Point = [number, number];
 export type Road = { id: string; a: Point; b: Point; width: number; kind: 'road' | 'trail' };
 export const ROADS: Road[] = [
@@ -18,6 +20,8 @@ export const ROADS: Road[] = [
   { id: 'trilha-javalis', a: [-20, 12], b: [-24.5, 7.5], width: 1.4, kind: 'trail' },
   { id: 'trilha-lobos-1', a: [-4.7, -1.8], b: [-15, -3.5], width: 1.4, kind: 'trail' },
   { id: 'trilha-lobos-2', a: [-15, -3.5], b: [-23.5, -5], width: 1.4, kind: 'trail' },
+  { id: 'trilha-caverna-norte', a: [0, -28], b: [-14, -31], width: 1.8, kind: 'trail' },
+  { id: 'trilha-caverna-final', a: [-14, -31], b: [INSTANCES.cavern.x, INSTANCES.cavern.z + 2], width: 1.8, kind: 'trail' },
   { id: 'trilha-pomar', a: [12, 12], b: [12.5, 17.5], width: 1.4, kind: 'trail' },
   { id: 'trilha-farol', a: [1.9, -10.9], b: [12.2, -11], width: 1.4, kind: 'trail' },
 ];

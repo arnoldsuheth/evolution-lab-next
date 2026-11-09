@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useGame } from "@/lib/store";
 import { MONSTERS, REGIONS, regionRequirement, type RegionId } from "@/lib/campaign";
 import { findPath } from "@/lib/navigation";
+import { INSTANCES } from "@/lib/instances";
 import { CITADEL_SECTORS } from "@/lib/town";
 import { CitadelMap } from "./CitadelMap";
 
@@ -13,11 +14,13 @@ export default function WorldMap() {
   const [region, setRegion] = useState<RegionId | "atlas">("atlas");
   const [selection, setSelection] = useState("");
   const reason = region === "atlas" ? undefined : regionRequirement(hero, education, region);
-  const sector = CITADEL_SECTORS.find(entry => entry.name === selection);
+  const cave = INSTANCES.cavern;
+  const caveSelected = selection === cave.name;
+  const destination = caveSelected ? { name: cave.name, entrance: [cave.x, cave.z + 2] as [number, number] } : CITADEL_SECTORS.find(entry => entry.name === selection);
   const position = region === hero.region && !hero.instance ? hero.position : undefined;
   const shown: RegionId = region === "atlas" ? hero.region : region;
-  const route = region === "aurora" && sector && position
-    ? findPath(position, sector.entrance, education.completed.includes("variables"), education.completed.includes("conditions") && hero.defeatedBosses.includes("boss-forest"))
+  const route = region === "aurora" && destination && position
+    ? findPath(position, destination.entrance, education.completed.includes("variables"), education.completed.includes("conditions") && hero.defeatedBosses.includes("boss-forest"))
     : [];
   const map = (coordinate: number) => 50 + coordinate * .95;
   return <section className="panel-body world-map">
@@ -30,8 +33,9 @@ export default function WorldMap() {
       <CitadelMap position={position} route={route} selected={selection} />
       <nav className="tabs citadel-map-sectors" aria-label="Destinos da Cidadela">
         {CITADEL_SECTORS.map(({ name, short }) => <button key={name} aria-label={name} aria-pressed={selection === name} className={selection === name ? "active" : ""} onClick={() => setSelection(selection === name ? "" : name)}>{short}</button>)}
+        <button aria-pressed={caveSelected} className={caveSelected ? "active" : ""} onClick={() => setSelection(caveSelected ? "" : cave.name)}>Caverna · {cave.level}+</button>
       </nav>
-      <small>{!sector ? "Toque em um setor para ver a rota. O ponto claro mostra sua posição." : route.length ? `Rota em ciano até ${sector.name}.` : !position ? "Entre na Cidadela para traçar a rota." : `Destino selecionado — ${sector.name}.`}</small>
+      <small>{!destination ? "Toque em um setor para ver a rota. O ponto claro mostra sua posição." : route.length ? `Rota em ciano até ${destination.name}.` : !position ? "Entre na Cidadela para traçar a rota." : caveSelected && !education.completed.includes("variables") ? "Conclua a primeira runa para abrir o caminho pelo bosque." : `Destino selecionado — ${destination.name}.`}</small>
     </> : <>
       <svg viewBox="0 0 100 100" role="img" aria-label={`Mapa de ${REGIONS[shown].name}`}>
         <rect x="1" y="1" width="98" height="98" rx="6" fill={REGIONS[shown].color} />
