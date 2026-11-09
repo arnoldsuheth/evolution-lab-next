@@ -11,10 +11,10 @@ test('missões secundárias são todas de clique (falar, caçar, coletar) e cada
 test('pontos de coleta ficam em lugares caminháveis e alcançáveis',()=>{for(const n of GATHER_NODES){const forest=true;assert.ok(walkable(n.x,n.z,forest,true),n.id);assert.ok(findPath([0,5],[Math.round(n.x),Math.round(n.z)],true,true).length>0,n.id+' sem caminho');}});
 test('ciclo completo: aceitar, progredir, entregar e não repetir',()=>{
  let log=emptyLog();const q=QUESTS.find(q=>q.id==='q-boas-vindas')!;
- assert.equal(questStatus(log,q,1,[]),'available');assert.equal(npcMarker(log,'lion',1,[]),'!');
+ assert.equal(questStatus(log,q,1,[]),'available');assert.equal(npcMarker(log,'lovelace',1,[]),'!');
  log=acceptQuest(log,q.id,1,[]);assert.equal(questStatus(log,q,1,[]),'active');
  for(const npc of ['eldrin','borin','eldrin','mira'] as const)log=progressQuests(log,{type:'talk',npc}).log;
- assert.deepEqual(log.active[q.id],[1,1,1],'falar duas vezes não conta em dobro');assert.equal(npcMarker(log,'lion',1,[]),'?');
+ assert.deepEqual(log.active[q.id],[1,1,1],'falar duas vezes não conta em dobro');assert.equal(npcMarker(log,'lovelace',1,[]),'?');
  const done=turnInQuest(log,q.id);assert.deepEqual(done.reward,q.reward);assert.equal(questStatus(done.log,q,1,[]),'done');assert.equal(turnInQuest(done.log,q.id).reward,undefined);
  assert.equal(questStatus(done.log,QUESTS.find(q=>q.id==='q-couro')!,1,[]),'available','libera a próxima');
  assert.equal(questStatus(done.log,QUESTS.find(q=>q.id==='q-cristais')!,5,[]),'locked','exige a primeira runa');

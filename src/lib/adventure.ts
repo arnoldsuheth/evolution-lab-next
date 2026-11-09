@@ -95,8 +95,8 @@ export const restBonus = (adv: AdventureState, xp: number) => Math.min(adv.reste
 export const REP_MAX = 3000;
 export const FACTIONS: Record<Faction, { name: string; npcs: NpcId[]; perk: string }> = {
   mercadores: { name: 'Mercadores da Aurora', npcs: ['elara', 'dorin', 'mira'], perk: 'desconto nas lojas' },
-  ferreiros: { name: 'Forja de Borin', npcs: ['borin'], perk: 'desconto no ferreiro e nos reparos' },
-  sabios: { name: 'Círculo das Runas', npcs: ['eldrin', 'lion', 'pip', 'traveler'], perk: 'mais XP nas runas e missões do dia' },
+  ferreiros: { name: 'Forja de Babbage', npcs: ['borin'], perk: 'desconto no ferreiro e nos reparos' },
+  sabios: { name: 'Círculo das Runas', npcs: ['eldrin', 'lion', 'lovelace', 'pip', 'traveler'], perk: 'mais XP nas runas e missões do dia' },
 };
 export const REP_LEVELS = [{ name: 'Neutro', min: 0 }, { name: 'Amigável', min: 250 }, { name: 'Honrado', min: 750 }, { name: 'Reverenciado', min: 1500 }, { name: 'Exaltado', min: 3000 }];
 export const repRank = (points: number) => REP_LEVELS.reduce((rank, l, i) => points >= l.min ? i : rank, 0);

@@ -1,4 +1,7 @@
 "use client";
+import "./testNamespace";
+import { CHAMBER_CHALLENGE, cleanLovelaceProgress, evaluateLovelace, hasAllArtifacts, LOVELACE_POSITION } from "./precursors";
+import { CHAMBER_POSITION, PRECURSORS, type PrecursorId } from "./precursorCatalog";
 import { dogFood, feedDog as feedDogRule, TREAT_PRICE, hasDogJoy, DOG_NAME } from './dog';
 import {ATTRIBUTE_KEYS,attributePoints,cleanAttributes,type AttributeKey} from "./attributes";
 import {packCharacters,selectCharacter,deleteCharacter} from './characterSlots';
@@ -61,6 +64,9 @@ interface GameStore extends SaveData {
   /** Monstros vencidos voltam depois de um tempo; pontos de coleta também (só durante a sessão). */
   slain:Record<string,number>; gathered:Record<string,number>;
   /** Monstro selecionado com um clique e a ação esperando o herói chegar ao alcance. */
+  submitPrecursor: (id: PrecursorId, step: number, answer: number) => string | null;
+  submitChamber: (answer: number) => string | null;
+  submitLovelace: (step: number, submission: string | number) => string | null;
   deleteCharacter:(slot:number)=>boolean; upgradeItem:(id:string)=>void; claimNexus:()=>void;
   target:string|null; queued:CombatAction|null; setTarget:(id:string|null)=>void; act:(action:CombatAction)=>void;
   acceptQuest:(id:string)=>void; turnInQuest:(id:string)=>void; questEvent:(event:QuestEvent)=>void; gather:(id:string)=>void;
@@ -94,7 +100,7 @@ export function replaceFromCloud(snapshot:SaveData,backup:boolean){
  const next=migrateSave(snapshot);
  if(backup){const previous=localStorage.getItem(SAVE_KEY);if(previous)localStorage.setItem(SAVE_KEY+'-before-cloud-'+Date.now(),previous);}
  blocked=false;storageIssue='';
- useGame.setState({...next,ready:true,encounter:null,challenge:null,battleEvent:null,cooldowns:{},lastAttack:0,effects:[],buff:0,saveError:'',notice:'Jornada da conta carregada.'});
+ useGame.setState({...next,ready:true,encounter:null,challenge:null,battleEvent:null,cooldowns:{},lastAttack:0,effects:[],buff:0,saveError:''});
  if(blocked)throw Error(storageIssue);
 }
 function executeBattle(id:string|undefined,starter:boolean,set:(value:Partial<GameStore>)=>void,get:()=>GameStore){
@@ -114,21 +120,61 @@ function executeBattle(id:string|undefined,starter:boolean,set:(value:Partial<Ga
 }
 /** Aventura com as missões de hoje já sorteadas (sem gravar nada a cada segundo). */
 export const currentAdventure=(s:{hero:SaveData["hero"];education:{completed:string[]}})=>ensureDaily(adventureOf(s.hero),Date.now(),s.hero.id,s.hero.level,s.education.completed);
+function nearLegacySite(state: GameStore, site: { x: number; z: number }) {
+  const { hero } = state;
+  return state.ready && !state.saveError && !hero.dead && !state.encounter && !state.challenge
+    && !hero.instance && hero.region === "aurora"
+    && Math.hypot(hero.position[0] - site.x, hero.position[1] - site.z) <= 3.7;
+}
 export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>((set, get) => ({
   ...freshSave(), rareSeen:0, restPending:0, relocation:0,mounted:false, battleEvent:null, slain:{}, gathered:{}, target:null, queued:null, challenge:null, ready: false, saveError: "", notice: "", encounter: null, buff: 0, lastAttack: 0, cooldowns: {}, now: 0, effects: [],
   enterInstance:id=>{const s=get();if(s.encounter||s.challenge||s.hero.instance)return;const reason=instanceRequirement(s.hero,s.education.completed,id);if(reason){set({notice:reason});return;}const place=INSTANCES[id];if(Math.hypot(s.hero.position[0]-place.x,s.hero.position[1]-place.z)>4.5){set({notice:'Aproxime-se da entrada para entrar.'});return;}set({mounted:false,relocation:s.relocation+1,hero:{...s.hero,instance:id,instanceProgress:[],position:[0,8]},notice:place.name+' · inimigos mais fortes, XP dobrado. Use a saída ao sul para retornar.'});},
   leaveInstance:()=>{const s=get(),id=s.hero.instance;if(!id||s.encounter||s.challenge||s.hero.dead)return;if(Math.hypot(s.hero.position[0],s.hero.position[1]-10)>4.5){set({notice:'A saída fica ao sul da instância.'});return;}const place=INSTANCES[id];set({mounted:false,relocation:s.relocation+1,hero:{...s.hero,instance:null,position:[place.x,place.z+2]},notice:'Você retornou da expedição.'});},
-  repair:()=>{const s=get();if(s.hero.dead||s.encounter||s.hero.region!=='aurora'||!!s.hero.instance||Math.hypot(s.hero.position[0]+7,s.hero.position[1])>8){set({notice:'Procure Borin na vila para reparar.'});return;}const fee=discounted(repairCost(s.hero.equipped,s.hero.durability??{},ITEMS),repPercent(adventureOf(s.hero),'ferreiros'));if(!fee||s.hero.gold<fee)return;set({hero:{...s.hero,gold:s.hero.gold-fee,durability:{...s.hero.durability,...Object.fromEntries(s.hero.equipped.map(id=>[id,100]))}},notice:'Equipamento reparado.'});},
+  repair:()=>{const s=get();if(s.hero.dead||s.encounter||s.hero.region!=='aurora'||!!s.hero.instance||Math.hypot(s.hero.position[0]+7,s.hero.position[1])>8){set({notice:'Procure Babbage na vila para reparar.'});return;}const fee=discounted(repairCost(s.hero.equipped,s.hero.durability??{},ITEMS),repPercent(adventureOf(s.hero),'ferreiros'));if(!fee||s.hero.gold<fee)return;set({hero:{...s.hero,gold:s.hero.gold-fee,durability:{...s.hero.durability,...Object.fromEntries(s.hero.equipped.map(id=>[id,100]))}},notice:'Equipamento reparado.'});},
   learnProfession:id=>{const s=get();if(!Object.hasOwn(PROFESSIONS,id)||s.hero.dead||s.encounter||s.hero.gold<20||s.hero.professions?.[id]||s.hero.region!=='aurora'||!!s.hero.instance||Math.hypot(s.hero.position[0]+7,s.hero.position[1])>8)return;set({hero:{...s.hero,gold:s.hero.gold-20,professions:{...s.hero.professions,[id]:1}},notice:'Ofício aprendido: '+PROFESSIONS[id]});},
   toggleMount:()=>{const s=get();if(s.mounted){set({mounted:false});return;}if(s.hero.dead||s.encounter||s.challenge||s.hero.level<MOUNT_LEVEL){set({notice:`Montaria a partir do nível ${MOUNT_LEVEL}, fora de combate.`});return;}if(s.hero.instance){set({notice:'Não dá para montar dentro da masmorra.'});return;}set({mounted:true,notice:mountSpeed(s.hero)>1.4?'Montado no Javali de Montaria: 50% mais rápido.':'Montado no Lobo de Trilha: 35% mais rápido.'});},
   claimNexus:()=>{const s=get();if(s.hero.dead||s.encounter)return;if(s.hero.region!=='aurora'||!!s.hero.instance||Math.hypot(...s.hero.position)>7){set({notice:'Vá até o cristal da praça para receber a aura.'});return;}if(!nexusFull(s.hero.nexus,s.hero.level)){set({notice:'O Nexus ainda não está cheio. Ganhe XP em lutas, missões e runas.'});return;}set({hero:{...s.hero,nexus:{charge:0,aura:NEXUS_SECONDS}},notice:'✦ Aura do Herói! +12% ataque, +12% defesa e +10% vida por 10 minutos de jogo.'});},
   upgradeItem:id=>{const s=get(),step=forgeStep(id),item=ITEMS[id];if(!step||!item||s.hero.dead||s.encounter)return;const next=ITEMS[forgeId(step.base,step.to)];if(!next)return;
-   if(s.hero.region!=='aurora'||!!s.hero.instance||Math.hypot(s.hero.position[0]+7,s.hero.position[1])>8){set({notice:'Procure Borin, o ferreiro, na vila para aprimorar.'});return;}
+   if(s.hero.region!=='aurora'||!!s.hero.instance||Math.hypot(s.hero.position[0]+7,s.hero.position[1])>8){set({notice:'Procure Babbage, o ferreiro, na vila para aprimorar.'});return;}
    if(!s.hero.inventory.includes(id)){set({notice:'Você precisa ter o item.'});return;}
    const cost=forgeCost(item,next,step.to,LEVEL_BANDS[bandFor(item.minLevel)]),forgeGold=discounted(cost.gold,repPercent(adventureOf(s.hero),'ferreiros'));const left=removeItems(s.hero.inventory,cost.materials);
    if(!left||s.hero.gold<forgeGold||s.hero.materials<cost.fragments){set({notice:'Faltam moedas, fragmentos ou cristais para aprimorar.'});return;}
    const inventory=[...left];inventory[inventory.indexOf(id)]=next.id;const swap=(list:string[])=>list.map(i=>i===id?next.id:i);const durability={...s.hero.durability};delete durability[id];durability[next.id]=100;
-   set({hero:{...s.hero,inventory,equipped:swap(s.hero.equipped),gold:s.hero.gold-forgeGold,materials:s.hero.materials-cost.fragments,durability},notice:`${next.name}! Borin aprimorou seu item para ${next.rarity}.`});},
+   set({hero:{...s.hero,inventory,equipped:swap(s.hero.equipped),gold:s.hero.gold-forgeGold,materials:s.hero.materials-cost.fragments,durability},notice:`${next.name}! Babbage aprimorou seu item para ${next.rarity}.`});},
+  submitPrecursor: (id, step, answer) => {
+    const state = get();
+    const { hero } = state;
+    const precursor = PRECURSORS[id];
+    if (!precursor || !nearLegacySite(state, precursor)) return "Aproxime-se do precursor com a jornada pronta para salvar.";
+    const current = hero.precursorProgress?.[id] ?? 0;
+    const quest = precursor.quests[current];
+    if (step !== current || !quest) return "Esta etapa já foi registrada.";
+    if (answer !== quest.answer) return quest.hint;
+    set({ hero: { ...hero, precursorProgress: { ...hero.precursorProgress, [id]: current + 1 } } });
+    return null;
+  },
+  submitChamber: answer => {
+    const state = get();
+    const { hero } = state;
+    if (!nearLegacySite(state, CHAMBER_POSITION) || !hasAllArtifacts(hero)) return "Reúna os dez artefatos e vá até a Câmara.";
+    if (hero.chamberComplete) return "A Câmara já foi restaurada.";
+    if (answer !== CHAMBER_CHALLENGE.answer) return CHAMBER_CHALLENGE.hint;
+    set({ hero: { ...hero, chamberComplete: true } });
+    return null;
+  },
+  submitLovelace: (step, submission) => {
+    const state = get();
+    const { hero } = state;
+    const current = cleanLovelaceProgress(hero.lovelaceProgress);
+    if (!nearLegacySite(state, LOVELACE_POSITION)) {
+      return "Aproxime-se de Lovelace com a jornada pronta para salvar.";
+    }
+    if (step !== current) return "Esta etapa já foi registrada. Abra o desafio atual.";
+    const error = evaluateLovelace(step, submission);
+    if (error) return error;
+    set({ hero: { ...hero, lovelaceProgress: current + 1 } });
+    return null;
+  },
   deleteCharacter: slot=>{const s=get();if(!s.ready||s.saveError||s.encounter||s.challenge)return false;const next=deleteCharacter(savedState(s),slot);set({...next,relocation:s.relocation+1,mounted:false,encounter:null,challenge:null,target:null,queued:null,effects:[],cooldowns:{},buff:0,lastAttack:0,battleEvent:null,notice:'Personagem excluído.'});return true;},
   selectCharacter: slot=>{const s=get();if(!s.ready||s.saveError||s.encounter||s.challenge)return false;const next=selectCharacter(savedState(s),slot);set({...next,relocation:s.relocation+1,mounted:false,encounter:null,challenge:null,effects:[],cooldowns:{},buff:0,lastAttack:0,battleEvent:null,notice:''});return true;},
   hydrate: async () => { if(get().ready)return; await useGame.persist.rehydrate(); set({ ready: true, now: Date.now(), saveError: storageIssue, notice: storageIssue ? "Salvamento protegido. Exporte o original antes de recuperar." : "Bem-vindo a Pedra da Aurora." }); },
@@ -138,7 +184,7 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     const inherited = Math.min(100, s.ancestors.filter(a => !a.claimed).reduce((sum, a) => sum + a.legacy, 0));
     let hero = { ...freshHero(), name: name.trim().slice(0, 30) || "Viajante", classId, race: raceForClass(classId,race), created: true, mode, inherited };
     hero = { ...withXp(hero, inherited), hp: stats(hero).maxHp, mp: stats(hero).maxMp };
-    set({ hero, challenge:null, ancestors: s.ancestors.map(a => ({ ...a, claimed: true })), encounter: null, notice: inherited ? `Nova jornada. ${inherited} XP de legado recebidos uma única vez.` : "Sua jornada começa com roupas remendadas. Procure Eldrin." });
+    set({ hero, challenge:null, ancestors: s.ancestors.map(a => ({ ...a, claimed: true })), encounter: null, notice: inherited ? `Nova jornada. ${inherited} XP de legado recebidos uma única vez.` : "Sua jornada começa com roupas remendadas. Procure Boole." });
   },
   customize: look => set(s => ({ look: migrateSave({ ...savedState(s), look: { ...s.look, ...look } }).look })),
   chooseClass: (classId, race) => {
@@ -187,7 +233,7 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
   },
   craft: id => {
     const s=get(),item=ITEMS[id];if(!item||s.hero.dead||s.encounter||!s.education.completed.includes('arithmetic')||!item.recipe&&!item.ingredients)return;
-    if(item.profession&&!s.hero.professions?.[item.profession]){set({notice:"Aprenda o ofício necessário com Borin."});return;}if(s.hero.level<item.minLevel){set({notice:`Requer nível ${item.minLevel} para fabricar.`});return;}if(countItem(s.hero.inventory,id)>=item.maxStack)return;
+    if(item.profession&&!s.hero.professions?.[item.profession]){set({notice:"Aprenda o ofício necessário com Babbage."});return;}if(s.hero.level<item.minLevel){set({notice:`Requer nível ${item.minLevel} para fabricar.`});return;}if(countItem(s.hero.inventory,id)>=item.maxStack)return;
     const fragments=item.recipe??0;const fee=item.ingredients?Math.max(item.sellPrice+1,Math.ceil((item.craftGold??0)*(1-passiveBonuses(s.hero).craftDiscount/100))):0;
     if(s.hero.materials<fragments||s.hero.gold<fee)return;const inventory=removeItems(s.hero.inventory,item.ingredients??{});if(!inventory)return;
     set({hero:{...s.hero,professions:item.profession?{...s.hero.professions,[item.profession]:Math.min(100000,(s.hero.professions?.[item.profession]??1)+1)}:s.hero.professions,materials:s.hero.materials-fragments,gold:s.hero.gold-fee,inventory:[...inventory,id]},notice:`${item.name} fabricado. Materiais e custo descontados uma única vez.`});
@@ -235,7 +281,7 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     localStorage.setItem(SAVE_KEY + "-before-import-" + Date.now(), localStorage.getItem(SAVE_KEY) ?? raw);
     blocked = false; storageIssue = ""; set({ ...next, hero: ancestors.has(next.hero.id) ? { ...next.hero, dead: true, hp: 0 } : {...next.hero,defeatedBosses:next.hero.id===s.hero.id?[...new Set([...next.hero.defeatedBosses,...s.hero.defeatedBosses])]:next.hero.defeatedBosses,openedChests:next.hero.id===s.hero.id?[...new Set([...next.hero.openedChests,...s.hero.openedChests])]:next.hero.openedChests,promotions:next.hero.id===s.hero.id?Object.fromEntries(Object.keys(CLASSES).map(id=>[id,Math.max(next.hero.promotions[id as ClassId]??0,s.hero.promotions[id as ClassId]??0)])):next.hero.promotions}, education, ancestors: [...ancestors.values()], ready: true, encounter: null, challenge:null, saveError: "", notice: "Jornada recuperada. Educação e legados consumidos preservados." });
   },
-  deliverQuest:kind=>{const s=get();const npc=kind==='main'?{x:5,z:-5}:travelerFor(s.hero.id);if(s.hero.dead||s.encounter||Math.hypot(s.hero.position[0]-npc.x,s.hero.position[1]-npc.z)>4){set({notice:'Chegue mais perto: caminhe até o mentor (o personagem com ? em cima) e aperte Entregar missão ali.'});return;}const pending=pendingDelivery(s.education,kind);if(!pending.length)return;set({education:{...s.education,deliveries:[...new Set([...s.education.deliveries,...pending.map(id=>kind+':'+id)])]},notice:'Missão entregue. O próximo capítulo está liberado; a recompensa da prática já foi registrada.'});},
+  deliverQuest:kind=>{const s=get();const npc=kind==='main'?PRECURSORS.boole:travelerFor(s.hero.id);if(s.hero.dead||s.encounter||Math.hypot(s.hero.position[0]-npc.x,s.hero.position[1]-npc.z)>4){set({notice:'Chegue mais perto: caminhe até o mentor (o personagem com ? em cima) e aperte Entregar missão ali.'});return;}const pending=pendingDelivery(s.education,kind);if(!pending.length)return;set({education:{...s.education,deliveries:[...new Set([...s.education.deliveries,...pending.map(id=>kind+':'+id)])]},notice:'Missão entregue. O próximo capítulo está liberado; a recompensa da prática já foi registrada.'});},
   draftAI:(id,code)=>set(s=>({education:{...s.education,aiEvidence:{...s.education.aiEvidence,[id]:code.slice(0,12000)}}})),
   reviewProject:index=>{const s=get();const reason=projectRequirement(s.hero,s.education,index);if(reason){set({notice:reason});return;}if((s.education.projects[String(index)]?.code.trim().length??0)<160){set({notice:'Registre o projeto, os testes e a revisão antes de avançar (mínimo de 160 caracteres).'});return;}set({education:{...s.education,reviewedProjects:[...new Set([...s.education.reviewedProjects,index])]},notice:'Revisão própria registrada. Não equivale a certificação automática de domínio.'});},
   beginPromotion:()=>{const s=get();if(s.challenge||s.encounter)return;const reason=promotionRequirement(s.hero,s.education);if(reason){set({notice:reason});return;}if((s.cooldowns.exam??0)>Date.now()){set({notice:'Revise o conteúdo. Nova tentativa liberada em até 30 segundos.'});return;}set({challenge:makeChallenge('promotion',String(promotionRank(s.hero)+1),s.hero)});},

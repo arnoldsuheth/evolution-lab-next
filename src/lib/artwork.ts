@@ -1,7 +1,7 @@
 import type {Item} from './catalogue';
 import type {ClassId} from './game';
 import {headLook} from './heroModels';
-export const ART_BASE=process.env.NEXT_PUBLIC_GITHUB_PAGES==='true'?'/evolution-lab-next':'';
+export const ART_BASE=(process.env.NEXT_PUBLIC_BASE_PATH??'');
 export type ArtCrop={sheet:'items'|'equipment'|'classes';x:number;y:number;w:number;h:number;outline?:string};
 const itemCrop=(index:number):ArtCrop=>({sheet:'items',x:index%6*256+15,y:[94,345,551,754][Math.floor(index/6)],w:226,h:[202,166,166,178][Math.floor(index/6)]});
 const equipment=(x:number,y:number,w:number,h:number):ArtCrop=>({sheet:'equipment',x,y,w,h});

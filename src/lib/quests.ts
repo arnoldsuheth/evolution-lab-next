@@ -15,13 +15,13 @@ export type QuestEvent = { type: 'talk'; npc: NpcId } | { type: 'kill'; kind: Mo
 export type GatherKind = 'herb' | 'crystal';
 
 export const QUESTS: Quest[] = [
-  { id: 'q-boas-vindas', title: 'Boas-vindas à Aurora', giver: 'lion', level: 1, intro: 'Conheça quem vai te ajudar: fale com Eldrin, Borin e Mira.', finish: 'Agora você sabe a quem pedir ajuda. Bem-vindo à vila!', objectives: [{ type: 'talk', npc: 'eldrin', label: 'Falar com Eldrin' }, { type: 'talk', npc: 'borin', label: 'Falar com Borin' }, { type: 'talk', npc: 'mira', label: 'Falar com Mira' }], reward: { xp: 40, gold: 80 } },
+  { id: 'q-boas-vindas', title: 'Boas-vindas à Aurora', giver: 'lovelace', level: 1, intro: 'Conheça quem vai te ajudar: fale com Boole, Babbage e Mira.', finish: 'Agora você sabe a quem pedir ajuda. Bem-vindo à vila!', objectives: [{ type: 'talk', npc: 'eldrin', label: 'Falar com Boole' }, { type: 'talk', npc: 'borin', label: 'Falar com Babbage' }, { type: 'talk', npc: 'mira', label: 'Falar com Mira' }], reward: { xp: 40, gold: 80 } },
   { id: 'q-couro', title: 'Couro para a oficina', giver: 'borin', level: 1, after: 'q-boas-vindas', intro: 'Os javalis do Campo dos Javalis (oeste) estão comendo as plantações. Traga couro de 3 deles.', finish: 'Couro de primeira! Vou fazer boas botas com isto.', objectives: [{ type: 'kill', kinds: ['boar'], count: 3, label: 'Javalis vencidos' }], reward: { xp: 60, gold: 120 } },
   { id: 'q-ervas', title: 'Ervas da Aurora', giver: 'mira', level: 1, after: 'q-boas-vindas', intro: 'Preciso de 5 ervas brilhantes. Elas crescem nos campos ao redor da vila.', finish: 'Perfeitas! Com isto preparo poções para todos os aventureiros.', objectives: [{ type: 'collect', node: 'herb', count: 5, label: 'Ervas coletadas' }], reward: { xp: 50, gold: 96 } },
   { id: 'q-teias', title: 'Teias no pomar', giver: 'mira', level: 1, after: 'q-ervas', intro: 'Aranhas tomaram o pomar ao sul da avenida. Afaste 3 delas.', finish: 'O pomar voltou a dar frutas. Obrigada!', objectives: [{ type: 'kill', kinds: ['spider'], count: 3, label: 'Aranhas vencidas' }], reward: { xp: 70, gold: 144 } },
   { id: 'q-lobos', title: 'Uivos nas colinas', giver: 'borin', level: 3, after: 'q-couro', intro: 'Lobos rondam as Colinas dos Lobos, a oeste da praça. Vença 3 lobos.', finish: 'As colinas estão seguras de novo. Você está ficando forte!', objectives: [{ type: 'kill', kinds: ['wolf'], count: 3, label: 'Lobos vencidos' }], reward: { xp: 110, gold: 200 } },
-  { id: 'q-lanternas', title: 'A luz da praça', giver: 'eldrin', level: 1, lesson: 'variables', intro: 'Sua primeira runa acendeu as lanternas! Conte para Lion o que você aprendeu.', finish: 'Cada runa que você restaura muda o mundo de verdade.', objectives: [{ type: 'talk', npc: 'lion', label: 'Contar a Lion sobre as lanternas' }], reward: { xp: 30, gold: 40 } },
-  { id: 'q-cristais', title: 'Fragmentos da floresta', giver: 'pip', level: 2, lesson: 'variables', intro: 'Há cristais de runa espalhados pela Floresta das Variáveis. Junte 4 para mim. Shhh!', finish: 'Que brilho! Borin vai ficar com inveja.', objectives: [{ type: 'collect', node: 'crystal', count: 4, label: 'Cristais coletados' }], reward: { xp: 90, gold: 160 } },
+  { id: 'q-lanternas', title: 'A luz da praça', giver: 'eldrin', level: 1, lesson: 'variables', intro: 'Sua primeira runa acendeu as lanternas! Conte para Lovelace o que você aprendeu.', finish: 'Cada runa que você restaura muda o mundo de verdade.', objectives: [{ type: 'talk', npc: 'lovelace', label: 'Contar a Lovelace sobre as lanternas' }], reward: { xp: 30, gold: 40 } },
+  { id: 'q-cristais', title: 'Fragmentos da floresta', giver: 'pip', level: 2, lesson: 'variables', intro: 'Há cristais de runa espalhados pela Floresta das Variáveis. Junte 4 para mim. Shhh!', finish: 'Que brilho! Babbage vai ficar com inveja.', objectives: [{ type: 'collect', node: 'crystal', count: 4, label: 'Cristais coletados' }], reward: { xp: 90, gold: 160 } },
   { id: 'q-senhor-bosque', title: 'O Senhor do Bosque', giver: 'pip', level: 5, after: 'q-cristais', intro: 'O Brutamato guarda o coração da floresta. Vença-o e a floresta fica livre.', finish: 'Você venceu o Brutamato! A floresta inteira fala de você.', objectives: [{ type: 'kill', ids: ['boss-forest'], count: 1, label: 'Brutamato vencido' }], reward: { xp: 220, gold: 400 } },
 ];
 /** Pontos de coleta: brilham no chão; somem por alguns segundos depois de coletados. */
@@ -57,7 +57,7 @@ export function questStatus(log: QuestLog, quest: Quest, level: number, lessons:
 export function questLockReason(log: QuestLog, quest: Quest, level: number, lessons: string[]) {
   if (level < quest.level) return `Requer nível ${quest.level}`;
   if (quest.after && !log.done.includes(quest.after)) return `Conclua antes: ${QUESTS.find(q => q.id === quest.after)?.title}`;
-  if (quest.lesson && !lessons.includes(quest.lesson)) return 'Restaure a primeira runa com Eldrin';
+  if (quest.lesson && !lessons.includes(quest.lesson)) return 'Restaure a primeira runa com Boole';
   return undefined;
 }
 export function acceptQuest(log: QuestLog, id: string, level: number, lessons: string[]): QuestLog {

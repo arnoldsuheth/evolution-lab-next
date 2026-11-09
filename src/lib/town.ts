@@ -6,20 +6,29 @@
 export type Point = [number, number];
 export type Road = { id: string; a: Point; b: Point; width: number; kind: 'road' | 'trail' };
 export const ROADS: Road[] = [
+  { id: 'eixo-cidadela', a: [0, -28], b: [0, 20], width: 4.8, kind: 'road' },
   // Avenida das Guildas: liga os postos de Elara (oeste) e Dorin (leste) passando pela entrada da praça.
   { id: 'avenida', a: [-33, 12], b: [33, 12], width: 3.2, kind: 'road' },
   // Caminhos das portas até a avenida e até a praça.
   { id: 'porta-oficina', a: [-9, 8.3], b: [-9, 12], width: 1.6, kind: 'road' },
   { id: 'porta-pousada', a: [9, 7.1], b: [9, 12], width: 1.6, kind: 'road' },
-  { id: 'porta-arquivo', a: [-8, -2.7], b: [-4.7, -2.9], width: 1.6, kind: 'road' },
-  { id: 'porta-casa', a: [9, -3.7], b: [4.8, -2.9], width: 1.6, kind: 'road' },
+  { id: 'porta-arquivo', a: [-8, -2.7], b: [-3.8, -2.9], width: 1.6, kind: 'road' },
+  { id: 'porta-casa', a: [9, -3.7], b: [3.8, -2.9], width: 1.6, kind: 'road' },
   // Trilhas de terra até os campos de caça.
   { id: 'trilha-javalis', a: [-20, 12], b: [-24.5, 7.5], width: 1.4, kind: 'trail' },
-  { id: 'trilha-lobos-1', a: [-5.2, -1.8], b: [-15, -3.5], width: 1.4, kind: 'trail' },
+  { id: 'trilha-lobos-1', a: [-4.7, -1.8], b: [-15, -3.5], width: 1.4, kind: 'trail' },
   { id: 'trilha-lobos-2', a: [-15, -3.5], b: [-23.5, -5], width: 1.4, kind: 'trail' },
   { id: 'trilha-pomar', a: [12, 12], b: [12.5, 17.5], width: 1.4, kind: 'trail' },
-  { id: 'trilha-farol', a: [2.4, -10.9], b: [12.2, -11], width: 1.4, kind: 'trail' },
+  { id: 'trilha-farol', a: [1.9, -10.9], b: [12.2, -11], width: 1.4, kind: 'trail' },
 ];
+export const CITADEL_SECTORS = [
+  { name: "Biblioteca ancestral", short: "Biblioteca", x: -3, z: -9.3, entrance: [0, -9] },
+  { name: "Arquivo histórico", short: "Arquivo", x: -8, z: -5, entrance: [-6, -2.8] },
+  { name: "Oficina de mecanismos", short: "Oficina", x: -8.6, z: 4.3, entrance: [-9, 9] },
+  { name: "Academia de programação", short: "Academia", x: 8.5, z: -4, entrance: [6, -2.9] },
+  { name: "Pátio de cálculos", short: "Pátio", x: 8.5, z: 5.8, entrance: [9, 9] },
+] satisfies { name: string; short: string; x: number; z: number; entrance: Point }[];
+
 export function distanceToRoad(x: number, z: number, road: Road) {
   const [ax, az] = road.a, [bx, bz] = road.b, dx = bx - ax, dz = bz - az, len = dx * dx + dz * dz;
   const t = len ? Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / len)) : 0;
@@ -27,7 +36,6 @@ export function distanceToRoad(x: number, z: number, road: Road) {
 }
 /** Também conta a estrada principal (norte-sul), a praça do cristal e a estrada das minas, já existentes. */
 export function onRoad(x: number, z: number, margin = 0) {
-  if (Math.abs(x) < 2.4 + margin && z > -28 && z < 20) return true;
   if (Math.hypot(x, z) < 5.8 + margin) return true;
   if (Math.abs(z + 16) < 1.5 + margin && x > -1.5 && x < 23.5) return true;
   return ROADS.some(r => distanceToRoad(x, z, r) < r.width / 2 + margin);
@@ -42,7 +50,7 @@ export const PROPS: Prop[] = [
   // Lanternas da avenida e da entrada sul.
   lamp('lamp-av1', -14, 13.9), lamp('lamp-av2', -26, 13.9), lamp('lamp-av3', 14.5, 10.1), lamp('lamp-av4', 26, 10.1), lamp('lamp-sul1', -3.1, 17), lamp('lamp-sul2', 3.1, 17),
   // Portões da cidade.
-  { id: 'gate-sul', kind: 'gate', x: 0, z: 19.4, radius: 0, label: 'Pedra da Aurora' },
+  { id: 'gate-sul', kind: 'gate', x: 0, z: 19.4, radius: 0, label: 'Cidadela do Conhecimento' },
   { id: 'gate-norte', kind: 'gate', x: 0, z: -11.2, radius: 0, label: 'Floresta das Variáveis' },
   // Armazém de Borin: caixas se enchem com a runa das operações.
   { id: 'crates', kind: 'crate', x: -9.4, z: .3, radius: .9, unlock: 'arithmetic' },
