@@ -21,7 +21,7 @@ import CityDog from "./CityDog";
 import PetFollower from "./PetFollower";
 import { adventureOf, titleOf, mountSpeed, MOUNT_LEVEL, type PetId } from "@/lib/adventure";
 import { doorBetween } from "@/lib/dungeon";
-import { ARCHIVE, ARCHIVE_DESK, ARCHIVE_READING_SPOT, CITADEL_SECTORS, TOWN_SERVICES, type TownService } from "@/lib/town";
+import { PLAZA_RADIUS, CITADEL_SECTORS, TOWN_SERVICES, type Interior, type InteriorPanel, type TownService } from "@/lib/town";
 import { frameWorld } from "@/lib/worldCamera";
 import WorldDetails, { HouseDetails } from "./WorldDetails";
 import {MONSTERS,REGIONS,AGGRO_RADIUS,SAFE_TOWN_RADIUS,isAggressive} from "@/lib/campaign";
@@ -114,32 +114,35 @@ function House({ x, z, index, citadel }: { x: number; z: number; index: number; 
     </>}
   </group>;
 }
-function ArchiveInterior({ onGroundClick, read }: {
+function CitadelInterior({ room, onGroundClick, read }: {
+  room: Interior;
   onGroundClick: (event: ThreeEvent<MouseEvent>) => void;
   read: () => void;
 }) {
-  const near = useGame(s => Math.hypot(s.hero.position[0] - ARCHIVE_DESK[0], s.hero.position[1] - ARCHIVE_DESK[1]) < 5);
-  return <group position={[ARCHIVE.x, 0, ARCHIVE.z]}>
+  const near = useGame(s => Math.hypot(s.hero.position[0] - room.x, s.hero.position[1] - room.z + 1.1) < 5);
+  return <group position={[room.x, 0, room.z]}>
     <mesh position={[0,.04,0]} receiveShadow onClick={onGroundClick}>
-      <boxGeometry args={[5.6,.08,5]} /><meshStandardMaterial color="#534638" />
+      <boxGeometry args={[room.w * 2,.08,room.d * 2]} /><meshStandardMaterial color="#534638" />
     </mesh>
     <MergedParts parts={() => [
-      { g: box(5.6,2.4,.35), p: [0,1.2,-2.3], c: "#626e88" },
+      { g: box(room.w * 2,2.4,.35), p: [0,1.2,-2.3], c: "#626e88" },
       ...[-1,1].flatMap((side): Part[] => [
-        { g: box(.35,1.25,4.6), p: [side*2.6,.625,0], c: "#626e88" },
+        { g: box(.35,1.25,4.6), p: [side*(room.w - .2),.625,0], c: "#626e88" },
         { g: box(1.8,.7,.3), p: [side*1.7,.35,2.35], c: "#626e88" },
         { g: box(1.65,1.5,.28), p: [side*1.55,.9,-2.03], c: "#513927" },
-        ...Array.from({length:6},(_,i): Part => ({g:box(.19,.32,.22),p:[side*(.88+i*.23),1.13,-1.83],c:["#b88b58","#547f87","#884a59"][i%3]})),
+        ...Array.from({length:6},(_,i): Part => ({g:box(.19,.32,.22),p:[side*(.88+i*.23),1.13,-1.83],c:[room.accent,"#547f87","#884a59"][i%3]})),
       ]),
     ]} castShadow receiveShadow />
-    <group position={[ARCHIVE_DESK[0]-ARCHIVE.x,0,ARCHIVE_DESK[1]-ARCHIVE.z]} {...cursorOn("point")} onClick={event=>{
+    <group position={[0,0,-1.1]} {...cursorOn("point")} onClick={event=>{
       if(event.button!==0||event.delta>6)return;
       event.stopPropagation();
       read();
     }}>
-      <mesh position={[0,.55,0]}><boxGeometry args={[1.45,1.1,.65]} /><meshStandardMaterial color="#784e2f" /></mesh>
-      <mesh position={[0,1.12,0]}><boxGeometry args={[.74,.09,.42]} /><meshStandardMaterial color="#f6dfab" emissive="#684d31" emissiveIntensity={.25}/></mesh>
-      {near&&<Html center position={[0,1.65,0]} style={{pointerEvents:"none"}}><span className="town-sign">Consultar o Códice</span></Html>}
+      <mesh position={[0,.55,0]}><boxGeometry args={[1.45,1.1,.65]} /><meshStandardMaterial color={room.id === "workshop" ? "#535865" : "#784e2f"} /></mesh>
+      {room.id === "workshop" ? <mesh position={[0,1.28,0]} rotation={[Math.PI/2,0,0]}><torusGeometry args={[.26,.075,6,12]} /><meshStandardMaterial color={room.accent} metalness={.5} /></mesh>
+        : room.id === "academy" ? <mesh position={[0,1.32,0]}><octahedronGeometry args={[.23]} /><meshStandardMaterial color={room.accent} emissive="#287183" emissiveIntensity={.5} /></mesh>
+        : <mesh position={[0,1.12,0]}><boxGeometry args={[.74,.09,.42]} /><meshStandardMaterial color="#f6dfab" emissive="#684d31" emissiveIntensity={.25}/></mesh>}
+      {near&&<Html center position={[0,1.65,0]} style={{pointerEvents:"none"}}><span className="town-sign">{room.label}</span></Html>}
     </group>
   </group>;
 }
@@ -174,6 +177,18 @@ function Crystal({ small = false }: { small?: boolean }) {
     </group>
   </group>;
 }
+const PRECURSOR_LOOKS: Partial<Record<NpcId, Partial<Look>>> = {
+  lovelace: { hair: 3, hairColor: 2, body: 1 },
+  borin: { hair: 4, hairColor: 4, beard: 2, brows: 2, body: 4 },
+  eldrin: { hair: 1, hairColor: 4, beard: 5, body: 2 },
+  turing: { hair: 2, hairColor: 0, brows: 1, body: 1 },
+  "von-neumann": { hair: 1, hairColor: 1, moustache: 1, body: 3 },
+  pascal: { hair: 3, hairColor: 0, moustache: 2, body: 2 },
+  leibniz: { hair: 5, hairColor: 4, body: 3 },
+  jacquard: { hair: 2, hairColor: 3, beard: 3, body: 4 },
+  hollerith: { hair: 1, hairColor: 2, moustache: 3, body: 2 },
+  zuse: { hair: 4, hairColor: 0, brows: 3, body: 1 },
+};
 function Npc({ npc, interact, player }: { npc: typeof NPCS_LIVE[number]; interact: (id: NpcId) => void; player: RefObject<THREE.Vector3> }) {
   const root = useRef<THREE.Group>(null); const shade = useRef(-1); const label = useRef<HTMLDivElement>(null); const marker = useGame(({ hero, education }) => {
     if (npc.id === "chamber") return hasAllArtifacts(hero) && !hero.chamberComplete ? "!" : "";
@@ -191,7 +206,7 @@ function Npc({ npc, interact, player }: { npc: typeof NPCS_LIVE[number]; interac
     {npc.id === "chamber" ? <group position={[0, 1, 0]}>
       <mesh><torusGeometry args={[.82, .1, 8, 28]} /><meshStandardMaterial color="#c9a052" emissive="#62409b" emissiveIntensity={.65} /></mesh>
       <mesh position={[0, -.93, 0]}><boxGeometry args={[1.8, .14, .75]} /><meshStandardMaterial color="#243249" /></mesh>
-    </group> : npc.id === "lion" ? <Crystal /> : <group ref={root} position={[0, 0, 0]}><Character classId={npc.classId} skinOverride={npc.id === "pip" ? "#7d9858" : undefined} look={{ ...DEFAULT_LOOK, skin: npc.id === "pip" ? 5 : 1, beard: npc.id === "eldrin" ? 5 : (npc.id === "pip" || npc.id === "lovelace") ? 0 : 3, hair: npc.id === "lovelace" ? 3 : DEFAULT_LOOK.hair, hairColor: npc.id === "eldrin" ? 4 : 2, cloth: npc.id === "lovelace" ? 3 : npc.id === "eldrin" ? 4 : 0 }} equipped={npc.id==="eldrin"?["staff","tunic"]:npc.id==="borin"?["tool","tunic"]:["dagger","tunic"]} animated={!reduced} /></group>}
+    </group> : npc.id === "lion" ? <Crystal /> : <group ref={root} position={[0, 0, 0]}><Character classId={npc.classId} skinOverride={npc.id === "pip" ? "#7d9858" : undefined} look={{ ...DEFAULT_LOOK, skin: npc.id === "pip" ? 5 : 1, beard: npc.id === "eldrin" ? 5 : (npc.id === "pip" || npc.id === "lovelace") ? 0 : 3, hair: npc.id === "lovelace" ? 3 : DEFAULT_LOOK.hair, hairColor: npc.id === "eldrin" ? 4 : 2, cloth: npc.id === "lovelace" ? 3 : npc.id === "eldrin" ? 4 : 0, ...PRECURSOR_LOOKS[npc.id] }} equipped={npc.id==="eldrin"?["staff","tunic"]:npc.id==="borin"?["tool","tunic"]:["dagger","tunic"]} animated={!reduced} /></group>}
     <Html zIndexRange={[8, 0]} position={[0, npc.id === "lion" ? 3.2 : 3.1, 0]} center style={{ pointerEvents: "none" }}><div ref={label} className="npc-label"><span className="quest-marker main-quest">{marker}</span><strong>{npc.name}</strong><small>{npc.title}</small></div></Html>
   </group>;
 }
@@ -207,7 +222,7 @@ function WorldFraming() {
   useLayoutEffect(()=>{if(camera instanceof THREE.OrthographicCamera)frameWorld(camera,size.width,size.height);},[camera,size.width,size.height]);
   return null;
 }
-function Scene({ paused, interact, openService, report, thirdPerson }: { thirdPerson: boolean; paused: boolean; interact: (id: NpcId) => void; openService: (id: TownService | "codex") => void; report: (text: string) => void }) {
+function Scene({ paused, interact, openService, report, thirdPerson }: { thirdPerson: boolean; paused: boolean; interact: (id: NpcId) => void; openService: (id: TownService | InteriorPanel) => void; report: (text: string) => void }) {
   // Pausado (janela aberta) o mundo não desenha; só tira uma "foto" nova se algo terminar de carregar ou a tela mudar de tamanho.
   const advance = useThree(s => s.advance), size = useThree(s => s.size), loading = useProgress(s => s.active);
   useEffect(() => { if (!paused || loading) return; const id = requestAnimationFrame(t => advance(t)); return () => cancelAnimationFrame(id); }, [paused, loading, size, advance]);
@@ -216,7 +231,7 @@ function Scene({ paused, interact, openService, report, thirdPerson }: { thirdPe
   const low = useGame(s => s.settings.quality === "low"); const quality = useGame(s => s.settings.quality);
   const worldRegion=hero.instance?"instance":hero.region;const forest = !!hero.instance||hero.region!=="aurora"||education.includes("variables"); const mines = !!hero.instance||hero.region!=="aurora"||education.includes("conditions")&&hero.defeatedBosses.includes("boss-forest");
   const lastRegion=useRef(hero.region); const player = useRef(new THREE.Vector3(hero.position[0], 0, hero.position[1])); // Position belongs to the simulation; save checkpoints do not recreate it.
-  const monsterTarget=useRef<string|null>(null); const aggroCheck=useRef(0); const gatherTarget=useRef<{id:string;x:number;z:number}|null>(null); const path = useRef<[number, number][]>([]); const pending = useRef<{ x: number; z: number; open: () => void } | null>(null); const keys = useRef(new Set<string>()); const checkpoint = useRef(0); const wasWalking = useRef(false); const [walking, setWalking] = useState(false);
+  const monsterTarget=useRef<string|null>(null); const aggroCheck=useRef(0); const gatherTarget=useRef<{id:string;x:number;z:number}|null>(null); const path = useRef<[number, number][]>([]); const pending = useRef<{ x: number; z: number; open: () => void; range?: number } | null>(null); const keys = useRef(new Set<string>()); const checkpoint = useRef(0); const wasWalking = useRef(false); const [walking, setWalking] = useState(false);
   const desktopCamera = thirdPerson && size.width >= 1000;
   const camera = useThree(s => s.camera);const invalidate=useThree(s=>s.invalidate); const canvas=useThree(s=>s.gl.domElement);
   useEffect(()=>{bindCursor(canvas);return()=>bindCursor(null);},[canvas]); useEffect(()=>{setCombatCursor(!!encounter);},[encounter]); const temp = useRef(new THREE.Vector3()); const offset = useRef(new THREE.Vector3());
@@ -289,7 +304,7 @@ function Scene({ paused, interact, openService, report, thirdPerson }: { thirdPe
       if (hero.instance && moving) { const sealed = doorBetween(hero.instance, adventure.doors, fromZ, player.current.z); if (sealed) { player.current.z = sealed.z + .6; path.current = []; monsterTarget.current = null; if (useGame.getState().queued) useGame.setState({ queued: null }); if (Date.now() - doorNote.current > 4000) { doorNote.current = Date.now(); report(`🔒 ${sealed.title}: clique na porta e resolva o código.`); } } }
       if (heroRoot.current && moving) heroRoot.current.rotation.y = Math.atan2(temp.current.x, temp.current.z);
       const interaction = pending.current;
-      if (interaction && Math.hypot(player.current.x - interaction.x, player.current.z - interaction.z) < 3.2) {
+      if (interaction && Math.hypot(player.current.x - interaction.x, player.current.z - interaction.z) < (interaction.range ?? 3.2)) {
         path.current = [];
         pending.current = null;
         useGame.getState().move([player.current.x, player.current.z]);
@@ -323,7 +338,7 @@ function Scene({ paused, interact, openService, report, thirdPerson }: { thirdPe
     <directionalLight position={[12, 22, 8]} intensity={0.7 + light * 1.6} color="#fff0cf" castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-22} shadow-camera-right={22} shadow-camera-top={20} shadow-camera-bottom={-25} shadow-bias={-0.001} />
     <KingdomDetails region={hero.region} low={low}/><CombatFeedback />
     <TerrainSurface onClick={groundClick} color={REGIONS[hero.region].color}/><CampaignWorld paused={paused} approach={approachMonster}/>{!hero.instance&&hero.region==="aurora"&&<BiomeDetails region="aurora"/>}{!hero.instance&&hero.region==="aurora"&&<SceneDressing quality={low?"low":quality==="high"?"high":"medium"} groundColor={REGIONS.aurora.color}/>}{hero.region==="aurora"&&!hero.instance&&<>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.028, 0]} onClick={groundClick} receiveShadow><circleGeometry args={[5.8, 40]} /><meshStandardMaterial color="#a5adba" roughness={0.9} /></mesh>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.028, 0]} onClick={groundClick} receiveShadow><circleGeometry args={[PLAZA_RADIUS, 40]} /><meshStandardMaterial color="#a5adba" roughness={0.9} /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[11, 0.025, -16]} onClick={groundClick}><planeGeometry args={[25, 3]} /><meshStandardMaterial color="#8e8b76" /></mesh>
     <group position={[0, .04, 0]}>
       <mesh rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[3.8, 3.9, 48]} /><meshBasicMaterial color="#c2a15e" side={THREE.DoubleSide} /></mesh>
@@ -331,20 +346,21 @@ function Scene({ paused, interact, openService, report, thirdPerson }: { thirdPe
     </group>
     <CitadelSectors />
     <TownDistrict onGroundClick={groundClick} onService={serviceClick}/><CodeSpots night={light<0.4}/><CityDog/><GatherNodes paused={paused} approach={approachGather}/><WorldUnlocks/><ExplorationEncounters paused={paused} interact={()=>interact("traveler")} report={report} /><WorldDetails night={light<0.4} low={low} reduced={reduced} />
-    {BUILDINGS.map((b, i) => b===ARCHIVE ? <ArchiveInterior key="archive" onGroundClick={groundClick} read={()=>{
-      if(paused||useGame.getState().encounter)return;
-      const {x,z}=player.current;
-      if(z < ARCHIVE.z + 1.6 && Math.hypot(x-ARCHIVE_DESK[0],z-ARCHIVE_DESK[1]) < 1.6){
-        path.current=[];
-        pending.current=null;
-        useGame.getState().move([x,z]);
-        openService("codex");
-      }else{
-        pending.current=null;
-        monsterTarget.current=null;
-        gatherTarget.current=null;
-        useGame.getState().setTarget(null);
-        travel(...ARCHIVE_READING_SPOT);
+    {BUILDINGS.map((b, i) => "id" in b ? <CitadelInterior key={b.id} room={b} onGroundClick={groundClick} read={()=>{
+      const state = useGame.getState();
+      if(paused || hero.dead || state.encounter) return;
+      const {x,z} = player.current;
+      pending.current = null;
+      monsterTarget.current = null;
+      gatherTarget.current = null;
+      state.setTarget(null);
+      if(z < b.z + 1.6 && Math.hypot(x - b.x, z - b.z + 1.1) < 1.6){
+        path.current = [];
+        state.move([x,z]);
+        openService(b.panel);
+      } else {
+        travel(b.x,b.z);
+        if(path.current.length) pending.current = { x:b.x, z:b.z, range:.7, open:()=>openService(b.panel) };
       }
     }} /> : <House key={i} x={b.x} z={b.z} index={i%4} citadel={i >= 4} />)}
     {TREES.map((t, i) => <Tree key={i} {...t} />)}
@@ -367,7 +383,7 @@ function Scene({ paused, interact, openService, report, thirdPerson }: { thirdPe
     <OrbitControls ref={controls} enablePan={false} enabled={!paused} enableDamping={!reduced} dampingFactor={0.08} minZoom={24} maxZoom={65} minDistance={desktopCamera ? 4.5 : 6.5} maxDistance={desktopCamera ? 23 : 13} minPolarAngle={desktopCamera ? .38 : thirdPerson ? 1.04 : .84} maxPolarAngle={desktopCamera ? 1.46 : thirdPerson ? 1.32 : .84} mouseButtons={{ LEFT: undefined, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE }} touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }} />
   </>;
 }
-export default function GameWorld(props: { paused: boolean; interact: (id: NpcId) => void; openService: (id: TownService | "codex") => void; report: (text: string) => void }) {
+export default function GameWorld(props: { paused: boolean; interact: (id: NpcId) => void; openService: (id: TownService | InteriorPanel) => void; report: (text: string) => void }) {
   const quality = useGame(s => s.settings.quality);
   const thirdPerson = useGame(s => s.hero.region === "aurora" && !s.hero.instance);
   return <WorldBoundary><Canvas key={thirdPerson ? "citadel" : "region"} frameloop={props.paused ? "never" : "always"} orthographic={!thirdPerson} dpr={quality === "high" ? [1, 1.75] : [1, 1.25]} camera={thirdPerson ? { position: [0, 4.4, 9.3], fov: 52, near: 0.15, far: 135 } : { position: [14, 18, 14], zoom: 42, left:-840, right:840, top:420, bottom:-420, near:.1, far:220 }} shadows={quality !== "low" ? "percentage" : false} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} fallback={<div className="world-fallback">Seu navegador não disponibilizou o WebGL. Os painéis continuam disponíveis.</div>}><Suspense fallback={null}><WorldFraming /><Scene {...props} thirdPerson={thirdPerson} /></Suspense></Canvas></WorldBoundary>;

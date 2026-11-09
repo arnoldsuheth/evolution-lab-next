@@ -3,7 +3,7 @@
 import { INSTANCES } from "@/lib/instances";
 import { MONSTERS } from "@/lib/campaign";
 import { BUILDINGS } from "@/lib/navigation";
-import { CITADEL_SECTORS, ROADS, TOWN_SERVICES, type Point } from "@/lib/town";
+import { CITADEL_SECTORS, PLAZA_RADIUS, ROADS, TOWN_SERVICES, type Point } from "@/lib/town";
 
 export function CitadelMap({ position, local = false, route = [], selected }: {
   position?: Point;
@@ -23,9 +23,9 @@ export function CitadelMap({ position, local = false, route = [], selected }: {
           <line key={id} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} strokeWidth={width} stroke={kind === "road" ? "#8e836b" : "#685f58"} />
         ))}
       </g>
-      <circle r="5.8" fill="#8e836b" stroke="#ccb079" strokeWidth=".4" />
+      <circle r={PLAZA_RADIUS} fill="#8e836b" stroke="#ccb079" strokeWidth=".4" />
       <circle r="1.25" fill="#6bd4dd" />
-      {BUILDINGS.map(({ x, z, w, d }) => <rect key={x} x={x - w} y={z - d} width={w * 2} height={d * 2} rx=".5" fill="#3c4f73" stroke="#a28a61" strokeWidth=".35" />)}
+      {BUILDINGS.map(({ x, z, w, d }) => <rect key={`${x},${z}`} x={x - w} y={z - d} width={w * 2} height={d * 2} rx=".5" fill="#3c4f73" stroke="#a28a61" strokeWidth=".35" />)}
       {!!route.length && position && (
         <polyline points={[position, ...route].map(point => point.join(",")).join(" ")} fill="none" stroke="#72e5eb" strokeWidth=".6" strokeLinecap="round" strokeLinejoin="round" />
       )}

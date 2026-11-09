@@ -1,6 +1,6 @@
 import {insideWorld} from "./worldBounds";
-import {ARCHIVE, archiveBlocks, townBlocked} from "./town";
-export const BUILDINGS = [{x:-35,z:7,w:2.6,d:2.5},{x:-31,z:18,w:2.6,d:2.5},{x:35,z:7,w:2.6,d:2.5},{x:31,z:18,w:2.6,d:2.5},{ x: -9, z: 5, w: 2.7, d: 2.7 }, { x: 9, z: 4, w: 2.6, d: 2.5 }, ARCHIVE, { x: 9, z: -7, w: 2.6, d: 2.6 }];
+import {INTERIORS, interiorBlocks, townBlocked} from "./town";
+export const BUILDINGS = [{x:-35,z:7,w:2.6,d:2.5},{x:-31,z:18,w:2.6,d:2.5},{x:35,z:7,w:2.6,d:2.5},{x:31,z:18,w:2.6,d:2.5},{ x: 9, z: 4, w: 2.6, d: 2.5 }, ...INTERIORS];
 export const TREES = Array.from({ length: 48 }, (_, i) => { const a = i * 2.39996; const r = 7 + (i % 5) * 1.6; return { x: Math.cos(a) * r, z: -22 + Math.sin(a) * r * 0.5, size: 0.75 + (i % 4) * 0.18 }; }).filter(t => Math.abs(t.x) > 2.2);
 export const REGION_PILLARS = Array.from({length:12},(_,i)=>({x:Math.cos(i*2.4)*18,z:-10+Math.sin(i*2.4)*14}));
 export function walkable(x: number, z: number, forest: boolean, mines: boolean, region="aurora") {
@@ -9,7 +9,7 @@ export function walkable(x: number, z: number, forest: boolean, mines: boolean, 
   if(region!=="aurora")return !REGION_PILLARS.some(p=>Math.hypot(x-p.x,z-p.z)<1.6);
   if (z < -12 && !forest) return false;
   if (x > 15 && !mines) return false;
-  if (archiveBlocks(x, z) || BUILDINGS.some(b => b !== ARCHIVE && Math.abs(x - b.x) < b.w + 0.4 && Math.abs(z - b.z) < b.d + 0.4)) return false;
+  if (BUILDINGS.some(b => "id" in b ? interiorBlocks(b, x, z) : Math.abs(x - b.x) < b.w + 0.4 && Math.abs(z - b.z) < b.d + 0.4)) return false;
   if (townBlocked(x, z)) return false;
   if (TREES.some(t => Math.hypot(x - t.x, z - t.z) < 0.6)) return false;
   if (Math.hypot(x, z) < 1.45 || Math.hypot(x - 22, z + 20) < 2) return false;

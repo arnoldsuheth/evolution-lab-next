@@ -1,5 +1,5 @@
 import {test} from 'node:test';import {strict as assert} from 'node:assert';
-import {ARCHIVE,ARCHIVE_READING_SPOT,PROPS,ROADS,WORLD_UNLOCKS,onRoad,townBlocked} from './town';
+import {INTERIORS,PROPS,ROADS,WORLD_UNLOCKS,onRoad,townBlocked} from './town';
 import {walkable,findPath,BUILDINGS} from './navigation';
 import {MONSTERS} from './campaign';
 import {NPCS_LIVE,LESSONS} from './game';
@@ -24,4 +24,13 @@ test('monstros ficam em acampamentos fora da cidade e todos podem ser alcançado
 });
 test('cada uma das oito runas muda algo no mapa',()=>{assert.deepEqual(WORLD_UNLOCKS.map(u=>u.lesson),LESSONS.map(l=>l.id));for(const u of WORLD_UNLOCKS)assert.ok(u.lesson==='loops'||PROPS.some(p=>p.unlock===u.lesson),u.lesson);});
 
-test('Arquivo tem entrada, passagem interna e paredes sólidas',()=>{const {x,z}=ARCHIVE;assert.ok(findPath([0,5],ARCHIVE_READING_SPOT,false,false).length);assert.ok(findPath(ARCHIVE_READING_SPOT,[x,z+4],false,false).length);assert.equal(walkable(x+2,z,true,true),false);assert.equal(walkable(x,z-2,true,true),false);assert.equal(walkable(x+1,z+2,true,true),false);assert.equal(walkable(x,z-1,true,true),false);});
+test('interiores podem ser alcançados pela porta e têm paredes e balcões sólidos',()=>{
+ for(const {id,x,z} of INTERIORS){
+  assert.ok(findPath([0,5],[x,z],false,false).length,id);
+  assert.ok(findPath([x,z],[x,z+4],false,false).length,id);
+  assert.equal(walkable(x+2,z,true,true),false,id);
+  assert.equal(walkable(x,z-2,true,true),false,id);
+  assert.equal(walkable(x+1,z+2,true,true),false,id);
+  assert.equal(walkable(x,z-1,true,true),false,id);
+ }
+});

@@ -7,16 +7,22 @@ import { INSTANCES } from "./instances";
 
 export type Point = [number, number];
 export type Road = { id: string; a: Point; b: Point; width: number; kind: 'road' | 'trail' };
-export const ARCHIVE = { x: -8, z: -6, w: 2.8, d: 2.5 };
-export const ARCHIVE_DESK: Point = [ARCHIVE.x, ARCHIVE.z - 1.1];
-export const ARCHIVE_READING_SPOT: Point = [ARCHIVE.x, ARCHIVE.z];
+export const PLAZA_RADIUS = 6.7;
+export type InteriorPanel = 'codex' | 'academy' | 'character';
+export type Interior = {
+  id: string; x: number; z: number; w: number; d: number;
+  label: string; panel: InteriorPanel; accent: string;
+};
+export const ARCHIVE: Interior = { id: 'archive', x: -8, z: -6, w: 2.8, d: 2.5, label: 'Consultar o Códice', panel: 'codex', accent: '#b88b58' };
+export const WORKSHOP: Interior = { id: 'workshop', x: -9, z: 5, w: 2.7, d: 2.7, label: 'Abrir equipamento e fabricação', panel: 'character', accent: '#bf8445' };
+export const ACADEMY: Interior = { id: 'academy', x: 9, z: -7, w: 2.6, d: 2.6, label: 'Abrir estudos de programação', panel: 'academy', accent: '#6daabf' };
+export const INTERIORS = [ARCHIVE, WORKSHOP, ACADEMY];
 
-export function archiveBlocks(x: number, z: number) {
-  const dx = Math.abs(x - ARCHIVE.x);
-  const dz = z - ARCHIVE.z;
-  if (dx >= ARCHIVE.w + .4 || Math.abs(dz) >= ARCHIVE.d + .4) return false;
-  // The front wall has a doorway, and the desk leaves a clear reading aisle.
-  return dx >= 1.85 || dz <= -1.6 || (dz >= 1.6 && dx >= .85) ||
+export function interiorBlocks(room: Interior, x: number, z: number) {
+  const dx = Math.abs(x - room.x);
+  const dz = z - room.z;
+  if (dx >= room.w + .4 || Math.abs(dz) >= room.d + .4) return false;
+  return dx >= room.w - .95 || dz <= -1.6 || (dz >= 1.6 && dx >= .85) ||
     (dx < .8 && dz >= -1.5 && dz <= -.75);
 }
 
@@ -24,6 +30,12 @@ export const ROADS: Road[] = [
   { id: 'eixo-cidadela', a: [0, -28], b: [0, 20], width: 4.8, kind: 'road' },
   // Avenida das Guildas: liga os postos de Elara (oeste) e Dorin (leste) passando pela entrada da praça.
   { id: 'avenida', a: [-33, 12], b: [33, 12], width: 3.2, kind: 'road' },
+  { id: 'arcada-norte', a: [-8, -10], b: [9, -10], width: 2.2, kind: 'road' },
+  { id: 'rua-oeste', a: [-13, -3], b: [-13, 12], width: 2.1, kind: 'road' },
+  { id: 'travessa-oeste', a: [-13, -3], b: [ARCHIVE.x, -3], width: 1.8, kind: 'road' },
+  { id: 'rua-leste', a: [12.7, -10], b: [12.7, 12], width: 1.8, kind: 'road' },
+  { id: 'ligacao-academia', a: [9, -10], b: [12.7, -10], width: 2.2, kind: 'road' },
+  { id: 'travessa-leste', a: [9, -3.7], b: [12.7, -3.7], width: 1.8, kind: 'road' },
   // Caminhos das portas até a avenida e até a praça.
   { id: 'porta-oficina', a: [-9, 8.3], b: [-9, 12], width: 1.6, kind: 'road' },
   { id: 'porta-pousada', a: [9, 7.1], b: [9, 12], width: 1.6, kind: 'road' },
@@ -43,7 +55,7 @@ export const CITADEL_SECTORS = [
   { name: "Biblioteca ancestral", short: "Biblioteca", x: -3, z: -9.3, entrance: [0, -9] },
   { name: "Arquivo histórico", short: "Arquivo", x: ARCHIVE.x, z: ARCHIVE.z + 1.4, entrance: [ARCHIVE.x, -3] },
   { name: "Oficina de mecanismos", short: "Oficina", x: -8.6, z: 4.3, entrance: [-9, 9] },
-  { name: "Academia de programação", short: "Academia", x: 8.5, z: -4, entrance: [6, -2.9] },
+  { name: "Academia de programação", short: "Academia", x: 8.5, z: -4, entrance: [ACADEMY.x, -3] },
   { name: "Pátio de cálculos", short: "Pátio", x: 8.5, z: 5.8, entrance: [9, 9] },
 ] satisfies { name: string; short: string; x: number; z: number; entrance: Point }[];
 
@@ -60,7 +72,7 @@ export function distanceToRoad(x: number, z: number, road: Road) {
 }
 /** Também conta a estrada principal (norte-sul), a praça do cristal e a estrada das minas, já existentes. */
 export function onRoad(x: number, z: number, margin = 0) {
-  if (Math.hypot(x, z) < 5.8 + margin) return true;
+  if (Math.hypot(x, z) < PLAZA_RADIUS + margin) return true;
   if (Math.abs(z + 16) < 1.5 + margin && x > -1.5 && x < 23.5) return true;
   return ROADS.some(r => distanceToRoad(x, z, r) < r.width / 2 + margin);
 }
