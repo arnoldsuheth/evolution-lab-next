@@ -1,4 +1,5 @@
 "use client";
+import { BAG_RECIPES } from '@/lib/bags';
 import { PanelGroupTabs, groupOf, MountsPanel } from "@/components/PanelGroups";
 import { PRECURSORS, precursorForNpc } from "@/lib/precursorCatalog";
 import { BankPanel, WagonPanel } from "@/components/TownServices";
@@ -147,7 +148,7 @@ export default function Home() {
   useEffect(()=>{installCursors(document.documentElement);},[]);
   const [editingHud,setEditingHud]=useState(false);
   const [questsCollapsed,setQuestsCollapsed]=useState(false);
-  const [panel, setPanel] = useState<Panel>("none"); const [npc, setNpc] = useState<NpcId>("lion"); const [collapsed, setCollapsed] = useState(false); const [clock, setClock] = useState("Brasília"); const audio = useRef<KingdomAudio | null>(null);
+  const [panel, setPanel] = useState<Panel>("none"); const [initialBag, setInitialBag] = useState("all"); const [npc, setNpc] = useState<NpcId>("lion"); const [collapsed, setCollapsed] = useState(false); const [clock, setClock] = useState("Brasília"); const audio = useRef<KingdomAudio | null>(null);
   // Com uma página do menu aberta, o tempo do jogo para: sem recuperar vida e sem gastar a duração de poções e bônus.
   const [door, setDoor] = useState("");
   useEffect(() => { const on = (e: Event) => { const id = (e as CustomEvent<string>).detail; if (typeof id === "string") { setDoor(id); setPanel("door"); } }; window.addEventListener("lions-cave-door", on); return () => window.removeEventListener("lions-cave-door", on); }, []);
@@ -216,7 +217,7 @@ export default function Home() {
     return ()=>{window.removeEventListener('pointerdown',start);window.removeEventListener('keydown',start);document.removeEventListener('visibilitychange',visibility);};
   },[entered,settings.volume,settings.ambienceVolume,settings.muted]);
 
-  const close = useCallback(() => { useGame.getState().cancelChallenge(); setPanel("none"); }, []);
+  const close = useCallback(() => { useGame.getState().cancelChallenge(); setPanel("none"); setInitialBag("all"); }, []);
   useEffect(()=>{
     const key=(event:KeyboardEvent)=>{
       if(!entered||!hero.created||editingHud||cloudBlocked||portrait||challenge||event.repeat||event.ctrlKey||event.metaKey||event.altKey)return;
@@ -252,10 +253,16 @@ export default function Home() {
       <button onClick={()=>setPanel("journal")} title="Diário de missões"><span aria-hidden="true">▤</span>Diário</button>
       <button onClick={()=>setPanel("codex")} title="Códice"><span aria-hidden="true">❖</span>Códice</button>
       <button onClick={()=>setPanel("bag")} title="Mochila"><span aria-hidden="true">▣</span>Mochila</button>
-      <div className="desktop-bags" aria-label="Bolsas"><button onClick={()=>setPanel("bag")} title="Mochila inicial · abrir">🎒</button>{[5,10,20].map(n=><button key={n} className="locked" disabled title={`Espaço para bolsa de ${n} lugares · fabricação em breve`} aria-label={`Bolsa de ${n} lugares, ainda não fabricada`}>👜</button>)}</div>
+      <div className="desktop-bags" aria-label="Bolsas">
+        <button onClick={()=>{setInitialBag("backpack");setPanel("bag");}} title="Mochila inicial · abrir">🎒</button>
+        {BAG_RECIPES.map(({id,size})=>{
+          const owned=hero.inventory.includes(id);
+          return <button key={id} className={owned?"":"locked"} disabled={!owned} title={owned?`Abrir bolsa de ${size} espaços`:`Fabrique a bolsa de ${size} espaços com Babbage`} aria-label={`Bolsa de ${size} espaços`} onClick={()=>{setInitialBag(id);setPanel("bag");}}>👜</button>;
+        })}
+      </div>
     </nav>}
     {activePanel !== "none" && <Modal title={groupOf(activePanel)?.title ?? titles[activePanel]} close={close} wide={["creator", "journal", "academy"].includes(activePanel)} creator={activePanel === "creator"}>
-      <PanelGroupTabs active={activePanel} go={setPanel} />{activePanel === "codex" && <PrecursorCodex />}{activePanel === "map" && <WorldMap/>}{activePanel === "character" && <Inventory edit={()=>setPanel("creator")}/>}{activePanel === "journey" && <JourneyPanel />}{activePanel === "adventure" && <AdventurePanel />}{activePanel === "door" && <DoorPanel key={door} id={door} close={close} />}{activePanel === "spot" && <SpotPanel key={spot} id={spot} close={close} />}{activePanel === "dog" && <DogPanel />}{activePanel === "mounts" && <MountsPanel />}{activePanel === "bank" && <BankPanel />}{activePanel === "wagon" && <WagonPanel />}{activePanel === "challenge" && <ChallengePanel />}{activePanel === "creator" && (!hero.created || hero.dead) && <Creator close={close} />}{activePanel === "journal" && <Journal />}{activePanel === "bag" && <Inventory edit={()=>setPanel("creator")}/>}{activePanel === "talents" && <Talents />}{activePanel === "academy" && <Academy />}{activePanel === "settings" && <SettingsPanel />}
+      <PanelGroupTabs active={activePanel} go={setPanel} />{activePanel === "codex" && <PrecursorCodex />}{activePanel === "map" && <WorldMap/>}{activePanel === "character" && <Inventory edit={()=>setPanel("creator")}/>}{activePanel === "journey" && <JourneyPanel />}{activePanel === "adventure" && <AdventurePanel />}{activePanel === "door" && <DoorPanel key={door} id={door} close={close} />}{activePanel === "spot" && <SpotPanel key={spot} id={spot} close={close} />}{activePanel === "dog" && <DogPanel />}{activePanel === "mounts" && <MountsPanel />}{activePanel === "bank" && <BankPanel />}{activePanel === "wagon" && <WagonPanel />}{activePanel === "challenge" && <ChallengePanel />}{activePanel === "creator" && (!hero.created || hero.dead) && <Creator close={close} />}{activePanel === "journal" && <Journal />}{activePanel === "bag" && <Inventory initialBag={initialBag} edit={()=>setPanel("creator")}/>}{activePanel === "talents" && <Talents />}{activePanel === "academy" && <Academy />}{activePanel === "settings" && <SettingsPanel />}
       {activePanel === "ancestors" && <div className="panel-body"><span className="eyebrow">SEU LEGADO É O QUE VOCÊ APRENDEU</span><h3>Nenhuma descoberta se perde.</h3><p>{completed.length} missões educacionais preservadas. A herança equivale a 15% do XP próprio da aventura encerrada, limitada a 100 XP e recebida uma única vez. O XP herdado não gera nova herança.</p>{ancestors.length ? ancestors.map(a => <article className="ancestor" key={a.id}><span>♜</span><div><h4>{a.name}</h4><p>{CLASSES[a.classId].name} · nível {a.level} · {a.cause}</p><small>{new Date(a.diedAt).toLocaleDateString("pt-BR")} · {a.legacy} XP de legado · {a.claimed ? "utilizado" : "disponível"}</small></div></article>) : <div className="empty-state">As primeiras páginas ainda estão em branco.</div>}{hero.dead && <button className="primary" onClick={() => setPanel("creator")}>Criar um novo personagem</button>}<p className="small-note">Modo individual local. Restaurar arquivos fora do aplicativo ou adulterar dados pode contornar proteções locais; não existe competição ou ranking nesta versão.</p></div>}
       {activePanel === "npc" && (npc === "chamber" ? <ChamberPanel /> : npc === "lovelace" ? <><QuestDialog npc={npc} /><LovelacePanel key={hero.id} /></> : precursor ? <>
         {npc === "borin" ? <details className="panel-body"><summary>Oficina e missões de Aurora</summary><Inventory shop /></details> : <QuestDialog npc={npc} />}

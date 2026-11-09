@@ -1,4 +1,5 @@
 "use client";
+import { BAG_RECIPES, inventorySections } from '@/lib/bags';
 import CharacterSheet from "./CharacterSheet";
 import Currency from "./Currency";
 import {adventureOf,discounted,repPercent} from "@/lib/adventure";
@@ -72,7 +73,7 @@ function DeltaBadge({info}:{info:ReturnType<typeof upgradeDelta>}){
  return <span className={`item-delta ${delta>0?'stat-good':delta<0?'stat-bad':'stat-same'}`} aria-label={delta>0?`Melhor que o equipado: +${delta} ${label}`:delta<0?`Pior que o equipado: ${delta} ${label}`:`Igual ao equipado em ${label}`}>{delta>0?'▲+':delta<0?'▼':'='}{delta!==0?delta:''}<small className="delta-label"> {label}</small></span>;
 }
 
-export default function EquipmentPanel({shop=false,vendor="borin",edit=()=>{}}:{shop?:boolean;vendor?:"borin"|"elara"|"dorin"|"mira";edit?:()=>void}){
+export default function EquipmentPanel({shop=false,vendor="borin",edit=()=>{},initialBag="all"}:{initialBag?:string;shop?:boolean;vendor?:"borin"|"elara"|"dorin"|"mira";edit?:()=>void}){
  const mounted=useGame(s=>s.mounted);const hero=useGame(s=>s.hero),shopCut=repPercent(adventureOf(hero),'mercadores'),completed=useGame(s=>s.education.completed),encounter=useGame(s=>s.encounter);
  const detail=useRef<HTMLElement>(null);
  const [inspected,setInspected]=useState<string|null>(null);
@@ -80,11 +81,17 @@ export default function EquipmentPanel({shop=false,vendor="borin",edit=()=>{}}:{
  const [slotFilter,setSlotFilter]=useState<string|null>(null);
  const [filtersOpen,setFiltersOpen]=useState(false);
  const [view,setView]=useState(shop?'shop':'bag'),[query,setQuery]=useState(''),[category,setCategory]=useState('all'),[classFilter,setClassFilter]=useState('mine'),[rarity,setRarity]=useState('all'),[band,setBand]=useState('all'),[locked,setLocked]=useState(true),[page,setPage]=useState(0);
+ const [bagFilter,setBagFilter]=useState(initialBag);
  const inventory=hero.inventory,limits=stats(hero);
+ const bags=inventorySections(inventory,hero.equipped);
+ const bagIds=new Set<string>(BAG_RECIPES.map(bag=>bag.id));
+ const selectedItems=bagFilter==='all'?null:new Set(bagFilter==='overflow'?bags.overflow:bags.sections.find(bag=>bag.id===bagFilter)?.items??[]);
+
 
  const all=Object.values(ITEMS);const matching=all.filter(item=>{
   if(view==='bag'||view==='sell'){if(bagCount(hero,item.id)<=0)return false;}
   if(view==='sell'&&!item.sellPrice)return false;
+  if(view==='bag'&&(bagIds.has(item.id)||(selectedItems&&!selectedItems.has(item.id))))return false;
   if(view==='bag'&&slotFilter&&item.slot!==slotFilter&&!(slotFilter==='weapon'&&item.slot==='twohand'))return false;
   if(view==='shop'&&item.source!=='shop')return false;
   if(view==='shop'&&countItem(inventory,item.id)>=Math.max(1,item.maxStack))return false; // já tem: só aparece para vender
@@ -114,6 +121,11 @@ export default function EquipmentPanel({shop=false,vendor="borin",edit=()=>{}}:{
  
  <div className="inventory-toolbar"><div className="tabs">{views.map(([id,label])=><button key={id} className={view===id?'active':''} onClick={()=>{setView(id);setInspected(null);setPage(0);}} title={label} aria-label={label}><span aria-hidden="true">{({shop:"◈",forge:"⚒",sell:"◉",quests:"!",catalogue:"▦",bag:"▣",character:"♙"} as Record<string,string>)[id]}</span><small>{label}</small></button>)}</div><span className="currency" aria-label="Suas moedas"><Currency value={hero.gold}/></span>{view!=='character'&&view!=='quests'&&<button type="button" className="inventory-search" aria-label="Buscar e filtrar itens" aria-expanded={filtersOpen} aria-controls="inventory-filter-options" onClick={()=>setFiltersOpen(!filtersOpen)}><span aria-hidden="true">⌕</span></button>}</div>
  <div className={shop?'shop-main':'panel-flow'}>{view==='character'?<CharacterSheet edit={edit} bag={()=>setView('bag')}/>:view==='quests'?<div className="shop-quests"><QuestDialog npc={vendor}/>{vendor==="borin"&&<WorkshopServices/>}</div>:<>
+ {view==='bag'&&!shop&&<nav className="tabs" aria-label="Bolsas do inventário">
+   <button aria-pressed={bagFilter==='all'} onClick={()=>{setBagFilter('all');setPage(0);setInspected(null);}}>Tudo · {bags.used}/{bags.capacity}</button>
+   {bags.sections.map(bag=><button key={bag.id} aria-pressed={bagFilter===bag.id} onClick={()=>{setBagFilter(bag.id);setPage(0);setInspected(null);}}>{bag.id==='backpack'?'Mochila':`Bolsa ${bag.size}`} · {bag.items.length}/{bag.size}</button>)}
+   {(bags.overflow.length>0||bagFilter==='overflow')&&<button aria-pressed={bagFilter==='overflow'} onClick={()=>{setBagFilter('overflow');setPage(0);setInspected(null);}}>Excedente · {bags.overflow.length}</button>}
+ </nav>}
  <div className="category-chips" role="tablist" aria-label="Categorias">{CATEGORY_CHIPS.map(([id,label])=><button key={id} type="button" role="tab" aria-selected={category===id} className={category===id?'active':''} onClick={()=>{setCategory(id);setPage(0);setInspected(null);}}>{label}</button>)}</div>
  <div id="inventory-filter-options" className="inventory-filters" hidden={!filtersOpen}><div className="catalogue-controls"><label>Buscar<input value={query} onChange={e=>{setQuery(e.target.value);setPage(0);}} placeholder="Nome, material ou tipo de item"/></label><label>Tipo<select value={category} onChange={select(setCategory)}><option value="all">Todos os tipos</option>{Object.entries(CATEGORY_NAMES).map(([id,name])=><option key={id} value={id}>{name}</option>)}</select></label><label>Classe<select value={classFilter} onChange={select(setClassFilter)}><option value="mine">Minha classe e universais</option><option value="all">Todas as classes</option></select></label><label>Nível mínimo<select value={band} onChange={select(setBand)}><option value="all">Todas as faixas</option>{LEVEL_BANDS.map(n=><option key={n} value={n}>Nível {n}+</option>)}</select></label><label>Raridade<select value={rarity} onChange={select(setRarity)}><option value="all">Todas</option>{['Comum','Incomum','Raro','Épico','Lendário','Mítico'].map(r=><option key={r}>{r}</option>)}</select></label></div>
  <label className="check-row"><input type="checkbox" checked={locked} onChange={e=>{setLocked(e.target.checked);setPage(0);}}/>Mostrar itens que ainda não posso usar</label></div>

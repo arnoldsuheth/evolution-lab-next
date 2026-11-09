@@ -1,3 +1,4 @@
+import { BAG_RECIPES } from './bags';
 import {equipmentValue} from "./economy";
 import type { ClassId } from './game';
 /**
@@ -72,6 +73,14 @@ export function buildCatalogue(legacy:Record<string,{name:string;price:number;sl
  const apprentice=[['blacksmith','Broquel do Aprendiz','offhand','armor','shield'],['weaponsmith','Lâmina do Aprendiz','weapon','weapon','sword'],['tailor','Manto do Aprendiz','chest','armor','chest'],['leatherworker','Botas do Aprendiz','feet','armor','feet'],['alchemist','Tônico do Aprendiz','consumable','consumable','potion']] as const;
  for(const [profession,name,slot,category,visual] of apprentice)result['apprentice-'+profession]=make('apprentice-'+profession,{name,slot,category,visual,profession,source:'craft',minLevel:1,price:30,sellPrice:3,craftGold:5,ingredients:profession==='alchemist'?{'mat-crystal-1':2}:{['mat-'+(profession==='tailor'?'cloth':profession==='leatherworker'?'leather':'ore')+'-1']:3},maxStack:profession==='alchemist'?20:1,power:profession==='weaponsmith'?5:0,defense:category==='armor'?3:0,effect:profession==='alchemist'?{hp:30,stamina:20}:undefined,description:'Receita de aprendiz. Requer o ofício correspondente aprendido com Borin.'});
  result['scroll-aurora']=make('scroll-aurora',{name:'Pergaminho de Retorno à Aurora',slot:'consumable',category:'consumable',price:50,sellPrice:2,source:'craft',maxStack:20,visual:'charm',ingredients:{'mat-crystal-1':2,'mat-cloth-1':1},craftGold:10,effect:{teleport:true},description:'Fabricado com Borin. Consuma fora de combate para voltar à praça da Aurora. Não abre regiões bloqueadas.'});
+ for (const bag of BAG_RECIPES) {
+  result[bag.id] = make(bag.id, {
+   name: `Bolsa de ${bag.size} espaços`, slot: 'material', category: 'material', source: 'craft',
+   minLevel: bag.level, maxStack: 1, sellPrice: 0, price: bag.gold, craftGold: bag.gold,
+   ingredients: { 'mat-cloth-1': bag.cloth }, visual: 'cloth',
+   description: `Ativa automaticamente uma bolsa de ${bag.size} espaços no inventário.`,
+  });
+ }
  result['mount-boar']=make('mount-boar',{name:'Javali de Montaria da Aurora',slot:'pet',category:'companion',minLevel:30,price:1800,visual:'boar',mount:true,rarity:'Épico',description:'Montaria para todas as classes a partir do nível 30. Equipe como companheiro e escolha Montar. Caminha 50% mais rápido; desmonta ao iniciar combate.'});
  for(const [id,name,level] of [['cache-dawn','Lembrança da Primeira Runa',1],['cache-forest','Medalhão do Bosque Oculto',10],['cache-rune','Relíquia da Chave Perdida',20]] as const)result[id]=make(id,{name,slot:'trinket',category:'accessory',minLevel:level,rarity:'Épico',power:3+Math.ceil(level*.3),defense:2+Math.ceil(level*.2),hp:8+level,source:'chest',visual:'charm',description:'Tesouro de um baú oculto, aberto por uma chave de conhecimento.'});
  for(const [id,old]of Object.entries(legacy)){const consumable=old.slot==='consumable';const category:Category=consumable?(id==='food'?'food':'consumable'):['helmet','shield','tunic'].includes(id)?'armor':id==='runic'?'accessory':'weapon';result[id]=make(id,{...old,slot:old.slot as Slot,category,minLevel:id==='runic'?5:1,visual:{axe:'axe',shield:'shield',helmet:'head',sword:'sword',greatsword:'greatsword',bow:'bow',tool:'hammer',staff:'staff',dagger:'dagger',tunic:'chest',runic:'charm',potion:'potion',food:'food',tea:'potion'}[id]??'gadget',classes:id==='axe'?['warrior','engineer']:id==='shield'?['paladin']:undefined,armor:id==='helmet'?'Leve':id==='tunic'?'Leve':undefined,maxStack:consumable?99:1,effect:id==='potion'?{hp:45}:id==='food'?{mp:30,stamina:100}:id==='tea'?{buff:'defense',amount:5,duration:60}:undefined});}
