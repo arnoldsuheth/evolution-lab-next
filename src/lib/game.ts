@@ -186,7 +186,7 @@ export function migrateSave(input: unknown): SaveData {
   if (old.chamberComplete === true && hasAllArtifacts(hero)) hero.chamberComplete = true;
   hero.attributeAllocation=cleanAttributes(old.attributeAllocation,hero.level);
   const look = { ...DEFAULT_LOOK };
-  for (const key of Object.keys(look) as (keyof Look)[]) look[key] = Math.floor(number(oldLook[key], look[key], 0, key === "skin" ? SKIN.length - 1 : key === "hairColor" ? HAIR.length - 1 : key === "beard" || key === "hair" ? 9 : 5));
+  for (const key of Object.keys(look) as (keyof Look)[]) look[key] = Math.floor(number(oldLook[key], look[key], 0, key === "skin" ? SKIN.length - 1 : key === "hairColor" ? HAIR.length - 1 : key === "beard" ? 10 : key === "hair" ? 9 : 5));
   // Antes da 1.9 essas opções não apareciam no herói 3D: zerar mantém o personagem exatamente como o jogador o via.
   if (data.look && !Object.hasOwn(oldLook, "ears")) for (const key of ["beard", "moustache", "brows", "nose", "eyes", "scar", "tattoo", "accessory"] as const) look[key] = 0;
   if (!data.look) { if (appearance.beard === "copper") look.hairColor = 2; if (appearance.beard === "silver") look.hairColor = 4; if (appearance.armor === "red") look.cloth = 2; if (appearance.armor === "green") look.cloth = 3; }

@@ -9,7 +9,7 @@ test('raça traz suas marcas: orelha de elfo, presas de orc e orelhas grandes de
  assert.equal(RACE_EARS.elf,4);
 });
 test('cada opção do menu cria peças e o elmo esconde só o que fica por baixo dele',()=>{
- for(const [key,list] of [['beard',BEARDS],['moustache',MOUSTACHES],['brows',BROWS],['nose',NOSES],['ears',EARS],['scar',SCARS],['tattoo',PAINTS],['accessory',ACCESSORIES]] as const){assert.equal(list.length,key==='beard'?10:6,key);for(let i=1;i<list.length;i++)assert.ok(faceParts({look:{...none,[key]:i},race:'human',covered:false}).length>0,`${key} ${i}`);}
+ for(const [key,list] of [['beard',BEARDS],['moustache',MOUSTACHES],['brows',BROWS],['nose',NOSES],['ears',EARS],['scar',SCARS],['tattoo',PAINTS],['accessory',ACCESSORIES]] as const){assert.equal(list.length,key==='beard'?11:6,key);for(let i=1;i<list.length;i++)assert.ok(faceParts({look:{...none,[key]:i},race:'human',covered:false}).length>0,`${key} ${i}`);}
  const helm=faceParts({look:{...none,beard:2,ears:4,brows:2,accessory:4},race:'elf',covered:true}).map(p=>p.part);
  assert.ok(helm.includes('beard'),'barba aparece sob o elmo');assert.ok(!helm.includes('ear')&&!helm.includes('brow')&&!helm.includes('accessory'));
  assert.equal(buildFaceKit({look:{...none,beard:5},race:'dwarf',covered:false,hair:'#825235',skin:'#e7bd9e'}).children.length,faceParts({look:{...none,beard:5},race:'dwarf',covered:false}).length);

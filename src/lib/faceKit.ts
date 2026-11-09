@@ -10,7 +10,7 @@ import type { Look, Race } from './game';
  */
 export const FACE = { eyeY: 1.606, eyeX: .17, faceZ: .47, noseY: 1.5, mouthY: 1.39, chinY: 1.22, earX: .54, earY: 1.53, browY: 1.735, crownY: 2.12 } as const;
 
-export const BEARDS = ['Sem barba', 'Curta', 'Cheia', 'Trança central', 'Duas tranças', 'Quatro tranças', 'Cavanhaque', 'Costeletas', 'Barba por fazer', 'Âncora'];
+export const BEARDS = ['Sem barba', 'Curta', 'Cheia', 'Trança central', 'Duas tranças', 'Quatro tranças', 'Cavanhaque', 'Costeletas', 'Barba por fazer', 'Âncora', 'Selvagem'];
 /** Anão nunca fica sem barba: as 6 opções são próprias da raça. */
 export const DWARF_BEARDS = ['Barba de forja', 'Bifurcada', 'Longa até o cinto', 'Duas tranças grossas', 'Anéis de ouro', 'Larga e cheia'];
 /** Cabelos próprios do anão (o índice é o mesmo campo `hair` do visual). */
@@ -71,6 +71,8 @@ export function faceParts({ look, race, covered, extra, dwarfHair }: FaceOptions
   if (race !== 'dwarf' && look.beard === 6) add({ part: 'beard', shape: 'sphere', color: 'hair', position: [0, 1.25, .45], scale: [.13, .13, .11] });
   if (race !== 'dwarf' && look.beard === 7) add(...mirror({ part: 'beard', shape: 'capsule', color: 'hair', position: [.4, 1.47, .3], scale: [.055, .12, .05] }));
   if (race !== 'dwarf' && look.beard === 8) add({ part: 'beard', shape: 'sphere', color: 'hair', position: [0, 1.28, .43], scale: [.33, .075, .07] });
+  // Selvagem (veio dos penteados): barba volumosa e desgrenhada, com tufos soltos.
+  if (race !== 'dwarf' && look.beard === 10) add({ part: 'beard', shape: 'sphere', color: 'hair', position: [0, 1.18, .42], scale: [.46, .26, .18] }, ...mirror({ part: 'beard', shape: 'sphere', color: 'hair', position: [.34, 1.36, .3], scale: [.14, .22, .14] }), { part: 'beard', shape: 'sphere', color: 'hair', position: [-.16, .98, .43], scale: [.15, .14, .13] }, { part: 'beard', shape: 'sphere', color: 'hair', position: [.14, .96, .43], scale: [.14, .15, .13] }, { part: 'beard', shape: 'sphere', color: 'hair', position: [0, .9, .44], scale: [.12, .12, .11] });
   if (race !== 'dwarf' && look.beard === 9) add({ part: 'beard', shape: 'sphere', color: 'hair', position: [0, 1.23, .45], scale: [.14, .15, .11] }, { part: 'beard', shape: 'box', color: 'hair', position: [0, 1.335, .465], scale: [.3, .035, .04] });
   // Bigode: logo abaixo do nariz.
   if (look.moustache === 1) add(...mirror({ part: 'moustache', shape: 'capsule', color: 'hair', position: [.09, 1.43, .53], scale: [.028, .09, .028], rotation: [0, 0, 1.25] }));

@@ -72,8 +72,12 @@ export const HERO_HAIRSTYLES: { label: string; base: HeroBase | null; extra?: 'p
   { label: 'Da classe', base: null }, { label: 'Curto', base: 'knight' }, { label: 'Longo', base: 'rogue' }, { label: 'Repartido', base: 'mage' }, { label: 'Rabo de cavalo', base: 'knight', extra: 'ponytail' }, { label: 'Coque', base: 'mage', extra: 'bun' },
   { label: 'Longo preso', base: 'rogue', extra: 'ponytail' }, { label: 'Coque baixo', base: 'knight', extra: 'bun' }, { label: 'Selvagem', base: 'barbarian' }, { label: 'Longo com coque', base: 'rogue', extra: 'bun' },
 ];
+/** Penteado escondido no criador: a opção Selvagem virou barba. Quem já usa continua com ela. */
+export const HIDDEN_HAIRSTYLES = [8];
 /** Estrutura corporal muda a largura do herói. */
 export const BODY_WIDTH = [.9, .95, 1, 1.05, 1.1, 1.15];
+/** Corpo também muda a altura: esbelto um pouco mais alto, robusto mais baixo e largo (prévia 5). */
+export const BODY_HEIGHT = [1.03, 1.015, 1, .99, .975, .96];
 
 export interface HeroGear { head: boolean; chest: boolean; back: boolean }
 export interface HeroDress { outfit: 'rags' | 'class'; hat: string | null; cape: boolean; head: HeroBase; extra?: 'ponytail' | 'bun'; covered: boolean }
