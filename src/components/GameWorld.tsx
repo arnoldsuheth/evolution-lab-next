@@ -19,7 +19,7 @@ import MonsterModel from "./MonsterModel";
 import { MergedParts, type Part } from "./MergedParts";
 import CityDog from "./CityDog";
 import PetFollower from "./PetFollower";
-import { adventureOf, titleOf, mountSpeed, MOUNT_LEVEL, type PetId } from "@/lib/adventure";
+import { adventureOf, titleOf, mountOf, mountSpeed, MOUNT_LEVEL, type PetId } from "@/lib/adventure";
 import { doorBetween } from "@/lib/dungeon";
 import { PLAZA_RADIUS, CITADEL_SECTORS, TOWN_SERVICES, type Interior, type InteriorPanel, type TownService } from "@/lib/town";
 import { frameWorld } from "@/lib/worldCamera";
@@ -29,6 +29,9 @@ import CampaignWorld from "./CampaignWorld";
 import { questMarker } from "@/lib/journey";
 import { npcMarker, cleanLog } from "@/lib/quests";
 import TownDistrict from "./TownDistrict";
+import FlyingMount from "./FlyingMount";
+import RacialCity from "./RacialCity";
+import {AURORA_PORTAL,isNewCity} from "@/lib/kingdomCities";
 import CodeSpots from "./CodeSpots";
 import GatherNodes, { WorldUnlocks } from "./GatherNodes";
 import ExplorationEncounters from "./ExplorationEncounters";
@@ -222,12 +225,12 @@ function WorldFraming() {
   useLayoutEffect(()=>{if(camera instanceof THREE.OrthographicCamera)frameWorld(camera,size.width,size.height);},[camera,size.width,size.height]);
   return null;
 }
-function Scene({ paused, interact, openService, report, thirdPerson }: { thirdPerson: boolean; paused: boolean; interact: (id: NpcId) => void; openService: (id: TownService | InteriorPanel) => void; report: (text: string) => void }) {
+function Scene({ paused, interact, openService, report, thirdPerson }: { thirdPerson: boolean; paused: boolean; interact: (id: NpcId) => void; openService: (id: TownService | InteriorPanel | "mounts" | "journey" | "workshop") => void; report: (text: string) => void }) {
   // Pausado (janela aberta) o mundo não desenha; só tira uma "foto" nova se algo terminar de carregar ou a tela mudar de tamanho.
   const advance = useThree(s => s.advance), size = useThree(s => s.size), loading = useProgress(s => s.active);
   useEffect(() => { if (!paused || loading) return; const id = requestAnimationFrame(t => advance(t)); return () => cancelAnimationFrame(id); }, [paused, loading, size, advance]);
   const controls = useRef<ComponentRef<typeof OrbitControls>>(null); const shadowRoot=useRef<THREE.Group>(null);const jump=useRef({height:0,velocity:0});const touch=useRef({x:0,z:0}); const heroRoot = useRef<THREE.Group>(null);
-  const mounted=useGame(s=>s.mounted); const encounter=useGame(s=>s.encounter); const relocation=useGame(s=>s.relocation); const lastRelocation=useRef(relocation); const hero = useGame(s => s.hero); const riding=mounted&&hero.level>=MOUNT_LEVEL&&!hero.dead&&!encounter&&!hero.instance; const walkMode = useGame(s => s.walking); const speed=4.5*(riding?mountSpeed(hero):walkMode?.55:1); const mountKind=mountSpeed(hero)>1.4?"boar":"wolf"; const adventure=adventureOf(hero); const title=hero.chamberComplete ? "Guardião dos Dez Artefatos" : titleOf(adventure); const doorNote=useRef(0); const look = useGame(s => s.look); const education = useGame(s => s.education.completed); const reduced = useGame(s => s.settings.reduceMotion);
+  const mounted=useGame(s=>s.mounted); const encounter=useGame(s=>s.encounter); const relocation=useGame(s=>s.relocation); const lastRelocation=useRef(relocation); const hero = useGame(s => s.hero); const riding=mounted&&hero.level>=MOUNT_LEVEL&&!hero.dead&&!encounter&&!hero.instance; const walkMode = useGame(s => s.walking); const speed=4.5*(riding?mountSpeed(hero):walkMode?.55:1); const mount=mountOf(hero);const airborne=riding&&(mount?.id==="dragon"||mount?.id==="griffin"&&!!hero.flyingMount);const mountKind=mount?.id==="dragon"?"dragon":mountSpeed(hero)>1.4?"boar":"wolf"; const adventure=adventureOf(hero); const title=hero.chamberComplete ? "Guardião dos Dez Artefatos" : titleOf(adventure); const doorNote=useRef(0); const look = useGame(s => s.look); const education = useGame(s => s.education.completed); const reduced = useGame(s => s.settings.reduceMotion);
   const low = useGame(s => s.settings.quality === "low"); const quality = useGame(s => s.settings.quality);
   const worldRegion=hero.instance?"instance":hero.region;const forest = !!hero.instance||hero.region!=="aurora"||education.includes("variables"); const mines = !!hero.instance||hero.region!=="aurora"||education.includes("conditions")&&hero.defeatedBosses.includes("boss-forest");
   const lastRegion=useRef(hero.region); const player = useRef(new THREE.Vector3(hero.position[0], 0, hero.position[1])); // Position belongs to the simulation; save checkpoints do not recreate it.
@@ -316,7 +319,7 @@ function Scene({ paused, interact, openService, report, thirdPerson }: { thirdPe
     } else { keys.current.clear(); path.current = []; pending.current = null; }
     if(!paused&&!hero.dead&&!useGame.getState().encounter){if(keys.current.delete("jump")&&jump.current.height===0)jump.current.velocity=6.2;jump.current=advanceJump(jump.current.height,jump.current.velocity,dt);}else{keys.current.delete("jump");touch.current={x:0,z:0};}
     if (moving !== wasWalking.current) { setWalking(moving); wasWalking.current = moving; }
-    if(heroRoot.current){heroRoot.current.position.copy(player.current);heroRoot.current.position.y=jump.current.height;}if(shadowRoot.current){shadowRoot.current.position.set(player.current.x,.045,player.current.z);shadowRoot.current.scale.setScalar(1-jump.current.height*.13);}
+    if(heroRoot.current){heroRoot.current.position.copy(player.current);heroRoot.current.position.y=jump.current.height+(airborne?2.1:0);}if(shadowRoot.current){shadowRoot.current.position.set(player.current.x,.045,player.current.z);shadowRoot.current.scale.setScalar(1-jump.current.height*.13);}
     if (controls.current) {
       const orbit = controls.current;
       temp.current.set(player.current.x, thirdPerson ? 1.65 : 1.2, player.current.z);
@@ -336,8 +339,13 @@ function Scene({ paused, interact, openService, report, thirdPerson }: { thirdPe
     <color attach="background" args={[sky]} /><fog attach="fog" args={[sky,44,96]} />
     <ambientLight intensity={0.9 + light * 0.45} /><hemisphereLight args={["#e6f3ff", "#6f7d55", 1.3]} />
     <directionalLight position={[12, 22, 8]} intensity={0.7 + light * 1.6} color="#fff0cf" castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-22} shadow-camera-right={22} shadow-camera-top={20} shadow-camera-bottom={-25} shadow-bias={-0.001} />
-    <KingdomDetails region={hero.region} low={low}/><CombatFeedback />
-    <TerrainSurface onClick={groundClick} color={REGIONS[hero.region].color}/><CampaignWorld paused={paused} approach={approachMonster}/>{!hero.instance&&hero.region==="aurora"&&<BiomeDetails region="aurora"/>}{!hero.instance&&hero.region==="aurora"&&<SceneDressing quality={low?"low":quality==="high"?"high":"medium"} groundColor={REGIONS.aurora.color}/>}{hero.region==="aurora"&&!hero.instance&&<>
+    <GatherNodes paused={paused} approach={approachGather}/>
+    {hero.region!=="goddard"&&<KingdomDetails region={hero.region} low={low}/>}<CombatFeedback />
+    {hero.region==="goddard"&&!hero.instance?<group position={[0,-.35,-4.5]}>
+      <mesh onClick={groundClick} receiveShadow><boxGeometry args={[39,.7,34]}/><meshStandardMaterial color={REGIONS.goddard.color}/></mesh>
+      <mesh position={[0,-2.7,0]} rotation={[Math.PI,0,0]} scale={[1,.7,.85]}><coneGeometry args={[22,6,7]}/><meshStandardMaterial color="#4e5068" flatShading/></mesh>
+    </group>:<TerrainSurface onClick={groundClick} color={REGIONS[hero.region].color}/>}
+    {!hero.instance&&isNewCity(hero.region)&&<RacialCity city={hero.region} paused={paused} approach={approachInteraction} openService={openService} openStory={()=>interact("eldrin")}/>}<CampaignWorld paused={paused} approach={approachMonster}/>{!hero.instance&&hero.region==="aurora"&&<BiomeDetails region="aurora"/>}{!hero.instance&&hero.region==="aurora"&&<SceneDressing quality={low?"low":quality==="high"?"high":"medium"} groundColor={REGIONS.aurora.color}/>}{hero.region==="aurora"&&!hero.instance&&<>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.028, 0]} onClick={groundClick} receiveShadow><circleGeometry args={[PLAZA_RADIUS, 40]} /><meshStandardMaterial color="#a5adba" roughness={0.9} /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[11, 0.025, -16]} onClick={groundClick}><planeGeometry args={[25, 3]} /><meshStandardMaterial color="#8e8b76" /></mesh>
     <group position={[0, .04, 0]}>
@@ -345,7 +353,14 @@ function Scene({ paused, interact, openService, report, thirdPerson }: { thirdPe
       <mesh rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[4.05, 4.1, 48]} /><meshBasicMaterial color="#5aabb1" side={THREE.DoubleSide} /></mesh>
     </group>
     <CitadelSectors />
-    <TownDistrict onGroundClick={groundClick} onService={serviceClick}/><CodeSpots night={light<0.4}/><CityDog/><GatherNodes paused={paused} approach={approachGather}/><WorldUnlocks/><ExplorationEncounters paused={paused} interact={()=>interact("traveler")} report={report} /><WorldDetails night={light<0.4} low={low} reduced={reduced} />
+    <group position={[AURORA_PORTAL[0],0,AURORA_PORTAL[1]]} {...cursorOn("point")} onClick={event=>{
+      if(paused||event.delta>6||event.button!==0)return;
+      event.stopPropagation();
+      approachInteraction(...AURORA_PORTAL,()=>useGame.getState().skyTravel("goddard"));
+    }}><mesh position={[0,1.6,0]}><torusGeometry args={[1.2,.16,8,24]}/><meshStandardMaterial color="#d6b9f1" emissive="#6744a1" emissiveIntensity={.65}/></mesh>
+      <Html center position={[0,3.25,0]} style={{pointerEvents:"none"}}><span className="town-sign">Portal para Goddard</span></Html>
+    </group>
+    <TownDistrict onGroundClick={groundClick} onService={serviceClick}/><CodeSpots night={light<0.4}/><CityDog/><WorldUnlocks/><ExplorationEncounters paused={paused} interact={()=>interact("traveler")} report={report} /><WorldDetails night={light<0.4} low={low} reduced={reduced} />
     {BUILDINGS.map((b, i) => "id" in b ? <CitadelInterior key={b.id} room={b} onGroundClick={groundClick} read={()=>{
       const state = useGame.getState();
       if(paused || hero.dead || state.encounter) return;
@@ -376,14 +391,14 @@ function Scene({ paused, interact, openService, report, thirdPerson }: { thirdPe
     {!mines && <mesh position={[15, 1.3, -16]}><boxGeometry args={[0.2, 2.6, 6]} /><meshStandardMaterial color="#b8a3cf" transparent opacity={0.25} /></mesh>}
     </>}
     <group ref={shadowRoot}><mesh rotation={[-Math.PI/2,0,0]}><circleGeometry args={[.48,24]}/><meshBasicMaterial color="#172a39" transparent opacity={.25} depthWrite={false}/></mesh><mesh rotation={[-Math.PI/2,0,0]} position={[0,.003,0]}><ringGeometry args={[.51,.55,24]}/><meshBasicMaterial color="#f8d474" transparent opacity={.55} depthWrite={false}/></mesh></group>
-    <group ref={heroRoot} rotation={[0, thirdPerson ? Math.PI : 0, 0]} position={[hero.position[0], 0, hero.position[1]]}><HeroAura /><Html position={[0,3*heroProportions(hero.race).height*.74+.3,0]} center style={{pointerEvents:"none"}}><span className="player-name">{hero.name}{title&&<small>«{title}»</small>}</span></Html>{riding&&<group scale={.65}><MonsterModel kind={mountKind} boss={false} reduced={reduced}/></group>}<group position={[0,riding?.8:0,0]}><Character race={hero.race} classId={hero.classId} look={look} equipped={activeEquipment(hero,ITEMS).map(i=>i.id)} level={hero.level} combatant walking={walking&&!riding} animated={!reduced} /></group>
+    <group ref={heroRoot} rotation={[0, thirdPerson ? Math.PI : 0, 0]} position={[hero.position[0], 0, hero.position[1]]}><HeroAura /><Html position={[0,3*heroProportions(hero.race).height*.74+.3,0]} center style={{pointerEvents:"none"}}><span className="player-name">{hero.name}{title&&<small>«{title}»</small>}</span></Html>{riding&&<group scale={.65}>{airborne&&mountKind!=="dragon"&&hero.flyingMount?<FlyingMount id={hero.flyingMount} reduced={reduced}/>:<MonsterModel kind={mountKind} boss={false} reduced={reduced}/>}</group>}<group position={[0,riding?(mountKind==="dragon"?1.23:.8):0,0]}><Character race={hero.race} classId={hero.classId} look={look} equipped={activeEquipment(hero,ITEMS).map(i=>i.id)} level={hero.level} combatant walking={walking&&!riding} animated={!reduced} /></group>
       {hero.classId === "hunter" && activeEquipment(hero,ITEMS).some(i=>i.category==="weapon") && <group position={[-1.3, 0, 0.5]}><mesh position={[0, 0.45, 0]}><boxGeometry args={[0.4, 0.55, 0.9]} /><meshStandardMaterial color="#b6a88a" /></mesh><mesh position={[0, 0.75, 0.5]}><coneGeometry args={[0.24, 0.65, 4]} /><meshStandardMaterial color="#d3c9af" /></mesh></group>}
     </group>
     {adventure.pet&&!hero.dead&&<PetFollower kind={adventure.pet as PetId} player={player} reduced={reduced}/>}
     <OrbitControls ref={controls} enablePan={false} enabled={!paused} enableDamping={!reduced} dampingFactor={0.08} minZoom={24} maxZoom={65} minDistance={desktopCamera ? 4.5 : 6.5} maxDistance={desktopCamera ? 23 : 13} minPolarAngle={desktopCamera ? .38 : thirdPerson ? 1.04 : .84} maxPolarAngle={desktopCamera ? 1.46 : thirdPerson ? 1.32 : .84} mouseButtons={{ LEFT: undefined, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE }} touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }} />
   </>;
 }
-export default function GameWorld(props: { paused: boolean; interact: (id: NpcId) => void; openService: (id: TownService | InteriorPanel) => void; report: (text: string) => void }) {
+export default function GameWorld(props: { paused: boolean; interact: (id: NpcId) => void; openService: (id: TownService | InteriorPanel | "mounts" | "journey" | "workshop") => void; report: (text: string) => void }) {
   const quality = useGame(s => s.settings.quality);
   const thirdPerson = useGame(s => s.hero.region === "aurora" && !s.hero.instance);
   return <WorldBoundary><Canvas key={thirdPerson ? "citadel" : "region"} frameloop={props.paused ? "never" : "always"} orthographic={!thirdPerson} dpr={quality === "high" ? [1, 1.75] : [1, 1.25]} camera={thirdPerson ? { position: [0, 4.4, 9.3], fov: 52, near: 0.15, far: 135 } : { position: [14, 18, 14], zoom: 42, left:-840, right:840, top:420, bottom:-420, near:.1, far:220 }} shadows={quality !== "low" ? "percentage" : false} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} fallback={<div className="world-fallback">Seu navegador não disponibilizou o WebGL. Os painéis continuam disponíveis.</div>}><Suspense fallback={null}><WorldFraming /><Scene {...props} thirdPerson={thirdPerson} /></Suspense></Canvas></WorldBoundary>;

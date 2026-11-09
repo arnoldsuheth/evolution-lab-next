@@ -38,14 +38,14 @@ export function skillRank(hero:HeroData,id:string){return Math.max(0,Math.min(SK
 export function spentSkillPoints(hero:HeroData){return Object.values(SKILLS).filter(s=>s.classId===hero.classId).reduce((n,s)=>n+skillRank(hero,s.id),0)+hero.talents.reduce((a,b)=>a+b,0);}
 export function availableSkillPoints(hero:HeroData){return Math.max(0,hero.level-1-spentSkillPoints(hero));}
 export function skillRequirement(hero:HeroData,id:string):string|undefined{
- const s=SKILLS[id];if(!s)return'Habilidade desconhecida';if(hero.dead)return'Personagem encerrado';if(s.classId!==hero.classId)return'Habilidade de outra classe';const rank=skillRank(hero,id);
+ const s=SKILLS[id];if(!s)return'Habilidade desconhecida';if(hero.dead)return'Personagem encerrado';if(hero.classInitiated===false)return'Conclua a iniciação com o treinador';if(s.classId!==hero.classId)return'Habilidade de outra classe';const rank=skillRank(hero,id);
  if(rank>=s.maxRank)return'Grau máximo';if(hero.level<s.minLevel+rank*2)return`Requer nível ${s.minLevel+rank*2}`;
  if(promotionRank(hero)<Math.max(0,s.tier-1))return`Requer promoção de nível ${Math.max(0,s.tier-1)*20}`;
  if(s.parent&&skillRank(hero,s.parent)<2)return'Requer grau 2 na habilidade anterior';if(!availableSkillPoints(hero))return'Sem pontos disponíveis';
  return undefined;
 }
 export function effectiveSkillRank(hero:HeroData,id:string):number{
- const s=SKILLS[id];if(!s||s.classId!==hero.classId||hero.level<s.minLevel||spentSkillPoints(hero)>Math.max(0,hero.level-1))return 0;
+ const s=SKILLS[id];if(!s||hero.classInitiated===false||s.classId!==hero.classId||hero.level<s.minLevel||spentSkillPoints(hero)>Math.max(0,hero.level-1))return 0;
  if(promotionRank(hero)<Math.max(0,s.tier-1))return 0;
  if(s.parent&&effectiveSkillRank(hero,s.parent)<2)return 0;
  return Math.min(skillRank(hero,id),1+Math.floor((hero.level-s.minLevel)/2));

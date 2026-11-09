@@ -29,6 +29,6 @@ export function WagonPanel() {
   const hero = useGame(s => s.hero), education = useGame(s => s.education);
   return <div className="panel-body town-service">
     <p>Tobias e o cavalo Pipoca levam você mais rápido do que a pé. Cada viagem custa <b><Currency value={WAGON_PRICE} /></b>. A carroça sai da vila e espera na chegada de cada região.</p>
-    <div className="wagon-list">{(Object.keys(REGIONS) as RegionId[]).map(id => { const lock = regionRequirement(hero, education, id), here = hero.region === id; return <button key={id} disabled={!!lock || here || hero.gold < WAGON_PRICE} title={lock ?? undefined} onClick={() => useGame.getState().wagonTravel(id)}><b>{REGIONS[id].name}</b><small>{here ? "Você está aqui" : lock ?? `Nível ${REGIONS[id].level}+ · `}{!here && !lock && <Currency value={WAGON_PRICE} />}</small></button>; })}</div>
+    <div className="wagon-list">{(Object.keys(REGIONS) as RegionId[]).filter(id=>id!=="goddard").map(id => { const lock = regionRequirement(hero, education, id), here = hero.region === id; return <button key={id} disabled={!!lock || here || hero.gold < WAGON_PRICE} title={lock ?? undefined} onClick={() => useGame.getState().wagonTravel(id)}><b>{REGIONS[id].name}</b><small>{here ? "Você está aqui" : lock ?? `Nível ${REGIONS[id].level}+ · `}{!here && !lock && <Currency value={WAGON_PRICE} />}</small></button>; })}</div>
   </div>;
 }

@@ -1,6 +1,6 @@
 import {isCaster,BASIC_ATTACK_COST} from './attributes';
-import type {MonsterKind} from './campaign';
-import {INSTANCES} from './instances';
+import {NULLARION_SCALE,type MonsterKind} from './campaign';
+import {INSTANCES,type InstanceId} from './instances';
 import { ITEMS,stats, type HeroData } from './game';
 import { activeEquipment } from './equipment';
 import { bandFor,LEVEL_BANDS } from './catalogue';
@@ -15,7 +15,7 @@ export function enemyVitals(kind:MonsterKind,level:number,boss=false){
 export type HeroStatus={kind:'poison'|'slow'|'freeze'|'burn';turns:number;damage:number};
 export const MONSTER_POWER:Record<MonsterKind,{name:string;kind:HeroStatus['kind']|'charge';every:number}>={spider:{name:'Picada venenosa',kind:'poison',every:3},wolf:{name:'Mordida que atrasa',kind:'slow',every:3},golem:{name:'Golpe de pedra',kind:'slow',every:4},wraith:{name:'Toque congelante',kind:'freeze',every:3},dragon:{name:'Sopro de fogo',kind:'burn',every:3},boar:{name:'Investida',kind:'charge',every:3}};
 export const STATUS_NAMES:Record<HeroStatus['kind'],string>={poison:'Envenenado',slow:'Lento',freeze:'Congelado',burn:'Queimando'};
-export interface EnemyState{kind?:MonsterKind;turn?:number;heroStatus?:HeroStatus;resource?:'mp'|'stamina';resourceCurrent?:number;resourceMax?:number;instanceId?:"cavern"|"monastery";id:string;name:string;hp:number;maxHp:number;power:number;reward:number;elite:boolean;level?:number;monsterId?:string;bossId?:string;bleed?:{damage:number;turns:number};phase?:2;rare?:number}
+export interface EnemyState{kind?:MonsterKind;turn?:number;heroStatus?:HeroStatus;resource?:'mp'|'stamina';resourceCurrent?:number;resourceMax?:number;instanceId?:InstanceId;id:string;name:string;hp:number;maxHp:number;power:number;reward:number;elite:boolean;level?:number;monsterId?:string;bossId?:string;bleed?:{damage:number;turns:number};phase?:2;rare?:number}
 export function resolveCombat(hero:HeroData,enemy:EnemyState,options:{skillId?:string;starter?:boolean;attackBuff?:number;defenseBuff?:number;criticalRoll?:number}={}){
  const st=stats(hero),skill=options.skillId?SKILLS[options.skillId]:undefined;const rank=skill?effectiveSkillRank(hero,skill.id):1;
  if(options.skillId&&(!skill||skill.classId!==hero.classId||skill.kind!=='active'||!rank||hero.level<skill.minLevel))return{hero,enemy,error:'Habilidade indisponível',won:false,dead:false,damage:0,received:0};
@@ -55,6 +55,7 @@ export function battleRewards(hero:HeroData,enemy:EnemyState){
  const level=enemy.level??hero.level;const tier=bandFor(level),band=LEVEL_BANDS[tier];const drops:string[]=[];
  for(const kind of ['ore','wood','leather','cloth','crystal','parts']){const count=kind==='ore'||kind==='crystal'?enemy.elite?3:1:((hero.kills+tier)%3===0?1:0);for(let i=0;i<count;i++)drops.push(`mat-${kind}-${band}`);}
  if(enemy.elite||hero.kills%4===3){const pool=Object.values(ITEMS).filter(i=>i.minLevel<=level&&i.minLevel>=band&&i.source!=='trophy'&&i.source!=='chest'&&i.source!=='forge'&&i.category!=='material'&&i.slot!=='consumable'&&(!i.classId||i.classId===hero.classId)&&(!i.classes||i.classes.includes(hero.classId)));if(pool.length)drops.push(pool[hero.kills%pool.length].id);}
+ if(enemy.bossId==='boss-master'&&!hero.inventory.includes(NULLARION_SCALE))drops.push(NULLARION_SCALE);
  if(enemy.elite)drops.push(`trophy-${Math.min(7,Math.floor((level-1)/7))}`);
  if(enemy.instanceId&&enemy.instanceId===hero.instance)drops.push(INSTANCES[enemy.instanceId].material);
  const instanceBonus=enemy.instanceId&&enemy.instanceId===hero.instance?2:1;const penalty=level<hero.level-5?.2:1;

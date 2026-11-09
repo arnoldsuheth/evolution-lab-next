@@ -1,5 +1,6 @@
 "use client";
 
+import { ORE_VEINS } from "@/lib/mining";
 import { INSTANCES } from "@/lib/instances";
 import { MONSTERS } from "@/lib/campaign";
 import { BUILDINGS } from "@/lib/navigation";
@@ -26,6 +27,7 @@ export function CitadelMap({ position, local = false, route = [], selected }: {
       <circle r={PLAZA_RADIUS} fill="#8e836b" stroke="#ccb079" strokeWidth=".4" />
       <circle r="1.25" fill="#6bd4dd" />
       {BUILDINGS.map(({ x, z, w, d }) => <rect key={`${x},${z}`} x={x - w} y={z - d} width={w * 2} height={d * 2} rx=".5" fill="#3c4f73" stroke="#a28a61" strokeWidth=".35" />)}
+      {!local && ORE_VEINS.filter(vein=>!vein.region).map(vein => <circle key={vein.id} cx={vein.x} cy={vein.z} r=".55" fill={vein.color} stroke="#fff0d0" strokeWidth=".15"><title>{vein.name}</title></circle>)}
       {!!route.length && position && (
         <polyline points={[position, ...route].map(point => point.join(",")).join(" ")} fill="none" stroke="#72e5eb" strokeWidth=".6" strokeLinecap="round" strokeLinejoin="round" />
       )}

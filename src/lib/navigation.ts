@@ -1,3 +1,4 @@
+import {cityWalkable,isNewCity} from './kingdomCities';
 import {insideWorld} from "./worldBounds";
 import {INTERIORS, interiorBlocks, townBlocked} from "./town";
 export const BUILDINGS = [{x:-35,z:7,w:2.6,d:2.5},{x:-31,z:18,w:2.6,d:2.5},{x:35,z:7,w:2.6,d:2.5},{x:31,z:18,w:2.6,d:2.5},{ x: 9, z: 4, w: 2.6, d: 2.5 }, ...INTERIORS];
@@ -6,6 +7,7 @@ export const REGION_PILLARS = Array.from({length:12},(_,i)=>({x:Math.cos(i*2.4)*
 export function walkable(x: number, z: number, forest: boolean, mines: boolean, region="aurora") {
   if (!insideWorld(x,z)) return false;
   if(region==="instance")return Math.abs(x)<=12&&z>=-23&&z<=12;
+  if(isNewCity(region))return cityWalkable(region,x,z);
   if(region!=="aurora")return !REGION_PILLARS.some(p=>Math.hypot(x-p.x,z-p.z)<1.6);
   if (z < -12 && !forest) return false;
   if (x > 15 && !mines) return false;

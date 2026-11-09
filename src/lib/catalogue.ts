@@ -1,3 +1,5 @@
+import { PICKAXE_ID } from './mining';
+import { NULLARION_SCALE } from './campaign';
 import { BAG_RECIPES } from './bags';
 import {equipmentValue} from "./economy";
 import type { ClassId } from './game';
@@ -66,8 +68,11 @@ const pets=[['wolf','Lobo Cinzento'],['fox','Raposa da Aurora'],['owl','Coruja d
 pets.forEach(([key,name],i)=>add(make(`pet-${key}`,{name,slot:'pet',category:'companion',classes:['hunter'],minLevel:1+i*5,price:50+i*140,companion:4+i*3,hp:i*8,rarity:i<4?'Comum':'Épico',visual:key,source:i>3?'loot':'shop',description:'Companheiro Hunter: participa do dano e ocupa o slot de pet. IA e modelos individuais ainda simplificados.'})));
 ['Kit de Ferreiro','Ferramentas de Tecelagem','Estojo de Alquimia','Instrumentos de Coureiro','Lupa de Engenho','Bússola do Explorador'].forEach((name,i)=>add(make(`toolkit-${i}`,{name,slot:'trinket',category:'tool',minLevel:1+i*5,price:40+i*80,defense:i+1,rarity:'Comum',visual:'gadget',description:'Ferramenta equipada no slot relíquia. Concede a defesa indicada; não desbloqueia profissões adicionais.'})));
 ['Selo da Aurora','Fragmento do Guardião','Insígnia do Bosque','Runa da Comporta','Medalhão do Eclipse','Cristal da Cidadela','Marca da Ascensão','Emblema do Código Perdido'].forEach((name,i)=>add(make(`trophy-${i}`,{name,slot:'trophy',category:'trophy',minLevel:1+i*7,rarity:i<3?'Épico':'Mítico',source:'trophy',visual:'trophy',description:'Troféu de encontro com chefe. Colecionável sem bônus de combate.'})));
+add(make(NULLARION_SCALE,{name:'Escama de Nullarion',slot:'trophy',category:'trophy',rarity:'Mítico',source:'trophy',visual:'trophy',description:'Troféu exclusivo de Nullarion. Requisito para a futura montaria voadora de nível 80.'}));
+add(make(PICKAXE_ID,{name:'Picareta de Mineiro',slot:'material',category:'tool',price:75,visual:'tool',description:'Carregue na mochila para extrair minério dos veios.'}));
 export function buildCatalogue(legacy:Record<string,{name:string;price:number;slot:string;power:number;defense:number;rarity:string;classId?:ClassId;recipe?:number;description:string}>):Record<string,Item>{
  const result={...items};
+ result['copper-forged-blade']=make('copper-forged-blade',{name:'Espada de Cobre Temperado',slot:'weapon',category:'weapon',classes:['paladin','warrior','duelist'],source:'craft',visual:'sword',profession:'weaponsmith',rarity:'Épico',power:15,craftGold:24,ingredients:{'mat-ore-1':4},description:'Lâmina de aprendiz forjada com cobre extraído dos veios da Aurora.'});
  for(const [id,name]of [['instance-crystal','Cristal Profundo da Caverna'],['instance-seal','Selo do Monastério']] as const)result[id]=make(id,{name,slot:'material',category:'material',source:'loot',rarity:'Épico',visual:'crystal',maxStack:999,description:'Material exclusivo de criaturas da instância correspondente. Não é vendido em lojas.'});
  result['instance-charm']=make('instance-charm',{name:'Amuleto da Memória Profunda',slot:'charm',category:'accessory',source:'craft',minLevel:25,price:800,sellPrice:80,craftGold:150,power:9,defense:9,hp:50,rarity:'Épico',visual:'charm',ingredients:{'instance-crystal':3,'instance-seal':3},description:'Reúne materiais exclusivos da caverna e do monastério.'});
  const apprentice=[['blacksmith','Broquel do Aprendiz','offhand','armor','shield'],['weaponsmith','Lâmina do Aprendiz','weapon','weapon','sword'],['tailor','Manto do Aprendiz','chest','armor','chest'],['leatherworker','Botas do Aprendiz','feet','armor','feet'],['alchemist','Tônico do Aprendiz','consumable','consumable','potion']] as const;

@@ -7,6 +7,7 @@ import {useRef,type ReactNode} from 'react';
 import {useFrame} from '@react-three/fiber';
 import * as THREE from 'three';
 
+import {isNewCity} from "@/lib/kingdomCities";
 import {MONSTERS,REGIONS,nextRegion} from '@/lib/campaign';
 import {INSTANCES,type InstanceId} from '@/lib/instances';
 import {useGame} from '@/lib/store';
@@ -33,11 +34,10 @@ export default function CampaignWorld({paused,approach}:{paused:boolean;approach
  <div className={`world-resource ${vitals.resource}`} role="meter" aria-label={vitals.resource==='mp'?'MP':'Estamina'} aria-valuemin={0} aria-valuemax={vitals.resourceMax??100} aria-valuenow={vitals.resourceCurrent??100}><i style={{width:`${(vitals.resourceCurrent??100)/(vitals.resourceMax??100)*100}%`}}/><span>{vitals.resource==='mp'?'MP':'STA'}</span></div>
  </div></Html>}</group>;});
  const gate=(position:[number,number,number],label:string,action:()=>void)=><group position={position} {...cursorOn("point")} onClick={e=>{if(paused||e.delta>6||e.button!==0)return;e.stopPropagation();action();}}><mesh position={[0,1.5,0]}><torusGeometry args={[1.2,.2,8,32]}/><meshStandardMaterial color="#b7a5c9" emissive="#80629e" emissiveIntensity={.5}/></mesh>{Math.hypot(hero.position[0]-position[0],hero.position[1]-position[2])<9&&<Html zIndexRange={[6,0]} position={[0,3.3,0]} center style={{pointerEvents:"none"}}><span className="gate-label">{label}</span></Html>}</group>;
- const cave=INSTANCES.cavern;
- const caveEntrance=<group position={[cave.x,0,cave.z]} {...cursorOn("point")} onClick={e=>{
+ const caveEntrance=(id:InstanceId,cave:typeof INSTANCES[InstanceId])=><group position={[cave.x,0,cave.z]} {...cursorOn("point")} onClick={e=>{
   if(paused||e.delta>6||e.button!==0)return;
   e.stopPropagation();
-  useGame.getState().enterInstance('cavern');
+  useGame.getState().enterInstance(id);
  }}>
   <mesh position={[0,1.4,-1.85]} scale={[1,1,.72]}><sphereGeometry args={[3.3,8,5]}/><meshStandardMaterial color="#566276" roughness={1} flatShading/></mesh>
   <mesh position={[0,1.1,.58]} scale={[1,1.15,.12]}><sphereGeometry args={[1.22,12,8]}/><meshBasicMaterial color="#111823"/></mesh>
@@ -48,5 +48,7 @@ export default function CampaignWorld({paused,approach}:{paused:boolean;approach
  const openDoor=(id:string)=>{if(!paused)window.dispatchEvent(new CustomEvent('lions-cave-door',{detail:id}));};
  const doorMeshes=doors.map(d=>{const isOpen=adv.doors.includes(d.id),next=firstClosed?.id===d.id;return <group key={d.id} position={[0,0,d.z]}>{isOpen?<mesh rotation={[-Math.PI/2,0,0]} position={[0,.05,0]}><planeGeometry args={[25,.35]}/><meshBasicMaterial color="#8be0a0" transparent opacity={.7}/></mesh>:<mesh position={[0,1.6,0]} {...cursorOn('point')} onClick={e=>{if(e.delta>6||e.button!==0)return;e.stopPropagation();openDoor(d.id);}}><boxGeometry args={[25.4,3.2,.3]}/><meshStandardMaterial color="#7fd3ff" emissive="#3a8fd0" emissiveIntensity={next?.9:.4} transparent opacity={next?.55:.3}/></mesh>}{Math.hypot(hero.position[0],hero.position[1]-d.z)<9&&<Html zIndexRange={[6,0]} position={[0,3.9,0]} center>{next?<button className="gate-label door-label" onClick={()=>openDoor(d.id)}>🔒 Sala {d.room} · {d.title} · abrir com código</button>:<span className="gate-label">{isOpen?'🔓':'🔒'} Sala {d.room}</span>}</Html>}</group>;});
  if(hero.instance)return <group>{monsters}{doorMeshes}<mesh position={[0,.02,-5]} receiveShadow><boxGeometry args={[26,.04,38]}/><meshStandardMaterial color={hero.instance==='cavern'?'#53636a':'#8b8375'}/></mesh>{[-1,1].map(side=><group key={side}><mesh position={[side*13,2.5,-5]}><boxGeometry args={[.6,5,38]}/><meshStandardMaterial color="#414c57"/></mesh>{[0,1,2,3].map(i=><mesh key={i} position={[side*11.5,1.2,7-i*8]}><cylinderGeometry args={[.5,.8,2.4,hero.instance==='cavern'?5:12]}/><meshStandardMaterial color={hero.instance==='cavern'?'#89c4d0':'#d4c59e'} emissive="#40535d" emissiveIntensity={.4}/></mesh>)}</group>)}<mesh position={[0,2.5,-24]}><boxGeometry args={[26,5,.6]}/><meshStandardMaterial color="#414c57"/></mesh>{gate([0,0,10],'Sair · '+INSTANCES[hero.instance].name,()=>useGame.getState().leaveInstance())}<Html position={[0,5,-22]} center style={{pointerEvents:'none'}}><span className="gate-label">{INSTANCES[hero.instance].name} · XP ×2</span></Html></group>;
- return <group>{monsters}{hero.region!=='aurora'&&gate([0,0,10],'Voltar a Pedra da Aurora',()=>useGame.getState().travelRegion('aurora'))}{next&&gate(hero.region==='aurora'?[25,0,-18]:[8,0,-24],'Portal · '+REGIONS[next].name,()=>useGame.getState().travelRegion(next))}{(Object.entries(INSTANCES) as [InstanceId,typeof INSTANCES[InstanceId]][]).filter(([,place])=>place.region===hero.region).map(([id,place])=><group key={id}>{id==='cavern'?caveEntrance:gate([place.x,0,place.z],`${place.name} · nível ${place.level}+ · XP ×2`,()=>useGame.getState().enterInstance(id))}</group>)}{hero.region!=='aurora'&&<><BiomeDetails region={hero.region}/><mesh position={[2,.02,-19]} rotation={[-Math.PI/2,0,0]}><ringGeometry args={[3.6,4,48]}/><meshStandardMaterial color="#c3a77b" emissive="#756b67" emissiveIntensity={.25}/></mesh></>}</group>;
+ const entrances=(Object.entries(INSTANCES) as [InstanceId,typeof INSTANCES[InstanceId]][]).filter(([,place])=>place.region===hero.region).map(([id,place])=><group key={id}>{id==='cavern'||id==='frost-cave'?caveEntrance(id,place):gate([place.x,0,place.z],`${place.name} · nível ${place.level}+ · XP ×2`,()=>useGame.getState().enterInstance(id))}</group>);
+ if(isNewCity(hero.region))return <group>{monsters}{entrances}</group>;
+ return <group>{monsters}{hero.region!=='aurora'&&gate([0,0,10],'Voltar a Pedra da Aurora',()=>useGame.getState().travelRegion('aurora'))}{next&&gate(hero.region==='aurora'?[25,0,-18]:[8,0,-24],'Portal · '+REGIONS[next].name,()=>useGame.getState().travelRegion(next))}{entrances}{hero.region!=='aurora'&&<><BiomeDetails region={hero.region}/><mesh position={[2,.02,-19]} rotation={[-Math.PI/2,0,0]}><ringGeometry args={[3.6,4,48]}/><meshStandardMaterial color="#c3a77b" emissive="#756b67" emissiveIntensity={.25}/></mesh></>}</group>;
 }

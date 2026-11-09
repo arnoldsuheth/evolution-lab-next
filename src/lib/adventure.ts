@@ -1,7 +1,7 @@
 import { cleanBank, type BankState } from './bank';
 import { cleanDog, type DogState } from './dog';
 import type { ClassId, HeroData, NpcId } from './game';
-import { MONSTERS, type MonsterKind, type RegionId } from './campaign';
+import { MONSTERS, NULLARION_SCALE, type MonsterKind, type RegionId } from './campaign';
 
 /**
  * Sistemas de aventura da 1.10 (mecânicas inspiradas em MMOs, com nomes e regras próprias):
@@ -174,9 +174,12 @@ export function rareNow(now: number, region: RegionId) {
 export const MOUNTS = [
   { id: 'wolf', name: 'Lobo de Trilha', level: 15, speed: 1.35, text: 'Ágil e confiável, ideal para as primeiras jornadas.' },
   { id: 'boar', name: 'Javali Real', level: 25, speed: 1.5, text: 'Montaria terrestre de grande vigor, com sela artesanal e espaço de carga.' },
-  { id: 'griffin', name: 'Grifo Celeste', level: 50, speed: 1.8, text: 'Montaria alada de prestígio. Por enquanto corre pelo chão; o voo vem depois.' },
+  { id: 'griffin', name: 'Grifo Celeste', level: 50, speed: 1.8, text: 'Montaria alada de prestígio. Sobrevoa as rotas já abertas.' },
+  { id: 'dragon', name: 'Dragão de Nullarion', level: 80, speed: 2.1, text: 'Requer a Escama de Nullarion, derrubada pelo chefe mestre.' },
 ] as const;
 export const MOUNT_LEVEL = MOUNTS[0].level;
-export const mountOf = (hero: Pick<HeroData, 'level'>) => [...MOUNTS].reverse().find(m => hero.level >= m.level) ?? null;
+export const mountAvailable = (hero: Pick<HeroData,'level'> & Partial<Pick<HeroData,'inventory'>>, mount: typeof MOUNTS[number]) =>
+  hero.level >= mount.level && (mount.id !== 'dragon' || !!hero.inventory?.includes(NULLARION_SCALE));
+export const mountOf = (hero: Pick<HeroData,'level'> & Partial<Pick<HeroData,'inventory'>>) => [...MOUNTS].reverse().find(m => mountAvailable(hero,m)) ?? null;
 /** Nível 10: montaria básica (+35%). Nível 30 com o Javali de Montaria equipado: +50%. */
 export function mountSpeed(hero: Pick<HeroData, 'level' | 'inventory' | 'equipped'>) { const tier = mountOf(hero)?.speed ?? 1.35; const legacyBoar = hero.inventory.includes('mount-boar') && hero.equipped.includes('mount-boar') ? 1.5 : 1.35; return Math.max(tier, hero.level >= 30 ? legacyBoar : 1.35); }

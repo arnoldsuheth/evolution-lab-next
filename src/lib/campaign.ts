@@ -1,8 +1,17 @@
 import type {HeroData,Education} from './game';
-export type RegionId='aurora'|'ruins'|'frontier'|'heart';
+import {RACIAL_CITIES,type NewCity} from './kingdomCities';
+import type {InstanceId} from './instances';
+import {MAIN_ORDER} from './journey';
+export const NULLARION_SCALE = 'nullarion-scale';
+export type RegionId='aurora'|'ruins'|'frontier'|'heart'|NewCity;
 export type MonsterKind='wolf'|'spider'|'boar'|'golem'|'wraith'|'dragon';
-export const REGIONS:Record<RegionId,{name:string;boss?:string;lesson?:string;level:number;color:string}>={aurora:{name:'Pedra da Aurora',level:1,color:'#76a35a'},ruins:{name:'Ruínas das Funções',boss:'boss-mines',lesson:'functions',level:15,color:'#647c83'},frontier:{name:'Fronteira dos Algoritmos',boss:'boss-ruins',lesson:'arrays',level:30,color:'#7b705d'},heart:{name:'Coração do Código Perdido',boss:'boss-frontier',lesson:'debug',level:45,color:'#5e5474'}};
-export interface Monster{id:string;name:string;kind:MonsterKind;region:RegionId;x:number;z:number;level:number;boss:boolean;instance?:"cavern"|"monastery"}
+export const REGIONS:Record<RegionId,{name:string;boss?:string;lesson?:string;level:number;color:string}>={aurora:{name:'Pedra da Aurora',level:1,color:'#76a35a'},ruins:{name:'Ruínas das Funções',boss:'boss-mines',lesson:'functions',level:15,color:'#647c83'},frontier:{name:'Fronteira dos Algoritmos',boss:'boss-ruins',lesson:'arrays',level:30,color:'#7b705d'},heart:{name:'Coração do Código Perdido',boss:'boss-frontier',lesson:'debug',level:45,color:'#5e5474'},
+ 'iron-forge':{...RACIAL_CITIES['iron-forge'],level:1},
+ gnomolandia:{...RACIAL_CITIES.gnomolandia,level:1},
+ bosque:{...RACIAL_CITIES.bosque,level:1},
+ ogrimmar:{...RACIAL_CITIES.ogrimmar,level:1},
+ goddard:{name:'Goddard',level:1,color:'#777fa1'}};
+export interface Monster{id:string;name:string;kind:MonsterKind;region:RegionId;x:number;z:number;level:number;boss:boolean;instance?:InstanceId}
 export const MONSTERS:Monster[]=[
  {id:'cavern-spider',name:'Aranha Cristalina',kind:'spider',region:'aurora',instance:'cavern',x:-6,z:0,level:8,boss:false},
  {id:'cavern-golem',name:'Vigia de Quartzo',kind:'golem',region:'aurora',instance:'cavern',x:6,z:-8,level:10,boss:false},
@@ -49,10 +58,18 @@ export const MONSTERS:Monster[]=[
  {id:'frontier-boar',name:'Javali de Obsidiana',kind:'boar' as MonsterKind,region:'frontier' as RegionId,x:-5,z:-8,level:32,boss:false},
  {id:'boss-frontier',name:'Aracna · Tecelã dos Caminhos',kind:'spider' as MonsterKind,region:'frontier' as RegionId,x:2,z:-19,level:45,boss:true},
  {id:'heart-golem',name:'Sentinela do Eclipse',kind:'golem' as MonsterKind,region:'heart' as RegionId,x:-5,z:-8,level:48,boss:false},
+ ...(['iron-forge','gnomolandia','bosque','ogrimmar'] as const).flatMap(region =>
+  ([{kind:'boar',name:'Javali jovem',x:-13,z:13,level:1},{kind:'wolf',name:'Lobo das trilhas',x:15,z:14,level:2},{kind:'spider',name:'Aranha do ermo',x:-17,z:18,level:3}] as const).flatMap(group =>
+   [-1,0,1].map((offset,i)=>({...group,id:region+'-'+group.kind+'-'+i,region,x:group.x+offset*2.4,z:group.z+(i%2)*2,boss:false})))),
+ ...([{instance:'frost-cave',region:'iron-forge',level:1,name:'Geada'},{instance:'red-rift',region:'ogrimmar',level:12,name:'Ruína Rubra'},{instance:'wood-rift',region:'bosque',level:18,name:'Raiz Corrompida'}] as const).flatMap(site=>
+  (['spider','golem','wraith'] as const).map((kind,i)=>({id:site.instance+'-'+kind,kind,region:site.region,instance:site.instance,x:[-5,6,0][i],z:[1,-7,-18][i],level:site.level+i,name:(i===2?'Guardião · ':'Elite · ')+site.name,boss:i===2}))),
  {id:'boss-master',name:'Nullarion · Devorador do Código',kind:'dragon' as MonsterKind,region:'heart' as RegionId,x:2,z:-19,level:60,boss:true},
 ];
-export function regionRequirement(hero:HeroData,education:Education,region:RegionId){const next=REGIONS[region];if(!next)return'Região desconhecida';if(hero.dead)return'Aventura encerrada';if(hero.level<next.level)return`Requer nível ${next.level}`;if(next.boss&&!hero.defeatedBosses.includes(next.boss))return'Derrote o chefe da região anterior';if(next.lesson&&!education.completed.includes(next.lesson))return'Conclua o capítulo de programação exigido';return undefined;}
-export function monsterRequirement(hero:HeroData,education:Education,id:string){const m=MONSTERS.find(m=>m.id===id);if(!m)return'Criatura desconhecida';if(hero.region!==m.region||(hero.instance??null)!==(m.instance??null))return'A criatura está em outra região ou instância';if(m.instance&&hero.instanceProgress?.includes(m.id))return'Criatura já vencida nesta incursão';if(m.instance&&m.boss&&MONSTERS.some(other=>other.instance===m.instance&&!other.boss&&!hero.instanceProgress?.includes(other.id)))return'Vença os dois guardiões menores antes do chefe';if(m.region==='aurora'){if(m.z < -12&&!education.completed.includes('variables'))return'Restaure a primeira runa para explorar a floresta';if(m.x>15&&(!education.completed.includes('conditions')||!hero.defeatedBosses.includes('boss-forest')))return'Derrote Brutamato e conclua Condições para entrar nas minas';}if(m.id==='boss-master'&&(hero.level<60||!education.reviewedProjects.includes(14)))return'O chefe final exige nível 60 e revisão do projeto final de jogos';return undefined;}
+function mainStoryDelivered(education: Education) {
+  return MAIN_ORDER.every(id => education.completed.includes(id) && education.deliveries.includes('main:'+id));
+}
+export function regionRequirement(hero:HeroData,education:Education,region:RegionId){const next=REGIONS[region];if(!next)return'Região desconhecida';if(hero.dead)return'Aventura encerrada';if(hero.level<next.level)return`Requer nível ${next.level}`;if(next.boss&&!hero.defeatedBosses.includes(next.boss))return'Derrote o chefe da região anterior';if(next.lesson&&!education.completed.includes(next.lesson))return'Conclua o capítulo de programação exigido';if(region==='heart'&&!mainStoryDelivered(education))return'Conclua e entregue todas as missões da história principal';return undefined;}
+export function monsterRequirement(hero:HeroData,education:Education,id:string){const m=MONSTERS.find(m=>m.id===id);if(!m)return'Criatura desconhecida';if(hero.region!==m.region||(hero.instance??null)!==(m.instance??null))return'A criatura está em outra região ou instância';if(m.instance&&hero.instanceProgress?.includes(m.id))return'Criatura já vencida nesta incursão';if(m.instance&&m.boss&&MONSTERS.some(other=>other.instance===m.instance&&!other.boss&&!hero.instanceProgress?.includes(other.id)))return'Vença os dois guardiões menores antes do chefe';if(m.region==='aurora'){if(m.z < -12&&!education.completed.includes('variables'))return'Restaure a primeira runa para explorar a floresta';if(m.x>15&&(!education.completed.includes('conditions')||!hero.defeatedBosses.includes('boss-forest')))return'Derrote Brutamato e conclua Condições para entrar nas minas';}if(m.id==='boss-master'){if(!mainStoryDelivered(education))return'Conclua e entregue todas as missões da história principal';if(hero.level<60||!education.reviewedProjects.includes(14))return'O chefe final exige nível 60 e revisão do projeto final de jogos';}return undefined;}
 export function nextRegion(region:RegionId):RegionId|undefined{return({aurora:'ruins',ruins:'frontier',frontier:'heart'} as Partial<Record<RegionId,RegionId>>)[region];}
 
 /** Monstros agressivos atacam quem chega perto: do nível 3 em diante e em todas as regiões de fora. Iniciantes e a vila são seguros. */
