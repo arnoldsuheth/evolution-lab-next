@@ -11,7 +11,7 @@ import {gearLook,rarityTier} from '@/lib/gearPieces';
 import {BorrowedPiece,SimpleWeapon} from './HeroGear';
 import {attachGearPieces,GearAura} from './GearPieces';
 
-const base=process.env.NEXT_PUBLIC_GITHUB_PAGES==='true'?'/evolution-lab-next':'';
+const base=(process.env.NEXT_PUBLIC_BASE_PATH??'');
 export const heroModelUrl=(model:HeroBase)=>`${base}/models/heroes/${HERO_BASE_FILES[model]}`;
 // Baixa todos os modelos uma vez: trocar raça ou classe no criador não mostra o boneco antigo enquanto carrega.
 if(typeof window!=='undefined')for(const model of Object.keys(HERO_BASE_FILES) as HeroBase[])useGLTF.preload(heroModelUrl(model));
@@ -21,7 +21,7 @@ const HUMAN_HEIGHT=3;
 const COMPACT_LEGS = new Set(["upperleg.l", "upperleg.r", "lowerleg.l", "lowerleg.r"]);
 const NOT_BODY=(name:string)=>HERO_HAT_MESHES.includes(name)||(HERO_WEAPON_MESHES as readonly string[]).includes(name)||name.endsWith('_Cape');
 const NO_FACE:FaceOptions['look']={beard:0,moustache:0,brows:0,nose:0,ears:0,scar:0,tattoo:0,accessory:0};
-/** As animações fixam a escala da cabeça em 1; sem essa trilha, a cabeça maior do gnomo e do anão é preservada. */
+/** Preserva as proporções raciais quando as animações definem a escala dos ossos. */
 const clipCache=new WeakMap<THREE.AnimationClip[],THREE.AnimationClip[]>();
 function headFreeClips(clips:THREE.AnimationClip[]){let out=clipCache.get(clips);if(!out){out=clips.map(c=>{const k=c.clone();k.tracks=k.tracks.filter(t=>t.name!=='head.scale'&&!Array.from(COMPACT_LEGS).some(name=>t.name===name+'.scale'));return k;});clipCache.set(clips,out);}return out;}
 const CASTERS=new Set<ClassId>(['mage','prophet','shaman']);

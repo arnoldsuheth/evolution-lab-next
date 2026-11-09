@@ -13,7 +13,7 @@ import EquipmentVisual,{rarityTone} from './EquipmentVisual';
  * Raridade da ARMA: Comum sem brilho · Épico brilho leve · Mítico brilho + fogo (o item continua nítido).
  * ARMADURA (elmo): muda só a cor.
  */
-const url=(base:string)=>`${process.env.NEXT_PUBLIC_GITHUB_PAGES==='true'?'/evolution-lab-next':''}/models/heroes/${base}`;
+const url=(base:string)=>`${(process.env.NEXT_PUBLIC_BASE_PATH??'')}/models/heroes/${base}`;
 
 const looks=new Map<string,THREE.Material>();
 const WEAPON_GLOW={epic:{color:"#b48cff",intensity:.45},mythic:{color:'#ffb43a',intensity:.55}};

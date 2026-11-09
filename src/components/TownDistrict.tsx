@@ -6,14 +6,14 @@ import * as THREE from 'three';
 import {useGame} from '@/lib/store';
 import {FENCES,PROPS,ROADS,type Prop} from '@/lib/town';
 
-const ROAD='#e2c88f',TRAIL='#c4a36e',WOOD='#9a6a40',WOOD_DARK='#6e4a2c',STONE='#b9b4a2',ROOF=['#d9644f','#3f86b8','#e1a73b'];
+const ROAD='#a5adba',TRAIL='#c4a36e',WOOD='#9a6a40',WOOD_DARK='#6e4a2c',STONE='#b9b4a2',ROOF=['#d9644f','#3f86b8','#e1a73b'];
 const std=(color:string,extra:Partial<THREE.MeshStandardMaterialParameters>={})=><meshStandardMaterial color={color} roughness={.85} {...extra}/>;
 
 /** Estradas e trilhas: faixas planas com pontas arredondadas, clicáveis para andar. */
 function Roads({onClick}:{onClick:(e:ThreeEvent<MouseEvent>)=>void}){
  return <group>{ROADS.map(r=>{const [ax,az]=r.a,[bx,bz]=r.b,len=Math.hypot(bx-ax,bz-az),angle=Math.atan2(bx-ax,bz-az),color=r.kind==='road'?ROAD:TRAIL,y=r.kind==='road'?.022:.02;
-  return <group key={r.id}><mesh position={[(ax+bx)/2,y,(az+bz)/2]} rotation={[-Math.PI/2,0,angle]} onClick={onClick} receiveShadow><planeGeometry args={[r.width,len]}/>{std(color,{roughness:1})}</mesh>
-   {[r.a,r.b].map((p,i)=><mesh key={i} position={[p[0],y-.001,p[1]]} rotation={[-Math.PI/2,0,0]} onClick={onClick} receiveShadow><circleGeometry args={[r.width/2,20]}/>{std(color,{roughness:1})}</mesh>)}</group>;})}</group>;
+  return <group key={r.id}><mesh position={[(ax+bx)/2,y,(az+bz)/2]} rotation={[-Math.PI/2,0,angle]} onClick={onClick} receiveShadow><planeGeometry args={[r.width,len]}/>{std(color,{roughness:.9})}</mesh>
+   {[r.a,r.b].map((p,i)=><mesh key={i} position={[p[0],y-.001,p[1]]} rotation={[-Math.PI/2,0,0]} onClick={onClick} receiveShadow><circleGeometry args={[r.width/2,20]}/>{std(color,{roughness:.9})}</mesh>)}</group>;})}</group>;
 }
 /** Todos os postes da cidade num só desenho por peça (poste, lanterna, tampa e brilho): bem mais leve. */
 const LAMP_PARTS:{y:number;geo:THREE.BufferGeometry;lit?:boolean}[]=[

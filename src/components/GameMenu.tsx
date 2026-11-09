@@ -5,10 +5,11 @@ import {CloudIndicator} from './CloudAccount';
 import {useGame} from '@/lib/store';
 import {adventureOf,MOUNT_LEVEL} from '@/lib/adventure';
 
-export type MenuPanel='bank'|'wagon'|'adventure'|'map'|'journal'|'journey'|'bag'|'talents'|'academy'|'character'|'ancestors'|'settings';
+export type MenuPanel='codex'|'bank'|'wagon'|'adventure'|'map'|'journal'|'journey'|'bag'|'talents'|'academy'|'character'|'ancestors'|'settings';
 /** Tudo o que antes ficava espalhado pela tela, num só lugar. A ordem segue o que o jogador mais usa. */
 export const MENU_ITEMS:{id:MenuPanel;label:string;icon:string;hint:string}[]=[
  {id:'journal',label:'Runas',icon:'◈',hint:'Missões de programação'},
+ {id:'codex',label:'Códice',icon:'▤',hint:'História e artefatos dos Precursores'},
  {id:'journey',label:'Jornada',icon:'◇',hint:'Missões, IA e promoção'},
  {id:'adventure',label:'Aventura',icon:'★',hint:'Do dia, conquistas, mascotes'},
  {id:'map',label:'Mapa',icon:'⌖',hint:'Atlas da Aurora'},
@@ -39,7 +40,7 @@ export default function GameMenu({hidden=false,open:openPanel,keys,rest,canRest,
     <button role="menuitem" onClick={()=>choose(()=>openPanel('wagon'))}><span className="menu-icon" aria-hidden>🐴</span><b>Carroça</b><small>Viagem · 2,5 prata</small></button></div>
    <div className="game-menu-row"><AudioControls/><button onClick={()=>choose(switchCharacter)}>Trocar personagem</button><button onClick={()=>choose(()=>openPanel('settings'))}>⚙ Configurações</button><button onClick={()=>choose(()=>window.dispatchEvent(new Event(MENU_EDIT_EVENT)))}>▦ Organizar a tela</button></div>
    <p className="game-menu-help">Clique no chão para andar · clique no monstro para lutar · roda ou pinça dá zoom</p>
-   <footer><span>LION’S CAVE {version}</span><span>{error?'Exportação necessária':<CloudIndicator/>}</span></footer>
+   <footer><span>LOVELACE KINGDOM {version}</span><span>{error?'Exportação necessária':<CloudIndicator/>}</span></footer>
   </div>}
  </div>;
 }
