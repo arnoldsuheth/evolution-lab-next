@@ -39,6 +39,7 @@ import ApprenticeCode from '@/components/ApprenticeCode';
 import { APPRENTICE, EXTRA_APPRENTICE, friendlyLock } from '@/lib/apprentice';
 import { adventureOf, titleOf } from '@/lib/adventure';
 import AudioControls from '@/components/AudioControls';
+import BeardIcon from '@/components/BeardIcon';
 import {HudLayout,HudBlock} from '@/components/HudLayout';
 import CombatHotbar from "@/components/CombatHotbar";
 import ExperienceBar from "@/components/ExperienceBar";
@@ -47,7 +48,7 @@ import { classTitle, mainRequirement, projectRequirement, pendingDelivery } from
 import LionMark from "@/components/LionMark";
 import CombatPanel from "@/components/CombatPanel";
 import { RACE_SKIN, RACE_FORM, appearanceLabel } from "@/lib/visual";
-import { HERO_HAIRSTYLES, DWARF_HAIRSTYLES } from "@/lib/heroModels";
+import { HERO_HAIRSTYLES, DWARF_HAIRSTYLES, HIDDEN_HAIRSTYLES } from "@/lib/heroModels";
 import { BEARDS, DWARF_BEARDS, MOUSTACHES, BROWS, NOSES, EARS, SCARS, PAINTS, ACCESSORIES } from "@/lib/faceKit";
 import { installCursors } from "@/lib/cursor";
 const World = dynamic(() => import("@/components/GameWorld"), { ssr: false, loading: () => <div className="world-fallback">Abrindo o caminho para Pedra da Aurora…</div> });
@@ -112,7 +113,7 @@ function Creator({ close }: { close: () => void }) {
       {fresh ? <label className="hardcore-choice"><input type="checkbox" checked={mode === "hardcore"} onChange={e => setMode(e.target.checked ? "hardcore" : "normal")} /><span>Modo Hardcore<small>Morte permanente. Seu aprendizado permanece.</small></span></label> : <p className="small-note">Trocar de classe preserva seus dados e devolve os pontos de talento. Itens incompatíveis ficam na mochila.</p>}
     </section>
 
-    <section className="creator-options"><span className="eyebrow">02 · SUA IDENTIDADE</span><h3>Cada detalhe conta.</h3><div className="tabs">{Object.keys(groups).map(c => <button key={c} className={category === c ? "active" : ""} onClick={() => setCategory(c)}>{c}</button>)}</div><div className="appearance-options">{groups[category].map(g => <fieldset key={g.key}><legend>{g.title}</legend><div className="option-row">{Array.from({ length: g.count }, (_, i) => <button key={i} aria-label={`${g.title}: opção ${i + 1}`} title={g.colors ? `${g.title}: tom ${i+1}` : g.labels?.[i] ?? appearanceLabel(g.key,i)} aria-pressed={look[g.key] === i} className={`appearance-choice ${look[g.key] === i ? "chosen" : ""} ${g.colors ? "swatch" : ""}`} style={g.colors ? { background: g.colors[i] } : {}} onClick={() => customize({ [g.key]: i })}>{g.colors ? "" : g.labels?.[i] ?? appearanceLabel(g.key,i)}</button>)}</div></fieldset>)}</div><p className="small-note">Aparência atualizada em tempo real. A raça define corpo e rosto (anão menor e barbudo, elfo de orelhas longas, orc com presas, gnomo pequeno); a classe define roupa e armas. O elmo só aparece quando você equipar um item de cabeça.</p><button className="primary large" onClick={confirm}>{fresh ? "Começar minha jornada" : "Salvar e voltar ao mundo"}<span>↗</span></button><span className="save-caption">◇ Salvamento automático neste navegador</span></section>
+    <section className="creator-options"><span className="eyebrow">02 · SUA IDENTIDADE</span><h3>Cada detalhe conta.</h3><div className="tabs">{Object.keys(groups).map(c => <button key={c} className={category === c ? "active" : ""} onClick={() => setCategory(c)}>{c}</button>)}</div><div className="appearance-options">{groups[category].map(g => <fieldset key={g.key}><legend>{g.title}</legend><div className="option-row">{Array.from({ length: g.count }, (_, i) => g.key === "hair" && race !== "dwarf" && HIDDEN_HAIRSTYLES.includes(i) && look.hair !== i ? null : <button key={i} aria-label={`${g.title}: opção ${i + 1}`} title={g.colors ? `${g.title}: tom ${i+1}` : g.labels?.[i] ?? appearanceLabel(g.key,i)} aria-pressed={look[g.key] === i} className={`appearance-choice ${look[g.key] === i ? "chosen" : ""} ${g.colors ? "swatch" : ""}`} style={g.colors ? { background: g.colors[i] } : {}} onClick={() => customize({ [g.key]: i })}>{g.key === "beard" && <BeardIcon index={i} dwarf={race === "dwarf"} />}{g.colors ? "" : g.labels?.[i] ?? appearanceLabel(g.key,i)}</button>)}</div></fieldset>)}</div><p className="small-note">Aparência atualizada em tempo real. A raça define corpo e rosto (anão menor e barbudo, elfo de orelhas longas, orc com presas, gnomo pequeno); a classe define roupa e armas. O elmo só aparece quando você equipar um item de cabeça.</p><button className="primary large" onClick={confirm}>{fresh ? "Começar minha jornada" : "Salvar e voltar ao mundo"}<span>↗</span></button><span className="save-caption">◇ Salvamento automático neste navegador</span></section>
     </div>
   </div>;
 }
@@ -251,6 +252,7 @@ export default function Home() {
       <button onClick={()=>setPanel("journal")} title="Diário de missões"><span aria-hidden="true">▤</span>Diário</button>
       <button onClick={()=>setPanel("codex")} title="Códice"><span aria-hidden="true">❖</span>Códice</button>
       <button onClick={()=>setPanel("bag")} title="Mochila"><span aria-hidden="true">▣</span>Mochila</button>
+      <div className="desktop-bags" aria-label="Bolsas"><button onClick={()=>setPanel("bag")} title="Mochila inicial · abrir">🎒</button>{[5,10,20].map(n=><button key={n} className="locked" disabled title={`Espaço para bolsa de ${n} lugares · fabricação em breve`} aria-label={`Bolsa de ${n} lugares, ainda não fabricada`}>👜</button>)}</div>
     </nav>}
     {activePanel !== "none" && <Modal title={groupOf(activePanel)?.title ?? titles[activePanel]} close={close} wide={["creator", "journal", "academy"].includes(activePanel)} creator={activePanel === "creator"}>
       <PanelGroupTabs active={activePanel} go={setPanel} />{activePanel === "codex" && <PrecursorCodex />}{activePanel === "map" && <WorldMap/>}{activePanel === "character" && <Inventory edit={()=>setPanel("creator")}/>}{activePanel === "journey" && <JourneyPanel />}{activePanel === "adventure" && <AdventurePanel />}{activePanel === "door" && <DoorPanel key={door} id={door} close={close} />}{activePanel === "spot" && <SpotPanel key={spot} id={spot} close={close} />}{activePanel === "dog" && <DogPanel />}{activePanel === "mounts" && <MountsPanel />}{activePanel === "bank" && <BankPanel />}{activePanel === "wagon" && <WagonPanel />}{activePanel === "challenge" && <ChallengePanel />}{activePanel === "creator" && (!hero.created || hero.dead) && <Creator close={close} />}{activePanel === "journal" && <Journal />}{activePanel === "bag" && <Inventory edit={()=>setPanel("creator")}/>}{activePanel === "talents" && <Talents />}{activePanel === "academy" && <Academy />}{activePanel === "settings" && <SettingsPanel />}

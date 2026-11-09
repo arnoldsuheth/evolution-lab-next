@@ -1,0 +1,114 @@
+/* Lovelace · telas (prévia 2): seleção de personagem e árvore de talentos em moldura dourada. */
+.lk-select{--lk-gold:#d6b06a;--lk-gold-dark:#7d5f2c}
+.lk-select .lk-select-body{display:grid;grid-template-columns:minmax(220px,280px) minmax(0,1fr) minmax(240px,320px);gap:18px;align-items:start;width:min(1240px,100%);margin:0 auto}
+.lk-roster,.lk-hero-info{padding:14px;border:2px solid var(--lk-gold);border-radius:10px;background:linear-gradient(180deg,#16233bf2,#0a1222f2);box-shadow:0 0 0 1px #000a,inset 0 0 0 1px #f5d89a2e,0 12px 30px #0008}
+.lk-roster>h2{margin:0 0 10px;text-align:center;font:600 18px/1.3 Georgia,serif;color:#fff3d6}
+.lk-select .lk-roster .character-slots{display:flex;flex-direction:column;gap:8px}
+.lk-select .lk-roster .character-slot{position:relative}
+.lk-select .lk-roster .character-slot>button:first-child{display:grid;grid-template-columns:44px 1fr;grid-template-rows:auto auto;column-gap:10px;align-items:center;text-align:left;
+ width:100%;min-height:58px;padding:6px 34px 6px 8px;border:1px solid #d6b06a55;border-radius:8px;background:linear-gradient(90deg,#1f2e4c,#111b30);color:#fff3d6}
+.lk-select .lk-roster .character-slot>button:first-child>small{display:none}
+.lk-select .lk-roster .character-slot>button:first-child :is(.hero-portrait,.portrait-photo,img,canvas,.class-portrait,.empty-character){grid-row:1/3;width:44px!important;height:44px!important;border-radius:50%;overflow:hidden;border:2px solid var(--lk-gold);font-size:20px;display:grid;place-items:center}
+.lk-select .lk-roster .character-slot>button:first-child h2{margin:0;font:600 14px/1.2 Georgia,serif;color:#fff3d6}
+.lk-select .lk-roster .character-slot>button:first-child p{margin:0;font-size:11px;color:#e9d7ad}
+.lk-select .lk-roster .character-slot.chosen>button:first-child{border:2px solid #ffd27a;box-shadow:0 0 14px #ffd27a55,inset 0 0 18px #e5aa5333}
+.lk-select .lk-roster .delete-character{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:26px;height:26px;min-height:0;padding:0;font-size:12px;opacity:.7}
+.lk-select .lk-roster .delete-confirm{margin-top:4px}
+.lk-hero-stage{display:grid;place-items:center;min-height:min(62vh,560px);border-radius:12px;background:radial-gradient(ellipse at 50% 35%,#f3d38a33,transparent 60%)}
+.lk-hero-stage>*{width:min(420px,100%)!important;height:auto!important;aspect-ratio:1;border-radius:50%;overflow:hidden;border:4px solid var(--lk-gold);box-shadow:0 0 0 3px #000a,0 0 40px #f3d38a44}
+.lk-hero-stage .lk-empty-stage{display:grid;place-items:center;font-size:90px;color:#d6b06a88;background:#0c1526aa}
+.lk-hero-info h2{margin:0;font:600 24px/1.2 Georgia,serif;color:#fff3d6}
+.lk-hero-info h2 i{color:var(--lk-gold);margin-right:8px;font-style:normal}
+.lk-hero-info .lk-class{margin:4px 0 10px;color:#e9d7ad;font-size:13px}
+.lk-hero-info .lk-role{font:italic 14px/1.5 Georgia,serif;color:#fff3d6cc;border-top:1px solid #d6b06a55;border-bottom:1px solid #d6b06a55;padding:10px 0}
+.lk-progress{list-style:none;padding:0;margin:10px 0 16px;display:grid;gap:6px;font-size:13px;color:#e9d7ad}
+.lk-progress b{color:#ffd27a}.lk-progress .lk-hardcore{color:#ff9a8a}
+.lk-enter{width:100%;min-height:54px;border-radius:10px;border:2px solid #ffe2a0;background:linear-gradient(#e9b85c,#a8742c);color:#2a1806;
+ font:700 19px/1 Georgia,serif;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 0 0 2px #000a,0 6px 20px #e5aa5355}
+.lk-enter:hover{filter:brightness(1.1)}
+@media (max-width:900px){
+ .lk-select .lk-select-body{grid-template-columns:1fr}
+ .lk-hero-stage{min-height:0;order:-1}.lk-hero-stage>*{width:min(180px,50vw)!important}
+}
+@media (orientation:landscape) and (max-height:540px){
+ .lk-select .lk-select-top{display:none}
+ .lk-select .lk-select-body{grid-template-columns:minmax(180px,1fr) minmax(130px,.8fr) minmax(200px,1.1fr);gap:10px}
+ .lk-hero-stage{min-height:0;order:0}.lk-hero-stage>*{width:min(200px,26vw)!important}
+ .lk-select .lk-roster .character-slot>button:first-child{min-height:46px}
+ .lk-roster,.lk-hero-info{padding:10px}.lk-hero-info h2{font-size:19px}.lk-enter{min-height:44px;font-size:16px}
+}
+
+/* Árvore de talentos */
+.talents-lk{--lk-gold:#d6b06a}
+.talents-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:8px 12px;margin-bottom:12px;border:1px solid #d6b06a88;border-radius:8px;background:linear-gradient(90deg,#16233b,#0c1526)}
+.talents-class{display:flex;align-items:baseline;gap:8px;font:600 18px/1.2 Georgia,serif;color:#fff3d6}
+.talents-class i{font-style:normal;color:var(--lk-gold)}.talents-class small{font-size:13px;color:#e9d7ad}
+.talents-points{margin-left:auto;font-size:13px;color:#e9d7ad}.talents-points b{font-size:18px;color:#ffd27a;margin-left:4px}
+.talents-respec{min-height:34px;border:1px solid var(--lk-gold)!important}
+.talents-columns{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.talent-col{padding:0 0 12px;border:2px solid #d6b06a99;border-radius:10px;background:linear-gradient(180deg,#14213a,#0b1324);overflow:hidden}
+.talent-col h4{display:flex;flex-direction:column;align-items:center;margin:0 0 10px;padding:10px 6px;font:600 17px/1.2 Georgia,serif;color:#fff3d6;background:linear-gradient(180deg,#22345a,#14213a);border-bottom:1px solid #d6b06a66}
+.talent-col h4 small{font-size:12px;color:#e9d7ad}
+.talent-col-1{background:linear-gradient(180deg,#1d1a12,#0b1324)}.talent-col-1 h4{background:linear-gradient(180deg,#3b2f17,#1d1a12)}
+.talent-col-2{background:linear-gradient(180deg,#1b1630,#0b1324)}.talent-col-2 h4{background:linear-gradient(180deg,#2e2550,#1b1630)}
+.talent-chain{display:flex;flex-direction:column;align-items:center;gap:18px}
+.talent-node{position:relative;width:64px;height:64px;min-height:0;padding:5px;border-radius:8px;border:2px solid #6b6f78;background:radial-gradient(at 50% 25%,#3a4152,#151a24 75%);filter:grayscale(.9) brightness(.75);cursor:pointer}
+.talent-node+.talent-node::before{content:'';position:absolute;left:50%;top:-20px;width:2px;height:16px;background:#6b6f78;transform:translateX(-50%)}
+.talent-node.active{filter:none;border-color:var(--lk-gold);background:radial-gradient(at 50% 25%,#6a5126,#22180b 75%);box-shadow:0 0 10px #e5aa5355}
+.talent-node.active+.talent-node::before,.talent-node.active+.talent-node.active::before{background:var(--lk-gold)}
+.talent-node.open{filter:none;border-color:#9aa6bd}
+.talent-node.focus{border-color:#58e4ff!important;box-shadow:0 0 0 2px #58e4ff66,0 0 18px #58e4ffaa!important;filter:none}
+.talent-node>b{position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);padding:0 6px;border-radius:4px;background:#0c1526;border:1px solid currentColor;color:#fff3d6;font-size:10px;line-height:15px}
+.talent-node .game-artwork,.talent-node img,.talent-node svg{width:100%;height:100%}
+.talent-lock{position:absolute;right:-6px;top:-6px;font-size:12px;font-style:normal}
+.talent-tip{position:absolute;z-index:5;left:50%;top:50%;transform:translate(-50%,-50%);width:min(340px,92%);padding:14px;border:2px solid var(--lk-gold);border-radius:10px;
+ background:linear-gradient(180deg,#16233bfa,#0a1222fa);box-shadow:0 0 0 1px #000,0 16px 40px #000c;color:#fff3d6}
+.talent-tip header{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding-bottom:8px;border-bottom:1px solid #d6b06a55}
+.talent-tip-icon{width:52px;height:52px;padding:4px;border:2px solid #58e4ff;border-radius:8px;background:#0c1526}
+.talent-tip h5{margin:0;font:600 18px/1.2 Georgia,serif;color:#fff3d6}.talent-tip header small{color:#e9d7ad;font-size:12px}
+.talent-tip p{margin:10px 0 6px;font-size:14px;line-height:1.5}
+.talent-tip-meta{display:block;margin-bottom:10px;color:#8dd4de;font-size:12px}
+.talent-tip .talent-max{text-align:center;color:#7fe0a0;font-weight:700;border-top:1px solid #d6b06a55;padding-top:8px}
+.talent-tip>button.primary{width:100%}
+.talents-foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;margin-top:12px;padding:8px 12px;border:1px solid #d6b06a66;border-radius:8px;background:#0c1526;font-size:13px;color:#e9d7ad}
+.talents-foot b{color:#ffd27a}
+.talents-legend{display:flex;align-items:center;gap:6px}
+.talents-legend i{display:inline-block;width:14px;height:14px;border-radius:3px;border:2px solid;margin-left:8px}
+.lg-active{border-color:#d6b06a!important;background:#6a5126}.lg-locked{border-color:#6b6f78!important;background:#2a2f38}.lg-focus{border-color:#58e4ff!important;background:#0c3540}
+.talent-extras{margin-top:12px;padding:8px 12px;border:1px solid #d6b06a44;border-radius:8px}
+.talent-extras summary{cursor:pointer;font-weight:700;color:#ffd27a}
+@media (max-width:700px),(orientation:landscape) and (max-height:540px){
+ .talents-columns{gap:6px}.talent-col h4{font-size:14px;padding:6px 4px;margin-bottom:8px}
+ .talent-chain{gap:14px}.talent-node{width:48px;height:48px;padding:3px}
+ .talent-node+.talent-node::before{top:-16px;height:12px}
+ .talent-tip{position:fixed;left:50%;top:50%}
+}
+
+/* Cidadela (prévia 4): placas dos prédios, poste de setas e atlas do reino */
+.world-container .citadel-plaque{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;padding:4px 12px;border-radius:4px;
+ font:700 12px/1.2 Georgia,serif;letter-spacing:.08em;color:#ffe9b0;background:linear-gradient(#26345e,#141d38);border:2px solid #d6b06a;box-shadow:0 2px 6px #0009}
+.world-container .citadel-plaque i{font-style:normal}
+.world-container .citadel-signpost{display:flex;flex-direction:column;gap:2px}
+.world-container .citadel-signpost span{display:flex;align-items:center;gap:5px;white-space:nowrap;padding:2px 9px 2px 7px;font:700 10.5px/1.3 Georgia,serif;color:#fff3d6;
+ background:#1d2a4aee;border:1px solid #d6b06a;clip-path:polygon(0 0,calc(100% - 7px) 0,100% 50%,calc(100% - 7px) 100%,0 100%)}
+.world-container .citadel-signpost i{font-style:normal}
+.kingdom-atlas svg{display:block;width:100%;max-height:min(62vh,560px);border:3px solid #d6b06a;border-radius:8px;background:#2c4a33}
+.kingdom-atlas .atlas-region{cursor:pointer}
+.kingdom-atlas .atlas-region:hover ellipse,.kingdom-atlas .atlas-region:focus ellipse{fill-opacity:.8;stroke:#fff}
+.kingdom-atlas .atlas-name{font:700 3.3px Georgia,serif;fill:#fff;paint-order:stroke;stroke:#0008;stroke-width:.6px}
+.kingdom-atlas .atlas-level{font:700 2.6px system-ui,sans-serif;fill:#ffe9b0;paint-order:stroke;stroke:#0009;stroke-width:.5px}
+.kingdom-atlas .atlas-compass{font:700 3px Georgia,serif;fill:#ffe9b0}
+.kingdom-atlas small{display:block;margin-top:6px}
+
+/* Criador (prévia 5): abas douradas, opções mais compactas e miniaturas de barba */
+.creator-modal .creator-options .tabs{gap:4px;padding:3px;border-radius:10px;background:#0c1526;border:1px solid #d6b06a55}
+.creator-modal .creator-options .tabs button{flex:1;min-height:34px;padding:4px 8px;border-radius:7px;font-weight:700}
+.creator-modal .creator-options .tabs button.active{background:linear-gradient(#e9b85c,#a8742c);color:#2a1806;border-color:#ffe2a0}
+.creator-modal .appearance-options fieldset{margin:0 0 8px;padding:6px 8px}
+.creator-modal .option-row{gap:5px}
+.creator-modal .appearance-choice{min-height:34px;padding:4px 8px;font-size:12px}
+.creator-modal .option-row:has(.beard-icon){display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr))}
+.creator-modal .appearance-choice:has(.beard-icon){display:flex;align-items:center;gap:6px;min-height:52px;text-align:left;border-radius:8px}
+.creator-modal .appearance-choice:has(.beard-icon).chosen{border-color:#ffd27a;box-shadow:0 0 0 2px #ffd27a66}
+.beard-icon{flex:none;width:40px;height:40px;border-radius:6px;background:#2b3a56}
+@media (orientation:landscape) and (max-height:540px){.creator-modal .appearance-choice:has(.beard-icon){min-height:44px}.beard-icon{width:32px;height:32px}}

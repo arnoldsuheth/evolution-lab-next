@@ -1,0 +1,86 @@
+/* Lovelace · HUD do computador (prévia 1): molduras douradas, retrato redondo com nível,
+   alvo ao lado do herói, minimapa redondo com faixa do lugar, barra de atalhos ornamentada,
+   menu de ícones redondos e quatro espaços de bolsa. Só vale com mouse e tela grande. */
+.desktop-bags{display:none}
+@media (min-width:1000px) and (min-height:541px) and (pointer:fine){
+ .game-shell{--lk-gold:#d6b06a;--lk-gold-dark:#7d5f2c;--lk-ink:#0c1526}
+
+ /* Herói e alvo */
+ .game-shell>.left-hud{left:18px;top:14px;width:300px}
+ .game-shell>.left-hud .hero-card{position:relative;padding:8px 10px 8px 84px;min-height:84px;border:0;border-radius:0;
+  background:linear-gradient(90deg,#0c1526ee 40%,#0c152600);box-shadow:none}
+ .game-shell>.left-hud .hero-card-header{position:static;display:block;padding:0;background:none;border:0;min-height:0}
+ .game-shell>.left-hud .hero-card-header>span{position:absolute;right:4px;top:2px;font-size:11px;opacity:.6}
+ .game-shell>.left-hud .portrait{position:absolute;left:4px;top:4px;width:72px;height:72px;border-radius:50%;overflow:hidden;
+  border:3px solid var(--lk-gold);box-shadow:0 0 0 2px #000c,0 4px 12px #000a;background:#1b2a46}
+ .game-shell>.left-hud .portrait>b{position:absolute;left:-2px;bottom:-2px;width:26px;height:26px;display:grid;place-items:center;
+  border-radius:50%;background:radial-gradient(#26375a,#0c1526);border:2px solid var(--lk-gold);color:#fff3d6;font-size:12px;z-index:2}
+ .game-shell>.left-hud .hero-card-header strong{display:block;font:600 16px/1.2 Georgia,'Times New Roman',serif;color:#fff3d6;text-shadow:0 1px 3px #000}
+ .game-shell>.left-hud .hero-card-header small{display:block;font-size:10px;color:#e9d7ad;opacity:.85;margin-bottom:3px}
+ .game-shell>.left-hud .meter,.desktop-target .meter{height:15px;margin:2px 0;border-radius:2px;border:1px solid var(--lk-gold-dark);
+  background:#060b14;box-shadow:inset 0 1px 3px #000;clip-path:polygon(0 0,calc(100% - 7px) 0,100% 50%,calc(100% - 7px) 100%,0 100%)}
+ .game-shell>.left-hud .meter span,.game-shell>.left-hud .meter b,.desktop-target .meter span,.desktop-target .meter b{font-size:10px;color:#fff;text-shadow:0 1px 2px #000}
+ .game-shell>.left-hud .meter b,.desktop-target .meter b{right:10px}
+ .game-shell>.left-hud .hero-card-footer{margin-top:3px}
+ .desktop-target{left:330px;top:14px;width:250px;padding:8px 10px 8px 70px;min-height:70px;border:0;border-radius:0;
+  background:linear-gradient(90deg,#0c1526ee 40%,#0c152600);box-shadow:none}
+ .desktop-target::before{content:'☠';position:absolute;left:4px;top:4px;width:58px;height:58px;display:grid;place-items:center;border-radius:50%;
+  border:3px solid #b85b4b;background:radial-gradient(#3a2230,#120a12);color:#f3c6b5;font-size:26px;box-shadow:0 0 0 2px #000c}
+ .desktop-target .eyebrow{font-size:9px;color:#f3c6b5}
+ .desktop-target strong{font:600 15px/1.2 Georgia,'Times New Roman',serif;color:#fff3d6}
+
+ /* Minimapa redondo com faixa do lugar */
+ .game-shell>.map-hud{top:12px;right:18px}
+ .map-hud .minimap{position:relative;width:184px;height:184px;margin-top:22px;border-radius:50%;overflow:visible;
+  border:4px solid var(--lk-gold);box-shadow:0 0 0 2px #000b,inset 0 0 0 2px #000a,0 6px 18px #000a;background:#1b2a46}
+ .map-hud .minimap>svg,.map-hud .minimap>div:not(.map-north){border-radius:50%;overflow:hidden;width:100%;height:100%}
+ .game-shell .game-menu{top:6px;right:18px;width:184px;display:block}
+ .game-shell .game-menu .zone-name{display:block;width:max-content;max-width:240px;margin:0 auto;padding:3px 16px;text-align:center;white-space:nowrap;
+  font:600 12px/1.3 Georgia,serif;color:#fff3d6;background:linear-gradient(#22345a,#0c1526);border:1px solid var(--lk-gold);
+  clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 50%,calc(100% - 8px) 100%,8px 100%,0 50%)}
+ .game-shell .game-menu .game-menu-toggle{position:fixed;top:228px;right:18px;min-height:32px;padding:4px 14px;border-radius:16px;
+  border:2px solid var(--lk-gold);background:linear-gradient(#22345a,#0c1526);color:#fff3d6}
+ .map-hud .map-north{position:absolute;left:50%;top:-8px;transform:translateX(-50%);z-index:2;width:20px;height:20px;display:grid;place-items:center;
+  border-radius:50%;background:#0c1526;border:2px solid var(--lk-gold);color:#fff3d6;font-size:10px}
+
+ /* Missões: lista com losangos dourados, sem caixa */
+ .game-shell>.quest-tracker{top:272px;right:14px;width:260px;padding:6px 10px;border:0;border-top:1px solid var(--lk-gold)}
+ .desktop-quest-title{font:600 18px/1.4 Georgia,serif!important;letter-spacing:.02em!important;text-transform:none;color:#fff3d6!important}
+ .desktop-quest-title::first-letter{font-size:20px}
+ .quest-tracker h3{font:600 15px/1.3 Georgia,serif!important;color:#ffd27a!important}
+ .quest-tracker h3::before{content:'◇ ';color:var(--lk-gold)}
+ .quest-tracker p{font-size:12.5px;padding-left:16px}
+
+ /* Barra de atalhos ornamentada */
+ .combat-console.combat-pad,.combat-console.combat-pad.without-target{bottom:30px;padding:8px 16px 14px;
+  background:linear-gradient(#1d2c4b,#0a1323);border:2px solid var(--lk-gold);border-radius:6px;
+  box-shadow:0 0 0 1px #000c,inset 0 0 0 1px #f5d89a33,0 8px 22px #000a;
+  clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,14px 100%,0 50%);--combat-control-size:clamp(36px,3.4vw,50px)}
+ .combat-console :is(.desktop-attack,.console-skill,.auto-attack,.class-power,.quick-use){border:2px solid #b8924f!important;border-radius:4px!important;
+  background:radial-gradient(at 50% 20%,#3c5078,#101c33 75%)!important}
+ .combat-console .console-skill kbd,.combat-console .desktop-attack kbd{position:absolute;left:50%;bottom:-13px;top:auto;transform:translateX(-50%);
+  font-size:9px;color:#f5e3bb;background:none;border:0;padding:0}
+
+ /* XP: trilho fino dourado com marcas */
+ .game-shell>.skills-hud .experience-track{height:12px;border:1px solid var(--lk-gold-dark);border-radius:2px;
+  background:repeating-linear-gradient(90deg,transparent 0 calc(10% - 1px),#d6b06a55 calc(10% - 1px) 10%),#060b14}
+ .game-shell>.skills-hud .experience-fill{background:linear-gradient(90deg,#7b4bd1,#b98cff)}
+
+ /* Menu de ícones redondos + bolsas */
+ .desktop-game-menu{right:14px;bottom:30px;gap:6px;padding:6px 10px;border:2px solid var(--lk-gold);border-radius:6px;
+  background:linear-gradient(#1d2c4b,#0a1323);box-shadow:0 0 0 1px #000c,0 8px 22px #000a}
+ .desktop-game-menu>button{width:42px;height:42px;min-width:0;padding:0;border-radius:50%;border:2px solid #b8924f;
+  background:radial-gradient(at 50% 25%,#34486e,#0e1a30 75%);font-size:0;color:transparent}
+ .desktop-game-menu>button span{font-size:17px!important}
+ .desktop-game-menu>button:hover{border-color:#ffd27a;box-shadow:0 0 10px #ffd27a66}
+ .desktop-bags{display:flex;gap:5px;margin-left:8px;padding-left:10px;border-left:1px solid #d6b06a77}
+ .desktop-bags button{width:42px;height:42px;padding:0;border-radius:6px;border:2px solid #b8924f;background:radial-gradient(at 50% 25%,#4b3a26,#1d140c 75%);font-size:20px}
+ .desktop-bags button.locked{filter:grayscale(.8);opacity:.55;border-style:dashed}
+
+ /* Registro de avisos: texto branco sobre fundo transparente */
+ .game-shell .action-log,.game-shell:has(.combat-console:not(.without-target)) .action-log{bottom:34px;max-width:min(360px,26vw);
+  font-size:11.5px;color:#fff;text-shadow:0 1px 2px #000,0 0 4px #000;background:linear-gradient(90deg,#0006,#0000)}
+}
+@media (min-width:1000px) and (min-height:541px) and (pointer:fine) and (max-width:1380px){
+ .desktop-game-menu{bottom:108px}
+}
