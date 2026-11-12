@@ -1,26 +1,45 @@
 "use client";
 
 import { useState } from "react";
-import type { RegionId } from "@/lib/campaign";
+import { REGIONS, type RegionId } from "@/lib/campaign";
+import { isRacialCity, RACIAL_CITIES, type RacialCity } from "@/lib/kingdomCities";
+import { overlandRoads, roadItinerary } from "@/lib/overland";
+import type { GuideTarget } from "@/lib/questNavigation";
 
 const LOCATIONS = [
   { id: "goddard", name: "Goddard", x: 51, y: 10, detail: "Capital flutuante dos Precursores. Missões da história e montarias voadoras. Acesso pelos portais das cinco cidades." , region: "goddard" },
   { id: "iron-forge", name: "Iron Forge", x: 13, y: 29, detail: "Cidade dos anões, no gelo. Treinadores de Guerreiro, Engenheiro, Hunter e Paladino." , region: "iron-forge" },
   { id: "gnomolandia", name: "Gnomolândia", x: 36, y: 39, detail: "Cidade dos gnomos, no gelo. Treinadores de Mago, Shaman, Hunter e Hacker." , region: "gnomolandia" },
   { id: "bosque", name: "Bosque Arcano", x: 86, y: 29, detail: "Cidade dos elfos, entre bosques e cordilheiras. Treinadores de Hunter, Mago, Profeta, Hacker e Dualista." , region: "bosque" },
-  { id: "cidadela", name: "Cidadela humana", x: 72, y: 42, detail: "Cidade dos humanos. Consulte o mapa local para ver as áreas que já estão jogáveis.", region: "aurora" },
+  { id: "cidadela", name: REGIONS.aurora.name, x: 72, y: 42, detail: "Cidade dos humanos e entroncamento das estradas do reino.", region: "aurora" },
   { id: "ogrimmar", name: "Ogrimmar", x: 23, y: 72, detail: "Cidade dos orcs, nas Terras Rubras. Treinadores de Shaman e Guerreiro." , region: "ogrimmar" },
   { id: "nullarion", name: "Nullarion", x: 84, y: 88, detail: "Reino no extremo do Vulcão. O chefe mestre, nível 60, encerra a campanha.", region: "heart" },
-] satisfies { id: string; name: string; x: number; y: number; detail: string; region?: RegionId }[];
+] satisfies { id: string; name: string; x: number; y: number; detail: string; region: RegionId }[];
 
-export default function KingdomAtlas({ here, open, locked }: {
+const cities=Object.keys(RACIAL_CITIES) as RacialCity[];
+const roads=cities.flatMap(from=>overlandRoads(from)
+  .filter(({to})=>from<to).map(({to})=>[from,to] as const));
+const portalLinks=cities.map(to=>['goddard',to] as const);
+const locationOf=(region:RegionId)=>LOCATIONS.find(location=>location.region===region)!;
+const mapPoint=(region:RegionId)=>{
+  const {x,y}=locationOf(region);
+  return [x*6,y*4].join(',');
+};
+const itineraryLabel=(route:RegionId[])=>route.map(id=>REGIONS[id].name).join(' → ');
+
+export default function KingdomAtlas({ here, open, locked, follow }: {
   here?: RegionId;
   open: (id: RegionId) => void;
   locked: (id: RegionId) => string | undefined;
+  follow: (target: GuideTarget) => void;
 }) {
-  const [selection, select] = useState(LOCATIONS[4]);
+  const [selection, select] = useState(() => LOCATIONS.find(location=>location.region===here)??LOCATIONS[4]);
   const { region } = selection;
-  const reason = region && locked(region);
+  const reason = here!==region ? locked(region) : undefined;
+  const land=here ? roadItinerary(here,region) : [];
+  const portals:RegionId[]=!here||here===region ? [] :
+    (here==='goddard'&&isRacialCity(region)||region==='goddard'&&isRacialCity(here)) ? [here,region] :
+    isRacialCity(here)&&isRacialCity(region) ? [here,'goddard',region] : [];
   return <div className="kingdom-atlas">
     <div className="kingdom-atlas-map" role="group" aria-label="Cidades e biomas do Atlas">
       <svg viewBox="0 0 600 400" preserveAspectRatio="none" aria-hidden="true">
@@ -30,8 +49,10 @@ export default function KingdomAtlas({ here, open, locked }: {
         <path d="M34 244 113 210 175 235 231 224 278 249 319 267 355 260 415 284 389 329 337 322 276 344 166 371 48 365 17 306Z" fill="#7a4736" stroke="#ca885c" />
         <path d="M415 284 490 251 565 278 586 342 549 383 447 381 389 329Z" fill="#79392d" stroke="#dd8b57" />
         <path d="M264 43 281 23 342 20 371 40 336 62 304 68Z" fill="#7a7893" stroke="#d8caeb" />
-        <path d="M138 288 Q265 314 318 281 Q363 250 415 284 M78 116 Q125 149 216 156 Q252 163 324 216 M516 116 Q487 137 432 168 Q370 177 324 216 M324 216 Q371 241 415 284 Q451 312 504 352" fill="none" stroke="#e4c38f" strokeWidth="2.5" strokeDasharray="7 5" />
-        <path d="M306 40 78 116 M306 40 216 156 M306 40 516 116 M306 40 432 168 M306 40 138 288" fill="none" stroke="#d7b6f5" strokeWidth="1.4" strokeDasharray="3 6" />
+        {roads.map(([from,to])=><polyline key={from+to} points={[from,to].map(mapPoint).join(' ')} fill="none" stroke="#c7a774" strokeWidth="2.5" />)}
+        {portalLinks.map(([from,to])=><polyline key={to} points={[from,to].map(mapPoint).join(' ')} fill="none" stroke="#d7b6f5" strokeWidth="1.4" strokeDasharray="3 6" />)}
+        {land.length>0&&<polyline points={land.map(mapPoint).join(' ')} fill="none" stroke="#ffe3a1" strokeWidth="4" />}
+        {portals.length>0&&<polyline points={portals.map(mapPoint).join(' ')} fill="none" stroke="#edc9ff" strokeWidth="2.5" strokeDasharray="4 5" />}
       </svg>
       <span className="atlas-biome" style={{ left: "24%", top: "18%" }}>Gelo</span>
       <span className="atlas-biome" style={{ left: "79%", top: "17%" }}>Bosques e cordilheiras</span>
@@ -47,10 +68,16 @@ export default function KingdomAtlas({ here, open, locked }: {
     <div className="atlas-location-info" aria-live="polite">
       <strong>{selection.name}</strong>
       <p>{selection.detail}</p>
-      {region ? <>
-        {reason && <small>{reason}</small>}
-        <button type="button" onClick={() => open(region)}>Ver mapa local</button>
-      </> : <small>Local planejado. A área jogável ainda está em construção.</small>}
+      {reason && <small>{reason}</small>}
+      {land.length>0&&<div className="atlas-trip">
+        <span>{itineraryLabel(land)}</span>
+        <button type="button" className="primary" disabled={!!reason} onClick={()=>follow({region})}>Seguir pela estrada</button>
+      </div>}
+      {portals.length>0&&<div className="atlas-trip">
+        <span>{itineraryLabel(portals)}</span>
+        <button type="button" disabled={!!reason} onClick={()=>follow({region,via:'portal'})}>Seguir por portal</button>
+      </div>}
+      <button type="button" onClick={() => open(region)}>Ver mapa local</button>
     </div>
   </div>;
 }

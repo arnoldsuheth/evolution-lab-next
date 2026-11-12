@@ -63,7 +63,7 @@ export function insideCity(region:string,x:number,z:number){
   return Math.abs(x)<=halfWidth && z>=north && z<=south;
 }
 
-type Road = { to: RacialCity; end: Point; points: Point[] };
+export type Road = { to: RacialCity; end: Point; points: Point[] };
 
 function road(region:RacialCity,to:RacialCity,gateName:string,waypoints:Point[]):Road {
   const gate=DEFENCES[region].gates.find(entry=>entry.name===gateName)!;
@@ -85,6 +85,22 @@ const ROADS: Record<RacialCity, Road[]> = {
 
 export const overlandRoads = (region: string): Road[] => isRacialCity(region) ? ROADS[region] : [];
 export const roadTo = (region: string, to: string) => overlandRoads(region).find(entry=>entry.to===to);
+export function roadItinerary(from:string,to:string):RacialCity[] {
+  if(!isRacialCity(from)||!isRacialCity(to)||from===to)return [];
+  const visited=new Set<RacialCity>([from]);
+  const queue:RacialCity[][]=[[from]];
+  while(queue.length){
+    const route=queue.shift()!;
+    for(const road of overlandRoads(route[route.length-1])){
+      if(visited.has(road.to))continue;
+      const next=[...route,road.to];
+      if(road.to===to)return next;
+      visited.add(road.to);
+      queue.push(next);
+    }
+  }
+  return [];
+}
 export const roadAt = (region: string, x: number, z: number) =>
   overlandRoads(region).find(entry=>Math.hypot(entry.end[0]-x,entry.end[1]-z)<=ROAD_EXIT_RADIUS);
 

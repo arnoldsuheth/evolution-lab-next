@@ -2,7 +2,7 @@ import {waterwayBlocks} from './waterways';
 import {biomeBlocks} from './biomes';
 import {marketCounterBlocks} from "./cityMarket";
 import {cityWalkable,isNewCity,trainerHouseBlocks,trainerHouses} from './kingdomCities';
-import {cityWallBlocks} from './overland';
+import {cityWallBlocks, insideCity, type Road} from './overland';
 import {insideWorld} from "./worldBounds";
 import {INTERIORS, interiorBlocks, townBlocked} from "./town";
 export const BUILDINGS = [{x:-35,z:7,w:2.6,d:2.5},{x:-31,z:18,w:2.6,d:2.5},{x:35,z:7,w:2.6,d:2.5},{x:31,z:18,w:2.6,d:2.5},{ x: 9, z: 4, w: 2.6, d: 2.5 }, ...INTERIORS];
@@ -40,4 +40,28 @@ export function findPath(start: [number, number], end: [number, number], region=
     }
   }
   return [];
+}
+
+
+export function followRoadPath(start:[number,number],road:Road,region:string,airborne=false):[number,number][] {
+  let first=0;
+  if(!insideCity(region,...start)){
+    let nearest=Infinity;
+    for(const [i,[x,z]] of road.points.entries()){
+      const distance=Math.hypot(start[0]-x,start[1]-z);
+      if(distance<nearest){first=i;nearest=distance;}
+    }
+  }
+  const path:[number,number][]=[];
+  let previous=start;
+  for(const point of road.points.slice(first)){
+    const alreadyThere=Math.round(previous[0])===Math.round(point[0])&&Math.round(previous[1])===Math.round(point[1]);
+    if(!alreadyThere){
+      const leg=findPath(previous,point,region,airborne);
+      if(!leg.length)return [];
+      path.push(...leg);
+    }
+    previous=point;
+  }
+  return path;
 }

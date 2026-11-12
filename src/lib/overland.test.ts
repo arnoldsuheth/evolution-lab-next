@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { RACIAL_CITIES, type RacialCity } from './kingdomCities';
-import { cityDefences, cityWallBlocks, oppositeGateSide, overlandRoads, roadArrival, roadAt } from './overland';
-import { findPath, walkable } from './navigation';
+import { cityDefences, cityWallBlocks, oppositeGateSide, overlandRoads, roadArrival, roadAt, roadItinerary } from './overland';
+import { findPath, followRoadPath, walkable } from './navigation';
 import { freshSave } from './game';
 import { useGame } from './store';
 import { INSTANCES, instanceRequirement } from './instances';
@@ -89,4 +89,36 @@ test('o atlas oferece estrada e portal para sair do Bosque sem bloquear a explor
   useGame.getState().move(second.point);
   useGame.getState().skyTravel('bosque');
   assert.equal(useGame.getState().hero.region,'bosque');
+});
+
+
+test('o trajeto guiado usa portões e liga cada cidade terrestre pelos mesmos trechos do atlas',()=>{
+  const save=freshSave();
+  const cities=Object.keys(RACIAL_CITIES) as RacialCity[];
+  for(const from of cities)for(const destination of cities.filter(city=>city!==from)){
+    const itinerary=roadItinerary(from,destination);
+    assert.equal(itinerary[0],from);
+    assert.equal(itinerary.at(-1),destination);
+    let hero={...save.hero,region:from,position:[0,5] as [number,number],level:15};
+    for(const next of itinerary.slice(1)){
+      const stop=guideStop(hero,{region:destination});
+      assert.ok(stop?.overland);
+      const road=roadAt(hero.region,...stop.point);
+      assert.equal(road?.to,next);
+      assert.ok(road);
+      const path=followRoadPath(hero.position,road,hero.region);
+      assert.deepEqual(path.at(-1),road.end);
+      for(const point of path){
+        const exit=roadAt(hero.region,...point);
+        assert.ok(!exit||exit.to===next);
+      }
+      if(hero.region===from){
+        const [x,z]=road.points[0];
+        assert.ok(path.some(([px,pz])=>Math.abs(px-x)<.6&&Math.abs(pz-z)<.6),from);
+      }
+      hero={...hero,region:next,position:roadArrival(hero.region,next)!};
+    }
+    assert.equal(guideStop(hero,{region:destination}),undefined);
+  }
+  assert.deepEqual(roadItinerary('goddard','bosque'),[]);
 });

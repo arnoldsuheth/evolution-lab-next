@@ -4,7 +4,7 @@ import { cityForRace, cityPortal, goddardExit, GODDARD_BOOLE, isRacialCity, RACI
 import { CAMPAIGN_BOSSES, MONSTERS, REGIONS, campaignGate, monsterRequirement, nextRegion, regionRequirement } from './campaign';
 import { GATHER_NODES, type QuestObjective } from './quests';
 import { INSTANCES, instanceRequirement, type InstanceId } from './instances';
-import { overlandRoads, roadTo } from './overland';
+import { overlandRoads, roadItinerary, roadTo } from './overland';
 import { findPath } from './navigation';
 
 export type GuideTarget = { npc: NpcId } | { trainer: ClassId }
@@ -83,8 +83,9 @@ export function guideStop(hero: HeroData, target: GuideTarget, world?: GuideWorl
 
   if (hero.instance) return { target, name: 'Saída da masmorra', point: [0,10], leaveInstance: true };
   if (region === destination) return;
-  if ('region' in target && target.via !== 'portal' && isRacialCity(region) && isRacialCity(destination)) {
-    const road=roadTo(region,destination)??roadTo(region,'aurora');
+  if ('region' in target && target.via !== 'portal') {
+    const next=roadItinerary(region,destination)[1];
+    const road=next && roadTo(region,next);
     if (road) return {target,name:`Estrada · ${REGIONS[road.to].name}`,point:road.end,overland:true};
   }
   const order = ['aurora','ruins','frontier','heart'];

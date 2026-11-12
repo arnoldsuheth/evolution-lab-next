@@ -7,7 +7,9 @@ import { CITADEL_SECTORS, TOWN_SERVICES } from "@/lib/town";
 import { areaDestinations, guideStop, regionPins, routeToPoint, type GuideRequest, type GuideTarget, type MapPin } from "@/lib/questNavigation";
 import { isRacialCity } from "@/lib/kingdomCities";
 import { INSTANCES } from "@/lib/instances";
-import { findPath } from "@/lib/navigation";
+import { findPath, followRoadPath } from "@/lib/navigation";
+import { roadAt } from "@/lib/overland";
+import { mountOf } from "@/lib/adventure";
 import { CitadelMap } from "./CitadelMap";
 import AreaMap from "./AreaMap";
 import KingdomAtlas from "./KingdomAtlas";
@@ -18,6 +20,9 @@ const DESTINATIONS = [...CITADEL_SECTORS, ...TOWN_SERVICES, { name: cave.name, s
 export default function WorldMap({ guide, follow }: { guide: GuideRequest | null; follow: (target: GuideTarget) => void }) {
   const hero = useGame(s => s.hero);
   const education = useGame(s => s.education);
+  const mounted = useGame(s => s.mounted);
+  const mount = mountOf(hero);
+  const airborne = mounted && !hero.instance && (mount?.id==="dragon" || mount?.id==="griffin" && !!hero.flyingMount);
   const [region, setRegion] = useState<RegionId | "atlas" | "here">("here");
   const [selection, setSelection] = useState<MapPin>();
   const [sector, setSector] = useState("");
@@ -32,10 +37,13 @@ export default function WorldMap({ guide, follow }: { guide: GuideRequest | null
   const destination = DESTINATIONS.find(item => item.name === sector);
   const route = useMemo(() => {
     if (!position) return [];
-    if (focus && 'road' in focus.target) return findPath(position,focus.point,hero.region);
+    if (focus && ('road' in focus.target || (focus===activeStop && activeStop.overland))) {
+      const road=roadAt(hero.region,...focus.point);
+      if(road)return followRoadPath(position,road,hero.region,airborne);
+    }
     if (focus) return routeToPoint(position, focus.point, hero);
     return destination ? findPath(position, destination.entrance) : [];
-  }, [position, focus, destination, hero]);
+  }, [position, focus, activeStop, destination, hero, airborne]);
   function open(next: typeof region) {
     setRegion(next);
     setSelection(undefined);
@@ -47,14 +55,14 @@ export default function WorldMap({ guide, follow }: { guide: GuideRequest | null
       <button className={region === "atlas" ? "active" : ""} onClick={() => open("atlas")}>Atlas do Reino</button>
     </nav>
     {reason && <p>{reason}</p>}
-    {!hero.instance && shown!==hero.region && (isRacialCity(shown)||shown==='goddard') &&
+    {!hero.instance && shown!==hero.region && (isRacialCity(hero.region)||hero.region==='goddard') && (isRacialCity(shown)||shown==='goddard') &&
       <div className="map-route-action" aria-label="Viajar para a cidade selecionada">
-        {isRacialCity(hero.region)&&isRacialCity(shown)&&<button className="primary" onClick={()=>follow({region:shown})}>Seguir pela estrada</button>}
-        <button onClick={()=>follow({region:shown,via:'portal'})}>Seguir por portal</button>
+        {isRacialCity(hero.region)&&isRacialCity(shown)&&<button className="primary" disabled={!!reason} onClick={()=>follow({region:shown})}>Seguir pela estrada</button>}
+        <button disabled={!!reason} onClick={()=>follow({region:shown,via:'portal'})}>Seguir por portal</button>
       </div>}
     {region==='here' && !hero.instance && (isRacialCity(shown)||shown==='goddard') &&
       <div className="map-route-action"><button onClick={()=>open("atlas")}>Viajar para outra cidade</button></div>}
-    {region === "atlas" ? <KingdomAtlas here={hero.instance ? undefined : hero.region} open={open} locked={id => regionRequirement(hero, education, id)} /> : <>
+    {region === "atlas" ? <KingdomAtlas here={hero.instance ? undefined : hero.region} open={open} follow={follow} locked={id => regionRequirement(hero, education, id)} /> : <>
       <h3>{instance ? "Masmorra atual" : REGIONS[shown].name}</h3>
       {shown === "aurora" && !instance ? <CitadelMap position={position} route={route} focus={focus} selected={sector} />
         : <AreaMap region={shown} instance={instance} position={position} route={route} focus={focus} locked={!!reason} />}

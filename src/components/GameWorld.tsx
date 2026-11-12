@@ -53,7 +53,7 @@ import { useGame } from "@/lib/store";
 import { bindCursor, cursorOn, setCombatCursor } from "@/lib/cursor";
 import { isRangedClass } from "@/lib/combatEffects";
 import { attackRange } from "@/lib/combat";
-import { BUILDINGS, TREES, findPath, walkable } from "@/lib/navigation";
+import { BUILDINGS, TREES, findPath, followRoadPath, walkable } from "@/lib/navigation";
 import { NPCS_LIVE, type NpcId, type Look, type ClassId, type Race } from "@/lib/game";
 
 export class WorldBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
@@ -265,7 +265,7 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
   const pausedRef = useRef(paused); useEffect(() => { pausedRef.current = paused; }, [paused]);
   const [light, setLight] = useState(0.8);
   useEffect(() => { const update = () => { const parts = new Intl.DateTimeFormat("en", { timeZone: "America/Sao_Paulo", hour: "numeric", minute: "numeric", hourCycle: "h23" }).formatToParts(new Date()); const h = Number(parts.find(p => p.type === "hour")?.value ?? 12) + Number(parts.find(p => p.type === "minute")?.value ?? 0)/60; setLight(Math.max(0.36, Math.sin((h - 6) / 12 * Math.PI))); }; update(); const id = setInterval(update, 60000); return () => clearInterval(id); }, []);
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (lastRelocation.current!==relocation || Math.hypot(player.current.x - hero.position[0], player.current.z - hero.position[1]) > 6 || hero.dead || lastRegion.current!==hero.region) { player.current.set(hero.position[0], 0, hero.position[1]);jump.current={height:0,velocity:0};path.current = [];lastRegion.current=hero.region;lastRelocation.current=relocation;pending.current=null;monsterTarget.current=null;if(controls.current){temp.current.set(player.current.x,worldCameraTargetHeight(thirdPerson, airborne),player.current.z);offset.current.copy(temp.current).sub(controls.current.target);camera.position.add(offset.current);controls.current.target.copy(temp.current);controls.current.update();invalidate();} }
   }, [hero.position, hero.dead, hero.region, relocation,player,camera,invalidate,thirdPerson,airborne]);
   useEffect(() => {
@@ -323,8 +323,12 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
       crossBoundary();
       return;
     }
-    travel(...point);
-    if(!path.current.length)endGuide();
+    const route=roadAt(state.hero.region,...point);
+    path.current=route?followRoadPath([player.current.x,player.current.z],route,state.hero.region,airborne):[];
+    if(!path.current.length){
+      report("Caminho até a estrada indisponível. Aproxime-se do portão e tente novamente.");
+      endGuide();
+    }
   }
   function crossBoundary() {
     if(hero.instance)return false;
