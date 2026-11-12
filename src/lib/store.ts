@@ -3,6 +3,7 @@ import { cityMarket, marketOpen, marketStocks, type MarketStall } from './cityMa
 import {FLYING_MOUNTS,FLYING_MOUNT_PRICE,MOUNT_VENDOR,type FlyingMountId} from "./flyingMounts";
 import {RACE_CLASSES} from "./game";
 import {isNewCity,isRacialCity,CITY_BANK,GODDARD_BOOLE,CITY_FORGE,CITY_WAGON,CITY_SPAWN,RACIAL_CITIES,trainerPosition,cityForRace,goddardExit,cityPortal,type RacialCity} from "./kingdomCities";
+import {monsterPoint} from "./patrols";
 import {walkable} from "./navigation";
 import { roadArrival, roadAt } from "./overland";
 import { ORE_VEINS, PICKAXE_ID } from './mining';
@@ -122,7 +123,7 @@ function executeBattle(id:string|undefined,starter:boolean,set:(value:Partial<Ga
  if(result.error){set({notice:result.error});return;}
  result.hero={...result.hero,durability:{...result.hero.durability,...Object.fromEntries(s.hero.equipped.filter(id=>ITEMS[id]&&ITEMS[id].slot!=="pet").map(id=>[id,Math.max(0,(s.hero.durability?.[id]??100)-1)]))}};
  const target=MONSTERS.find(m=>m.id===enemy.monsterId);
- const feedback={battleEvent:{critical:!!result.critical,companionStrike:!!target&&result.companionStrike,time:Date.now(),damage:result.damage,received:result.received,x:target?.x??s.hero.position[0],z:target?.z??s.hero.position[1],tone:id||starter?CLASSES[s.hero.classId].color:'#efd49a',kind:(id?'skill':starter?'power':'attack') as 'attack'|'power'|'skill',classId:s.hero.classId,basicEffect:result.basicEffect,skill:id,hx:s.hero.position[0],hz:s.hero.position[1],won:result.won,enemySkill:result.enemySkill,enemyPower:result.enemyPower}};
+ const feedback={battleEvent:{critical:!!result.critical,companionStrike:!!target&&result.companionStrike,time:Date.now(),damage:result.damage,received:result.received,x:enemy.position?.[0]??target?.x??s.hero.position[0],z:enemy.position?.[1]??target?.z??s.hero.position[1],tone:id||starter?CLASSES[s.hero.classId].color:'#efd49a',kind:(id?'skill':starter?'power':'attack') as 'attack'|'power'|'skill',classId:s.hero.classId,basicEffect:result.basicEffect,skill:id,hx:s.hero.position[0],hz:s.hero.position[1],won:result.won,enemySkill:result.enemySkill,enemyPower:result.enemyPower}};
  const skillBuff=id?SKILLS[id].buff:undefined;
  const effects=skillBuff?[...s.effects.filter(e=>e.kind!==skillBuff.kind),{kind:skillBuff.kind,amount:Math.round(skillBuff.amount*(1+(skillRank(s.hero,id!)-1)*.14)),remaining:skillBuff.duration}]:s.effects;
  const now=Date.now(),cooldowns={...s.cooldowns,...(id?{[id]:now+SKILLS[id].cooldown*1000}:{})};
@@ -313,12 +314,13 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     if((s.slain[monster.id]??0)>Date.now())return;
     if(s.hero.instance){const sealed=doorBetween(s.hero.instance,adventureOf(s.hero).doors,s.hero.position[1],monster.z);if(sealed){set({notice:`Porta selada: ${sealed.title}. Resolva o código da porta primeiro.`});return;}}
     const rare=rareNow(Date.now(),s.hero.region),isRare=!s.hero.instance&&!!rare&&rare.monsterId===monster.id&&adventureOf(s.hero).rareDone!==rare.window;
-    if(Math.hypot(s.hero.position[0]-monster.x,s.hero.position[1]-monster.z)>attackRange(s.hero,action)+.5){set({notice:'Fora de alcance. Chegue mais perto do alvo.'});return;}
+    const position=monsterPoint(monster,Date.now());
+    if(Math.hypot(s.hero.position[0]-position[0],s.hero.position[1]-position[1])>attackRange(s.hero,action)+.5){set({notice:'Fora de alcance. Chegue mais perto do alvo.'});return;}
     const level=monster.boss?monster.level:Math.max(monster.level,Math.min(60,s.hero.level+3,Number.isFinite(requestedLevel)?Math.floor(requestedLevel!):s.hero.level));
     const vitals=enemyVitals(monster.kind,level,monster.boss);
     const noviceExpedition=monster.instance==="frost-cave";
     const maxHp=Math.round(vitals.maxHp*(isRare?2:noviceExpedition?.76:1));
-    set({mounted:false,encounter:{...vitals,kind:monster.kind,turn:0,id:`enemy-${Date.now()}`,monsterId:monster.id,bossId:monster.boss?monster.id:undefined,name:isRare?`✦ ${monster.name} raro`:monster.name,hp:maxHp,maxHp,level,instanceId:s.hero.instance??undefined,power:Math.round((15+level*4)*(monster.boss?1.2:isRare?1.25:1)*(noviceExpedition?.72:s.hero.instance?1.15:1)),reward:25+level*18,elite:monster.boss||isRare,...(isRare&&rare?{rare:rare.window}:{})},lastAttack:0,notice:isRare?'✦ Monstro raro! Mais forte, com recompensa melhor.':monster.boss?(monster.instance?'Guardião da expedição.':'Chefe de região. A vitória abre o caminho seguinte.'):'Observe seus recursos e habilidades.'});
+    set({mounted:false,encounter:{...vitals,kind:monster.kind,turn:0,id:`enemy-${Date.now()}`,monsterId:monster.id,position,bossId:monster.boss?monster.id:undefined,name:isRare?`✦ ${monster.name} raro`:monster.name,hp:maxHp,maxHp,level,instanceId:s.hero.instance??undefined,power:Math.round((15+level*4)*(monster.boss?1.2:isRare?1.25:1)*(noviceExpedition?.72:s.hero.instance?1.15:1)),reward:25+level*18,elite:monster.boss||isRare,...(isRare&&rare?{rare:rare.window}:{})},lastAttack:0,notice:isRare?'✦ Monstro raro! Mais forte, com recompensa melhor.':monster.boss?(monster.instance?'Guardião da expedição.':'Chefe de região. A vitória abre o caminho seguinte.'):'Observe seus recursos e habilidades.'});
   },
   attack: starter => {const s=get();if(!s.encounter||s.hero.dead||Date.now()-s.lastAttack<650)return;executeBattle(undefined,!!starter,set,get);},
   flee: () => {

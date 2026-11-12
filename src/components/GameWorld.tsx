@@ -43,6 +43,8 @@ import GatherNodes, { WorldUnlocks } from "./GatherNodes";
 import ExplorationEncounters from "./ExplorationEncounters";
 import PavingMaterial from "./PavingMaterial";
 import {biomeOf,flightRelief} from "@/lib/biomes";
+import ScenicRoutes from "./ScenicRoutes";
+import {monsterPoint} from "@/lib/patrols";
 import Wildlands from "./Wildlands";
 import TerrainSurface from "./TerrainSurface";
 import { activeEquipment } from "@/lib/equipment";
@@ -63,7 +65,7 @@ const DEFAULT_LOOK: Look = { body: 2, hair: 0, beard: 2, moustache: 1, skin: 1, 
 function Stone({ position, size = 1, color = "#777e79" }: { position: [number, number, number]; size?: number; color?: string }) { return <mesh position={position} scale={[size, size * 0.6, size * 0.8]} castShadow receiveShadow><icosahedronGeometry args={[1, 1]} /><meshStandardMaterial color={color} roughness={0.9} /></mesh>; }
 function Tree({ x, z, size = 1 }: { x: number; z: number; size?: number }) {
   const crown=useRef<THREE.Group>(null),ray=useRef(new THREE.Ray()),origin=useRef(new THREE.Vector3()),direction=useRef(new THREE.Vector3()),hit=useRef(new THREE.Vector3()),bounds=useRef(new THREE.Box3(new THREE.Vector3(x-2.1*size,1.2*size,z-2.1*size),new THREE.Vector3(x+2.1*size,5.8*size,z+2.1*size)));
-  useFrame(({camera},dt)=>{const state=useGame.getState(),enemy=MONSTERS.find(m=>m.id===state.encounter?.monsterId);const targets=[state.hero.position,...(enemy?[[enemy.x,enemy.z]]:[])];const near=targets.some(p=>Math.hypot(p[0]-x,p[1]-z)<9*size),crowns=crown.current?.children??[];if(!near&&crowns.every(o=>((o as THREE.Mesh).material as THREE.MeshStandardMaterial).opacity>=1))return; // longe do herói: nada a esconder
+  useFrame(({camera},dt)=>{const state=useGame.getState(),enemy=MONSTERS.find(m=>m.id===state.encounter?.monsterId);const targets=[state.hero.position,...(enemy?[state.encounter?.position??[enemy.x,enemy.z]]:[])];const near=targets.some(p=>Math.hypot(p[0]-x,p[1]-z)<9*size),crowns=crown.current?.children??[];if(!near&&crowns.every(o=>((o as THREE.Mesh).material as THREE.MeshStandardMaterial).opacity>=1))return; // longe do herói: nada a esconder
 // Testa cabeça e pés do herói (e do inimigo): se a copa cobre qualquer parte, ela fica quase transparente.
  const covered=targets.some(p=>[.4,1.3,2.3].some(y=>{origin.current.set(p[0],y,p[1]);direction.current.copy(camera.position).sub(origin.current);const distance=direction.current.length();ray.current.set(origin.current,direction.current.normalize());return !!ray.current.intersectBox(bounds.current,hit.current)&&origin.current.distanceTo(hit.current)<distance;}));crown.current?.children.forEach(o=>{const m=(o as THREE.Mesh).material as THREE.MeshStandardMaterial;if(m){m.opacity=THREE.MathUtils.damp(m.opacity,covered?.12:1,10,Math.min(dt,.1));if(m.opacity>.995)m.opacity=1;m.depthWrite=m.opacity>.95;const see=m.opacity<1;if(m.transparent!==see){m.transparent=see;m.needsUpdate=true;}}});});
   return <group position={[x, 0, z]} scale={size}>
@@ -410,7 +412,27 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
         useGame.getState().move([player.current.x, player.current.z]);
         interaction.open();
       }
-      {const st=useGame.getState();if(st.queued&&st.target){const m=MONSTERS.find(m=>m.id===st.target);const range=attackRange(st.hero,st.queued);if(!m||(st.slain[m.id]??0)>Date.now()){useGame.setState({queued:null,target:null});monsterTarget.current=null;}else if(Math.hypot(player.current.x-m.x,player.current.z-m.z)<=range){path.current=[];monsterTarget.current=null;if(heroRoot.current)heroRoot.current.rotation.y=Math.atan2(m.x-player.current.x,m.z-player.current.z);const action=st.queued;st.move([player.current.x,player.current.z]);st.startEncounter(m.boss,m.level,m.id,action);useGame.setState({queued:null});if(useGame.getState().encounter)useGame.getState().act(action);}else if(monsterTarget.current!==m.id||!path.current.length){monsterTarget.current=m.id;travelNear(m.x,m.z);}}}
+      const state=useGame.getState();
+      if(state.queued&&state.target){
+        const monster=MONSTERS.find(m=>m.id===state.target);
+        const now=Date.now();
+        if(!monster||(state.slain[monster.id]??0)>now){
+          useGame.setState({queued:null,target:null});monsterTarget.current=null;
+        }else{
+          const [x,z]=monsterPoint(monster,now),action=state.queued;
+          if(Math.hypot(player.current.x-x,player.current.z-z)<=attackRange(state.hero,action)){
+            path.current=[];monsterTarget.current=null;
+            if(heroRoot.current)heroRoot.current.rotation.y=Math.atan2(x-player.current.x,z-player.current.z);
+            state.move([player.current.x,player.current.z]);
+            state.startEncounter(monster.boss,monster.level,monster.id,action);
+            useGame.setState({queued:null});
+            if(useGame.getState().encounter)useGame.getState().act(action);
+          }else if(monsterTarget.current!==monster.id||!path.current.length){
+            monsterTarget.current=monster.id;
+            travelNear(x,z);
+          }
+        }
+      }
       if(gatherTarget.current){const g=gatherTarget.current;if(Math.hypot(player.current.x-g.x,player.current.z-g.z)<3){path.current=[];gatherTarget.current=null;useGame.getState().move([player.current.x,player.current.z]);useGame.getState().gather(g.id);}}
       if (k.has("e")) { k.delete("e"); const npc = NPCS_LIVE.find(n => Math.hypot(player.current.x - n.x, player.current.z - n.z) < 3.3); if (npc) { useGame.getState().move([player.current.x, player.current.z]); interact(npc.id); } }
     } else { keys.current.clear(); path.current = []; pending.current = null; handledGuide.current = null; if (guide && useGame.getState().encounter) endGuide(); }
@@ -434,11 +456,15 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
         ||st.hero.region==='aurora'&&Math.hypot(p.x,p.z)<SAFE_TOWN_RADIUS);
       if(!safe&&!airborne&&!st.encounter&&!st.challenge&&!st.hero.dead){
         const now=Date.now();
-        const angry=MONSTERS.find(m=>m.region===st.hero.region&&(m.instance??null)===(st.hero.instance??null)
-          &&isAggressive(m)&&(st.slain[m.id]??0)<=now&&Math.hypot(p.x-m.x,p.z-m.z)<AGGRO_RADIUS
-          &&!monsterRequirement(st.hero,st.education,m.id)
-          &&(!st.hero.instance||!doorBetween(st.hero.instance,adventure.doors,p.z,m.z))
-          &&[.25,.5,.75].every(t=>walkable(p.x+(m.x-p.x)*t,p.z+(m.z-p.z)*t,worldRegion)));
+        const angry=MONSTERS.find(m=>{
+          if(m.region!==st.hero.region||(m.instance??null)!==(st.hero.instance??null)
+            ||!isAggressive(m)||(st.slain[m.id]??0)>now||Math.hypot(p.x-m.x,p.z-m.z)>AGGRO_RADIUS+2)return false;
+          const [x,z]=monsterPoint(m,now);
+          return Math.hypot(p.x-x,p.z-z)<AGGRO_RADIUS
+            &&!monsterRequirement(st.hero,st.education,m.id)
+            &&(!st.hero.instance||!doorBetween(st.hero.instance,adventure.doors,p.z,z))
+            &&[.25,.5,.75].every(t=>walkable(p.x+(x-p.x)*t,p.z+(z-p.z)*t,worldRegion));
+        });
         if(angry){
           st.move([p.x,p.z]);
           st.startEncounter(angry.boss,angry.level,angry.id);
@@ -471,7 +497,7 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
       <mesh onClick={groundClick} receiveShadow><boxGeometry args={[39,.7,34]}/><meshStandardMaterial color={REGIONS.goddard.color}/></mesh>
       <mesh position={[0,-2.7,0]} rotation={[Math.PI,0,0]} scale={[1,.7,.85]}><coneGeometry args={[22,6,7]}/><meshStandardMaterial color="#4e5068" flatShading/></mesh>
     </group>:<TerrainSurface region={hero.instance?"instance":hero.region} onClick={groundClick} color={REGIONS[hero.region].color}/>}
-    {!hero.instance&&<Wildlands region={hero.region} low={low}/>}
+    {!hero.instance&&<><Wildlands region={hero.region} low={low}/><ScenicRoutes region={hero.region} ground={groundClick}/></>}
     {!hero.instance&&isRacialCity(hero.region)&&<TrainerDistrict city={hero.region} paused={paused} approach={approachInteraction} openJourney={()=>openService("journey")}/>}
     {!hero.instance&&<CityMarket region={hero.region} paused={paused} approach={approachInteraction} open={openMarket}/>}
     {!hero.instance&&<CityRoutes region={hero.region} paused={paused} ground={groundClick} cross={crossGate}
