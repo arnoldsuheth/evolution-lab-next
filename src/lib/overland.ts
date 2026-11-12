@@ -56,6 +56,13 @@ export function cityWallBlocks(region: string, x: number, z: number) {
     &&z>=Math.min(a[1],b[1])-.62&&z<=Math.max(a[1],b[1])+.62) ?? false;
 }
 
+export function insideCity(region:string,x:number,z:number){
+  if(region==='goddard')return true;
+  if(!isRacialCity(region))return false;
+  const {halfWidth,north,south}=GROUND_CITIES[region];
+  return Math.abs(x)<=halfWidth && z>=north && z<=south;
+}
+
 type Road = { to: RacialCity; end: Point; points: Point[] };
 
 function road(region:RacialCity,to:RacialCity,gateName:string,waypoints:Point[]):Road {

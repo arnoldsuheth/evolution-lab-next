@@ -1,3 +1,4 @@
+import {biomeBlocks} from './biomes';
 import {marketCounterBlocks} from "./cityMarket";
 import {cityWalkable,isNewCity,trainerHouseBlocks,trainerHouses} from './kingdomCities';
 import {cityWallBlocks} from './overland';
@@ -9,9 +10,9 @@ export const REGION_PILLARS = Array.from({length:12},(_,i)=>({x:Math.cos(i*2.4)*
 export function walkable(x: number, z: number, region="aurora", airborne=false) {
   if (!insideWorld(x,z)) return false;
   if(region==="instance")return Math.abs(x)<=12&&z>=-23&&z<=12;
-  if (!airborne && (cityWallBlocks(region,x,z) || marketCounterBlocks(region,x,z))) return false;
+  if (!airborne && (cityWallBlocks(region,x,z) || marketCounterBlocks(region,x,z) || biomeBlocks(region,x,z))) return false;
   if(isNewCity(region))return cityWalkable(region,x,z);
-  if(region!=="aurora")return !REGION_PILLARS.some(p=>Math.hypot(x-p.x,z-p.z)<1.6);
+  if(region!=="aurora")return airborne || !REGION_PILLARS.some(p=>Math.hypot(x-p.x,z-p.z)<1.6);
   if (BUILDINGS.some(b => "id" in b ? interiorBlocks(b, x, z) : Math.abs(x - b.x) < b.w + 0.4 && Math.abs(z - b.z) < b.d + 0.4)) return false;
   if (townBlocked(x, z) || trainerHouses("aurora").some(house=>trainerHouseBlocks(house,x,z))) return false;
   if (TREES.some(t => Math.hypot(x - t.x, z - t.z) < 0.6)) return false;

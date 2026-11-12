@@ -70,7 +70,7 @@ export default function WorldMap({ guide, follow }: { guide: GuideRequest | null
       {shown === "aurora" && !instance && <details className="map-places"><summary>Prédios e serviços</summary><nav className="tabs" aria-label="Prédios e serviços">
         {DESTINATIONS.map(item => <button key={item.name} aria-pressed={sector === item.name} onClick={() => { setSector(item.name); setSelection(undefined); }}>{item.short}</button>)}
       </nav></details>}
-      <small>Ponto claro: você. Dourado: personagens. Ciano: destino e caminho.</small>
+      <small>Ponto claro: você. Dourado: personagens. Vermelho: criaturas agressivas. Ciano: caminho.</small>
     </>}
   </section>;
 }

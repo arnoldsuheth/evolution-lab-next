@@ -12,7 +12,7 @@ export const REGIONS:Record<RegionId,{name:string;boss?:string;lesson?:string;le
  bosque:{...RACIAL_CITIES.bosque,level:1},
  ogrimmar:{...RACIAL_CITIES.ogrimmar,level:1},
  goddard:{name:'Goddard',level:1,color:'#777fa1'}};
-export interface Monster{id:string;name:string;kind:MonsterKind;region:RegionId;x:number;z:number;level:number;boss:boolean;instance?:InstanceId}
+export interface Monster{id:string;name:string;kind:MonsterKind;region:RegionId;x:number;z:number;level:number;boss:boolean;instance?:InstanceId;hostile?:boolean}
 // Os sufixos preservam o progresso de incursões gravadas antes da mudança de criaturas.
 const EXPEDITION_ENCOUNTERS = [
  {instance:'frost-cave',region:'iron-forge',level:1,enemies:[['spider','wolf','Lobo da Geada'],['golem','boar','Javali Invernal'],['wraith','golem','Guardião do Gelo']]},
@@ -21,6 +21,52 @@ const EXPEDITION_ENCOUNTERS = [
  {instance:'gear-cave',region:'gnomolandia',level:10,enemies:[['spider','spider','Aranha de Cobre'],['golem','golem','Autômato Enferrujado'],['wraith','golem','Vigia das Engrenagens']]},
  {instance:'eclipse-rift',region:'frontier',level:38,enemies:[['spider','wolf','Lobo do Eclipse'],['golem','wraith','Arauto do Eclipse'],['wraith','dragon','Draco da Fenda']]},
 ] as const;
+type Camp = [region:RegionId, id:string, kind:MonsterKind, name:string, level:number, x:number, z:number, hostile:boolean];
+const CAMPS:Camp[] = [
+ ['aurora','south-stag','stag','Cervo da Campina',2,-2,42,false],
+ ['aurora','shore-beetle','beetle','Besouro das Dunas',3,48,41,false],
+ ['aurora','west-wolf','wolf','Lobo da Estrada',4,-44,-4,true],
+ ['aurora','south-boar','boar','Javali da Campina',2,-19,46,false],
+ ['aurora','north-spider','spider','Aranha das Nascentes',5,5,-58,true],
+ ['bosque','vale-stag','stag','Cervo do Vale Verde',2,22,-37,false],
+ ['bosque','costa-boar','boar','Javali do Litoral',3,39,31,false],
+ ['bosque','raiz-wolf','wolf','Lobo das Raízes',4,-24,-48,true],
+ ['bosque','moss-spider','spider','Aranha da Mata Fechada',5,19,-63,true],
+ ['bosque','prado-beetle','beetle','Besouro de Folhagem',3,-15,53,false],
+ ['iron-forge','tundra-stag','stag','Cervo da Tundra',2,16,-45,false],
+ ['iron-forge','ice-frostcat','frostcat','Lince das Agulhas',4,28,-36,true],
+ ['iron-forge','snow-boar','boar','Javali da Neve',3,-29,21,false],
+ ['iron-forge','frost-golem','golem','Sentinela Glacial',6,14,-65,true],
+ ['iron-forge','tundra-wolf','wolf','Lobo da Tundra',3,44,28,false],
+ ['gnomolandia','snow-stag','stag','Cervo do Degelo',2,15,-34,false],
+ ['gnomolandia','copper-beetle','beetle','Besouro dos Veios',3,-42,-18,false],
+ ['gnomolandia','mount-frostcat','frostcat','Lince de Prata',5,17,-57,true],
+ ['gnomolandia','slope-golem','golem','Autômato da Serra',6,15,48,true],
+ ['gnomolandia','mist-boar','boar','Javali da Névoa',3,-39,25,false],
+ ['ogrimmar','ash-boar','boar','Javali de Cinzas',2,-19,-41,false],
+ ['ogrimmar','ridge-basilisk','basilisk','Basilisco do Vulcão',5,30,-52,true],
+ ['ogrimmar','copper-beetle','beetle','Besouro das Terras Rubras',3,-35,43,false],
+ ['ogrimmar','ravine-wolf','wolf','Lobo da Garganta',4,18,47,true],
+ ['ogrimmar','basalt-golem','golem','Sentinela de Basalto',7,35,-10,true],
+ ['ruins','archive-spider','spider','Aranha do Claustro',18,13,-42,true],
+ ['ruins','old-stag','stag','Cervo do Mosteiro',17,-21,35,false],
+ ['ruins','rune-wraith','wraith','Espectro das Escarpas',23,24,-60,true],
+ ['ruins','shore-beetle','beetle','Besouro das Ruínas',19,29,35,false],
+ ['frontier','canyon-basilisk','basilisk','Basilisco do Cânion',36,-24,-51,true],
+ ['frontier','sand-beetle','beetle','Besouro de Areia',32,30,35,false],
+ ['frontier','mesa-golem','golem','Guardião de Arenito',40,20,-64,true],
+ ['frontier','frontier-boar','boar','Javali da Mesa',33,-22,44,false],
+ ['heart','obsidian-golem','golem','Golem de Obsidiana',49,-24,-49,true],
+ ['heart','ash-basilisk','basilisk','Basilisco de Cinzas',51,17,48,true],
+ ['heart','ash-beetle','beetle','Besouro do Eclipse',46,21,-35,false],
+ ['heart','crater-wraith','wraith','Espectro da Cratera',54,10,-66,true],
+];
+const CAMP_OFFSETS=[[-2.8,1.2],[.8,-1.9],[3.4,2.5]] as const;
+const WILDLIFE:Monster[]=CAMPS.flatMap(([region,id,kind,name,level,x,z,hostile])=>
+  CAMP_OFFSETS.map(([dx,dz],i)=>({
+    id:`wild-${region}-${id}-${i}`,name,kind,region,level,x:x+dx,z:z+dz,boss:false,hostile,
+  })));
+
 export const MONSTERS:Monster[]=[
  {id:'cavern-spider',name:'Aranha Cristalina',kind:'spider',region:'aurora',instance:'cavern',x:-6,z:0,level:8,boss:false},
  {id:'cavern-golem',name:'Vigia de Quartzo',kind:'golem',region:'aurora',instance:'cavern',x:6,z:-8,level:10,boss:false},
@@ -44,7 +90,7 @@ export const MONSTERS:Monster[]=[
  {id:'village-spider-5',name:'Aranha do Pomar',kind:'spider',region:'aurora',x:14,z:32,level:1,boss:false},
  {id:'village-spider-6',name:'Tecelã do Pomar',kind:'spider',region:'aurora',x:12,z:35,level:2,boss:false},
  {id:'field-wolf-4',name:'Lobo das Colinas',kind:'wolf',region:'aurora',x:-30,z:-3,level:3,boss:false},
- {id:'field-wolf-5',name:'Lobo das Colinas',kind:'wolf',region:'aurora',x:-23,z:-11,level:3,boss:false},
+ {id:'field-wolf-5',name:'Lobo das Colinas',kind:'wolf',region:'aurora',x:-25,z:-11,level:3,boss:false},
  {id:'field-wolf-6',name:'Lobo das Colinas',kind:'wolf',region:'aurora',x:-26,z:-9,level:3,boss:false},
  {id:'forest-wolf-3',name:'Lobo Espinhento',kind:'wolf',region:'aurora',x:-8,z:-18,level:2,boss:false},
  {id:'forest-spider-3',name:'Aranha das Runas',kind:'spider',region:'aurora',x:3,z:-24,level:4,boss:false},
@@ -82,6 +128,7 @@ export const MONSTERS:Monster[]=[
  {id:'gnome-copper-beetle',name:'Besouro de Cobre',kind:'beetle',region:'gnomolandia',x:-43,z:-13,level:3,boss:false},
  {id:'orc-ridge-basilisk',name:'Basilisco da Garganta',kind:'basilisk',region:'ogrimmar',x:23,z:-43,level:5,boss:false},
  {id:'frontier-sand-basilisk',name:'Basilisco de Arenito',kind:'basilisk',region:'frontier',x:-42,z:-30,level:36,boss:false},
+ ...WILDLIFE,
  {id:'boss-master',name:'Nullarion · Devorador do Código',kind:'dragon' as MonsterKind,region:'heart' as RegionId,x:2,z:-19,level:60,boss:true},
 ];
 function mainStoryDelivered(education: Education) {
@@ -99,7 +146,6 @@ export function campaignGate(from: RegionId, to: RegionId): [number, number] | u
   return from === 'aurora' ? [25, -18] : [8, -24];
 }
 
-/** Monstros agressivos atacam quem chega perto: do nível 3 em diante e em todas as regiões de fora. Iniciantes e a vila são seguros. */
 export const AGGRO_RADIUS = 4.2, SAFE_TOWN_RADIUS = 12;
-/** Só chefes e criaturas das masmorras (caverna e monastério) atacam quem chega perto; o resto luta só se for atacado. */
-export const isAggressive = (m: { boss: boolean; instance?: string }) => m.boss || !!m.instance;
+export const isAggressive = (m: { boss:boolean; instance?:string; hostile?:boolean }) =>
+  m.boss || !!m.instance || m.hostile === true;

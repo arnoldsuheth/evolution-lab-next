@@ -3,7 +3,8 @@ import { cityMarket, marketOpen, marketStocks, type MarketStall } from './cityMa
 import {FLYING_MOUNTS,FLYING_MOUNT_PRICE,MOUNT_VENDOR,type FlyingMountId} from "./flyingMounts";
 import {RACE_CLASSES} from "./game";
 import {isNewCity,isRacialCity,CITY_BANK,GODDARD_BOOLE,CITY_FORGE,CITY_WAGON,CITY_SPAWN,RACIAL_CITIES,trainerPosition,cityForRace,goddardExit,cityPortal,type RacialCity} from "./kingdomCities";
-import { cityWallBlocks, roadArrival, roadAt } from "./overland";
+import {walkable} from "./navigation";
+import { roadArrival, roadAt } from "./overland";
 import { ORE_VEINS, PICKAXE_ID } from './mining';
 import { canStoreInventory } from './bags';
 import "./testNamespace";
@@ -163,8 +164,8 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     if(Math.hypot(h.position[0]-MOUNT_VENDOR[0],h.position[1]-MOUNT_VENDOR[1])>4)return;
     set({hero:{...h,flyingMount:id,gold:h.gold-FLYING_MOUNT_PRICE},notice:`${m.name} adquirido.`});
   },
-  chooseMount:id=>{const s=get(),mount=MOUNTS.find(m=>m.id===id);if(!mount||s.hero.dead||s.hero.instance||s.encounter||s.challenge||!mountAvailable(s.hero,mount))return;if(s.mounted&&(id==='wolf'||id==='boar')&&cityWallBlocks(s.hero.region,...s.hero.position)){set({notice:'Desça sobre terreno livre antes de trocar para uma montaria terrestre.'});return;}set({hero:{...s.hero,selectedMount:id},notice:`${mount.name} selecionado.`});},
-  toggleMount:()=>{const s=get();if(s.mounted){const mount=mountOf(s.hero);if((mount?.id==='griffin'||mount?.id==='dragon')&&cityWallBlocks(s.hero.region,...s.hero.position)){set({notice:'Desça sobre terreno livre, fora da muralha.'});return;}set({mounted:false});return;}if(s.hero.dead||s.encounter||s.challenge||s.hero.level<MOUNT_LEVEL){set({notice:`Montaria a partir do nível ${MOUNT_LEVEL}, fora de combate.`});return;}if(s.hero.instance){set({notice:'Não dá para montar dentro da masmorra.'});return;}set({mounted:true,notice:`Montado em ${mountOf(s.hero)?.name}.`});},
+  chooseMount:id=>{const s=get(),mount=MOUNTS.find(m=>m.id===id);if(!mount||s.hero.dead||s.hero.instance||s.encounter||s.challenge||!mountAvailable(s.hero,mount))return;if(s.mounted&&(id==='wolf'||id==='boar')&&!walkable(...s.hero.position,s.hero.region)){set({notice:'Desça sobre terreno livre antes de trocar para uma montaria terrestre.'});return;}set({hero:{...s.hero,selectedMount:id},notice:`${mount.name} selecionado.`});},
+  toggleMount:()=>{const s=get();if(s.mounted){const mount=mountOf(s.hero);if((mount?.id==='griffin'||mount?.id==='dragon')&&!walkable(...s.hero.position,s.hero.region)){set({notice:'Desça sobre terreno livre, longe das muralhas, montanhas e água.'});return;}set({mounted:false});return;}if(s.hero.dead||s.encounter||s.challenge||s.hero.level<MOUNT_LEVEL){set({notice:`Montaria a partir do nível ${MOUNT_LEVEL}, fora de combate.`});return;}if(s.hero.instance){set({notice:'Não dá para montar dentro da masmorra.'});return;}set({mounted:true,notice:`Montado em ${mountOf(s.hero)?.name}.`});},
   claimNexus:()=>{const s=get();if(s.hero.dead||s.encounter)return;if(s.hero.region!=='aurora'||!!s.hero.instance||Math.hypot(...s.hero.position)>7){set({notice:'Vá até o cristal da praça para receber a aura.'});return;}if(!nexusFull(s.hero.nexus,s.hero.level)){set({notice:'O Nexus ainda não está cheio. Ganhe XP em lutas, missões e runas.'});return;}set({hero:{...s.hero,nexus:{charge:0,aura:NEXUS_SECONDS}},notice:'✦ Aura do Herói! +12% ataque, +12% defesa e +10% vida por 10 minutos de jogo.'});},
   upgradeItem:id=>{const s=get(),step=forgeStep(id),item=ITEMS[id];if(!step||!item||s.hero.dead||s.encounter)return;const next=ITEMS[forgeId(step.base,step.to)];if(!next)return;
    if(!atForge(s.hero)){set({notice:'Procure Babbage, o ferreiro, na vila para aprimorar.'});return;}

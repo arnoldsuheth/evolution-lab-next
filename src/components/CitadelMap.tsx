@@ -4,8 +4,9 @@ import { trainerHouses } from "@/lib/kingdomCities";
 
 import { ORE_VEINS } from "@/lib/mining";
 import { INSTANCES } from "@/lib/instances";
-import { MONSTERS } from "@/lib/campaign";
+import { MONSTERS, isAggressive } from "@/lib/campaign";
 import { regionPins, type MapPin } from "@/lib/questNavigation";
+import BiomeMap from "./BiomeMap";
 import MarketMap from "./MarketMap";
 import MapRoads from "./MapRoads";
 import { AURORA_PORTAL } from "@/lib/kingdomCities";
@@ -25,6 +26,7 @@ export function CitadelMap({ position, local = false, route = [], focus, selecte
     <svg viewBox={view} role="img" aria-label={local ? "Minimapa da Cidadela" : "Mapa da Cidadela"}>
       <rect x="-110" y="-110" width="220" height="220" fill="#16283b" />
       <path d="M-44 -44H17L12 -21L-44 -16ZM18 -26H40V-8H19Z" fill="#253b46" />
+      <BiomeMap region="aurora" local={local}/>
       <g strokeLinecap="round">
         <path d="M-1.5 -16H23.5" stroke="#85795d" strokeWidth="3" />
         {ROADS.map(({ id, a, b, width, kind }) => (
@@ -54,7 +56,7 @@ export function CitadelMap({ position, local = false, route = [], focus, selecte
         </g>
       ))}
       {!local && MONSTERS.filter(monster => monster.region === "aurora" && !monster.instance).map(monster => (
-        <circle key={monster.id} cx={monster.x} cy={monster.z} r={monster.boss ? 1 : .55} fill={monster.boss ? "#efbd65" : "#df756d"}>
+        <circle key={monster.id} cx={monster.x} cy={monster.z} r={monster.boss ? 1 : .55} fill={monster.boss ? "#efbd65" : isAggressive(monster) ? "#e56c59" : "#b99671"}>
           <title>{monster.name} · nível {monster.level}</title>
         </circle>
       ))}

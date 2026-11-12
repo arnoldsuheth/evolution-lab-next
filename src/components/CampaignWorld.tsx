@@ -9,7 +9,7 @@ import {useFrame} from '@react-three/fiber';
 import * as THREE from 'three';
 
 import {isNewCity} from "@/lib/kingdomCities";
-import {MONSTERS,REGIONS,campaignGate,nextRegion} from '@/lib/campaign';
+import {MONSTERS,REGIONS,campaignGate,isAggressive,nextRegion} from '@/lib/campaign';
 import {INSTANCES,type InstanceId} from '@/lib/instances';
 import {useGame} from '@/lib/store';
 import {adventureOf,rareNow} from '@/lib/adventure';
@@ -33,7 +33,7 @@ export default function CampaignWorld({paused,approach,approachGate}:{paused:boo
  const adv=adventureOf(hero),rare=hero.instance?null:rareNow(now,hero.region),rareId=rare&&adv.rareDone!==rare.window?rare.monsterId:null;
  const ranged=isRangedClass(hero.classId),viewRadius=ranged?42:VIEW_RADIUS;
  const monsters=MONSTERS.filter(m=>m.region===hero.region&&(m.instance??null)===(hero.instance??null)&&(!hero.instance||!hero.instanceProgress?.includes(m.id))&&(slain[m.id]??0)<=now&&(Math.hypot(hero.position[0]-m.x,hero.position[1]-m.z)<viewRadius||enemy?.monsterId===m.id||target===m.id)).map(m=>{const active=enemy?.monsterId===m.id?enemy:undefined,vitals=active??enemyVitals(m.kind,m.level,m.boss),near=Math.hypot(hero.position[0]-m.x,hero.position[1]-m.z)<(ranged?9:6),isRare=rareId===m.id;return <group key={m.id} position={[m.x,0,m.z]} {...cursorOn("combat")} onClick={e=>{if(paused||e.delta>6||e.button!==0)return;e.stopPropagation();approach(m.id);}}><Reacting x={m.x} z={m.z} reduced={reduced}><group scale={isRare?1.3:1}><MonsterModel kind={m.kind} boss={m.boss} reduced={reduced} shadow={Math.hypot(hero.position[0]-m.x,hero.position[1]-m.z)<SHADOW_RADIUS}/></group></Reacting>{isRare&&!active&&target!==m.id&&<mesh rotation={[-Math.PI/2,0,0]} position={[0,.05,0]}><ringGeometry args={[1.5,1.75,40]}/><meshBasicMaterial color="#ffcf3a" transparent opacity={.9} depthWrite={false}/></mesh>}{(target===m.id||active)&&<mesh rotation={[-Math.PI/2,0,0]} position={[0,.06,0]}><ringGeometry args={[m.boss?1.9:1.2,m.boss?2.15:1.4,40]}/><meshBasicMaterial color={active?'#ff5a4a':'#ffd24a'} transparent opacity={.85} depthWrite={false}/></mesh>}{(near||active||target===m.id)&&<Html zIndexRange={[6,0]} position={[0,m.boss?4.4:2.8,0]} center style={{pointerEvents:'none'}}><div className={`monster-vitals ${active?'targeted':''}`} aria-label={`${m.name}, nível ${active?.level??m.level}`}>
- {(near||active||target===m.id||m.boss||isRare)&&<strong className={isRare?'rare-name':''}>{m.boss?'◆ ':isRare?'✦ ':''}{m.name}{isRare?' raro':''} <small>{active?.level??m.level}</small></strong>}
+ {(near||active||target===m.id||m.boss||isRare)&&<strong className={isRare?'rare-name':''}>{m.boss?'◆ ':isRare?'✦ ':isAggressive(m)?'⚠ ':''}{m.name}{isRare?' raro':''} <small>{active?.level??m.level}</small></strong>}
  <div className="world-resource health" role="meter" aria-label="HP" aria-valuemin={0} aria-valuemax={vitals.maxHp} aria-valuenow={active?.hp??vitals.maxHp}><i style={{width:`${(active?.hp??vitals.maxHp)/vitals.maxHp*100}%`}}/><span>HP</span></div>
  <div className={`world-resource ${vitals.resource}`} role="meter" aria-label={vitals.resource==='mp'?'MP':'Estamina'} aria-valuemin={0} aria-valuemax={vitals.resourceMax??100} aria-valuenow={vitals.resourceCurrent??100}><i style={{width:`${(vitals.resourceCurrent??100)/(vitals.resourceMax??100)*100}%`}}/><span>{vitals.resource==='mp'?'MP':'STA'}</span></div>
  </div></Html>}</group>;});

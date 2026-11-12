@@ -24,7 +24,7 @@ import { doorBetween } from "@/lib/dungeon";
 import { PLAZA_RADIUS, CITADEL_SECTORS, TOWN_SERVICES, type Interior, type InteriorPanel, type TownService } from "@/lib/town";
 import { FLIGHT_HEIGHT, frameWorld, WORLD_ZOOM, worldCameraOptions, worldCameraTargetHeight } from "@/lib/worldCamera";
 import WorldDetails, { HouseDetails } from "./WorldDetails";
-import {MONSTERS,REGIONS,AGGRO_RADIUS,SAFE_TOWN_RADIUS,isAggressive} from "@/lib/campaign";
+import {MONSTERS,REGIONS,AGGRO_RADIUS,SAFE_TOWN_RADIUS,isAggressive,monsterRequirement} from "@/lib/campaign";
 import CampaignWorld from "./CampaignWorld";
 import { questMarker } from "@/lib/journey";
 import { npcMarker, cleanLog } from "@/lib/quests";
@@ -36,12 +36,14 @@ import FlyingMount from "./FlyingMount";
 import { guideStop, routeToPoint, type GuideRequest } from "@/lib/questNavigation";
 import RacialCity from "./RacialCity";
 import CityRoutes from "./CityRoutes";
-import {oppositeGateSide,roadAt,type CityGate} from "@/lib/overland";
+import {insideCity,oppositeGateSide,roadAt,type CityGate} from "@/lib/overland";
 import {isNewCity,isRacialCity} from "@/lib/kingdomCities";
 import CodeSpots from "./CodeSpots";
 import GatherNodes, { WorldUnlocks } from "./GatherNodes";
 import ExplorationEncounters from "./ExplorationEncounters";
 import PavingMaterial from "./PavingMaterial";
+import {biomeOf,flightRelief} from "@/lib/biomes";
+import Wildlands from "./Wildlands";
 import TerrainSurface from "./TerrainSurface";
 import { activeEquipment } from "@/lib/equipment";
 import { CLASSES, ITEMS, hunterCompanion } from "@/lib/game";
@@ -414,23 +416,47 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
     } else { keys.current.clear(); path.current = []; pending.current = null; handledGuide.current = null; if (guide && useGame.getState().encounter) endGuide(); }
     if(!paused&&!hero.dead&&!useGame.getState().encounter){if(keys.current.delete("jump")&&jump.current.height===0)jump.current.velocity=6.2;jump.current=advanceJump(jump.current.height,jump.current.velocity,dt);}else{keys.current.delete("jump");touch.current={x:0,z:0};}
     if (moving !== wasWalking.current) { setWalking(moving); wasWalking.current = moving; }
-    if(heroRoot.current){heroRoot.current.position.copy(player.current);heroRoot.current.position.y=jump.current.height+(airborne?FLIGHT_HEIGHT:0);}if(shadowRoot.current){shadowRoot.current.position.set(player.current.x,.045,player.current.z);shadowRoot.current.scale.setScalar(1-jump.current.height*.13);}
+    const relief=airborne?flightRelief(hero.region,player.current.x,player.current.z):0;
+    if(heroRoot.current){heroRoot.current.position.copy(player.current);heroRoot.current.position.y=jump.current.height+(airborne?FLIGHT_HEIGHT+relief:0);}if(shadowRoot.current){shadowRoot.current.position.set(player.current.x,.045,player.current.z);shadowRoot.current.scale.setScalar(1-jump.current.height*.13);}
     if (controls.current) {
       const orbit = controls.current;
-      temp.current.set(player.current.x, worldCameraTargetHeight(thirdPerson, airborne), player.current.z);
+      temp.current.set(player.current.x, worldCameraTargetHeight(thirdPerson, airborne)+relief, player.current.z);
       offset.current.copy(temp.current).sub(orbit.target).multiplyScalar(reduced ? 1 : Math.min(1, dt * 8));
       orbit.target.add(offset.current);
       camera.position.add(offset.current);
     }
     // Monstros agressivos: se o herói chega perto (fora da vila), eles atacam primeiro.
     aggroCheck.current += dt;
-    if(aggroCheck.current>.4&&!paused){aggroCheck.current=0;const st=useGame.getState();if(!st.encounter&&!st.challenge&&!st.hero.dead&&!(st.hero.region==='aurora'&&!st.hero.instance&&Math.hypot(player.current.x,player.current.z)<SAFE_TOWN_RADIUS)){const now=Date.now();const angry=MONSTERS.find(m=>m.region===st.hero.region&&(m.instance??null)===(st.hero.instance??null)&&isAggressive(m)&&(st.slain[m.id]??0)<=now&&!(m.instance&&st.hero.instanceProgress?.includes(m.id))&&Math.hypot(player.current.x-m.x,player.current.z-m.z)<AGGRO_RADIUS);if(angry){path.current=[];monsterTarget.current=null;st.move([player.current.x,player.current.z]);useGame.setState({target:angry.id,queued:null});st.startEncounter(angry.boss,angry.level,angry.id);if(useGame.getState().encounter)useGame.setState({notice:`${angry.name} te atacou! Use 1 para atacar ou ↩ para recuar.`});}}}
+    if(aggroCheck.current>.4&&!paused){
+      aggroCheck.current=0;
+      const st=useGame.getState(),p=player.current;
+      const safe=!st.hero.instance&&(insideCity(st.hero.region,p.x,p.z)
+        ||st.hero.region==='aurora'&&Math.hypot(p.x,p.z)<SAFE_TOWN_RADIUS);
+      if(!safe&&!airborne&&!st.encounter&&!st.challenge&&!st.hero.dead){
+        const now=Date.now();
+        const angry=MONSTERS.find(m=>m.region===st.hero.region&&(m.instance??null)===(st.hero.instance??null)
+          &&isAggressive(m)&&(st.slain[m.id]??0)<=now&&Math.hypot(p.x-m.x,p.z-m.z)<AGGRO_RADIUS
+          &&!monsterRequirement(st.hero,st.education,m.id)
+          &&(!st.hero.instance||!doorBetween(st.hero.instance,adventure.doors,p.z,m.z))
+          &&[.25,.5,.75].every(t=>walkable(p.x+(m.x-p.x)*t,p.z+(m.z-p.z)*t,worldRegion)));
+        if(angry){
+          st.move([p.x,p.z]);
+          st.startEncounter(angry.boss,angry.level,angry.id);
+          if(useGame.getState().encounter){
+            path.current=[];monsterTarget.current=null;
+            useGame.setState({target:angry.id,queued:null,notice:`${angry.name} te atacou! Toque em Atacar ou Recuar.`});
+          }
+        }
+      }
+    }
     checkpoint.current += dt;
     if (checkpoint.current > 0.7) { checkpoint.current = 0; const p = useGame.getState().hero.position; if (Math.hypot(p[0] - player.current.x, p[1] - player.current.z) > 0.05) useGame.getState().move([player.current.x, player.current.z]); }
   });
   const groundClick = (e: ThreeEvent<MouseEvent>) => { if (e.button !== 0 || e.delta > 6 || paused) return; e.stopPropagation(); if(useGame.getState().encounter)return;endGuide();useGame.getState().setTarget(null);pending.current = null;monsterTarget.current=null;gatherTarget.current=null; travel(e.point.x, e.point.z); };
-  const sky = new THREE.Color("#596882").lerp(new THREE.Color("#c2d9d9"),Math.max(0,Math.min(1,(light-.36)/.64))).getStyle();
-  const distanceFog = hero.instance ? [28, 70] as const : [37, 95] as const;
+  const horizon = hero.instance ? undefined : biomeOf(hero.region)?.horizon;
+  const sky = new THREE.Color("#596882").lerp(new THREE.Color(horizon??"#c2d9d9"),
+    Math.max(0,Math.min(1,(light-.36)/.64))).getStyle();
+  const distanceFog = hero.instance ? [28, 70] as const : [42, 112] as const;
   return <>
     {stop && <group position={[stop.point[0],.12,stop.point[1]]}>
       <mesh rotation={[-Math.PI / 2,0,0]} raycast={() => null}><ringGeometry args={[.9,1.2,32]} /><meshBasicMaterial color="#63ebff" depthTest={false} /></mesh>
@@ -444,7 +470,8 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
     {hero.region==="goddard"&&!hero.instance?<group position={[0,-.35,-4.5]}>
       <mesh onClick={groundClick} receiveShadow><boxGeometry args={[39,.7,34]}/><meshStandardMaterial color={REGIONS.goddard.color}/></mesh>
       <mesh position={[0,-2.7,0]} rotation={[Math.PI,0,0]} scale={[1,.7,.85]}><coneGeometry args={[22,6,7]}/><meshStandardMaterial color="#4e5068" flatShading/></mesh>
-    </group>:<TerrainSurface onClick={groundClick} color={REGIONS[hero.region].color}/>}
+    </group>:<TerrainSurface region={hero.instance?"instance":hero.region} onClick={groundClick} color={REGIONS[hero.region].color}/>}
+    {!hero.instance&&<Wildlands region={hero.region} low={low}/>}
     {!hero.instance&&isRacialCity(hero.region)&&<TrainerDistrict city={hero.region} paused={paused} approach={approachInteraction} openJourney={()=>openService("journey")}/>}
     {!hero.instance&&<CityMarket region={hero.region} paused={paused} approach={approachInteraction} open={openMarket}/>}
     {!hero.instance&&<CityRoutes region={hero.region} paused={paused} ground={groundClick} cross={crossGate}
