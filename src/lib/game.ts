@@ -1,6 +1,6 @@
 import {FLYING_MOUNTS,type FlyingMountId} from './flyingMounts';
 import {INSTANCES,type InstanceId} from './instances';
-import {isNewCity} from './kingdomCities';
+import {isNewCity,RACE_CLASSES} from './kingdomCities';
 import { CHAMBER_POSITION, cleanPrecursorProgress, PRECURSOR_IDS, PRECURSORS, type PrecursorId } from "./precursorCatalog";
 import { hasDogJoy, DOG_JOY_HP } from './dog';
 import { cleanMastery, PRACTICE_CONCEPTS, type Mastery } from './practice';
@@ -15,10 +15,10 @@ import { promotionRank } from "./journey";
 import { runProgram, type TraceStep, type Value } from "./program";
 import { cleanLog, type QuestLog } from "./quests";
 import { NEXUS_BONUS, chargeNexus, cleanNexus, type NexusState } from "./nexus";
-import { buildCatalogue } from "./catalogue";
-import { activeEquipment } from "./equipment";
+import { buildCatalogue, HUNTER_ARROW } from "./catalogue";
+import { activeEquipment, itemRequirement } from "./equipment";
 import { passiveBonuses, SKILLS } from "./skills";
-import { cleanAdventure, specOf, SPEC_EFFECT, type AdventureState } from "./adventure";
+import { cleanAdventure, MOUNTS, specOf, SPEC_EFFECT, type AdventureState, type MountId } from "./adventure";
 
 export const RELEASE = "1.14.0";
 export type Race = "human" | "orc" | "dwarf" | "elf" | "gnome";
@@ -35,13 +35,7 @@ export const CLASSES: Record<ClassId, { name: string; race: Race; role: string; 
   duelist: { name: "Dualista", race: "elf", role: "Duas lâminas, precisão, esquiva e contra-ataque.", skill: "Corte Duplo", color: "#c7a37e", talents: ["Duas Lâminas","Esquiva","Precisão"], stats: [6,8,4,10,10,4] },
   shaman: { name: "Shaman", race: "orc", role: "Espíritos, elementos, cura e bênçãos tribais.", skill: "Sopro Ancestral", color: "#82c5b1", talents: ["Elementos","Espíritos","Totens"], stats: [6,7,5,5,5,10] },
 };
-export const RACE_CLASSES: Record<Race, readonly ClassId[]> = {
-  human: ['mage','prophet','paladin','hunter','warrior','hacker'],
-  elf: ['hunter','mage','prophet','hacker','duelist'],
-  dwarf: ['paladin','warrior','hunter','engineer'],
-  orc: ['shaman','warrior'],
-  gnome: ['mage','shaman','hunter','hacker'], // Gnomolândia: magos, xamãs e caçadores; hacker mantido para salvamentos antigos.
-};
+export { RACE_CLASSES };
 export function validRaceClass(race: unknown, classId: ClassId): race is Race {
   return typeof race === 'string' && Object.hasOwn(RACE_CLASSES,race) && RACE_CLASSES[race as Race].includes(classId);
 }
@@ -52,7 +46,7 @@ export const HAIR = ["#30251f", "#825235", "#bf8b4d", "#e1cfac", "#9697a4", "#53
 export const EYES = ["#527f91", "#788447", "#9c6a39", "#a287bd", "#bcbfbd", "#262d34"];
 export interface Look { body: number; hair: number; beard: number; moustache: number; skin: number; hairColor: number; eyes: number; face: number; nose: number; brows: number; scar: number; tattoo: number; accessory: number; cloth: number; helmet: number; ears: number; }
 export const DEFAULT_LOOK: Look = { body: 2, hair: 0, beard: 0, moustache: 0, skin: 1, hairColor: 0, eyes: 0, face: 0, nose: 0, brows: 0, scar: 0, tattoo: 0, accessory: 0, cloth: 0, helmet: 1, ears: 0 };
-export interface HeroData {classTrial?:{id:ClassId;kills:number};classInitiated?:boolean;flyingMount?:FlyingMountId;lovelaceProgress?:number;precursorProgress?:Partial<Record<PrecursorId,number>>;chamberComplete?:boolean;adventure?:AdventureState;attributeAllocation?:Partial<Record<AttributeKey,number>>;quests?:QuestLog;nexus?:NexusState;instanceProgress?:string[];instance?:InstanceId|null; durability?:Record<string,number>;professions?:Record<string,number>; id: string; name: string; race: Race; classId: ClassId; created: boolean; gold: number; xp: number; level: number; inventory: string[]; equipped: string[]; hp: number; mp: number; stamina: number; talents: number[]; mode: "normal" | "hardcore"; dead: boolean; kills: number; position: [number, number]; materials: number; inherited: number; skills: Record<string,number>; hotbar: string[]; promotions: Partial<Record<ClassId,number>>; openedChests: string[]; region:RegionId; defeatedBosses:string[]; }
+export interface HeroData {starterArrowsGranted?:boolean;classTrial?:{id:ClassId;kills:number};classInitiated?:boolean;flyingMount?:FlyingMountId;selectedMount?:MountId;lovelaceProgress?:number;precursorProgress?:Partial<Record<PrecursorId,number>>;chamberComplete?:boolean;adventure?:AdventureState;attributeAllocation?:Partial<Record<AttributeKey,number>>;quests?:QuestLog;nexus?:NexusState;instanceProgress?:string[];instance?:InstanceId|null; durability?:Record<string,number>;professions?:Record<string,number>; id: string; name: string; race: Race; classId: ClassId; created: boolean; gold: number; xp: number; level: number; inventory: string[]; equipped: string[]; hp: number; mp: number; stamina: number; talents: number[]; mode: "normal" | "hardcore"; dead: boolean; kills: number; position: [number, number]; materials: number; inherited: number; skills: Record<string,number>; hotbar: string[]; promotions: Partial<Record<ClassId,number>>; openedChests: string[]; region:RegionId; defeatedBosses:string[]; }
 export interface Education { deliveries:string[]; aiCompleted: string[]; aiEvidence: Record<string,string>; reviewedProjects: number[]; completed: string[]; attempts: Record<string, number>; drafts: Record<string, string>; reviews: Record<string, number>; projects: Record<string, { code: string; savedAt: number }>; /** Treino rápido: nível de cada runa (dificuldade que se ajusta). */ practice?: Record<string, Mastery>; /** Dia em que a missão relâmpago de cada runa já deu recompensa. */ blitz?: Record<string, string>; }
 export interface Ancestor { id: string; name: string; classId: ClassId; level: number; diedAt: number; cause: string; legacy: number; claimed: boolean; }
 export interface Settings {keybindings?:Record<string,string>; ambienceVolume?:number; muted?:boolean; volume: number; panelOpacity: number; uiScale: number; quality: "auto" | "low" | "high"; reduceMotion: boolean; }
@@ -77,10 +71,41 @@ const LEGACY_ITEMS: Record<string, { name: string; price: number; slot: string; 
   tea: { name: "Chá de Lion", price: 12, slot: "consumable", power: 0, defense: 0, rarity: "Incomum", description: "Proteção adicional por 60 segundos de jogo." },
 };
 export const ITEMS = buildCatalogue(LEGACY_ITEMS);
+export function grantHunterStarterGear(hero: HeroData): HeroData {
+  if (!hero.created || hero.dead || hero.classId !== 'hunter' || hero.starterArrowsGranted) return hero;
+
+  const weapon = hero.inventory.find(id => {
+    const item = ITEMS[id];
+    return item?.category === 'weapon' && hero.durability?.[id] !== 0 && !itemRequirement(hero, item);
+  });
+  const starterBow = !weapon && !hero.inventory.includes('hunter-weapon0-1') && (hero.level <= 3 || hero.classInitiated === false) ? 'hunter-weapon0-1' : undefined;
+  const inventory = starterBow ? [...hero.inventory, starterBow] : hero.inventory;
+  const equipped = starterBow
+    ? [...hero.equipped.filter(id => !['weapon', 'twohand', 'offhand'].includes(ITEMS[id]?.slot)), starterBow]
+    : hero.equipped;
+
+  return {
+    ...hero,
+    starterArrowsGranted: true,
+    inventory: inventory.includes(HUNTER_ARROW) ? inventory : [...inventory, ...Array<string>(40).fill(HUNTER_ARROW)],
+    equipped,
+  };
+}
+const HUNTER_COMPANIONS = ['wolf', 'fox', 'owl', 'boar', 'lynx', 'crystal'] as const;
+export type HunterCompanion = typeof HUNTER_COMPANIONS[number];
+
+export function hunterCompanion(hero: HeroData, gear = activeEquipment(hero, ITEMS)): HunterCompanion | undefined {
+  if (hero.classId !== 'hunter' || !gear.some(item => item.slot === 'weapon' || item.slot === 'twohand')) return;
+  const pet = gear.find(item => item.slot === 'pet');
+  return HUNTER_COMPANIONS.find(kind => kind === pet?.visual) ?? 'wolf';
+}
+
 export function stats(hero: HeroData) {
   const a=cleanAttributes(hero.attributeAllocation,hero.level);
   const s=CLASSES[hero.classId].stats, promotion=promotionRank(hero), gear=activeEquipment(hero,ITEMS), pass=passiveBonuses(hero);
-  const out = { strength:s[0]+hero.level+a.strength,attack:a.attack+a.strength*.5+a.dexterity*.25+(["mage","prophet","shaman"].includes(hero.classId)?a.intelligence*.5+(a.mentality??0)*.75:0)+7+s[1]+hero.level*2+promotion*3+gear.reduce((n,g)=>n+g.power,0)+hero.talents[0]*2+pass.attack,defense:a.defense+s[2]+promotion*3+gear.reduce((n,g)=>n+g.defense,0)+hero.talents[1]*2+pass.defense,agility:s[3]+a.agility,dexterity:s[4]+a.dexterity,intelligence:s[5]+a.intelligence,mentality:a.mentality??0,maxHp:Math.round((a.defense*2+90+hero.level*10+s[2]*2+gear.reduce((n,g)=>n+(g.hp??0),0)+pass.hp)*(hasDogJoy(hero)?1+DOG_JOY_HP:1)),maxMp:a.intelligence*5+(a.mentality??0)*3+40+s[5]*5+gear.reduce((n,g)=>n+(g.mp??0),0)+pass.mp,maxStamina:a.agility+100+hero.talents[2]*10+pass.stamina,companion:gear.reduce((n,g)=>n+(g.companion??0),0)+pass.companion,craftDiscount:pass.craftDiscount,lifesteal:pass.lifesteal };
+  const companion = gear.find(item => item.slot === 'pet');
+  const companionPower = hunterCompanion(hero, gear) ? (companion?.companion ?? 2) + pass.companion : 0;
+  const out = { strength:s[0]+hero.level+a.strength,attack:a.attack+a.strength*.5+a.dexterity*.25+(["mage","prophet","shaman"].includes(hero.classId)?a.intelligence*.5+(a.mentality??0)*.75:0)+7+s[1]+hero.level*2+promotion*3+gear.reduce((n,g)=>n+g.power,0)+hero.talents[0]*2+pass.attack,defense:a.defense+s[2]+promotion*3+gear.reduce((n,g)=>n+g.defense,0)+hero.talents[1]*2+pass.defense,agility:s[3]+a.agility,dexterity:s[4]+a.dexterity,intelligence:s[5]+a.intelligence,mentality:a.mentality??0,maxHp:Math.round((a.defense*2+90+hero.level*10+s[2]*2+gear.reduce((n,g)=>n+(g.hp??0),0)+pass.hp)*(hasDogJoy(hero)?1+DOG_JOY_HP:1)),maxMp:a.intelligence*5+(a.mentality??0)*3+40+s[5]*5+gear.reduce((n,g)=>n+(g.mp??0),0)+pass.mp,maxStamina:a.agility+100+hero.talents[2]*10+pass.stamina,companion:companionPower,craftDiscount:pass.craftDiscount,lifesteal:pass.lifesteal };
   // Aura do Herói (Nexus): bônus temporário.
   if ((hero.nexus?.aura ?? 0) > 0) { out.attack = Math.round(out.attack * NEXUS_BONUS.attack); out.defense = Math.round(out.defense * NEXUS_BONUS.defense); out.maxHp = Math.round(out.maxHp * NEXUS_BONUS.maxHp); }
   // Especialização (nível 10): Guardião ou Fúria.
@@ -184,6 +209,7 @@ export function migrateSave(input: unknown): SaveData {
   const completed = [...new Set([...strings(edu.completed), ...(old.missionComplete === true ? ["variables"] : [])])];
   const hero: HeroData = { ...fresh.hero, id: typeof old.id === "string" ? old.id : fresh.hero.id, name: typeof old.name === "string" ? old.name.slice(0, 40) : fresh.hero.name, classId, race: validRaceClass(old.race,classId) ? old.race : CLASSES[classId].race, created: typeof old.created === "boolean" ? old.created : Object.keys(old).length > 0,
     instanceProgress:strings(old.instanceProgress),instance:typeof old.instance==="string"&&Object.hasOwn(INSTANCES,old.instance)?old.instance as InstanceId:null,durability:Object.fromEntries(Object.entries(record(old.durability)).map(([id,value])=>[id,Math.floor(number(value,100,0,100))])),professions:Object.fromEntries(Object.entries(record(old.professions)).filter(([id])=>["blacksmith","weaponsmith","tailor","leatherworker","alchemist"].includes(id)).map(([id,value])=>[id,Math.floor(number(value,0,0,100000))])),gold: number(old.gold, 0), xp: number(old.xp, 0), level: number(old.level, 1, 1), inventory: strings(old.inventory), equipped: strings(old.equipped), hp: number(old.hp, 100), mp: number(old.mp, 60), stamina: number(old.stamina, 100), talents: [0, 1, 2].map(i => number(Array.isArray(old.talents) ? old.talents[i] : 0, 0, 0, 10)), mode: old.mode === "hardcore" ? "hardcore" : "normal", dead: old.dead === true, kills: number(old.kills, 0), materials: number(old.materials, 0), inherited: number(old.inherited, 0), skills: Object.fromEntries(Object.entries(record(old.skills)).filter(([id])=>Object.hasOwn(SKILLS,id)).map(([id,value])=>[id,Math.floor(number(value,0,0,SKILLS[id].maxRank))])), promotions: Object.fromEntries(Object.entries(record(old.promotions)).filter(([id])=>Object.hasOwn(CLASSES,id)).map(([id,value])=>[id,Math.floor(number(value,0,0,3))])), openedChests: strings(old.openedChests), region:(["aurora","ruins","frontier","heart"].includes(String(old.region))||isNewCity(String(old.region)))?old.region as RegionId:"aurora", defeatedBosses:strings(old.defeatedBosses), quests:cleanLog(old.quests), nexus:cleanNexus(old.nexus), ...(old.adventure!==undefined?{adventure:cleanAdventure(old.adventure)}:{}), hotbar: normalizeHotbar(old.hotbar,id=>Object.hasOwn(SKILLS,id)||id.startsWith("item:")&&!!ITEMS[id.slice(5)]?.effect), position: Array.isArray(old.position) && old.position.length === 2 && old.position.every(v => typeof v === "number" && Number.isFinite(v)) && insideWorld(old.position[0] as number,old.position[1] as number) ? [old.position[0], old.position[1]] : [0, 5] };
+  if (old.starterArrowsGranted === true) hero.starterArrowsGranted = true;
   if (typeof old.classInitiated === "boolean") hero.classInitiated = old.classInitiated;
   const trial = record(old.classTrial);
   if (hero.classInitiated === false && validRaceClass(hero.race, trial.id as ClassId)) {
@@ -191,6 +217,8 @@ export function migrateSave(input: unknown): SaveData {
   }
   const flyingMount = FLYING_MOUNTS.find(m => m.id === old.flyingMount);
   if (flyingMount) hero.flyingMount = flyingMount.id;
+  const selectedMount = MOUNTS.find(m=>m.id===old.selectedMount);
+  if (selectedMount) hero.selectedMount = selectedMount.id;
   if (old.precursorProgress !== undefined) hero.precursorProgress = cleanPrecursorProgress(old.precursorProgress);
   if (old.lovelaceProgress !== undefined) hero.lovelaceProgress = cleanLovelaceProgress(old.lovelaceProgress);
   if (old.chamberComplete === true && hasAllArtifacts(hero)) hero.chamberComplete = true;
@@ -207,7 +235,7 @@ export function migrateSave(input: unknown): SaveData {
   for (const [key, raw] of Object.entries(record(edu.projects))) { const p = record(raw); if (typeof p.code === "string") projects[key] = { code: p.code, savedAt: number(p.savedAt, 0) }; }
   const settings = record(data.settings);
   const ancestors: Ancestor[] = Array.isArray(data.ancestors) ? data.ancestors.flatMap(raw => { const a = record(raw); return typeof a.id === "string" && typeof a.name === "string" ? [{ id: a.id, name: a.name, classId: typeof a.classId === "string" && Object.hasOwn(CLASSES, a.classId) ? a.classId as ClassId : "paladin" as ClassId, level: number(a.level, 1), diedAt: number(a.diedAt, 0), cause: typeof a.cause === "string" ? a.cause : "Jornada encerrada", legacy: number(a.legacy, 0, 0, 100), claimed: a.claimed === true }] : []; }) : [];
-  return { hero, look, education: { deliveries:Array.isArray(edu.deliveries)?strings(edu.deliveries):[...completed.map(id=>`main:${id}`),...strings(edu.aiCompleted).map(id=>`ai:${id}`)], aiCompleted: strings(edu.aiCompleted), aiEvidence: Object.fromEntries(Object.entries(record(edu.aiEvidence)).filter((entry): entry is [string,string]=>typeof entry[1]==="string")), reviewedProjects: Array.isArray(edu.reviewedProjects)?[...new Set(edu.reviewedProjects.filter((v): v is number=>Number.isInteger(v)&&Number(v)>=0&&Number(v)<15))]:[], completed, drafts, attempts, reviews, projects, ...cleanPractice(edu) }, ancestors, settings: {keybindings:cleanBindings(settings.keybindings), ambienceVolume:number(settings.ambienceVolume,.55,0,1),muted:settings.muted===true,volume: number(settings.volume, .3, 0, 1), panelOpacity: number(settings.panelOpacity, 0.92, 0.4, 1), uiScale: number(settings.uiScale, 1, 0.85, 1.2), quality: settings.quality === "low" || settings.quality === "high" ? settings.quality : "auto", reduceMotion: settings.reduceMotion === true }, legacy: Object.keys(data).length ? { ...record(data.legacy), ...(!data.look ? { originalSave: data } : {}) } : {} };
+  return { hero: grantHunterStarterGear(hero), look, education: { deliveries:Array.isArray(edu.deliveries)?strings(edu.deliveries):[...completed.map(id=>`main:${id}`),...strings(edu.aiCompleted).map(id=>`ai:${id}`)], aiCompleted: strings(edu.aiCompleted), aiEvidence: Object.fromEntries(Object.entries(record(edu.aiEvidence)).filter((entry): entry is [string,string]=>typeof entry[1]==="string")), reviewedProjects: Array.isArray(edu.reviewedProjects)?[...new Set(edu.reviewedProjects.filter((v): v is number=>Number.isInteger(v)&&Number(v)>=0&&Number(v)<15))]:[], completed, drafts, attempts, reviews, projects, ...cleanPractice(edu) }, ancestors, settings: {keybindings:cleanBindings(settings.keybindings), ambienceVolume:number(settings.ambienceVolume,.55,0,1),muted:settings.muted===true,volume: number(settings.volume, .3, 0, 1), panelOpacity: number(settings.panelOpacity, 0.92, 0.4, 1), uiScale: number(settings.uiScale, 1, 0.85, 1.2), quality: settings.quality === "low" || settings.quality === "high" ? settings.quality : "auto", reduceMotion: settings.reduceMotion === true }, legacy: Object.keys(data).length ? { ...record(data.legacy), ...(!data.look ? { originalSave: data } : {}) } : {} };
 }
 
 

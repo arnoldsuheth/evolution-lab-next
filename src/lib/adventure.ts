@@ -1,7 +1,7 @@
 import { cleanBank, type BankState } from './bank';
 import { cleanDog, type DogState } from './dog';
 import type { ClassId, HeroData, NpcId } from './game';
-import { MONSTERS, NULLARION_SCALE, type MonsterKind, type RegionId } from './campaign';
+import { MONSTERS, MONSTER_KINDS, NULLARION_SCALE, type MonsterKind, type RegionId } from './campaign';
 
 /**
  * Sistemas de aventura da 1.10 (mecânicas inspiradas em MMOs, com nomes e regras próprias):
@@ -30,7 +30,7 @@ export function cleanAdventure(input: unknown): AdventureState {
   return {
     daily: { day: typeof d.day === 'string' ? d.day : '', ids, progress: ids.map((_, i) => Math.floor(num(Array.isArray(d.progress) ? d.progress[i] : 0, 0, 999))), claimed: ids.map((_, i) => Array.isArray(d.claimed) && d.claimed[i] === true) },
     hearthAt: num(a.hearthAt), rested: Math.floor(num(a.rested)), gathers: Math.floor(num(a.gathers)), rares: Math.floor(num(a.rares)), rareDone: Math.floor(num(a.rareDone)), dailyDone: Math.floor(num(a.dailyDone)),
-    kinds: Object.fromEntries(Object.entries(kinds).filter(([k]) => ['wolf', 'spider', 'boar', 'golem', 'wraith', 'dragon'].includes(k)).map(([k, v]) => [k, Math.floor(num(v))])),
+    kinds: Object.fromEntries(Object.entries(kinds).filter(([k]) => MONSTER_KINDS.some(kind=>kind===k)).map(([k, v]) => [k, Math.floor(num(v))])),
     achievements: strs(a.achievements).filter(id => ACHIEVEMENTS.some(x => x.id === id)),
     title: typeof a.title === 'string' && ACHIEVEMENTS.some(x => x.id === a.title) ? a.title : '',
     rep: { mercadores: Math.floor(num(rep.mercadores, 0, REP_MAX)), ferreiros: Math.floor(num(rep.ferreiros, 0, REP_MAX)), sabios: Math.floor(num(rep.sabios, 0, REP_MAX)) },
@@ -177,9 +177,19 @@ export const MOUNTS = [
   { id: 'griffin', name: 'Grifo Celeste', level: 50, speed: 1.8, text: 'Montaria alada de prestígio. Sobrevoa as rotas já abertas.' },
   { id: 'dragon', name: 'Dragão de Nullarion', level: 80, speed: 2.1, text: 'Requer a Escama de Nullarion, derrubada pelo chefe mestre.' },
 ] as const;
+export type MountId = typeof MOUNTS[number]['id'];
 export const MOUNT_LEVEL = MOUNTS[0].level;
-export const mountAvailable = (hero: Pick<HeroData,'level'> & Partial<Pick<HeroData,'inventory'>>, mount: typeof MOUNTS[number]) =>
-  hero.level >= mount.level && (mount.id !== 'dragon' || !!hero.inventory?.includes(NULLARION_SCALE));
-export const mountOf = (hero: Pick<HeroData,'level'> & Partial<Pick<HeroData,'inventory'>>) => [...MOUNTS].reverse().find(m => mountAvailable(hero,m)) ?? null;
-/** Nível 10: montaria básica (+35%). Nível 30 com o Javali de Montaria equipado: +50%. */
-export function mountSpeed(hero: Pick<HeroData, 'level' | 'inventory' | 'equipped'>) { const tier = mountOf(hero)?.speed ?? 1.35; const legacyBoar = hero.inventory.includes('mount-boar') && hero.equipped.includes('mount-boar') ? 1.5 : 1.35; return Math.max(tier, hero.level >= 30 ? legacyBoar : 1.35); }
+type Rider = Pick<HeroData,'level'> & Partial<Pick<HeroData,'inventory'|'flyingMount'|'selectedMount'>>;
+export const mountAvailable = (hero: Rider, mount: typeof MOUNTS[number]) =>
+  hero.level >= mount.level
+  && (mount.id !== 'dragon' || !!hero.inventory?.includes(NULLARION_SCALE))
+  && (mount.id !== 'griffin' || !!hero.flyingMount);
+export function mountOf(hero: Rider) {
+  return MOUNTS.find(m=>m.id===hero.selectedMount&&mountAvailable(hero,m))
+    ?? [...MOUNTS].reverse().find(m=>mountAvailable(hero,m)) ?? null;
+}
+export function mountSpeed(hero: Rider & Pick<HeroData,'equipped'>) {
+  const current=mountOf(hero);
+  if (hero.selectedMount || current?.id !== 'wolf') return current?.speed ?? MOUNTS[0].speed;
+  return hero.level>=30 && hero.inventory?.includes('mount-boar') && hero.equipped.includes('mount-boar') ? 1.5 : current.speed;
+}

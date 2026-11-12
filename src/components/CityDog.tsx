@@ -18,7 +18,7 @@ const CARAMEL = '#c8843f', LIGHT = '#ecc489', CREAM = '#f6e2bb', DARK = '#2a1d16
 const openDog = () => window.dispatchEvent(new CustomEvent('lions-cave-dog'));
 const inTown = (x: number, z: number) => Math.hypot(x, z) < 16; // só dentro da vila (raio seguro + calçadas)
 /** Mesmo mapa de obstáculos do herói (casas, bancas, árvores, poço...). */
-const free = (x: number, z: number) => walkable(x, z, true, true);
+const free = (x: number, z: number) => walkable(x, z);
 function M({ color, rough = .9, ...rest }: { color: string; rough?: number } & Partial<THREE.MeshStandardMaterialParameters>) { return <meshStandardMaterial color={color} roughness={rough} {...rest} />; }
 
 function DogBody({ friendship, legs, tail, head, rear, tongue }: { friendship: number; legs: RefObject<(THREE.Group | null)[]>; tail: RefObject<THREE.Group | null>; head: RefObject<THREE.Group | null>; rear: RefObject<THREE.Group | null>; tongue: boolean }) {

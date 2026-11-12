@@ -1,61 +1,76 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useGame } from "@/lib/store";
-import { MONSTERS, REGIONS, regionRequirement, type RegionId } from "@/lib/campaign";
-import { findPath } from "@/lib/navigation";
-import { INSTANCES } from "@/lib/instances";
+import { REGIONS, regionRequirement, type RegionId } from "@/lib/campaign";
 import { CITADEL_SECTORS, TOWN_SERVICES } from "@/lib/town";
-import { isNewCity, cityBuildings, cityPortal } from "@/lib/kingdomCities";
-import { ORE_VEINS } from "@/lib/mining";
+import { areaDestinations, guideStop, regionPins, routeToPoint, type GuideRequest, type GuideTarget, type MapPin } from "@/lib/questNavigation";
+import { isRacialCity } from "@/lib/kingdomCities";
+import { INSTANCES } from "@/lib/instances";
+import { findPath } from "@/lib/navigation";
 import { CitadelMap } from "./CitadelMap";
+import AreaMap from "./AreaMap";
 import KingdomAtlas from "./KingdomAtlas";
 
-const DESTINATIONS = [...CITADEL_SECTORS, ...TOWN_SERVICES];
+const cave = INSTANCES.cavern;
+const DESTINATIONS = [...CITADEL_SECTORS, ...TOWN_SERVICES, { name: cave.name, short: "Caverna", entrance: [cave.x,cave.z+2] as [number,number] }];
 
-export default function WorldMap() {
+export default function WorldMap({ guide, follow }: { guide: GuideRequest | null; follow: (target: GuideTarget) => void }) {
   const hero = useGame(s => s.hero);
   const education = useGame(s => s.education);
-  const [region, setRegion] = useState<RegionId | "atlas">("atlas");
-  const [selection, setSelection] = useState("");
-  const reason = region === "atlas" ? undefined : regionRequirement(hero, education, region);
-  const cave = INSTANCES.cavern;
-  const caveSelected = selection === cave.name;
-  const destination = caveSelected ? { name: cave.name, entrance: [cave.x, cave.z + 2] as [number, number] } : DESTINATIONS.find(entry => entry.name === selection);
-  const position = region === hero.region && !hero.instance ? hero.position : undefined;
-  const shown: RegionId = region === "atlas" ? hero.region : region;
-  const route = region === "aurora" && destination && position
-    ? findPath(position, destination.entrance, education.completed.includes("variables"), education.completed.includes("conditions") && hero.defeatedBosses.includes("boss-forest"))
-    : [];
-  const map = (coordinate: number) => 50 + coordinate * .95;
+  const [region, setRegion] = useState<RegionId | "atlas" | "here">("here");
+  const [selection, setSelection] = useState<MapPin>();
+  const [sector, setSector] = useState("");
+  const shown = region === "here" || region === "atlas" ? hero.region : region;
+  const instance = region === "here" ? hero.instance : null;
+  const position = shown === hero.region && (!hero.instance || instance) ? hero.position : undefined;
+  const reason = region === "atlas" || shown === hero.region ? undefined : regionRequirement(hero, education, shown);
+  const pins = instance ? [] : regionPins(shown);
+  const exits = instance ? [] : areaDestinations(shown);
+  const activeStop = position && guide?.heroId === hero.id ? guideStop(hero, guide.target, useGame.getState()) : undefined;
+  const focus = selection ?? activeStop;
+  const destination = DESTINATIONS.find(item => item.name === sector);
+  const route = useMemo(() => {
+    if (!position) return [];
+    if (focus && 'road' in focus.target) return findPath(position,focus.point,hero.region);
+    if (focus) return routeToPoint(position, focus.point, hero);
+    return destination ? findPath(position, destination.entrance) : [];
+  }, [position, focus, destination, hero]);
+  function open(next: typeof region) {
+    setRegion(next);
+    setSelection(undefined);
+    setSector("");
+  }
   return <section className="panel-body world-map">
-    <nav className="tabs" aria-label="Regiões">
-      <button className={region === "atlas" ? "active" : ""} onClick={() => setRegion("atlas")}>Atlas do Reino</button>
-      {(Object.keys(REGIONS) as RegionId[]).map(id => <button key={id} className={region === id ? "active" : ""} onClick={() => setRegion(id)}>{id === "aurora" ? "Cidadela" : REGIONS[id].name} · {REGIONS[id].level}+</button>)}
+    <nav className="tabs" aria-label="Escala do mapa">
+      <button className={region === "here" ? "active" : ""} onClick={() => open("here")}>Onde estou</button>
+      <button className={region === "atlas" ? "active" : ""} onClick={() => open("atlas")}>Atlas do Reino</button>
     </nav>
-    {reason && <p>Região bloqueada. {reason}</p>}
-    {region === "atlas" ? <KingdomAtlas here={hero.instance ? undefined : hero.region} open={id => setRegion(id)} locked={id => regionRequirement(hero, education, id)} /> : region === "aurora" ? <>
-      <CitadelMap position={position} route={route} selected={selection} />
-      <nav className="tabs citadel-map-sectors" aria-label="Destinos da Cidadela">
-        {DESTINATIONS.map(({ name, short }) => <button key={name} aria-label={name} aria-pressed={selection === name} className={selection === name ? "active" : ""} onClick={() => setSelection(selection === name ? "" : name)}>{short}</button>)}
-        <button aria-pressed={caveSelected} className={caveSelected ? "active" : ""} onClick={() => setSelection(caveSelected ? "" : cave.name)}>Caverna · {cave.level}+</button>
-      </nav>
-      <small>{!destination ? "Toque em um destino para ver a rota. O ponto claro mostra sua posição." : route.length ? `Rota em ciano até ${destination.name}.` : !position ? "Entre na Cidadela para traçar a rota." : caveSelected && !education.completed.includes("variables") ? "Conclua a primeira runa para abrir o caminho pelo bosque." : `Destino selecionado — ${destination.name}.`}</small>
-    </> : <>
-      <svg viewBox="0 0 100 100" role="img" aria-label={`Mapa de ${REGIONS[shown].name}`}>
-        <rect x="1" y="1" width="98" height="98" rx="6" fill={REGIONS[shown].color} />
-        {!reason && MONSTERS.filter(m => m.region === shown && !m.instance).map(m => <g key={m.id}>
-          <circle cx={map(m.x)} cy={map(m.z)} r={m.boss ? 2 : 1.3} fill={m.boss ? "#efbd65" : "#bf5352"} />
-          <text x={map(m.x) + 2} y={map(m.z)}>{m.level}</text>
-        </g>)}
-        {isNewCity(shown) && cityBuildings(shown).map(b=><rect key={b.x+":"+b.z} x={map(b.x-b.w)} y={map(b.z-b.d)} width={b.w*1.9} height={b.d*1.9} fill="#cdbd9f" stroke="#574844" strokeWidth=".45"/>)}
-        {isNewCity(shown) && <circle cx={map(cityPortal(shown)[0])} cy={map(cityPortal(shown)[1])} r="2.2" fill="#d7b6ff"><title>Portal de Goddard</title></circle>}
-        {Object.values(INSTANCES).filter(place=>place.region===shown).map(place=><circle key={place.name} cx={map(place.x)} cy={map(place.z)} r="2" fill="#d4afe6"><title>{place.name}</title></circle>)}
-        {ORE_VEINS.filter(vein=>vein.region===shown&&!vein.instance).map(vein=><circle key={vein.id} cx={map(vein.x)} cy={map(vein.z)} r="1.6" fill={vein.color}><title>{vein.name}</title></circle>)}
-        {position && <circle cx={map(position[0])} cy={map(position[1])} r="1.8" fill="#8ee5ff" stroke="white" strokeWidth=".5" />}
-        {reason && <rect x="1" y="1" width="98" height="98" rx="6" fill="#172a36" opacity=".8" />}
-      </svg>
-      <small>Azul indica sua posição, vermelho indica criaturas e dourado indica chefes. Lilás indica portais e entradas de exploração. Os números indicam o nível.</small>
+    {reason && <p>{reason}</p>}
+    {!hero.instance && shown!==hero.region && (isRacialCity(shown)||shown==='goddard') &&
+      <div className="map-route-action" aria-label="Viajar para a cidade selecionada">
+        {isRacialCity(hero.region)&&isRacialCity(shown)&&<button className="primary" onClick={()=>follow({region:shown})}>Seguir pela estrada</button>}
+        <button onClick={()=>follow({region:shown,via:'portal'})}>Seguir por portal</button>
+      </div>}
+    {region==='here' && !hero.instance && (isRacialCity(shown)||shown==='goddard') &&
+      <div className="map-route-action"><button onClick={()=>open("atlas")}>Viajar para outra cidade</button></div>}
+    {region === "atlas" ? <KingdomAtlas here={hero.instance ? undefined : hero.region} open={open} locked={id => regionRequirement(hero, education, id)} /> : <>
+      <h3>{instance ? "Masmorra atual" : REGIONS[shown].name}</h3>
+      {shown === "aurora" && !instance ? <CitadelMap position={position} route={route} focus={focus} selected={sector} />
+        : <AreaMap region={shown} instance={instance} position={position} route={route} focus={focus} locked={!!reason} />}
+      {focus && <div className="map-route-action"><strong>{focus.name}</strong>
+        {(position || guideStop(hero, focus.target, useGame.getState())) && <button className="primary" disabled={!guideStop(hero, focus.target, useGame.getState())} onClick={() => follow(focus.target)}>Ir até {focus.name}</button>}
+      </div>}
+      {pins.length > 0 && <nav className="tabs map-people" aria-label="Personagens desta área">
+        {pins.map(pin => <button key={pin.name} aria-pressed={selection?.name === pin.name} onClick={() => { setSelection(pin); setSector(""); }}>{pin.name}</button>)}
+      </nav>}
+      {exits.length>0&&<details className="map-places"><summary>Estradas, portais e expedições</summary><nav className="tabs map-people" aria-label="Estradas, portais e expedições">
+        {exits.map(pin=><button key={pin.name} aria-pressed={selection?.name===pin.name} onClick={()=>{setSelection(pin);setSector("");}}>{pin.name}</button>)}
+      </nav></details>}
+      {shown === "aurora" && !instance && <details className="map-places"><summary>Prédios e serviços</summary><nav className="tabs" aria-label="Prédios e serviços">
+        {DESTINATIONS.map(item => <button key={item.name} aria-pressed={sector === item.name} onClick={() => { setSector(item.name); setSelection(undefined); }}>{item.short}</button>)}
+      </nav></details>}
+      <small>Ponto claro: você. Dourado: personagens. Ciano: destino e caminho.</small>
     </>}
   </section>;
 }

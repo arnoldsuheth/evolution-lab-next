@@ -25,11 +25,11 @@ export function MountsPanel() {
     {vendor&&<section><h4>Estábulo aéreo de Goddard</h4><p>Nível 50 · 15 prata · qualquer classe</p>
       <div className="tabs">{FLYING_MOUNTS.map(m=><button key={m.id} type="button" disabled={hero.level<50||hero.gold<FLYING_MOUNT_PRICE||hero.flyingMount===m.id} onClick={()=>useGame.getState().buyFlyingMount(m.id)}>{m.name}{hero.flyingMount===m.id?" · escolhida":""}</button>)}</div>
     </section>}
-    <p>Ao montar, você usa a melhor montaria que já liberou. Montar fica fora de combate e de masmorras.</p>
+    <p>Escolha uma montaria liberada. Você pode montar fora de combate e de masmorras.</p>
     <div className="mount-list">{MOUNTS.map(m => { const open = mountAvailable(hero,m), active = current?.id === m.id; return <article key={m.id} className={`mount-card${open ? '' : ' locked'}${active ? ' active' : ''}`}>
       <span className="mount-icon" aria-hidden>{MOUNT_ICON[m.id]}</span>
-      <div><h4>{m.id==="griffin"?(FLYING_MOUNTS.find(v=>v.id===hero.flyingMount)?.name??"Voadora de Goddard"):m.name}</h4><p>{m.id==="griffin"&&!hero.flyingMount?"Adquira no estábulo aéreo de Goddard.":m.text}</p><small>{open ? `Velocidade ×${m.speed}` : `Requer nível ${m.level}${m.id==="dragon"?" e a escama":""}`}{active ? ' · em uso' : ''}</small></div>
-      <b className="mount-level">Nível {m.level}</b></article>; })}</div>
-    <button className="primary" disabled={!current} onClick={() => useGame.getState().toggleMount()}>{mounted ? 'Desmontar' : current ? `Montar ${current.name}` : `Nível ${MOUNTS[0].level} para montar`}</button>
+      <div><h4>{m.id==="griffin"?(FLYING_MOUNTS.find(v=>v.id===hero.flyingMount)?.name??"Voadora de Goddard"):m.name}</h4><p>{m.id==="griffin"&&!hero.flyingMount?"Adquira no estábulo aéreo de Goddard.":m.text}</p><small>{open ? `Velocidade ×${m.speed}` : `Requer nível ${m.level}${m.id==="dragon"?" e a escama":""}`}{active ? mounted?' · em uso':' · selecionada' : ''}</small></div>
+      <button className="mount-level" disabled={!open||active||!!hero.instance} onClick={()=>useGame.getState().chooseMount(m.id)}>{active?"Selecionada":open?"Selecionar":`Nível ${m.level}`}</button></article>; })}</div>
+    <button className="primary" disabled={!current||!!hero.instance} onClick={() => useGame.getState().toggleMount()}>{mounted ? 'Desmontar' : current ? `Montar ${current.name}` : `Nível ${MOUNTS[0].level} para montar`}</button>
   </div>;
 }

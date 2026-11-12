@@ -1,6 +1,7 @@
 "use client";
 import {useGame} from '@/lib/store';
-import type {NpcId} from '@/lib/game';
+import {NPCS_LIVE,type NpcId} from '@/lib/game';
+import type {GuideTarget} from '@/lib/questNavigation';
 import Currency from './Currency';
 import {QUESTS,cleanLog,goal,questLockReason,questStatus} from '@/lib/quests';
 
@@ -24,8 +25,19 @@ export function QuestDialog({npc}:{npc:NpcId}){
 }
 
 /** Lista curta das missões ativas, embaixo da missão de programação. */
-export function QuestTrackerList(){
+export function QuestTrackerList({follow}:{follow:(target:GuideTarget)=>void}){
  const hero=useGame(s=>s.hero),log=cleanLog(hero.quests),active=QUESTS.filter(q=>log.active[q.id]);
  if(!active.length)return null;
- return <ul className="quest-tracker-list">{active.slice(0,3).map(q=>{const p=log.active[q.id],ready=q.objectives.every((o,i)=>(p[i]??0)>=goal(o));return <li key={q.id} className={ready?'ready':''}><b>{ready?'? ':''}{q.title}</b>{ready?<small>Volte para entregar</small>:q.objectives.map((o,i)=>(p[i]??0)<goal(o)&&<small key={i}>{o.label} {goal(o)>1?`${p[i]??0}/${goal(o)}`:''}</small>)}</li>;})}</ul>;
+ return <ul className="quest-tracker-list">{active.map(q=>{
+   const p=log.active[q.id],remaining=q.objectives.filter((o,i)=>(p[i]??0)<goal(o)),ready=!remaining.length;
+   const next=remaining[0];
+   const npc=ready?q.giver:next?.type==='talk'?next.npc:undefined;
+   const target:GuideTarget|undefined=npc?{npc}:next&&next.type!=='talk'?{objective:next}:undefined;
+   const name=NPCS_LIVE.find(person=>person.id===npc)?.name;
+   return <li key={q.id} className={ready?'ready':''}>
+     <b>{ready?'? ':''}{q.title}</b>
+     {ready?<small>Entregue a {name}</small>:q.objectives.map((o,i)=>(p[i]??0)<goal(o)&&<small key={i}>{o.label} {goal(o)>1?`${p[i]??0}/${goal(o)}`:''}</small>)}
+     {target&&<button className="quest-route-button" onClick={()=>follow(target)}>{name?`Ir até ${name}`:next?.type==='collect'?'Localizar coleta':'Localizar criaturas'}</button>}
+   </li>;
+ })}</ul>;
 }

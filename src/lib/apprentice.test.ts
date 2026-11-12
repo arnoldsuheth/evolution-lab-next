@@ -38,7 +38,7 @@ test('runa trancada explica o motivo real em português simples', () => {
 test('pontos de código: 8 temas, na grama da vila, em ordem', () => {
   assert.equal(CODE_SPOTS.length, 8); assert.equal(new Set(CODE_SPOTS.map(s => s.id)).size, 8);
   for (const s of CODE_SPOTS) {
-    assert.ok(walkable(s.x, s.z, true, true, 'aurora'), s.id); assert.ok(NPCS_LIVE.every(n => Math.hypot(n.x - s.x, n.z - s.z) >= 3), `${s.id} longe dos personagens`); assert.ok(!onRoad(s.x, s.z), `${s.id} fora da rua`);
+    assert.ok(walkable(s.x, s.z, 'aurora'), s.id); assert.ok(NPCS_LIVE.every(n => Math.hypot(n.x - s.x, n.z - s.z) >= 3), `${s.id} longe dos personagens`); assert.ok(!onRoad(s.x, s.z), `${s.id} fora da rua`);
     assert.ok(!BUILDINGS.some(b => Math.abs(b.x - s.x) < b.w + 1 && Math.abs(b.z - s.z) < b.d + 1), `${s.id} fora das casas`);
     assert.equal(checkPicks(s.builder, answers(s.builder)).ok, true);
     assert.equal(s.builder.explain.length, s.builder.code.split('\n').length, s.id);

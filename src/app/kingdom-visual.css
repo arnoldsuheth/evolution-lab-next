@@ -1,0 +1,88 @@
+.game-shell .quest-tracker {
+  color: #fff4db;
+  border-color: #c4a7778c;
+  background: linear-gradient(150deg, #202b36f5, #121c26ed);
+  box-shadow: 0 5px 18px #060a1370;
+}
+.game-shell .quest-tracker h3 { color: #f8dfad; }
+.quest-tracker .quest-route-button {
+  color: #e8fcff;
+  background: #204956;
+  border-color: #6eabb5;
+}
+.quest-tracker .quest-route-button:focus-visible,
+.radial-hud > button:focus-visible { outline: 2px solid #ffe1a6; outline-offset: 3px; }
+.world-container .npc-label.near strong,
+.world-container .town-sign {
+  font-family: system-ui, sans-serif;
+  font-weight: 650;
+  text-shadow: 0 2px 5px #070c10, 0 1px 2px #070c10;
+}
+.world-container .quest-world-pin {
+  color: #dffcff;
+  background: #17333fee;
+  border-color: #82d5e4;
+}
+.world-container .npc-label .quest-marker:empty { display: none; }
+
+@media (pointer: coarse), (max-width: 960px) {
+  .world-container :is(.citadel-plaque,.citadel-signpost) { display: none; }
+  .world-container .npc-label.near strong { font-size: 12px; }
+  .radial-hud {
+    right: max(10px, env(safe-area-inset-right));
+    bottom: calc(max(8px, env(safe-area-inset-bottom)) + 26px);
+    width: 177px;
+    height: 159px;
+    transform: none;
+  }
+  .radial-hud > button {
+    min-width: 44px;
+    min-height: 44px;
+    border-color: #b49c70;
+    background: #192835ed;
+    box-shadow: 0 2px 7px #0009;
+  }
+  .radial-hud .radial-attack {
+    right: 0; bottom: 0; width: 70px; height: 70px;
+    background: radial-gradient(circle at 34% 24%, #436d75, #1a333e 75%) !important;
+    border-color: #9bc2c4;
+  }
+  .radial-attack span { font-size: 26px; }
+  .radial-attack b { font-size: 10px; }
+  .radial-hud .radial-auto { right: 9px; bottom: 77px; }
+  .radial-hud .radial-skill { width: 45px; height: 45px; }
+  .radial-hud .radial-skill-1 { right: 77px; bottom: 0; }
+  .radial-hud .radial-skill-2 { right: 77px; bottom: 51px; }
+  .radial-hud .radial-skill-3 { right: 60px; bottom: 102px; }
+  .radial-hud .radial-power { right: 7px; bottom: 129px; }
+  .radial-hud .radial-more { right: 128px; bottom: 0; font-size: 22px; line-height: .75; }
+  .radial-hud .radial-more small { font-size: 8px; }
+  .radial-hud .radial-run { right: 128px; bottom: 50px; }
+  .radial-hud .radial-sit { right: 128px; bottom: 100px; }
+  .radial-hud .radial-food { right: 178px; bottom: 0; }
+  .radial-hud .radial-potion { right: 178px; bottom: 50px; }
+  .radial-hud .empty-skill,
+  .radial-hud:not(.utilities-open) > :is(.radial-run,.radial-sit,.radial-food,.radial-potion) { display: none; }
+}
+
+@media (orientation: landscape) and (max-height: 550px) {
+  .game-shell .quest-tracker:not(.hud-editing) {
+    width: clamp(156px, 23vw, 190px) !important;
+    max-height: min(148px, 44dvh) !important;
+    padding: 7px 8px !important;
+  }
+  .game-shell .quest-tracker h3 {
+    margin: 0 27px 4px 0;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+  }
+  .game-shell .quest-tracker .quest-route-button {
+    min-height: 40px;
+    margin: 4px 0;
+    font-size: 12px;
+  }
+  .game-shell .quest-tracker p { margin: 3px 0; padding: 0; }
+  .game-shell .quest-tracker .quest-toggle { margin: 0 0 2px 4px; }
+  .game-shell .quest-tracker .quest-extra > summary { font-size: 11px; }
+  .world-container .citadel-plaque, .world-container .citadel-signpost { display: none; }
+}

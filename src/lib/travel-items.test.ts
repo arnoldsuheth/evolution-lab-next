@@ -14,11 +14,11 @@ test('pergaminho é fabricado e consumido uma vez sem perder progresso',()=>{
 test('teleporte durante combate não consome o pergaminho',()=>{
  reset();useGame.setState(s=>({hero:{...s.hero,inventory:['scroll-aurora']},encounter:{id:'test',name:'Teste',hp:100,maxHp:100,power:1,reward:1,elite:false}}));useGame.getState().useItem('scroll-aurora');assert.deepEqual(useGame.getState().hero.inventory,['scroll-aurora']);assert.equal(useGame.getState().relocation,0);
 });
-test('montarias Lovelace: lobo no 15, javali no 25, grifo no 50; combate desmonta',()=>{
+test('montarias Lovelace: lobo no 15, javali no 25, grifo comprado no 50; combate desmonta',()=>{
  reset();useGame.setState(s=>({hero:{...s.hero,level:14}}));useGame.getState().toggleMount();assert.equal(useGame.getState().mounted,false);
  useGame.setState(s=>({hero:{...s.hero,level:15}}));useGame.getState().toggleMount();assert.equal(useGame.getState().mounted,true);assert.equal(mountSpeed(useGame.getState().hero),1.35);useGame.getState().toggleMount();assert.equal(useGame.getState().mounted,false);
- useGame.setState(s=>({hero:{...s.hero,level:25,inventory:[],equipped:[]}}));assert.equal(mountSpeed(useGame.getState().hero),1.5);useGame.setState(s=>({hero:{...s.hero,level:50}}));assert.equal(mountSpeed(useGame.getState().hero),1.8);
- useGame.setState(s=>({hero:{...s.hero,level:30,inventory:['mount-boar'],equipped:[]}}));assert.equal(mountSpeed(useGame.getState().hero),1.5);
+ useGame.setState(s=>({hero:{...s.hero,level:25,inventory:[],equipped:[]}}));assert.equal(mountSpeed(useGame.getState().hero),1.5);useGame.setState(s=>({hero:{...s.hero,level:50,region:'goddard',position:[9,-3],gold:1500}}));assert.equal(mountSpeed(useGame.getState().hero),1.5);useGame.getState().buyFlyingMount('griffin');assert.equal(mountSpeed(useGame.getState().hero),1.8);
+ useGame.setState(s=>({hero:{...s.hero,level:30,region:'aurora',inventory:['mount-boar'],equipped:[]}}));assert.equal(mountSpeed(useGame.getState().hero),1.5);
  useGame.getState().equip('mount-boar');assert.equal(mountSpeed(useGame.getState().hero),1.5);useGame.getState().toggleMount();assert.equal(useGame.getState().mounted,true);
  useGame.setState(s=>({hero:{...s.hero,position:[-4,-18]},education:{...s.education,completed:['variables']}}));useGame.getState().startEncounter(false,2,'forest-wolf');assert.ok(useGame.getState().encounter);assert.equal(useGame.getState().mounted,false);
 });

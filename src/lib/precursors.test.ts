@@ -6,7 +6,7 @@ import { useGame, savedState } from './store';
 import { findPath } from './navigation';
 
 test('Lovelace oferece rota de aproximação sem desbloquear a floresta ou as minas', () => {
-  const route = findPath([0, 5], [LOVELACE_POSITION.x, LOVELACE_POSITION.z + 2], false, false);
+  const route = findPath([0, 5], [LOVELACE_POSITION.x, LOVELACE_POSITION.z + 2]);
   assert.ok(route.length);
 });
 
@@ -55,7 +55,7 @@ test('os dez precursores e a Câmara têm rota de aproximação na Cidadela', as
   assert.equal(NPCS_LIVE.filter(npc => npc.id === 'lovelace' || precursorForNpc(npc.id)).length, 10);
   for (const { x, z } of sites) {
     const candidates = [[x + 2, z], [x - 2, z], [x, z + 2], [x, z - 2]] as [number, number][];
-    assert.ok(candidates.some(target => findPath([0, 5], target, false, false).length), 'Sem rota para ' + x + ', ' + z);
+    assert.ok(candidates.some(target => findPath([0, 5], target).length), 'Sem rota para ' + x + ', ' + z);
   }
 });
 

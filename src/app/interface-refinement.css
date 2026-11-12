@@ -99,3 +99,20 @@
   }
   .equipment-icons .catalogue-pagination { padding-block: 0; }
 }
+
+.quest-tracker .quest-route-button {
+  display: block; width: 100%; min-height: 36px; margin: 5px 0; padding: 4px 8px;
+  color: #d7faff; background: #154352; border: 1px solid #60bdd3; border-radius: 6px;
+  font: 650 12px/1.2 system-ui,sans-serif;
+}
+.quest-world-pin {
+  display: block; padding: 3px 8px; color: #062b38; background: #87efff;
+  border: 1px solid #d6faff; border-radius: 6px; font: 700 12px/1.2 system-ui,sans-serif;
+  white-space: nowrap;
+}
+.world-map .map-people { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.world-map .map-people button { flex: 0 1 auto; min-height: 36px; padding: 4px 8px; }
+.world-map button[aria-pressed="true"] { border-color: #72e5eb; color: #d7faff; }
+.map-route-action,.boole-story-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.world-map .area-map { aspect-ratio: auto; }
+.world-map .area-map text { font-size: 1.6px; paint-order: stroke; stroke: #16283b; stroke-width: .35px; }

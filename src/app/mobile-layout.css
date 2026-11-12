@@ -233,7 +233,7 @@
     left: var(--screen-left) !important;
     top: var(--screen-top) !important;
     width: min(155px, 27vw) !important;
-    max-height: min(104px, 33dvh) !important;
+    max-height: min(138px, 40dvh) !important;
     overflow: auto;
   }
   .game-shell .left-hud:not(.hud-editing) {

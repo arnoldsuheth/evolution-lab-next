@@ -6,8 +6,8 @@ import { cleanAttributes } from './attributes';
 const enemy = { id: 'lobo', name: 'Lobo', hp: 500, maxHp: 500, power: 1, reward: 1, elite: false, level: 1 };
 const hero = (classId: 'mage' | 'warrior') => ({ ...freshSave().hero, classId, created: true });
 
-test('mago gasta MP no ataque normal; guerreiro gasta estamina', () => {
-  const mage = hero('mage'), r = resolveCombat(mage, enemy, { criticalRoll: 1 });
+test('mago iniciado e equipado gasta MP no ataque normal; guerreiro gasta estamina', () => {
+  const mage = { ...hero('mage'), level: 8, classInitiated: true, inventory: ['staff'], equipped: ['staff'] }, r = resolveCombat(mage, enemy, { criticalRoll: 1 });
   assert.equal(r.hero.mp, mage.mp - 6); assert.equal(r.hero.stamina, mage.stamina);
   const war = hero('warrior'), w = resolveCombat(war, enemy, { criticalRoll: 1 });
   assert.equal(w.hero.stamina, war.stamina - 9); assert.equal(w.hero.mp, war.mp);

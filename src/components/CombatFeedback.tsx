@@ -17,6 +17,7 @@ function buildParts(kind:EffectKind,color:string){
   const m=glow(color),white=glow('#ffffff'),list:{mesh:THREE.Mesh;role:string;i:number}[]=[];
   const add=(geometry:THREE.BufferGeometry,role:string,material=m,i=0)=>{const mesh=new THREE.Mesh(geometry,material);mesh.raycast=()=>null;mesh.userData={role,i};list.push({mesh,role,i});};
   switch(kind){
+   case 'punch':for(let i=0;i<4;i++)add(shape('OctahedronGeometry:.09',()=>new THREE.OctahedronGeometry(.09)),'spark',m,i);break;
    case 'slash':add(shape('TorusGeometry:.9,.07,6,24,Math.PI*.9',()=>new THREE.TorusGeometry(.9,.07,6,24,Math.PI*.9)),'arc',white);for(let i=0;i<6;i++)add(shape('OctahedronGeometry:.07',()=>new THREE.OctahedronGeometry(.07)),'spark',m,i);break;
    case 'holy':add(shape('CylinderGeometry:.7,.9,7,20,1,true',()=>new THREE.CylinderGeometry(.7,.9,7,20,1,true)),'pillar');add(shape('RingGeometry:.6,.85,32',()=>new THREE.RingGeometry(.6,.85,32)),'ring');for(let i=0;i<10;i++)add(shape('OctahedronGeometry:.1',()=>new THREE.OctahedronGeometry(.1)),'fall',white,i);break;
    case 'shock':for(let i=0;i<3;i++)add(shape('RingGeometry:.7,1,40',()=>new THREE.RingGeometry(.7,1,40)),'wave',m,i);for(let i=0;i<7;i++)add(shape('DodecahedronGeometry:.16',()=>new THREE.DodecahedronGeometry(.16)),'rock',glow('#e8b48a'),i);break;
@@ -71,7 +72,7 @@ function FloatingDamage({time,amount,position,critical=false,received=false}:{ti
 export default function CombatFeedback(){
  const event=useGame(s=>s.battleEvent);
  if(!event)return null;
- const kind=effectFor(event.kind,event.classId);
+ const kind=event.basicEffect??effectFor(event.kind,event.classId);
  return <group><Effect key={event.time} kind={kind} color={event.tone} from={[event.hx??event.x,event.hz??event.z]} to={[event.x,event.z]} time={event.time}/>{event.enemyPower&&ENEMY_POWER_EFFECT[event.enemyPower]&&<Effect key={'e'+event.time} kind={ENEMY_POWER_EFFECT[event.enemyPower].kind} color={ENEMY_POWER_EFFECT[event.enemyPower].color} from={[event.x,event.z]} to={[event.hx,event.hz]} time={event.time} delay={.35}/>}
  <FloatingDamage key={'hit'+event.time} time={event.time} amount={event.damage} position={[event.x,event.z]} critical={event.critical}/><FloatingDamage key={'hurt'+event.time} time={event.time} amount={event.received} position={[event.hx,event.hz]} received/>
  </group>;

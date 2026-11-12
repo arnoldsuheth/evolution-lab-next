@@ -1,7 +1,9 @@
 "use client";
+import { cityMarket, marketOpen, marketStocks, type MarketStall } from './cityMarket';
 import {FLYING_MOUNTS,FLYING_MOUNT_PRICE,MOUNT_VENDOR,type FlyingMountId} from "./flyingMounts";
 import {RACE_CLASSES} from "./game";
 import {isNewCity,isRacialCity,CITY_BANK,GODDARD_BOOLE,CITY_FORGE,CITY_WAGON,CITY_SPAWN,RACIAL_CITIES,trainerPosition,cityForRace,goddardExit,cityPortal,type RacialCity} from "./kingdomCities";
+import { cityWallBlocks, roadArrival, roadAt } from "./overland";
 import { ORE_VEINS, PICKAXE_ID } from './mining';
 import { canStoreInventory } from './bags';
 import "./testNamespace";
@@ -15,8 +17,8 @@ import {PROFESSIONS,repairCost,forgeCost,currency,type Profession} from "./econo
 import {forgeStep,forgeId,bandFor,LEVEL_BANDS} from "./catalogue";
 import {recoverResources} from "./recovery";
 import { HOTBAR_SIZE } from './controls';
-import {MONSTERS,REGIONS,SAFE_TOWN_RADIUS,regionRequirement,monsterRequirement,type RegionId} from "./campaign";
-import { adventureOf, ensureDaily, progressDaily, dailyWants, dailyReward, DAILY_POOL, HEARTH_MS, accrueRest, restBonus, addRep, factionOf, repPercent, discounted, newAchievements, unlockedPets, SPECS, SPEC_LEVEL, specChangeCost, rareNow, MOUNT_LEVEL, mountOf, type PetId } from "./adventure";
+import {MONSTERS,REGIONS,SAFE_TOWN_RADIUS,campaignGate,regionRequirement,monsterRequirement,type RegionId} from "./campaign";
+import { adventureOf, ensureDaily, progressDaily, dailyWants, dailyReward, DAILY_POOL, HEARTH_MS, accrueRest, restBonus, addRep, factionOf, repPercent, discounted, newAchievements, unlockedPets, SPECS, SPEC_LEVEL, specChangeCost, rareNow, MOUNT_LEVEL, MOUNTS, mountAvailable, mountOf, type MountId, type PetId } from "./adventure";
 import { DOORS, doorBetween, tryDoor } from "./dungeon";
 import { CODE_SPOTS, spotAvailable } from "./codeSpots";
 import { friendlyLock } from "./apprentice";
@@ -26,13 +28,13 @@ import { deposit as bankDeposit, withdraw as bankWithdraw } from "./bank";
 import { WAGON_PRICE, WAGON_STOP_RADIUS } from "./wagon";
 import { PRACTICE_CONCEPTS, nextMastery, BLITZ_PASS, dayKey, blitzReward, battleBuff, BATTLE_COOLDOWN_MS, BATTLE_MISS_COOLDOWN_MS, BATTLE_BUFF_SECONDS } from "./practice";
 import { persist } from "zustand/middleware";
-import { SKILLS, skillRank, skillRequirement, passiveBonuses } from "./skills";
+import { SKILLS, classPowerRequirement, skillRank, skillRequirement, passiveBonuses } from "./skills";
 import { isEquipment, itemRequirement, removeItems, countItem } from "./equipment";
-import { enemyVitals, resolveCombat, battleRewards, STATUS_NAMES, type EnemyState } from "./combat";
-import { ATTACK_RANGE, type CombatAction } from "./combatEffects";
+import { attackRange, enemyVitals, resolveCombat, battleRewards, STATUS_NAMES, type EnemyState } from "./combat";
+import { type CombatAction, type EffectKind } from "./combatEffects";
 import { NEXUS_SECONDS, cleanNexus, nexusFull } from "./nexus";
 import { QUESTS, GATHER_NODES, GATHER_RESPAWN_MS, MONSTER_RESPAWN_MS, acceptQuest as acceptLog, progressQuests, turnInQuest as turnInLog, cleanLog, goal, type QuestEvent } from "./quests";
-import { CLASSES, ITEMS, LESSONS, evaluateLesson, freshHero, freshSave, migrateSave, stats, withXp, type SaveData, type ClassId, type Look, type Settings, type Race, validRaceClass, raceForClass } from "./game";
+import { CLASSES, ITEMS, LESSONS, evaluateLesson, freshHero, freshSave, grantHunterStarterGear, migrateSave, stats, withXp, type SaveData, type ClassId, type Look, type Settings, type Race, validRaceClass, raceForClass } from "./game";
 /** Serviços da vila (banco, carroça): só dentro da Pedra da Aurora, fora de masmorra. */
 const atForge=(hero:{instance?:string|null;region:RegionId;position:[number,number]})=>!hero.instance&&(hero.region==='aurora'
   ?Math.hypot(hero.position[0]+7,hero.position[1])<=8
@@ -67,10 +69,10 @@ const guardedStorage = {
 };
 export type Encounter = EnemyState;
 interface GameStore extends SaveData {
-  enterInstance:(id:InstanceId)=>void;leaveInstance:()=>void; repair:()=>void;learnProfession:(id:Profession)=>void; bindAction:(id:string,slot:number)=>void; relocation:number; mounted:boolean; /** Sentado: recupera HP, MP e vigor 3x mais rápido fora de combate. */ sitting:boolean; /** Caminhar (mais devagar) em vez de correr. */ walking:boolean; toggleSit:()=>void; toggleWalk:()=>void; toggleMount:()=>void; buyFlyingMount:(id:FlyingMountId)=>void; trainClass:(id:ClassId)=>void;
+  enterInstance:(id:InstanceId)=>void;leaveInstance:()=>void; repair:()=>void;learnProfession:(id:Profession)=>void; bindAction:(id:string,slot:number)=>void; relocation:number; mounted:boolean; /** Sentado: recupera HP, MP e vigor 3x mais rápido fora de combate. */ sitting:boolean; /** Caminhar (mais devagar) em vez de correr. */ walking:boolean; toggleSit:()=>void; toggleWalk:()=>void; toggleMount:()=>void; chooseMount:(id:MountId)=>void; buyFlyingMount:(id:FlyingMountId)=>void; trainClass:(id:ClassId)=>void;
   ready: boolean; saveError: string; notice: string; encounter: Encounter | null; buff: number; lastAttack: number; cooldowns: Record<string,number>; now: number; effects: {kind:string;amount:number;remaining:number}[];
   lootEvent?:{time:number;xp:number;gold:number;items:string[]};
-  battleEvent:{critical?:boolean;time:number;damage:number;received:number;x:number;z:number;tone:string;kind:"attack"|"power"|"skill";classId:ClassId;skill?:string;hx:number;hz:number;won?:boolean;enemySkill?:string;enemyPower?:string}|null;
+  battleEvent:{critical?:boolean;companionStrike?:boolean;time:number;damage:number;received:number;x:number;z:number;tone:string;kind:"attack"|"power"|"skill";basicEffect?:EffectKind;classId:ClassId;skill?:string;hx:number;hz:number;won?:boolean;enemySkill?:string;enemyPower?:string}|null;
   /** Monstros vencidos voltam depois de um tempo; pontos de coleta também (só durante a sessão). */
   slain:Record<string,number>; gathered:Record<string,number>;
   /** Monstro selecionado com um clique e a ação esperando o herói chegar ao alcance. */
@@ -91,12 +93,12 @@ interface GameStore extends SaveData {
   createCharacter: (name: string, classId: ClassId, mode: "normal" | "hardcore", race?: Race) => void;
   customize: (look: Partial<Look>) => void; chooseClass: (id: ClassId, race?: Race) => void; move: (p: [number, number]) => void;
   /** Treino rápido (missão relâmpago e perguntas de batalha). */
-  bankDeposit:(amount:number)=>void; bankWithdraw:(amount:number)=>void; wagonTravel:(region:RegionId)=>void; skyTravel:(region:RacialCity|"goddard")=>void;
+  bankDeposit:(amount:number)=>void; bankWithdraw:(amount:number)=>void; wagonTravel:(region:RegionId)=>void; skyTravel:(region:RacialCity|"goddard")=>void; overlandTravel:(region:RacialCity)=>void;
   practiceAnswer:(concept:string,correct:boolean)=>void; finishBlitz:(concept:string,score:number)=>{xp:number;gold:number}|null; battleInsight:(correct:boolean)=>void;
   draft: (id: string, code: string) => void; solve: (id: string, code: string) => ReturnType<typeof evaluateLesson>; project: (id: string, code: string) => void;
   allocateAttribute:(key:AttributeKey)=>void;
-  buy: (id: string) => void; equip: (id: string) => void; useItem: (id: string) => void; craft: (id: string) => void; talent: (branch: number) => void;
-  startEncounter: (elite?: boolean, level?: number, monsterId?:string) => void; travelRegion:(region:RegionId)=>void; attack: (skill?: boolean) => void; flee: () => void; rest: () => void; tick: (seconds: number) => void;
+  buy: (id: string, market?: MarketStall) => void; equip: (id: string) => void; useItem: (id: string) => void; craft: (id: string) => void; talent: (branch: number) => void;
+  startEncounter: (elite?: boolean, level?: number, monsterId?:string, action?:CombatAction) => void; travelRegion:(region:RegionId)=>void; attack: (skill?: boolean) => void; flee: () => void; rest: () => void; tick: (seconds: number) => void;
   sell: (id: string) => void; learnSkill: (id:string) => void; bindSkill: (id:string,slot?:number) => void; respec: () => void; castSkill: (id:string) => void;
   setting: (v: Partial<Settings>) => void; restore: (raw: string) => void; clearNotice: () => void;
 }
@@ -119,7 +121,7 @@ function executeBattle(id:string|undefined,starter:boolean,set:(value:Partial<Ga
  if(result.error){set({notice:result.error});return;}
  result.hero={...result.hero,durability:{...result.hero.durability,...Object.fromEntries(s.hero.equipped.filter(id=>ITEMS[id]&&ITEMS[id].slot!=="pet").map(id=>[id,Math.max(0,(s.hero.durability?.[id]??100)-1)]))}};
  const target=MONSTERS.find(m=>m.id===enemy.monsterId);
- const feedback={battleEvent:{critical:!!result.critical,time:Date.now(),damage:result.damage,received:result.received,x:target?.x??s.hero.position[0],z:target?.z??s.hero.position[1],tone:id||starter?CLASSES[s.hero.classId].color:'#efd49a',kind:(id?'skill':starter?'power':'attack') as 'attack'|'power'|'skill',classId:s.hero.classId,skill:id,hx:s.hero.position[0],hz:s.hero.position[1],won:result.won,enemySkill:result.enemySkill,enemyPower:result.enemyPower}};
+ const feedback={battleEvent:{critical:!!result.critical,companionStrike:!!target&&result.companionStrike,time:Date.now(),damage:result.damage,received:result.received,x:target?.x??s.hero.position[0],z:target?.z??s.hero.position[1],tone:id||starter?CLASSES[s.hero.classId].color:'#efd49a',kind:(id?'skill':starter?'power':'attack') as 'attack'|'power'|'skill',classId:s.hero.classId,basicEffect:result.basicEffect,skill:id,hx:s.hero.position[0],hz:s.hero.position[1],won:result.won,enemySkill:result.enemySkill,enemyPower:result.enemyPower}};
  const skillBuff=id?SKILLS[id].buff:undefined;
  const effects=skillBuff?[...s.effects.filter(e=>e.kind!==skillBuff.kind),{kind:skillBuff.kind,amount:Math.round(skillBuff.amount*(1+(skillRank(s.hero,id!)-1)*.14)),remaining:skillBuff.duration}]:s.effects;
  const now=Date.now(),cooldowns={...s.cooldowns,...(id?{[id]:now+SKILLS[id].cooldown*1000}:{})};
@@ -144,12 +146,12 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
   learnProfession:id=>{const s=get();if(!Object.hasOwn(PROFESSIONS,id)||s.hero.dead||s.encounter||s.hero.gold<20||s.hero.professions?.[id]||!atForge(s.hero))return;set({hero:{...s.hero,gold:s.hero.gold-20,professions:{...s.hero.professions,[id]:1}},notice:'Ofício aprendido: '+PROFESSIONS[id]});},
   trainClass:id=>{
     const s=get(),h=s.hero,city=h.region;
-    if(h.dead||h.instance||s.encounter||s.challenge||!isNewCity(city)||city==='goddard'||RACIAL_CITIES[city].race!==h.race)return;
+    if(h.dead||h.instance||s.encounter||s.challenge||!isRacialCity(city)||RACIAL_CITIES[city].race!==h.race)return;
     const index=RACE_CLASSES[h.race].indexOf(id),spot=trainerPosition(city,index);
     if(index<0||!spot||Math.hypot(h.position[0]-spot[0],h.position[1]-spot[1])>3.6)return;
     if(h.classInitiated!==false){set({notice:`Caminho de ${CLASSES[h.classId].name} já iniciado.`});return;}
     if(h.classTrial?.id===id&&h.classTrial.kills>=3){
-      const hero={...h,classId:id,classTrial:undefined,classInitiated:true,hotbar:[],skills:{},talents:[0,0,0]};
+      const hero=grantHunterStarterGear({...h,classId:id,classTrial:undefined,classInitiated:true,hotbar:[],skills:{},talents:[0,0,0]});
       set({hero:{...hero,equipped:hero.equipped.filter(item=>!ITEMS[item]||!itemRequirement(hero,ITEMS[item])),hp:Math.min(h.hp,stats(hero).maxHp),mp:Math.min(h.mp,stats(hero).maxMp)},notice:`Classe liberada: ${CLASSES[id].name}.`});return;
     }
     if(h.classTrial?.id===id){set({notice:`Prova de ${CLASSES[id].name}: ${h.classTrial.kills}/3 criaturas. Volte ao treinador ao concluir.`});return;}
@@ -161,7 +163,8 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     if(Math.hypot(h.position[0]-MOUNT_VENDOR[0],h.position[1]-MOUNT_VENDOR[1])>4)return;
     set({hero:{...h,flyingMount:id,gold:h.gold-FLYING_MOUNT_PRICE},notice:`${m.name} adquirido.`});
   },
-  toggleMount:()=>{const s=get();if(s.mounted){set({mounted:false});return;}if(s.hero.dead||s.encounter||s.challenge||s.hero.level<MOUNT_LEVEL){set({notice:`Montaria a partir do nível ${MOUNT_LEVEL}, fora de combate.`});return;}if(s.hero.instance){set({notice:'Não dá para montar dentro da masmorra.'});return;}set({mounted:true,notice:`Montado em ${mountOf(s.hero)?.name}.`});},
+  chooseMount:id=>{const s=get(),mount=MOUNTS.find(m=>m.id===id);if(!mount||s.hero.dead||s.hero.instance||s.encounter||s.challenge||!mountAvailable(s.hero,mount))return;if(s.mounted&&(id==='wolf'||id==='boar')&&cityWallBlocks(s.hero.region,...s.hero.position)){set({notice:'Desça sobre terreno livre antes de trocar para uma montaria terrestre.'});return;}set({hero:{...s.hero,selectedMount:id},notice:`${mount.name} selecionado.`});},
+  toggleMount:()=>{const s=get();if(s.mounted){const mount=mountOf(s.hero);if((mount?.id==='griffin'||mount?.id==='dragon')&&cityWallBlocks(s.hero.region,...s.hero.position)){set({notice:'Desça sobre terreno livre, fora da muralha.'});return;}set({mounted:false});return;}if(s.hero.dead||s.encounter||s.challenge||s.hero.level<MOUNT_LEVEL){set({notice:`Montaria a partir do nível ${MOUNT_LEVEL}, fora de combate.`});return;}if(s.hero.instance){set({notice:'Não dá para montar dentro da masmorra.'});return;}set({mounted:true,notice:`Montado em ${mountOf(s.hero)?.name}.`});},
   claimNexus:()=>{const s=get();if(s.hero.dead||s.encounter)return;if(s.hero.region!=='aurora'||!!s.hero.instance||Math.hypot(...s.hero.position)>7){set({notice:'Vá até o cristal da praça para receber a aura.'});return;}if(!nexusFull(s.hero.nexus,s.hero.level)){set({notice:'O Nexus ainda não está cheio. Ganhe XP em lutas, missões e runas.'});return;}set({hero:{...s.hero,nexus:{charge:0,aura:NEXUS_SECONDS}},notice:'✦ Aura do Herói! +12% ataque, +12% defesa e +10% vida por 10 minutos de jogo.'});},
   upgradeItem:id=>{const s=get(),step=forgeStep(id),item=ITEMS[id];if(!step||!item||s.hero.dead||s.encounter)return;const next=ITEMS[forgeId(step.base,step.to)];if(!next)return;
    if(!atForge(s.hero)){set({notice:'Procure Babbage, o ferreiro, na vila para aprimorar.'});return;}
@@ -213,8 +216,9 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     const inherited = Math.min(100, s.ancestors.filter(a => !a.claimed).reduce((sum, a) => sum + a.legacy, 0));
     let hero = { ...freshHero(), name: name.trim().slice(0, 30) || "Viajante", classId, race: raceForClass(classId,race), created: true, mode, inherited };
     if(race){hero.region=cityForRace(race);if(hero.region!=="aurora")hero.classInitiated=false;}
-    hero = { ...withXp(hero, inherited), hp: stats(hero).maxHp, mp: stats(hero).maxMp };
-    set({ hero, challenge:null, ancestors: s.ancestors.map(a => ({ ...a, claimed: true })), encounter: null, notice: inherited ? `Nova jornada. ${inherited} XP de legado recebidos uma única vez.` : "Sua jornada começa com roupas remendadas. Procure Boole." });
+    hero = grantHunterStarterGear(withXp(hero, inherited));
+    hero = { ...hero, hp: stats(hero).maxHp, mp: stats(hero).maxMp };
+    set({ hero, challenge:null, ancestors: s.ancestors.map(a => ({ ...a, claimed: true })), encounter: null, notice: inherited ? `Nova jornada. ${inherited} XP de legado recebidos uma única vez.` : hero.classId === "hunter" ? "Seu arco já está equipado. Você recebeu 40 flechas." : hero.region === "aurora" ? "Sua jornada começa com roupas remendadas. Procure Boole." : "Sua jornada começa com roupas remendadas." });
   },
   customize: look => set(s => ({ look: migrateSave({ ...savedState(s), look: { ...s.look, ...look } }).look })),
   chooseClass: (classId, race) => {
@@ -228,6 +232,14 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
   toggleWalk: () => set(s => ({ walking: !s.walking, notice: s.walking ? 'Correndo.' : 'Caminhando.' })),
   bankDeposit:amount=>{const s=get();if(s.encounter||s.hero.dead)return;if(!atTownService(s.hero)){set({notice:'Aproxime-se do banco da cidade.'});return;}const adv=adventureOf(s.hero),r=bankDeposit(adv.bank,s.hero.gold,amount,Date.now());if(!r.ok){set({notice:r.message});return;}set({hero:{...s.hero,gold:r.wallet,adventure:{...adv,bank:r.bank}},notice:`🏦 Guardado no banco. Saldo: ${currency(r.bank.balance)}.`});},
   bankWithdraw:amount=>{const s=get();if(s.encounter||s.hero.dead)return;if(!atTownService(s.hero)){set({notice:'Aproxime-se do banco da cidade.'});return;}const adv=adventureOf(s.hero),r=bankWithdraw(adv.bank,s.hero.gold,amount,Date.now());if(!r.ok){set({notice:r.message});return;}set({hero:{...s.hero,gold:r.wallet,adventure:{...adv,bank:r.bank}},notice:`🏦 Saque feito. Na bolsa: ${currency(r.wallet)}.`});},
+  overlandTravel:region=>{
+    const s=get(),from=s.hero.region;
+    if(s.hero.dead||s.encounter||s.challenge||s.hero.instance||!isRacialCity(from))return;
+    const road=roadAt(from,...s.hero.position),arrival=roadArrival(from,region);
+    if(road?.to!==region||!arrival)return;
+    set({hero:{...s.hero,region,position:arrival},relocation:s.relocation+1,sitting:false,
+      target:null,queued:null,notice:`Você chegou pela estrada a ${REGIONS[region].name}.`});
+  },
   skyTravel:region=>{
     const s=get(),from=s.hero.region;
     if(s.hero.dead||s.encounter||s.challenge||s.hero.instance)return;
@@ -253,7 +265,13 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     set({ education, ...(result.passed && !already ? { hero: { ...withXp(s.hero, lesson.xp + Math.round(lesson.xp * repPercent(adventureOf(s.hero), 'sabios') / 100)), gold: s.hero.gold + lesson.gold, adventure: addRep(progressDaily(currentAdventure(s), { type: 'code' }), 'sabios', 80) }, notice: `${lesson.title}: +${lesson.xp} XP e +${lesson.gold} bronze. O mundo se transforma.` } : {}), ...(result.passed && already ? { hero: { ...s.hero, adventure: progressDaily(currentAdventure(s), { type: 'code' }) }, notice: "Revisão concluída. Recompensa já recebida." } : {}) }); return result;
   },
   project: (id, code) => set(s => ({ education: { ...s.education, projects: { ...s.education.projects, [id]: { code, savedAt: Date.now() } } }, notice: "Projeto salvo. Evidências salvas não certificam domínio automaticamente." })),
-  buy: id => {const s=get(),item=ITEMS[id];if(!item||s.hero.dead)return;const reason=itemRequirement(s.hero,item);if(reason){set({notice:reason});return;}if(item.source!=='shop'){set({notice:'Este item é obtido por fabricação ou saque.'});return;}const price=discounted(item.price,repPercent(adventureOf(s.hero),'mercadores'));if(s.hero.gold<price||countItem(s.hero.inventory,id)>=item.maxStack)return;const inventory=[...s.hero.inventory,id];if(!canStoreInventory(s.hero.inventory,inventory,s.hero.equipped)){set({notice:'Mochila cheia. Libere um espaço ou fabrique uma bolsa com Babbage.'});return;}set({hero:{...s.hero,gold:s.hero.gold-price,inventory},notice:`${item.name} adquirido.`});},
+  buy: (id,market) => {const s=get(),item=ITEMS[id];if(!item||s.hero.dead||s.encounter)return;
+    if(market){
+      const stall=cityMarket(s.hero.region).find(entry=>entry.id===market);
+      if(s.hero.instance||!stall||Math.hypot(stall.approach[0]-s.hero.position[0],stall.approach[1]-s.hero.position[1])>3.3){set({notice:'Aproxime-se da banca para comprar.'});return;}
+      if(!marketOpen(s.hero.region,s.education.completed)||!marketStocks(market,item)){set({notice:'Este item não está disponível nesta banca.'});return;}
+    }
+    const reason=itemRequirement(s.hero,item);if(reason){set({notice:reason});return;}if(item.source!=='shop'){set({notice:'Este item é obtido por fabricação ou saque.'});return;}const price=discounted(item.price,repPercent(adventureOf(s.hero),'mercadores'));if(s.hero.gold<price||countItem(s.hero.inventory,id)>=item.maxStack)return;const inventory=[...s.hero.inventory,id];if(!canStoreInventory(s.hero.inventory,inventory,s.hero.equipped)){set({notice:'Mochila cheia. Libere um espaço ou fabrique uma bolsa com Babbage.'});return;}set({hero:{...s.hero,gold:s.hero.gold-price,inventory},notice:`${item.name} adquirido.`});},
   allocateAttribute:key=>{const s=get();if(!ATTRIBUTE_KEYS.includes(key)||s.hero.dead||s.encounter||s.challenge||attributePoints(s.hero)<1)return;const allocated=cleanAttributes(s.hero.attributeAllocation,s.hero.level);set({hero:{...s.hero,attributeAllocation:{...allocated,[key]:allocated[key]+1}}});},
   equip: id => {
     const s=get(),item=ITEMS[id];if(!item||s.hero.dead||s.encounter||!s.hero.inventory.includes(id)||!isEquipment(item))return;
@@ -285,8 +303,8 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
   respec:()=>{const s=get();if(s.encounter||s.hero.dead)return;const skills=Object.fromEntries(Object.entries(s.hero.skills).filter(([id])=>SKILLS[id]?.classId!==s.hero.classId));const hero={...s.hero,skills,hotbar:[],talents:[0,0,0]};const limits=stats(hero);set({hero:{...hero,hp:Math.min(hero.hp,limits.maxHp),mp:Math.min(hero.mp,limits.maxMp),stamina:Math.min(hero.stamina,limits.maxStamina)},notice:'Pontos da classe devolvidos. XP e progresso preservados.'});},
   castSkill:id=>{const s=get(),skill=SKILLS[id];if(!s.encounter||s.hero.dead||!skill||skill.classId!==s.hero.classId||skill.kind!=='active'||!skillRank(s.hero,id)||s.hero.level<skill.minLevel)return;if(Date.now()<(s.cooldowns[id]??0)||Date.now()-s.lastAttack<650)return;executeBattle(id,false,set,get);},
   talent: branch => { const s = get(); if (s.hero.dead || branch < 0 || branch > 2 || s.hero.talents.reduce((a, b) => a + b, 0) >= s.hero.level - 1 || s.hero.talents[branch] >= 10) return; set({ hero: { ...s.hero, talents: s.hero.talents.map((v, i) => i === branch ? v + 1 : v) } }); },
-  travelRegion:region=>{const s=get();if(isNewCity(region)||isNewCity(s.hero.region))return;if(s.encounter||s.challenge||s.hero.instance)return;const reason=regionRequirement(s.hero,s.education,region);if(reason){set({notice:reason});return;}const gate=region==='aurora'?{x:0,z:10}:s.hero.region==='aurora'?{x:25,z:-18}:{x:8,z:-24};if(Math.hypot(s.hero.position[0]-gate.x,s.hero.position[1]-gate.z)>4){set({notice:'Aproxime-se do portal para viajar.'});return;}set({hero:{...s.hero,region,position:[0,7]},notice:`Você entrou em ${REGIONS[region].name}.`});},
-  startEncounter: (elite, requestedLevel, monsterId) => {
+  travelRegion:region=>{const s=get();if(isNewCity(region)||isNewCity(s.hero.region))return;if(s.encounter||s.challenge||s.hero.instance)return;const reason=regionRequirement(s.hero,s.education,region);if(reason){set({notice:reason});return;}const gate=campaignGate(s.hero.region,region);if(!gate||Math.hypot(s.hero.position[0]-gate[0],s.hero.position[1]-gate[1])>4){set({notice:'Aproxime-se do portal para viajar.'});return;}set({hero:{...s.hero,region,position:[0,7]},mounted:false,relocation:s.relocation+1,notice:`Você entrou em ${REGIONS[region].name}.`});},
+  startEncounter: (elite, requestedLevel, monsterId, action) => {
     const s=get();if(s.hero.dead||s.encounter||s.challenge)return;
     const fallback=MONSTERS.find(m=>m.region===s.hero.region&&(m.instance??null)===(s.hero.instance??null)&&m.boss===!!elite&&(s.hero.region!=='aurora'||!!s.hero.instance||(s.hero.position[0]>15?m.x>15:m.x<15)));
     const monster=MONSTERS.find(m=>m.id===(monsterId??fallback?.id));if(!monster)return;
@@ -294,16 +312,29 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     if((s.slain[monster.id]??0)>Date.now())return;
     if(s.hero.instance){const sealed=doorBetween(s.hero.instance,adventureOf(s.hero).doors,s.hero.position[1],monster.z);if(sealed){set({notice:`Porta selada: ${sealed.title}. Resolva o código da porta primeiro.`});return;}}
     const rare=rareNow(Date.now(),s.hero.region),isRare=!s.hero.instance&&!!rare&&rare.monsterId===monster.id&&adventureOf(s.hero).rareDone!==rare.window;
-    if(Math.hypot(s.hero.position[0]-monster.x,s.hero.position[1]-monster.z)>(ATTACK_RANGE[s.hero.classId]??4)+.5){set({notice:'Fora de alcance. Chegue mais perto do alvo.'});return;}
+    if(Math.hypot(s.hero.position[0]-monster.x,s.hero.position[1]-monster.z)>attackRange(s.hero,action)+.5){set({notice:'Fora de alcance. Chegue mais perto do alvo.'});return;}
     const level=monster.boss?monster.level:Math.max(monster.level,Math.min(60,s.hero.level+3,Number.isFinite(requestedLevel)?Math.floor(requestedLevel!):s.hero.level));
-    const vitals=enemyVitals(monster.kind,level,monster.boss),maxHp=Math.round(vitals.maxHp*(isRare?2:1));
-    set({mounted:false,encounter:{...vitals,kind:monster.kind,turn:0,id:`enemy-${Date.now()}`,monsterId:monster.id,bossId:monster.boss?monster.id:undefined,name:isRare?`✦ ${monster.name} raro`:monster.name,hp:maxHp,maxHp,level,instanceId:s.hero.instance??undefined,power:Math.round((15+level*4)*(monster.boss?1.2:isRare?1.25:1)*(s.hero.instance?1.15:1)),reward:25+level*18,elite:monster.boss||isRare,...(isRare&&rare?{rare:rare.window}:{})},lastAttack:0,notice:isRare?'✦ Monstro raro! Mais forte, com recompensa melhor.':monster.boss?'Chefe de região. A vitória abre o caminho seguinte.':'Observe seus recursos e habilidades.'});
+    const vitals=enemyVitals(monster.kind,level,monster.boss);
+    const noviceExpedition=monster.instance==="frost-cave";
+    const maxHp=Math.round(vitals.maxHp*(isRare?2:noviceExpedition?.76:1));
+    set({mounted:false,encounter:{...vitals,kind:monster.kind,turn:0,id:`enemy-${Date.now()}`,monsterId:monster.id,bossId:monster.boss?monster.id:undefined,name:isRare?`✦ ${monster.name} raro`:monster.name,hp:maxHp,maxHp,level,instanceId:s.hero.instance??undefined,power:Math.round((15+level*4)*(monster.boss?1.2:isRare?1.25:1)*(noviceExpedition?.72:s.hero.instance?1.15:1)),reward:25+level*18,elite:monster.boss||isRare,...(isRare&&rare?{rare:rare.window}:{})},lastAttack:0,notice:isRare?'✦ Monstro raro! Mais forte, com recompensa melhor.':monster.boss?(monster.instance?'Guardião da expedição.':'Chefe de região. A vitória abre o caminho seguinte.'):'Observe seus recursos e habilidades.'});
   },
   attack: starter => {const s=get();if(!s.encounter||s.hero.dead||Date.now()-s.lastAttack<650)return;executeBattle(undefined,!!starter,set,get);},
-  flee: () => set(s => ({ encounter: null, target: null, queued: null, hero: { ...s.hero, region:'aurora', position: [0, 5] }, notice: "Você recuou para Pedra da Aurora." })),
+  flee: () => {
+    const s=get(), id=s.hero.instance;
+    if (!s.encounter || s.hero.dead) return;
+    if (id) {
+      const place=INSTANCES[id];
+      set({encounter:null,target:null,queued:null,mounted:false,relocation:s.relocation+1,
+        hero:{...s.hero,region:place.region,instance:null,instanceProgress:[],position:[place.x,place.z+2]},
+        notice:"Você recuou para a entrada da expedição."});
+      return;
+    }
+    set({encounter:null,target:null,queued:null,hero:{...s.hero,region:'aurora',position:[0,5]},notice:"Você recuou para Pedra da Aurora."});
+  },
   rest: () => { const s = get(); if (s.encounter || s.hero.dead || s.hero.region!=="aurora" || !!s.hero.instance || Math.hypot(...s.hero.position) > 11) return; const st = stats(s.hero); set({ hero: { ...s.hero, hp: st.maxHp, mp: st.maxMp, stamina: st.maxStamina }, notice: "Você descansou junto ao cristal de Lion." }); },
   setTarget:id=>{const s=get();if(s.encounter&&id!==s.encounter.monsterId)return;set({target:id,queued:null});},
-  act:action=>{const s=get();if(s.hero.dead)return;if(s.encounter){if(action.kind==='skill'&&action.skill)get().castSkill(action.skill);else get().attack(action.kind==='power');return;}if(!s.target){set({notice:'Clique em um monstro para selecioná-lo.'});return;}set({queued:action});},
+  act:action=>{const s=get();if(s.hero.dead)return;const lock=action.kind==='power'?classPowerRequirement(s.hero):undefined;if(lock){set({notice:lock});return;}if(s.encounter){if(action.kind==='skill'&&action.skill)get().castSkill(action.skill);else get().attack(action.kind==='power');return;}if(!s.target){set({notice:'Clique em um monstro para selecioná-lo.'});return;}set({queued:action});},
   acceptQuest:id=>{const s=get(),log=cleanLog(s.hero.quests),next=acceptLog(log,id,s.hero.level,s.education.completed);if(next===log||s.hero.dead)return;const q=QUESTS.find(q=>q.id===id)!;set({hero:{...s.hero,quests:next},notice:`Nova missão: ${q.title}. ${q.objectives.map(o=>o.label).join(' · ')}`});},
   turnInQuest:id=>{const s=get();if(s.hero.dead)return;const {log,reward}=turnInLog(cleanLog(s.hero.quests),id);if(!reward)return;const q=QUESTS.find(q=>q.id===id)!;set({hero:{...withXp(s.hero,reward.xp),gold:s.hero.gold+reward.gold,quests:log,adventure:addRep(adventureOf(s.hero),factionOf(q.giver),100)},notice:`${q.title} concluída! +${reward.xp} XP · +${reward.gold} bronze. ${q.finish}`});},
   questEvent:event=>{const s=get();const {log,changed}=progressQuests(cleanLog(s.hero.quests),event);if(!changed.length)return;set({hero:{...s.hero,quests:log},notice:changed.map(id=>{const q=QUESTS.find(q=>q.id===id)!,p=log.active[id];return `${q.title}: `+q.objectives.map((o,i)=>`${o.label} ${p[i]}/${goal(o)}`).join(' · ');}).join(' | ')});},

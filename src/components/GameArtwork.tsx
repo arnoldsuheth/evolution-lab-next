@@ -13,6 +13,7 @@ const paths:Record<string,string>={
  dagger:'<path d="m28 36 14-24 13-8-3 16-21 20Z" fill="#b4d5d4"/><path d="m20 33 17 12-4 5-17-12Z" fill="#b5a06d"/><path d="m22 42 6 5-12 15-6-5Z" fill="#705b61"/>',
  axe:'<path d="m18 57 25-43" stroke="#936341" stroke-width="7"/><path d="M28 12Q48 23 55 10L53 32Q40 40 27 25Z" fill="#a6c2cb"/><path d="m29 13-5 14" stroke="#d6b269" stroke-width="5"/>',
  hammer:'<path d="m18 57 25-39" stroke="#976b45" stroke-width="7"/><path d="m26 9 31 20-9 15-31-20Z" fill="#a4b8ba" stroke="#d4bd85" stroke-width="2"/>',
+ arrow:'<path d="M13 51 51 13m-15 0h15v15M13 51l2-13m-2 13 13-2" fill="none" stroke="#d4c4a2" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>',
  bow:'<path d="M20 8Q61 28 20 57" fill="none" stroke="#b68951" stroke-width="6"/><path d="M20 8 34 32 20 57" fill="none" stroke="#ece2bf"/><path d="m8 43 43-23m-4-2 10-2-5 8" fill="none" stroke="#c2d7cb" stroke-width="2"/>',
  crossbow:'<path d="m16 54 29-39" stroke="#b48852" stroke-width="8"/><path d="M17 13Q42 16 55 39M17 13 35 34 55 39" fill="none" stroke="#c5b275" stroke-width="3"/><path d="m22 42 20-26" stroke="#d8e1cd" stroke-width="2"/>',
  gun:'<path d="m9 47 13-15 14 6-14 19Z" fill="#916747"/><path d="m24 31 27-23 6 7-26 25Z" fill="#9daeb4"/><path d="m20 42 13 7 6-9" fill="none" stroke="#d3b86e" stroke-width="3"/>',

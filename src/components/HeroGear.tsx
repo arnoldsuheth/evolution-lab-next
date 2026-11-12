@@ -54,9 +54,27 @@ export function BorrowedPiece({piece,bone,scene,rarity,kind}:{piece:BorrowedMesh
  return object&&line?createPortal(<WeaponFire from={line.from} to={line.to}/>,object):null;
 }
 
-/** Arma sem peça pronta no pacote: modelo simples com a cor da raridade, no mesmo osso da mão. */
+const BOW_FORWARD = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI / 2);
+
+/** Peças procedurais têm a origem no punho e seguem o osso durante as animações. */
 export function SimpleWeapon({visual,bone,scene,rarity,small=false}:{visual:string;bone:string;scene:THREE.Group;rarity:string;small?:boolean}){
  const target=useMemo(()=>boneIn(scene,bone),[scene,bone]),tier=rarityTier(rarity);
+ const grip=useRef<THREE.Group>(null);
+ const handRotation=useRef(new THREE.Quaternion()), heroRotation=useRef(new THREE.Quaternion());
+ useFrame(()=>{
+  if (visual !== 'bow' || !grip.current || !target) return;
+  // O clipe de disparo gira o pulso para a besta. A mão esquerda carrega o arco, que fica na vertical.
+  target.getWorldQuaternion(handRotation.current).invert();
+  scene.getWorldQuaternion(heroRotation.current);
+  grip.current.quaternion.copy(handRotation.current).multiply(heroRotation.current).multiply(BOW_FORWARD);
+ });
  if(!target)return null;
- return createPortal(<group rotation={[0,Math.PI,0]}><EquipmentVisual visual={visual} tone={rarityTone(rarity)} small={small}/>{tier!=='common'&&<pointLight position={[0,.6,0]} color={tier==='mythic'?'#ffb43a':'#b48cff'} intensity={tier==='mythic'?1.2:.5} distance={1.6}/>}{tier==='mythic'&&<WeaponFire from={new THREE.Vector3(0,.35,0)} to={new THREE.Vector3(0,1,0)}/>}</group>,target);
+ const rotation: [number,number,number]=[0,visual==='bow'?-Math.PI/2:visual==='gun'?Math.PI/2:bone==='handslot.l'?0:Math.PI,0];
+ const muzzle = visual === 'gun';
+ const glowPosition: [number,number,number] = muzzle ? [0,.21,.84] : [0,.6,0];
+ return createPortal(<group ref={grip} rotation={rotation}>
+  <EquipmentVisual visual={visual} tone={rarityTone(rarity)} small={small}/>
+  {tier!=='common'&&<pointLight position={glowPosition} color={tier==='mythic'?'#ffb43a':'#b48cff'} intensity={tier==='mythic'?1.2:.5} distance={1.6}/>}
+  {tier==='mythic'&&<WeaponFire from={muzzle?new THREE.Vector3(0,.21,.48):new THREE.Vector3(0,.22,0)} to={muzzle?new THREE.Vector3(0,.21,.88):new THREE.Vector3(0,.62,0)}/>}
+ </group>,target);
 }

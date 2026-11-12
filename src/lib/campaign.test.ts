@@ -41,7 +41,7 @@ test('mineração exige picareta e proximidade e respeita a recarga',()=>{
  reset();
  const vein=ORE_VEINS[0];
  const game=()=>useGame.getState();
- assert.ok(findPath([0,5],[vein.x,vein.z],false,false).length);
+ assert.ok(findPath([0,5],[vein.x,vein.z]).length);
  game().gather(vein.id);
  assert.ok(!game().hero.inventory.includes(vein.item));
  useGame.setState(s=>({hero:{...s.hero,position:[vein.x,vein.z],gold:100}}));

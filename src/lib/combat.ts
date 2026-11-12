@@ -2,9 +2,10 @@ import {isCaster,BASIC_ATTACK_COST} from './attributes';
 import {NULLARION_SCALE,type MonsterKind} from './campaign';
 import {INSTANCES,type InstanceId} from './instances';
 import { ITEMS,stats, type HeroData } from './game';
-import { activeEquipment } from './equipment';
-import { bandFor,LEVEL_BANDS } from './catalogue';
-import { SKILLS,effectiveSkillRank } from './skills';
+import { activeEquipment, removeItems } from './equipment';
+import { bandFor,HUNTER_ARROW,LEVEL_BANDS } from './catalogue';
+import { SKILLS,classPowerRequirement,effectiveSkillRank } from './skills';
+import { ATTACK_RANGE, type CombatAction } from './combatEffects';
 import { specOf, SPEC_EFFECT } from './adventure';
 export function enemyVitals(kind:MonsterKind,level:number,boss=false){
  const resource=kind==='wraith'||kind==='dragon'?'mp' as const:'stamina' as const;
@@ -13,17 +14,36 @@ export function enemyVitals(kind:MonsterKind,level:number,boss=false){
 }
 /** Poderes dos monstros: aplicados no herói por algumas rodadas. */
 export type HeroStatus={kind:'poison'|'slow'|'freeze'|'burn';turns:number;damage:number};
-export const MONSTER_POWER:Record<MonsterKind,{name:string;kind:HeroStatus['kind']|'charge';every:number}>={spider:{name:'Picada venenosa',kind:'poison',every:3},wolf:{name:'Mordida que atrasa',kind:'slow',every:3},golem:{name:'Golpe de pedra',kind:'slow',every:4},wraith:{name:'Toque congelante',kind:'freeze',every:3},dragon:{name:'Sopro de fogo',kind:'burn',every:3},boar:{name:'Investida',kind:'charge',every:3}};
+export const MONSTER_POWER:Record<MonsterKind,{name:string;kind:HeroStatus['kind']|'charge';every:number}>={spider:{name:'Picada venenosa',kind:'poison',every:3},wolf:{name:'Mordida que atrasa',kind:'slow',every:3},golem:{name:'Golpe de pedra',kind:'slow',every:4},wraith:{name:'Toque congelante',kind:'freeze',every:3},dragon:{name:'Sopro de fogo',kind:'burn',every:3},boar:{name:'Investida',kind:'charge',every:3},stag:{name:'Golpe de galhada',kind:'charge',every:4},frostcat:{name:'Garras da geada',kind:'freeze',every:4},beetle:{name:'Mordida corrosiva',kind:'poison',every:4},basilisk:{name:'Olhar petrificante',kind:'slow',every:3}};
 export const STATUS_NAMES:Record<HeroStatus['kind'],string>={poison:'Envenenado',slow:'Lento',freeze:'Congelado',burn:'Queimando'};
 export interface EnemyState{kind?:MonsterKind;turn?:number;heroStatus?:HeroStatus;resource?:'mp'|'stamina';resourceCurrent?:number;resourceMax?:number;instanceId?:InstanceId;id:string;name:string;hp:number;maxHp:number;power:number;reward:number;elite:boolean;level?:number;monsterId?:string;bossId?:string;bleed?:{damage:number;turns:number};phase?:2;rare?:number}
+export function basicAttack(hero: HeroData) {
+ const gear=activeEquipment(hero,ITEMS);
+ const weapon=gear.find(item=>item.slot==='weapon'||item.slot==='twohand');
+ const bow=weapon?.visual==='bow';
+ const caster=!!weapon&&isCaster(hero.classId)&&!classPowerRequirement(hero);
+ const ranged=caster||hero.classId==='hunter'&&!!weapon;
+ const resource=caster?'mp':'stamina';
+ return { weapon,bow,range:ranged?ATTACK_RANGE[hero.classId]:4,resource,cost:BASIC_ATTACK_COST[resource] } as const;
+}
+export function attackRange(hero: HeroData, action?: CombatAction) {
+ return action?.kind==='power'&&!classPowerRequirement(hero)
+  || action?.kind==='skill'&&action.skill&&effectiveSkillRank(hero,action.skill)>0
+  ? ATTACK_RANGE[hero.classId] : basicAttack(hero).range;
+}
 export function resolveCombat(hero:HeroData,enemy:EnemyState,options:{skillId?:string;starter?:boolean;attackBuff?:number;defenseBuff?:number;criticalRoll?:number}={}){
  const st=stats(hero),skill=options.skillId?SKILLS[options.skillId]:undefined;const rank=skill?effectiveSkillRank(hero,skill.id):1;
  if(options.skillId&&(!skill||skill.classId!==hero.classId||skill.kind!=='active'||!rank||hero.level<skill.minLevel))return{hero,enemy,error:'Habilidade indisponível',won:false,dead:false,damage:0,received:0};
- const casterBasic=!skill&&!options.starter&&isCaster(hero.classId);const resource=skill?.resource??(options.starter||casterBasic?'mp':'stamina');const cost=skill?.cost??(options.starter?18:casterBasic?BASIC_ATTACK_COST.mp:BASIC_ATTACK_COST.stamina);
+ const powerLock=options.starter?classPowerRequirement(hero):undefined;
+ if(powerLock)return{hero,enemy,error:powerLock,won:false,dead:false,damage:0,received:0};
+ const basic=basicAttack(hero),normal=!skill&&!options.starter;
+ const resource=skill?.resource??(options.starter?'mp':basic.resource);
+ const cost=skill?.cost??(options.starter?18:basic.cost);
+ const inventory=normal&&basic.bow?removeItems(hero.inventory,{[HUNTER_ARROW]:1}):hero.inventory;
+ if(!inventory)return{hero,enemy,error:'Sem flechas. Reponha a munição ou desequipe o arco.',won:false,dead:false,damage:0,received:0};
  if(hero[resource]<cost)return{hero,enemy,error:resource==='mp'?'MP insuficiente':'Estamina insuficiente',won:false,dead:false,damage:0,received:0};
  const power=st.attack+(options.attackBuff??0);const scale=1+(rank-1)*.14;
- const ranged=hero.classId==='hunter'&&activeEquipment(hero,ITEMS).some(i=>i.category==='weapon');
- const pet=ranged?Math.max(5,st.companion):0;
+ const pet=st.companion;
  const dot=enemy.bleed&&enemy.bleed.turns>0?enemy.bleed.damage:0;
  // Lento ou congelado: o herói bate mais fraco enquanto o efeito durar.
  const status=enemy.heroStatus&&enemy.heroStatus.turns>0?enemy.heroStatus:undefined,weaken=status?.kind==='freeze'?.5:status?.kind==='slow'?.75:1;
@@ -31,7 +51,7 @@ export function resolveCombat(hero:HeroData,enemy:EnemyState,options:{skillId?:s
  const critical=(options.criticalRoll??1)<Math.min(.25,.05+st.dexterity*.002);
  const damage=Math.max(0,Math.round((power*(skill?skill.damage*scale:options.starter?1.8*(specFx?.powerDamage??1):1)+pet)*weaken*(critical?1.5:1)+dot));
  const hp=Math.max(0,enemy.hp-damage);
- const next={...hero,[resource]:hero[resource]-cost};
+ const next={...hero,inventory,[resource]:hero[resource]-cost};
  const heal=(skill?Math.round(st.maxHp*skill.heal*scale):options.starter&&['paladin','prophet','shaman'].includes(hero.classId)?Math.round(st.maxHp*(hero.classId==='paladin'?.07:.24)):0)+(options.starter&&specFx?Math.round(st.maxHp*specFx.powerHeal):0);
  // Chefes e raros têm duas fases: abaixo da metade da vida, ficam furiosos (batem 30% mais e usam o poder mais vezes).
  const enraged=enemy.phase===2,phaseChange=!!enemy.elite&&!enraged&&hp>0&&hp<=enemy.maxHp/2;
@@ -49,11 +69,12 @@ export function resolveCombat(hero:HeroData,enemy:EnemyState,options:{skillId?:s
  next.hp=Math.min(st.maxHp,Math.max(0,next.hp+heal+steal-received));
  if(skill?.restore){next.mp=Math.min(st.maxMp,next.mp+Math.floor(st.maxMp*skill.restore));next.stamina=Math.min(st.maxStamina,next.stamina+Math.floor(st.maxStamina*skill.restore));}
  const bleed=skill?.bleed?{damage:Math.max(1,Math.round(power*skill.bleed*scale)),turns:2}:enemy.bleed&&enemy.bleed.turns>1?{...enemy.bleed,turns:enemy.bleed.turns-1}:undefined;
- return{hero:next,enemy:{...enemy,hp,bleed,resourceCurrent,turn,heroStatus:hp>0?heroStatus:undefined,...(enraged||phaseChange?{phase:2 as const}:{})},phaseChange,error:undefined,won:hp===0,dead:next.hp===0,damage,received,critical,enemySkill:special&&power2?power2.name:undefined,enemyPower:special&&power2?power2.kind:undefined};
+ return{hero:next,companionStrike:pet>0,basicEffect:normal?(basic.bow?'arrow':basic.weapon?'slash':'punch') as 'arrow'|'slash'|'punch':undefined,enemy:{...enemy,hp,bleed,resourceCurrent,turn,heroStatus:hp>0?heroStatus:undefined,...(enraged||phaseChange?{phase:2 as const}:{})},phaseChange,error:undefined,won:hp===0,dead:next.hp===0,damage,received,critical,enemySkill:special&&power2?power2.name:undefined,enemyPower:special&&power2?power2.kind:undefined};
 }
 export function battleRewards(hero:HeroData,enemy:EnemyState){
  const level=enemy.level??hero.level;const tier=bandFor(level),band=LEVEL_BANDS[tier];const drops:string[]=[];
  for(const kind of ['ore','wood','leather','cloth','crystal','parts']){const count=kind==='ore'||kind==='crystal'?enemy.elite?3:1:((hero.kills+tier)%3===0?1:0);for(let i=0;i<count;i++)drops.push(`mat-${kind}-${band}`);}
+ if(hero.classId==='hunter')drops.push(...Array<string>(4).fill(HUNTER_ARROW));
  if(enemy.elite||hero.kills%4===3){const pool=Object.values(ITEMS).filter(i=>i.minLevel<=level&&i.minLevel>=band&&i.source!=='trophy'&&i.source!=='chest'&&i.source!=='forge'&&i.category!=='material'&&i.slot!=='consumable'&&(!i.classId||i.classId===hero.classId)&&(!i.classes||i.classes.includes(hero.classId)));if(pool.length)drops.push(pool[hero.kills%pool.length].id);}
  if(enemy.bossId==='boss-master'&&!hero.inventory.includes(NULLARION_SCALE))drops.push(NULLARION_SCALE);
  if(enemy.elite)drops.push(`trophy-${Math.min(7,Math.floor((level-1)/7))}`);

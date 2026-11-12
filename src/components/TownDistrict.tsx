@@ -8,7 +8,7 @@ import {CITADEL_SECTORS,FENCES,PROPS,ROADS,type Prop,type TownService} from '@/l
 
 import {cursorOn} from '@/lib/cursor';
 
-const ROAD='#a5adba',TRAIL='#c4a36e',WOOD='#9a6a40',WOOD_DARK='#6e4a2c',STONE='#b9b4a2',ROOF=['#d9644f','#3f86b8','#e1a73b'];
+const ROAD='#a5adba',TRAIL='#c4a36e',WOOD='#9a6a40',WOOD_DARK='#6e4a2c',STONE='#b9b4a2';
 const std=(color:string,extra:Partial<THREE.MeshStandardMaterialParameters>={})=><meshStandardMaterial color={color} roughness={.85} {...extra}/>;
 
 /** Estradas e trilhas: faixas planas com pontas arredondadas, clicáveis para andar. */
@@ -30,13 +30,6 @@ function LampPosts({lit}:{lit:boolean}){
  const points=useMemo(()=>PROPS.filter(p=>p.kind==='lamp'),[]);
  return <group>{LAMP_PARTS.map((part,i)=><InstancedParts key={i} points={points} geo={part.geo} y={part.y}>{part.lit?std(lit?'#ffe08a':'#6c6f74',{emissive:lit?'#ffb43a':'#000000',emissiveIntensity:lit?1.6:0}):std('#3d4350',i===0?{metalness:.4}:{})}</InstancedParts>)}
   {lit&&<InstancedParts points={points} geo={LAMP_GLOW} y={2.3}><meshBasicMaterial color="#ffd36b" transparent opacity={.22} depthWrite={false}/></InstancedParts>}</group>;
-}
-function Stall({open,index}:{open:boolean;index:number}){
- const goods=['#e05d4f','#f2c14e','#7fbf5a','#7a8fe0','#e58fc0'];
- return <group><mesh position={[0,.55,0]} castShadow receiveShadow><boxGeometry args={[2,1.1,1]}/>{std(WOOD)}</mesh>
-  {[-.9,.9].map(x=><mesh key={x} position={[x,1.3,-.4]}><cylinderGeometry args={[.06,.06,2.6,6]}/>{std(WOOD_DARK)}</mesh>)}
-  <mesh position={[0,2.55,0]} rotation={[.25,0,0]} castShadow><boxGeometry args={[2.3,.08,1.5]}/>{std(open?ROOF[index%3]:'#8c8577')}</mesh>
-  {open?goods.map((c,i)=><mesh key={i} position={[-.75+i*.37,1.22,0]} castShadow><sphereGeometry args={[.15,10,8]}/>{std(c)}</mesh>):<mesh position={[0,1.35,.05]}><boxGeometry args={[2,.5,.9]}/>{std('#a89a80')}</mesh>}</group>;
 }
 function Well({flowing}:{flowing:boolean}){
  const water=useRef<THREE.Mesh>(null);
@@ -67,7 +60,7 @@ function NearbySign({prop}:{prop:Prop}){
 function PropModel({prop,unlocked}:{prop:Prop;unlocked:boolean}){
  switch(prop.kind){
   case 'lamp':return null; // desenhados juntos em LampPosts
-  case 'stall':return <Stall open={unlocked} index={Number(prop.id.slice(-1))}/>;
+  case 'stall':return null; // CityMarket desenha as bancas interativas.
   case 'well':return <Well flowing={unlocked}/>;
   case 'beacon':return <Beacon lit={unlocked}/>;
   case 'floodgate':return <Floodgate open={unlocked}/>;

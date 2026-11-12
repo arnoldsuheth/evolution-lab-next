@@ -24,7 +24,6 @@ const NO_FACE:FaceOptions['look']={beard:0,moustache:0,brows:0,nose:0,ears:0,sca
 /** Preserva as proporções raciais quando as animações definem a escala dos ossos. */
 const clipCache=new WeakMap<THREE.AnimationClip[],THREE.AnimationClip[]>();
 function headFreeClips(clips:THREE.AnimationClip[]){let out=clipCache.get(clips);if(!out){out=clips.map(c=>{const k=c.clone();k.tracks=k.tracks.filter(t=>t.name!=='head.scale'&&!Array.from(COMPACT_LEGS).some(name=>t.name===name+'.scale'));return k;});clipCache.set(clips,out);}return out;}
-const CASTERS=new Set<ClassId>(['mage','prophet','shaman']);
 /** Capuz (armadura): só a cor muda com a raridade. */
 const HOOD_TINT:Record<string,string|undefined>={common:undefined,epic:'#7a52c9',mythic:'#d9a531'};
 const materials=new Map<string,THREE.Material>();
@@ -64,6 +63,7 @@ function ForeignHead({from,host,classId,skin,hair,eyes,tint}:{from:HeroBase;host
 export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairStyle=0,body:bodyShape=2,face=NO_FACE,showHelmet=true,weaponRarity='Comum',gearItems=[],gear,armed,shielded,walking=false,animated=true,combatant=false,preview=false}:{classId:ClassId;race:Race;skin:string;hair?:string;eyes?:string;hairStyle?:number;body?:number;face?:FaceOptions['look'];showHelmet?:boolean;weaponRarity?:string;gearItems?:{slot:string;rarity:string;visual?:string;classId?:ClassId}[];gear:HeroGear;armed:boolean;shielded:boolean;walking?:boolean;animated?:boolean;combatant?:boolean;preview?:boolean}){
  const style=HERO_STYLE[classId],gltf=useGLTF(heroModelUrl(style.base));
  const eventTime=useGame(s=>combatant?s.battleEvent?.time??0:0),hurtTime=useGame(s=>combatant&&s.battleEvent?.received?s.battleEvent.time:0);
+ const punch=useGame(s=>combatant&&s.battleEvent?.basicEffect==='punch');
  const gearKey=gearItems.map(i=>`${i.slot}:${i.rarity}`).join('|'),equipmentLook=useMemo(()=>gearLook(gearKey?gearKey.split('|').map(e=>{const [slot,rarity]=e.split(':');return {slot,rarity};}):[]),[gearKey]);
  const dress=heroDress(classId,gear,hairStyle,showHelmet,race),{outfit,cape,head,extra,covered}=dress,faceKey=JSON.stringify(face);
  // Item equipado manda: arma, escudo e elmo aparecem iguais ao ícone (peças nativas da classe só sem item).
@@ -84,7 +84,8 @@ export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairSty
   const headBone=host?(host as THREE.SkinnedMesh).skeleton.bones.find(b=>b.name==='head'):undefined;
   if(host&&headBone){const skeleton=(host as THREE.SkinnedMesh).skeleton,index=skeleton.bones.indexOf(headBone),kit=buildFaceKit({look:JSON.parse(faceKey),race,covered,extra,hair,skin,dwarfHair:race==='dwarf'?hairStyle:undefined});
    const anchor=new THREE.Group();anchor.name='face-anchor';anchor.matrixAutoUpdate=false;anchor.matrix.copy(skeleton.boneInverses[index]);anchor.add(kit);if(classId==='prophet'&&!covered){const halo=new THREE.Mesh(new THREE.TorusGeometry(.5,.035,8,40),new THREE.MeshStandardMaterial({color:'#f2c75c',emissive:'#a8741c',emissiveIntensity:.6,metalness:.7,roughness:.35}));halo.name='prophet-halo';halo.position.set(0,1.82,-.42);kit.add(halo);}headBone.add(anchor);
-   headBone.scale.set(...(RACE_HEAD_SHAPE[race]??[1,1,1]));}
+   const [headWidth,headHeight,headDepth]=RACE_HEAD_SHAPE[race];
+   headBone.scale.set(headWidth*.91,headHeight*.9,headDepth*.93);}
   if(race==='dwarf')model.traverse(node=>{if(node instanceof THREE.Bone&&COMPACT_LEGS.has(node.name))node.scale.y*=.78;});
   model.updateMatrixWorld(true);
   model.traverse(node=>{if(node instanceof THREE.SkinnedMesh)node.skeleton.update();});
@@ -94,11 +95,23 @@ export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairSty
   attachGearPieces(model,equipmentLook.slots);
   return {scene:model,host};
  },[equipmentLook,gltf.scene,style,classId,race,skin,hair,eyes,bodyShape,armed,shielded,preview,outfit,hat,cape,head,extra,covered,faceKey,hairStyle,weaponRarity,ownWeapon,ownOffhand]);
- // Guerreiro com espada de uma mão segura e golpeia como espada de uma mão.
- const oneHand=weaponItem?.slot==='weapon'&&style.idle==='2H_Melee_Idle';
- const idle=armed?(oneHand?'Idle':style.idle):'Idle',move=walking?HERO_WALK:idle,attack=armed||CASTERS.has(classId)?(oneHand?'1H_Melee_Attack_Chop':style.attack):HERO_PUNCH;
  const wv=weaponItem?.visual??'',ov=offItem?.visual??'';
- return <group><GearAura tier={weaponItem&&rarityTier(weaponItem.rarity)==='mythic'?'mythic':'common'} animated={animated}/><Rig key={scene.uuid} scene={scene} clips={headFreeClips(gltf.animations)} move={move} walking={walking} animated={animated} attack={attack} eventTime={eventTime} hurtTime={hurtTime}/>{weaponItem&&(WEAPON_MESH[wv]?<Suspense fallback={null}><BorrowedPiece piece={WEAPON_MESH[wv]} bone="handslot.r" scene={scene} rarity={weaponItem.rarity} kind="weapon"/></Suspense>:wv&&<SimpleWeapon visual={wv} bone="handslot.r" scene={scene} rarity={weaponItem.rarity}/>)}{offItem&&(OFFHAND_MESH[ov]?<Suspense fallback={null}><BorrowedPiece piece={OFFHAND_MESH[ov]} bone="handslot.l" scene={scene} rarity={offItem.rarity} kind="weapon"/></Suspense>:ov&&<SimpleWeapon visual={ov} bone="handslot.l" scene={scene} rarity={offItem.rarity} small/>)}{wornHat&&headItem&&<Suspense fallback={null}><BorrowedPiece piece={wornHat} bone="head" scene={scene} rarity={headItem.rarity} kind="armor"/></Suspense>}{host&&head!==style.base&&<Suspense fallback={null}><ForeignHead from={head} host={host} classId={classId} skin={skin} hair={hair} eyes={eyes} tint={headKind==='hood'&&headItem?HOOD_TINT[rarityTier(headItem.rarity)]:undefined}/></Suspense>}</group>;
+ const bow=wv==='bow';
+ const twoHandMelee=weaponItem?.slot==='twohand'&&['greatsword','axe','hammer'].includes(wv);
+ const oneHand=weaponItem?.slot==='weapon'&&style.idle==='2H_Melee_Idle';
+ const singleBlade=!!weaponItem&&!offItem&&style.attack.startsWith('Dualwield');
+ const idle=armed?(twoHandMelee?'2H_Melee_Idle':oneHand?'Idle':style.idle):'Idle';
+ const move=walking?HERO_WALK:idle;
+ const attack=punch?HERO_PUNCH:twoHandMelee?'2H_Melee_Attack_Chop':oneHand||singleBlade?'1H_Melee_Attack_Chop':style.attack;
+ const mainMesh=twoHandMelee&&wv==='axe'?{mesh:'2H_Axe',base:'barbarian'} as const:WEAPON_MESH[wv];
+ return <group>
+  <GearAura tier={weaponItem&&rarityTier(weaponItem.rarity)==='mythic'?'mythic':'common'} animated={animated}/>
+  <Rig key={scene.uuid} scene={scene} clips={headFreeClips(gltf.animations)} move={move} walking={walking} animated={animated} attack={attack} eventTime={eventTime} hurtTime={hurtTime}/>
+  {weaponItem&&(mainMesh?<Suspense fallback={null}><BorrowedPiece piece={mainMesh} bone="handslot.r" scene={scene} rarity={weaponItem.rarity} kind="weapon"/></Suspense>:wv&&<SimpleWeapon visual={wv} bone={bow?'handslot.l':'handslot.r'} scene={scene} rarity={weaponItem.rarity}/>)}
+  {offItem&&(OFFHAND_MESH[ov]?<Suspense fallback={null}><BorrowedPiece piece={OFFHAND_MESH[ov]} bone="handslot.l" scene={scene} rarity={offItem.rarity} kind="weapon"/></Suspense>:ov&&<SimpleWeapon visual={ov} bone="handslot.l" scene={scene} rarity={offItem.rarity} small/>)}
+  {wornHat&&headItem&&<Suspense fallback={null}><BorrowedPiece piece={wornHat} bone="head" scene={scene} rarity={headItem.rarity} kind="armor"/></Suspense>}
+  {host&&head!==style.base&&<Suspense fallback={null}><ForeignHead from={head} host={host} classId={classId} skin={skin} hair={hair} eyes={eyes} tint={headKind==='hood'&&headItem?HOOD_TINT[rarityTier(headItem.rarity)]:undefined}/></Suspense>}
+ </group>;
 }
 
 /** Animações presas a uma montagem do modelo; trocar roupa ou arma cria uma montagem nova (sem pose em T). */

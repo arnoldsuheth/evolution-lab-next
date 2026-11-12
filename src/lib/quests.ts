@@ -26,7 +26,7 @@ export const QUESTS: Quest[] = [
 ];
 /** Pontos de coleta: brilham no chão; somem por alguns segundos depois de coletados. */
 export const GATHER_NODES: { id: string; node: GatherKind; x: number; z: number }[] = [
-  ...([[-18, 6], [-21, 1.5], [-12, 16.5], [-27, 15], [17.5, 7.5], [-6, 21], [20, 16], [-30, 3]] as const).map(([x, z], i) => ({ id: 'herb-' + i, node: 'herb' as const, x, z })),
+  ...([[-21, 6], [-21, 1.5], [-12, 16.5], [-27, 15], [14, 8], [-6, 21], [20, 16], [-30, 3]] as const).map(([x, z], i) => ({ id: 'herb-' + i, node: 'herb' as const, x, z })),
   ...([[-6, -20], [4, -22], [-13, -16], [9, -18], [-2, -26]] as const).map(([x, z], i) => ({ id: 'crystal-' + i, node: 'crystal' as const, x, z })),
 ];
 export const GATHER_RESPAWN_MS = 30000, MONSTER_RESPAWN_MS = 40000;

@@ -1,19 +1,20 @@
 import {test} from 'node:test';
 import {strict as assert} from 'node:assert';
-import {freshSave,migrateSave,withXp} from './game';
+import {freshSave,migrateSave,RACE_CLASSES,withXp} from './game';
 import {MONSTERS,NULLARION_SCALE} from './campaign';
 import {mountOf} from './adventure';
-import {cityForRace,CITY_PORTAL,goddardExit,trainerPosition} from './kingdomCities';
+import {cityForRace,CITY_PORTAL,goddardExit,RACIAL_CITIES,trainerHouses,trainerPosition} from './kingdomCities';
 import {findPath,walkable} from './navigation';
 import {useGame} from './store';
+import {guideStop} from './questNavigation';
 
 test('Iron Forge tem três grupos iniciais e caminho até o treinador e a gruta',()=>{
   assert.equal(cityForRace('dwarf'),'iron-forge');
   const trainer=trainerPosition('iron-forge',3)!;
-  assert.ok(findPath([0,5],[...trainer],true,true,'iron-forge').length);
-  assert.ok(findPath([0,5],[17,-7],true,true,'iron-forge').length);
-  assert.deepEqual([...new Set(MONSTERS.filter(m=>m.region==='iron-forge'&&!m.instance).map(m=>m.level))],[1,2,3]);
-  assert.equal(walkable(25,0,true,true,'goddard'),false);
+  assert.ok(findPath([0,5],[...trainer], 'iron-forge').length);
+  assert.ok(findPath([0,5],[33,-17], 'iron-forge').length);
+  assert.deepEqual([...new Set(MONSTERS.filter(m=>m.region==='iron-forge'&&!m.instance&&m.level<=3).map(m=>m.level))],[1,2,3]);
+  assert.equal(walkable(25,0, 'goddard'),false);
 });
 test('um anão nasce em Iron Forge, inicia treinamento e viaja por Goddard',()=>{
   useGame.setState({...freshSave(),encounter:null,challenge:null});
@@ -43,4 +44,31 @@ test('dragão requer nível 80 e escama, e o nível 80 é pós-campanha',()=>{
   assert.equal(veteran.level,80);
   assert.notEqual(mountOf(veteran)?.id,'dragon');
   assert.equal(mountOf({...veteran,inventory:[NULLARION_SCALE]})?.id,'dragon');
+});
+
+test('montaria terrestre pode ser escolhida e permanece após carregar o save',()=>{
+ const save=freshSave();
+ const hero={...save.hero,level:50,created:true};
+ useGame.setState({...save,hero,encounter:null,challenge:null});
+ assert.equal(mountOf(hero)?.id,'boar');
+ useGame.getState().chooseMount('griffin');
+ assert.equal(useGame.getState().hero.selectedMount,undefined);
+ useGame.getState().chooseMount('wolf');
+ const loaded=migrateSave({...save,hero:useGame.getState().hero});
+ assert.equal(mountOf(loaded.hero)?.id,'wolf');
+});
+
+test('cada classe tem casa e acesso pelo mapa da cidade da sua raça', () => {
+  for (const [city, {race}] of Object.entries(RACIAL_CITIES)) {
+    const region=cityForRace(race);
+    const classes=RACE_CLASSES[race];
+    assert.equal(trainerHouses(region).length,classes.length,city);
+    for (const [index, id] of classes.entries()) {
+      const home=trainerHouses(region)[index];
+      const point=[...trainerPosition(region,index)!] as [number,number];
+      assert.ok(findPath([0,5],point, region).length,`${city} · ${id}`);
+      assert.equal(walkable(home.x+home.w,home.z, region),false);
+      assert.deepEqual(guideStop({...freshSave().hero,race,region},{trainer:id})?.point,point);
+    }
+  }
 });

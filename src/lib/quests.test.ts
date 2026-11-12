@@ -8,7 +8,7 @@ import {freshSave} from './game';
 test('missões secundárias são todas de clique (falar, caçar, coletar) e cada uma tem quem entrega',()=>{
  for(const q of QUESTS){assert.ok(NPCS_LIVE.some(n=>n.id===q.giver),q.id);for(const o of q.objectives){assert.ok(['talk','kill','collect'].includes(o.type));if(o.type==='kill'){const targets=MONSTERS.filter(m=>m.region==='aurora'&&!m.instance&&(o.ids?o.ids.includes(m.id):o.kinds!.includes(m.kind)));assert.ok(targets.length>=(o.ids?1:Math.min(o.count,3)),`${q.id}: poucos alvos`);}if(o.type==='collect')assert.ok(GATHER_NODES.filter(n=>n.node===o.node).length>=o.count,`${q.id}: poucos pontos`);}if(q.after)assert.ok(QUESTS.some(p=>p.id===q.after));}
 });
-test('pontos de coleta ficam em lugares caminháveis e alcançáveis',()=>{for(const n of GATHER_NODES){const forest=true;assert.ok(walkable(n.x,n.z,forest,true),n.id);assert.ok(findPath([0,5],[Math.round(n.x),Math.round(n.z)],true,true).length>0,n.id+' sem caminho');}});
+test('pontos de coleta ficam em lugares caminháveis e alcançáveis',()=>{for(const n of GATHER_NODES){assert.ok(walkable(n.x,n.z),n.id);assert.ok(findPath([0,5],[Math.round(n.x),Math.round(n.z)]).length>0,n.id+' sem caminho');}});
 test('ciclo completo: aceitar, progredir, entregar e não repetir',()=>{
  let log=emptyLog();const q=QUESTS.find(q=>q.id==='q-boas-vindas')!;
  assert.equal(questStatus(log,q,1,[]),'available');assert.equal(npcMarker(log,'lovelace',1,[]),'!');

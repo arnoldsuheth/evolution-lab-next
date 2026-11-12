@@ -1,3 +1,4 @@
+import { AURORA_MARKET_UNLOCK, cityMarket } from './cityMarket';
 /**
  * Pedra da Aurora como cidade de verdade: avenidas que ligam as portas, trilhas até os campos de caça
  * e objetos de cidade com colisão. Tudo é dado puro (testado) e o mundo 3D só desenha.
@@ -86,8 +87,6 @@ export const PROPS: Prop[] = [
   // Lanternas da avenida e da entrada sul.
   lamp('lamp-av1', -14, 13.9), lamp('lamp-av2', -26, 13.9), lamp('lamp-av3', 14.5, 10.1), lamp('lamp-av4', 26, 10.1), lamp('lamp-sul1', -3.1, 17), lamp('lamp-sul2', 3.1, 17),
   // Portões da cidade.
-  { id: 'gate-sul', kind: 'gate', x: 0, z: 19.4, radius: 0, label: 'Cidadela do Conhecimento' },
-  { id: 'gate-norte', kind: 'gate', x: 0, z: -11.2, radius: 0, label: 'Floresta das Variáveis' },
   // Armazém de Borin: caixas se enchem com a runa das operações.
   { id: 'crates', kind: 'crate', x: -9.4, z: .3, radius: .9, unlock: 'arithmetic' },
   { id: 'barrels', kind: 'barrel', x: -11.6, z: 9.2, radius: .7 },
@@ -96,10 +95,7 @@ export const PROPS: Prop[] = [
   { id: 'floodgate', kind: 'floodgate', x: 14.2, z: -16, radius: 0, unlock: 'conditions' },
   // Poço dos ecos: a água volta a correr com a runa das funções.
   { id: 'well', kind: 'well', x: -5.6, z: 15.6, radius: 1.0, unlock: 'functions' },
-  // Mercado: as bancas abrem com a runa dos arrays (uma lista de mercadorias).
-  { id: 'stall-1', kind: 'stall', x: -15, z: 16, radius: 1.3, unlock: 'arrays' },
-  { id: 'stall-2', kind: 'stall', x: -19.5, z: 16, radius: 1.3, unlock: 'arrays' },
-  { id: 'stall-3', kind: 'stall', x: -24, z: 16, radius: 1.3, unlock: 'arrays' },
+  ...cityMarket('aurora').map(({id, point:[x,z]}): Prop => ({ id: `stall-${id}`, kind: 'stall', x, z, radius: 0, unlock: AURORA_MARKET_UNLOCK })),
   // Quadro do guardião: a ficha dos heróis aparece com a runa dos objetos.
   { id: 'board', kind: 'board', x: 6.8, z: 8.4, radius: .5, unlock: 'objects', label: 'Registro dos heróis' },
   // Farol das sentinelas: acende com a runa da depuração.
@@ -124,12 +120,12 @@ export function townBlocked(x: number, z: number) {
 
 /** O que cada runa muda no mundo (aparece no aviso, no mapa e no próprio cenário). */
 export const WORLD_UNLOCKS: { lesson: string; title: string; text: string; x: number; z: number }[] = [
-  { lesson: 'variables', title: 'As lanternas acenderam!', text: 'As lanternas da praça e da avenida ganharam luz, e a trilha da floresta se abriu.', x: 0, z: 6 },
+  { lesson: 'variables', title: 'As lanternas acenderam!', text: 'As lanternas da praça e da avenida ganharam luz, e os encontros da floresta foram liberados.', x: 0, z: 6 },
   { lesson: 'arithmetic', title: 'O armazém de Borin encheu', text: 'As contas fecharam: caixas de suprimentos chegaram à oficina de Borin.', x: -9.4, z: .3 },
   { lesson: 'conditions', title: 'A comporta se abriu', text: 'A comporta decidiu: há energia suficiente. O caminho das minas está livre.', x: 14.2, z: -16 },
   { lesson: 'loops', title: 'A trilha iluminada', text: 'Uma lanterna para cada volta do laço: a trilha da floresta brilha à noite.', x: 0, z: -18 },
   { lesson: 'functions', title: 'O poço dos ecos voltou', text: 'A função devolveu a água: o poço da avenida voltou a correr.', x: -5.6, z: 15.6 },
-  { lesson: 'arrays', title: 'O mercado abriu', text: 'Uma lista de mercadorias: as bancas do mercado abriram na avenida.', x: -19.5, z: 16 },
+  { lesson: 'arrays', title: 'O mercado abriu', text: 'Uma lista de mercadorias: as bancas do mercado abriram ao sul da cidadela.', x: -14, z: 18 },
   { lesson: 'objects', title: 'O registro dos heróis', text: 'Sua ficha de herói foi pendurada no quadro da praça.', x: 6.8, z: 8.4 },
   { lesson: 'debug', title: 'O farol das sentinelas', text: 'Você achou o erro do limite: o farol voltou a vigiar a estrada das minas.', x: 13.6, z: -11.3 },
 ];

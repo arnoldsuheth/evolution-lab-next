@@ -34,6 +34,12 @@ for(const classId of Object.keys(names)as ClassId[])for(let branch=0;branch<3;br
  const description=active?[damage?`Dano ${Math.round(damage*100)}% do ATQ`:null,heal?`cura ${Math.round(heal*100)}% da vida máxima`:null,guard?`reduz a próxima reação em ${Math.round(guard*100)}%`:null,stun?'impede a próxima reação':null,bleed?'sangramento por 2 ações':null,restore?'recupera parte da reserva':null,buff?`bênção +${buff.amount} ${buff.kind==='attack'?'ATQ':'DEF'} por ${buff.duration}s`:null].filter(Boolean).join(' · '):Object.entries(passive).map(([k,v])=>`+${v} ${({attack:'ATQ',defense:'DEF',hp:'HP máximo',mp:'MP máximo',stamina:'EST máxima',companion:'dano do companheiro',craftDiscount:'% de desconto de fabricação',lifesteal:'% de roubo de vida'}as Record<string,string>)[k]}`).join(' · ');
  SKILLS[id]={id,classId,branch,tier,name:names[classId][branch][tier],minLevel:[2,8,16,28,42][tier],maxRank:active?3:5,parent:tier?`${classId}-${branch}-${tier-1}`:undefined,kind:active?'active':'passive',resource,cost:active?12+tier*5:0,cooldown:active?4+tier*2:0,description,passive:active?undefined:passive,damage,heal,guard,stun,bleed,restore,buff};
 }
+export const CLASS_POWER_LEVEL = SKILLS['hunter-0-1'].minLevel;
+export function classPowerRequirement(hero: HeroData): string | undefined {
+ if(hero.level<CLASS_POWER_LEVEL)return `Poder da classe disponível no nível ${CLASS_POWER_LEVEL}.`;
+ if(hero.classInitiated===false)return 'Conclua a iniciação com o treinador.';
+ return undefined;
+}
 export function skillRank(hero:HeroData,id:string){return Math.max(0,Math.min(SKILLS[id]?.maxRank??0,Math.floor(hero.skills?.[id]??0)));}
 export function spentSkillPoints(hero:HeroData){return Object.values(SKILLS).filter(s=>s.classId===hero.classId).reduce((n,s)=>n+skillRank(hero,s.id),0)+hero.talents.reduce((a,b)=>a+b,0);}
 export function availableSkillPoints(hero:HeroData){return Math.max(0,hero.level-1-spentSkillPoints(hero));}
