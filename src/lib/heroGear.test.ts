@@ -21,7 +21,7 @@ test('elmo no boneco segue a mesma regra do ícone',()=>{
 });
 
 test('toda arma do catálogo tem como aparecer no boneco',()=>{
- const simple=new Set(['hammer','tool','bow','gun','focus','gadget','sword','greatsword','dagger','axe','staff','wand','crossbow','shield']);
+ const simple=new Set(['club','slingshot','hammer','tool','bow','gun','focus','gadget','sword','greatsword','dagger','axe','staff','wand','crossbow','shield']);
  for(const item of Object.values(ITEMS).filter(i=>['weapon','twohand','offhand'].includes(i.slot)))
   assert.ok(WEAPON_MESH[item.visual]||OFFHAND_MESH[item.visual]||simple.has(item.visual),`${item.id}: ${item.visual}`);
 });

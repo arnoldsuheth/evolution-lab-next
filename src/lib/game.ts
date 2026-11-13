@@ -91,6 +91,18 @@ export function grantHunterStarterGear(hero: HeroData): HeroData {
     equipped,
   };
 }
+/** Todo herói começa com uma arma simples da classe (até o nível 5, se não tiver nenhuma arma usável). */
+export function grantStarterWeapon(hero: HeroData): HeroData {
+  if (!hero.created || hero.dead || hero.classId === 'hunter' || hero.level > 5) return hero;
+  const id = 'starter-' + hero.classId, item = ITEMS[id];
+  if (!item || hero.inventory.includes(id)) return hero;
+  const usable = hero.inventory.some(owned => { const it = ITEMS[owned]; return it?.category === 'weapon' && (it.slot === 'weapon' || it.slot === 'twohand') && hero.durability?.[owned] !== 0 && !itemRequirement(hero, it); });
+  if (usable) return hero;
+  const extra = (hero.classId === 'paladin' || hero.classId === 'warrior') && !hero.inventory.includes('starter-buckler') && !hero.equipped.some(e => ITEMS[e]?.slot === 'offhand') ? ['starter-buckler'] : [];
+  return { ...hero, inventory: [...hero.inventory, id, ...extra], equipped: [...hero.equipped.filter(e => !['weapon', 'twohand'].includes(ITEMS[e]?.slot)), id, ...extra] };
+}
+/** Equipamento inicial de qualquer classe (arco e flechas do caçador, arma simples dos outros). */
+export const grantStarterGear = (hero: HeroData): HeroData => grantStarterWeapon(grantHunterStarterGear(hero));
 const HUNTER_COMPANIONS = ['wolf', 'fox', 'owl', 'boar', 'lynx', 'crystal'] as const;
 export type HunterCompanion = typeof HUNTER_COMPANIONS[number];
 

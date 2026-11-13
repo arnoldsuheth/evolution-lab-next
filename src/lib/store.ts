@@ -21,7 +21,7 @@ import {forgeStep,forgeId,bandFor,LEVEL_BANDS} from "./catalogue";
 import {recoverResources} from "./recovery";
 import { HOTBAR_SIZE } from './controls';
 import {MONSTERS,REGIONS,SAFE_TOWN_RADIUS,campaignGate,regionRequirement,monsterRequirement,type RegionId} from "./campaign";
-import { adventureOf, ensureDaily, progressDaily, dailyWants, dailyReward, DAILY_POOL, HEARTH_MS, accrueRest, restBonus, addRep, factionOf, repPercent, discounted, newAchievements, unlockedPets, SPECS, SPEC_LEVEL, specChangeCost, rareNow, MOUNT_LEVEL, MOUNTS, mountAvailable, mountOf, type MountId, type PetId } from "./adventure";
+import { specOf, SPEC_FX, adventureOf, ensureDaily, progressDaily, dailyWants, dailyReward, DAILY_POOL, HEARTH_MS, accrueRest, restBonus, addRep, factionOf, repPercent, discounted, newAchievements, unlockedPets, SPECS, SPEC_LEVEL, specChangeCost, rareNow, MOUNT_LEVEL, MOUNTS, mountAvailable, mountOf, type MountId, type PetId } from "./adventure";
 import { DOORS, doorBetween, tryDoor } from "./dungeon";
 import { CODE_SPOTS, spotAvailable } from "./codeSpots";
 import { friendlyLock } from "./apprentice";
@@ -38,7 +38,7 @@ import { hitWeight, type HitTier } from "./impact";
 import { type CombatAction, type EffectKind } from "./combatEffects";
 import { NEXUS_SECONDS, cleanNexus, nexusFull } from "./nexus";
 import { QUESTS, GATHER_NODES, GATHER_RESPAWN_MS, MONSTER_RESPAWN_MS, acceptQuest as acceptLog, progressQuests, turnInQuest as turnInLog, cleanLog, goal, type QuestEvent } from "./quests";
-import { CLASSES, ITEMS, LESSONS, evaluateLesson, freshHero, freshSave, grantHunterStarterGear, migrateSave, stats, withXp, type SaveData, type ClassId, type Look, type Settings, type Race, validRaceClass, raceForClass } from "./game";
+import { CLASSES, ITEMS, LESSONS, evaluateLesson, freshHero, freshSave, grantStarterGear, migrateSave, stats, withXp, type SaveData, type ClassId, type Look, type Settings, type Race, validRaceClass, raceForClass } from "./game";
 /** Serviços da vila (banco, carroça): só dentro da Pedra da Aurora, fora de masmorra. */
 const atForge=(hero:{instance?:string|null;region:RegionId;position:[number,number]})=>!hero.instance&&(hero.region==='aurora'
   ?Math.hypot(hero.position[0]+7,hero.position[1])<=8
@@ -131,7 +131,8 @@ function executeBattle(id:string|undefined,starter:boolean,set:(value:Partial<Ga
  result.hero={...result.hero,durability:{...result.hero.durability,...Object.fromEntries(s.hero.equipped.filter(id=>ITEMS[id]&&ITEMS[id].slot!=="pet").map(id=>[id,Math.max(0,(s.hero.durability?.[id]??100)-1)]))}};
  const target=MONSTERS.find(m=>m.id===enemy.monsterId);
  const kindNow=(id?'skill':starter?'power':'attack') as 'attack'|'power'|'skill',supremoNext=supremo?0:Math.min(SUPREMO_MAX,s.supremo+supremoGain(kindNow,!!result.critical));
- const feedback={supremo:supremoNext,lastSkill:id?{id,time:t0}:s.lastSkill,battleEvent:{combo,supremo,weight:hitWeight({damage:result.damage,maxHp:enemy.maxHp,critical:!!result.critical,kind:id?'skill':starter?'power':'attack',won:result.won}),critical:!!result.critical,companionStrike:!!target&&result.companionStrike,time:Date.now(),damage:result.damage,received:result.received,x:enemy.position?.[0]??target?.x??s.hero.position[0],z:enemy.position?.[1]??target?.z??s.hero.position[1],tone:id||starter?CLASSES[s.hero.classId].color:'#efd49a',kind:(id?'skill':starter?'power':'attack') as 'attack'|'power'|'skill',classId:s.hero.classId,basicEffect:result.basicEffect,skill:id,hx:s.hero.position[0],hz:s.hero.position[1],won:result.won,enemySkill:result.enemySkill,enemyPower:result.enemyPower}};
+ const specElement=specOf(s.hero)?.element,specFx=specElement?SPEC_FX[specElement]:undefined;
+ const feedback={supremo:supremoNext,lastSkill:id?{id,time:t0}:s.lastSkill,battleEvent:{combo,supremo,weight:hitWeight({damage:result.damage,maxHp:enemy.maxHp,critical:!!result.critical,kind:id?'skill':starter?'power':'attack',won:result.won}),critical:!!result.critical,companionStrike:!!target&&result.companionStrike,time:Date.now(),damage:result.damage,received:result.received,x:enemy.position?.[0]??target?.x??s.hero.position[0],z:enemy.position?.[1]??target?.z??s.hero.position[1],tone:starter&&specFx?specFx.tone:id||starter?CLASSES[s.hero.classId].color:'#efd49a',kind:(id?'skill':starter?'power':'attack') as 'attack'|'power'|'skill',classId:s.hero.classId,basicEffect:starter&&specFx?specFx.effect:result.basicEffect,skill:id,hx:s.hero.position[0],hz:s.hero.position[1],won:result.won,enemySkill:result.enemySkill,enemyPower:result.enemyPower}};
  const skillBuff=id?SKILLS[id].buff:undefined;
  const effects=skillBuff?[...s.effects.filter(e=>e.kind!==skillBuff.kind),{kind:skillBuff.kind,amount:Math.round(skillBuff.amount*(1+(skillRank(s.hero,id!)-1)*.14)),remaining:skillBuff.duration}]:s.effects;
  const now=Date.now(),cooldowns={...s.cooldowns,...(id?{[id]:now+SKILLS[id].cooldown*1000}:{})};
@@ -161,7 +162,7 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     if(index<0||!spot||Math.hypot(h.position[0]-spot[0],h.position[1]-spot[1])>3.6)return;
     if(h.classInitiated!==false){set({notice:`Caminho de ${CLASSES[h.classId].name} já iniciado.`});return;}
     if(h.classTrial?.id===id&&h.classTrial.kills>=3){
-      const hero=grantHunterStarterGear({...h,classId:id,classTrial:undefined,classInitiated:true,hotbar:[],skills:{},talents:[0,0,0]});
+      const hero=grantStarterGear({...h,classId:id,classTrial:undefined,classInitiated:true,hotbar:[],skills:{},talents:[0,0,0]});
       set({hero:{...hero,equipped:hero.equipped.filter(item=>!ITEMS[item]||!itemRequirement(hero,ITEMS[item])),hp:Math.min(h.hp,stats(hero).maxHp),mp:Math.min(h.mp,stats(hero).maxMp)},notice:`Classe liberada: ${CLASSES[id].name}.`});return;
     }
     if(h.classTrial?.id===id){set({notice:`Prova de ${CLASSES[id].name}: ${h.classTrial.kills}/3 criaturas. Volte ao treinador ao concluir.`});return;}
@@ -226,9 +227,9 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     const inherited = Math.min(100, s.ancestors.filter(a => !a.claimed).reduce((sum, a) => sum + a.legacy, 0));
     let hero = { ...freshHero(), name: name.trim().slice(0, 30) || "Viajante", classId, race: raceForClass(classId,race), created: true, mode, inherited };
     if(race){hero.region=cityForRace(race);if(hero.region!=="aurora")hero.classInitiated=false;}
-    hero = grantHunterStarterGear(withXp(hero, inherited));
+    hero = grantStarterGear(withXp(hero, inherited));
     hero = { ...hero, hp: stats(hero).maxHp, mp: stats(hero).maxMp };
-    set({ hero, challenge:null, ancestors: s.ancestors.map(a => ({ ...a, claimed: true })), encounter: null, notice: inherited ? `Nova jornada. ${inherited} XP de legado recebidos uma única vez.` : hero.classId === "hunter" ? "Seu arco já está equipado. Você recebeu 40 flechas." : hero.region === "aurora" ? "Sua jornada começa com roupas remendadas. Procure Boole." : "Sua jornada começa com roupas remendadas." });
+    set({ hero, challenge:null, ancestors: s.ancestors.map(a => ({ ...a, claimed: true })), encounter: null, notice: inherited ? `Nova jornada. ${inherited} XP de legado recebidos uma única vez.` : hero.classId === "hunter" ? "Seu arco já está equipado. Você recebeu 40 flechas." : hero.region === "aurora" ? "Você começa com roupas remendadas e uma arma simples. Procure Boole." : "Você começa com roupas remendadas e uma arma simples." });
   },
   customize: look => set(s => ({ look: migrateSave({ ...savedState(s), look: { ...s.look, ...look } }).look })),
   chooseClass: (classId, race) => {

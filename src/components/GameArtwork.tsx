@@ -18,6 +18,8 @@ const paths:Record<string,string>={
  crossbow:'<path d="m16 54 29-39" stroke="#b48852" stroke-width="8"/><path d="M17 13Q42 16 55 39M17 13 35 34 55 39" fill="none" stroke="#c5b275" stroke-width="3"/><path d="m22 42 20-26" stroke="#d8e1cd" stroke-width="2"/>',
  gun:'<path d="m9 47 13-15 14 6-14 19Z" fill="#916747"/><path d="m24 31 27-23 6 7-26 25Z" fill="#9daeb4"/><path d="m20 42 13 7 6-9" fill="none" stroke="#d3b86e" stroke-width="3"/>',
  staff:'<path d="m15 60 23-39" stroke="#936d4b" stroke-width="6"/><path d="m38 5 13 12-13 15-12-15Z" fill="#92c7de" stroke="#e8d49a" stroke-width="2"/><path d="m38 8 2 18-10-10Z" fill="#d9f0ed"/>',
+ club:'<path d="m14 58 18-26" stroke="#8a6646" stroke-width="6"/><path d="M30 34 44 10Q55 8 54 20L38 40Z" fill="#7a5a3c" stroke="#c9a76a" stroke-width="2"/><path d="m47 13 5-3m-2 12 6 1m-14 4-1 6" stroke="#d8d3c6" stroke-width="3"/>',
+ slingshot:'<path d="M32 60V36L20 14m12 22 12-22" fill="none" stroke="#9a7148" stroke-width="6" stroke-linecap="round"/><path d="M20 14Q32 30 44 14" fill="none" stroke="#c2564a" stroke-width="3"/><circle cx="32" cy="24" r="4" fill="#9a958c"/>',
  wand:'<path d="m15 57 29-36" stroke="#ad8a5b" stroke-width="5"/><path d="m46 7 4 9 9 4-9 5-4 10-5-10-10-5 10-4Z" fill="#bfc7ed"/>',
  shield:'<path d="m11 12 21-7 21 7v21Q51 49 32 59 13 49 11 33Z" fill="#718c99" stroke="#d4bd80" stroke-width="4"/><path d="M32 11v41M17 27h30" stroke="#d4bd80" stroke-width="5"/><circle cx="32" cy="27" r="7" fill="#a2d1d3"/>',
  head:'<path d="M14 44V25Q14 7 32 7t18 18v19l-12 8H26Z" fill="#a5b7ba" stroke="#d6bd81" stroke-width="2"/><path d="M20 25h24v11H20Z" fill="#26363c"/><path d="M32 9v38" stroke="#d9c798" stroke-width="5"/>',

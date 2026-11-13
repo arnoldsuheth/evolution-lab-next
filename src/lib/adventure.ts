@@ -144,23 +144,40 @@ export const titleOf = (adv: AdventureState) => ACHIEVEMENTS.find(a => a.id === 
 
 // ── Especialização (nível 10) ───────────────────────────────────────────────────
 export const SPEC_LEVEL = 10;
-export type Spec = { id: string; name: string; style: 'guard' | 'fury'; power: string; description: string };
+export type SpecElement = 'fire' | 'frost' | 'shadow' | 'heal' | 'jungle' | 'astral';
+export type Spec = { id: string; name: string; style: 'guard' | 'fury' | 'shadow'; power: string; description: string; element?: SpecElement };
 const pair = (c: string, guard: [string, string], fury: [string, string]): [Spec, Spec] => [
   { id: c + '-guard', name: guard[0], style: 'guard', power: guard[1], description: 'Defesa +15%, vida +12%. O Poder (R) bate menos, mas cura 12% da vida.' },
   { id: c + '-fury', name: fury[0], style: 'fury', power: fury[1], description: 'Ataque +12%. O Poder (R) causa 35% a mais de dano.' },
 ];
-export const SPECS: Record<ClassId, [Spec, Spec]> = {
+const path = (id: string, name: string, style: Spec['style'], power: string, element: SpecElement, description: string): Spec => ({ id, name, style, power, element, description });
+export const SPECS: Record<ClassId, Spec[]> = {
   paladin: pair('paladin', ['Guardião da Luz', 'Égide Radiante'], ['Cruzado', 'Sentença Solar']),
   warrior: pair('warrior', ['Muralha', 'Grito de Ferro'], ['Berserker', 'Fúria Selvagem']),
   hunter: pair('hunter', ['Mestre das Feras', 'Vínculo Curativo'], ['Atirador', 'Tiro Certeiro']),
   engineer: pair('engineer', ['Blindado', 'Escudo de Engrenagens'], ['Artilheiro', 'Canhão de Pulso']),
-  mage: pair('mage', ['Guardião Rúnico', 'Barreira Arcana'], ['Arcano', 'Cometa Estelar']),
+  // Mago: três caminhos (gelo, fogo e bruxo).
+  mage: [
+    path('mage-guard', 'Mago de Gelo', 'guard', 'Nevasca', 'frost', 'Defesa +15%, vida +12%. O Poder (R) congela: o monstro bate 30% menos naquele golpe.'),
+    path('mage-fury', 'Mago de Fogo', 'fury', 'Cometa Flamejante', 'fire', 'Ataque +12%. O Poder (R) bate 35% mais e deixa o monstro queimando por 3 golpes.'),
+    path('mage-warlock', 'Bruxo', 'shadow', 'Pacto Sombrio', 'shadow', 'Ataque +8%, vida +5%. O Poder (R) rouba 15% do dano como vida.'),
+  ],
   hacker: pair('hacker', ['Sabotador', 'Firewall'], ['Sombra', 'Golpe Invisível']),
   prophet: pair('prophet', ['Luz Curativa', 'Prece Maior'], ['Disciplina', 'Castigo Sagrado']),
   duelist: pair('duelist', ['Esquiva', 'Dança das Lâminas'], ['Lâmina Dançante', 'Corte Final']),
-  shaman: pair('shaman', ['Espíritos', 'Sopro da Vida'], ['Tempestade', 'Relâmpago Ancestral']),
+  // Shaman: cura, selva (corpo a corpo) e astral (magia de longe, totens e natureza verde).
+  shaman: [
+    path('shaman-guard', 'Shaman da Cura', 'guard', 'Sopro da Vida', 'heal', 'Defesa +15%, vida +12%. O Poder (R) cura 12% da vida.'),
+    path('shaman-jungle', 'Shaman da Selva', 'fury', 'Garras da Selva', 'jungle', 'Ataque +12%. Luta de perto: o Poder (R) rasga com garras e bate 15% a mais.'),
+    path('shaman-fury', 'Shaman Astral', 'fury', 'Totem Astral', 'astral', 'Ataque +12%. Magia de longe: o Poder (R) ergue um totem verde que fere por 2 golpes e cura um pouco.'),
+  ],
 };
-export const SPEC_EFFECT = { guard: { attack: 1, defense: 1.15, maxHp: 1.12, powerDamage: .85, powerHeal: .12 }, fury: { attack: 1.12, defense: 1, maxHp: 1, powerDamage: 1.35, powerHeal: 0 } } as const;
+export const SPEC_EFFECT = { guard: { attack: 1, defense: 1.15, maxHp: 1.12, powerDamage: .85, powerHeal: .12 }, fury: { attack: 1.12, defense: 1, maxHp: 1, powerDamage: 1.35, powerHeal: 0 }, shadow: { attack: 1.08, defense: 1, maxHp: 1.05, powerDamage: 1.2, powerHeal: 0 } } as const;
+/** Cor e efeito do Poder (R) em cada caminho com elemento. */
+export const SPEC_FX: Record<SpecElement, { effect: 'star' | 'shadow' | 'heal' | 'cross' | 'storm'; tone: string }> = {
+  fire: { effect: 'star', tone: '#ff6a2a' }, frost: { effect: 'star', tone: '#8fe3ff' }, shadow: { effect: 'shadow', tone: '#9b5cff' },
+  heal: { effect: 'heal', tone: '#b8ffb0' }, jungle: { effect: 'cross', tone: '#6fdc4a' }, astral: { effect: 'storm', tone: '#7dff9a' },
+};
 export function specOf(hero: Pick<HeroData, 'classId' | 'level' | 'adventure'>): Spec | undefined {
   if (hero.level < SPEC_LEVEL) return undefined; const id = hero.adventure?.spec;
   return SPECS[hero.classId].find(s => s.id === id);

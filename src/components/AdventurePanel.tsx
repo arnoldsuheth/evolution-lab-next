@@ -42,7 +42,7 @@ export default function AdventurePanel({ initial = 'daily' }: { initial?: Tab })
     </section>}
 
     {tab === 'spec' && <section className="adventure-spec">
-      {hero.level < SPEC_LEVEL ? <p className="small-note">🔒 No nível {SPEC_LEVEL} você escolhe um dos dois caminhos da sua classe.</p> : <p className="small-note">{SPECS[hero.classId].some(s => s.id === adv.spec) ? <>Trocar custa <Currency value={specChangeCost(hero.level)} />.</> : 'A primeira escolha é grátis.'}</p>}
+      {hero.level < SPEC_LEVEL ? <p className="small-note">🔒 No nível {SPEC_LEVEL} você escolhe um dos caminhos da sua classe (Mago e Shaman têm três).</p> : <p className="small-note">{SPECS[hero.classId].some(s => s.id === adv.spec) ? <>Trocar custa <Currency value={specChangeCost(hero.level)} />.</> : 'A primeira escolha é grátis.'}</p>}
       <div className="spec-choices">{SPECS[hero.classId].map(s => { const mine = adv.spec === s.id;
         return <button key={s.id} className={`spec-card ${s.style} ${mine ? 'chosen' : ''}`} disabled={hero.level < SPEC_LEVEL || mine || hero.dead} onClick={() => useGame.getState().chooseSpec(s.id)}>
           <span aria-hidden>{s.style === 'guard' ? '🛡' : '🔥'}</span><b>{s.name}</b><em>Poder: {s.power}</em><small>{s.description}</small>{mine && <strong>✓ Seu caminho</strong>}
