@@ -9,13 +9,16 @@ import {activeEquipment} from '@/lib/equipment';
 import CloudAccount from './CloudAccount';
 const base = (process.env.NEXT_PUBLIC_BASE_PATH ?? '');
 /** Lovelace · seleção de personagem (prévia 2): lista à esquerda, herói no centro, resumo e "Entrar no reino" à direita. */
+/** 5.0: partículas douradas subindo na tela de início (posições fixas, sem sorteio a cada desenho). */
+const MOTES=Array.from({length:22},(_,i)=>{const size=3+(i*7)%6,dur=9+(i*13)%9;return{left:`${(i*37)%100}%`,width:size,height:size,animationDuration:`${dur}s`,animationDelay:`${-((i*1.7)%dur).toFixed(1)}s`};});
 export default function CharacterSelect({enter}:{enter:()=>void}){
  const state=useGame(),roster=characterSlots(state),[error,setError]=useState(''),[confirm,setConfirm]=useState<number|null>(null);
  const firstHero=roster.slots.findIndex(s=>s?.hero.created),[chosen,setChosen]=useState(firstHero>=0?firstHero:0);
  const picked=roster.slots[chosen],save=picked?.hero.created?picked:null,made=!!save;
  function play(index:number){if(useGame.getState().selectCharacter(index))enter();else setError('Termine o combate ou exercício antes de trocar. Se houver erro no salvamento, preserve uma exportação primeiro.');}
  return <main className="character-select lk-select">
-  <header className="lk-select-top"><div className="lovelace-brand-banner"><Image src={base + "/lovelace-identidade.jpeg"} width={1536} height={1024} alt="Lovelace Kingdom · O Reino do Conhecimento" unoptimized priority /></div><span className="eyebrow">LOVELACE KINGDOM · SUAS CAMPANHAS</span><h1>Escolha sua jornada</h1><p>Cinco personagens. Cada um com sua história, equipamentos e progresso.</p></header>
+  <div className="lk-start-fx" aria-hidden="true"><i className="lk-aurora"/><i className="lk-rune lk-rune-a"/><i className="lk-rune lk-rune-b"/>{MOTES.map((m,i)=><i key={i} className="lk-mote" style={m}/>)}</div>
+  <header className="lk-select-top"><div className="lovelace-brand-banner"><i className="lk-sweep" aria-hidden="true"/><Image src={base + "/lovelace-identidade.jpeg"} width={1536} height={1024} alt="Lovelace Kingdom · O Reino do Conhecimento" unoptimized priority /></div><span className="eyebrow">LOVELACE KINGDOM · SUAS CAMPANHAS</span><h1>Escolha sua jornada</h1><p>Cinco personagens. Cada um com sua história, equipamentos e progresso.</p></header>
   <div className="lk-select-body">
    <section className="lk-roster" aria-label="Selecionar personagem"><h2>Selecionar Personagem</h2>
     <div className="character-slots">{roster.slots.map((s,index)=><div key={index} className={`character-slot ${index===chosen?'chosen':''}`}>
