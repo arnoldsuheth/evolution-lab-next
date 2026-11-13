@@ -52,6 +52,7 @@ import TerrainSurface from "./TerrainSurface";
 import { activeEquipment } from "@/lib/equipment";
 import { CLASSES, ITEMS, hunterCompanion } from "@/lib/game";
 import { useGame } from "@/lib/store";
+import { ContactShadow } from "./GroundFx";
 import { bindCursor, cursorOn, setCombatCursor } from "@/lib/cursor";
 import { isRangedClass } from "@/lib/combatEffects";
 import { attackRange } from "@/lib/combat";
@@ -241,6 +242,11 @@ function Npc({ npc, interact, player, labeled }: { npc: typeof NPCS_LIVE[number]
         || (precursor && (hero.precursorProgress?.[precursor] ?? 0) < PRECURSORS[precursor].quests.length) ? "!" : "");
   });
   const reduced = useGame(s => s.settings.reduceMotion);
+  // 5.0: o NPC respira e vira o rosto para o herói quando ele chega perto (volta devagar quando ele se afasta).
+  const body = useRef<THREE.Group>(null);
+  useFrame((state, dt) => { const b = body.current; if (!b || reduced) return; const t = state.clock.elapsedTime + npc.x * .3;
+    b.scale.y = 1 + Math.sin(t * 1.6) * .012; const dx = player.current.x - npc.x, dz = player.current.z - npc.z, near = Math.hypot(dx, dz) < 6;
+    const goal = near ? Math.atan2(dx, dz) : 0; let diff = goal - b.rotation.y; diff = Math.atan2(Math.sin(diff), Math.cos(diff)); b.rotation.y += diff * Math.min(1, dt * 3); });
   useFrame(state => { const close = Math.hypot(player.current.x - npc.x, player.current.z - npc.z) < 7; if (!root.current) return;
     // Longe do herói o personagem não faz sombra (desenha metade das vezes); confere 2x por segundo.
     if (state.clock.elapsedTime - shade.current > .5) { shade.current = state.clock.elapsedTime; const shadow = Math.hypot(player.current.x - npc.x, player.current.z - npc.z) < 16; root.current.traverse(o => { if (!(o as THREE.Mesh).isMesh) return; if (o.userData.shadow0 === undefined) o.userData.shadow0 = o.castShadow; o.castShadow = shadow && o.userData.shadow0; }); } root.current.rotation.y = close ? Math.atan2(player.current.x - npc.x, player.current.z - npc.z) : Math.sin(state.clock.elapsedTime * 0.15 + npc.x) * 0.3; if (!reduced && npc.id === "pip" && !close) root.current.position.x = Math.sin(state.clock.elapsedTime * 0.45) * 0.5; });
@@ -248,7 +254,7 @@ function Npc({ npc, interact, player, labeled }: { npc: typeof NPCS_LIVE[number]
     {npc.id === "chamber" ? <group position={[0, 1, 0]}>
       <mesh><torusGeometry args={[.82, .1, 8, 28]} /><meshStandardMaterial color="#c9a052" emissive="#62409b" emissiveIntensity={.65} /></mesh>
       <mesh position={[0, -.93, 0]}><boxGeometry args={[1.8, .14, .75]} /><meshStandardMaterial color="#243249" /></mesh>
-    </group> : npc.id === "lion" ? <Crystal /> : <group ref={root} position={[0, 0, 0]}><Character classId={npc.classId} race={npc.id==="borin"?"dwarf":npc.id==="pip"?"gnome":npc.id==="elara"?"elf":npc.id==="dorin"?"dwarf":"human"} skinOverride={npc.id === "pip" ? "#7d9858" : undefined} look={{ ...DEFAULT_LOOK, skin: npc.id === "pip" ? 5 : 1, beard: npc.id === "eldrin" ? 5 : (npc.id === "pip" || npc.id === "lovelace") ? 0 : 3, hair: npc.id === "lovelace" ? 3 : DEFAULT_LOOK.hair, hairColor: npc.id === "eldrin" ? 4 : 2, cloth: npc.id === "lovelace" ? 3 : npc.id === "eldrin" ? 4 : 0, ...PRECURSOR_LOOKS[npc.id] }} equipped={npc.id==="eldrin"?["staff","tunic"]:npc.id==="borin"?["tool","tunic"]:["dagger","tunic"]} animated={!reduced} /></group>}
+    </group> : npc.id === "lion" ? <Crystal /> : <group ref={root} position={[0, 0, 0]}><ContactShadow radius={.75} opacity={.34} /><group ref={body}><Character classId={npc.classId} race={npc.id==="borin"?"dwarf":npc.id==="pip"?"gnome":npc.id==="elara"?"elf":npc.id==="dorin"?"dwarf":"human"} skinOverride={npc.id === "pip" ? "#7d9858" : undefined} look={{ ...DEFAULT_LOOK, skin: npc.id === "pip" ? 5 : 1, beard: npc.id === "eldrin" ? 5 : (npc.id === "pip" || npc.id === "lovelace") ? 0 : 3, hair: npc.id === "lovelace" ? 3 : DEFAULT_LOOK.hair, hairColor: npc.id === "eldrin" ? 4 : 2, cloth: npc.id === "lovelace" ? 3 : npc.id === "eldrin" ? 4 : 0, ...PRECURSOR_LOOKS[npc.id] }} equipped={npc.id==="eldrin"?["staff","tunic"]:npc.id==="borin"?["tool","tunic"]:["dagger","tunic"]} animated={!reduced} /></group></group>}
     {labeled && <Html zIndexRange={[8, 0]} position={[0, npc.id === "borin" || npc.id === "dorin" ? 2.05 : npc.id === "pip" ? 1.6 : 2.85, 0]} center style={{ pointerEvents: "none" }}><div className="npc-label near"><span className="quest-marker main-quest">{marker}</span><strong>{npc.name}</strong></div></Html>}
   </group>;
 }
@@ -606,7 +612,7 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
     {education.includes("loops") && [-1, 1].flatMap(side => [0, 1, 2, 3].map(i => <group key={`lamp-${side}-${i}`} position={[side * 2.8, 0, -14 - i * 3]}><mesh position={[0, 0.7, 0]}><cylinderGeometry args={[0.06, 0.1, 1.4, 6]} /><meshStandardMaterial color="#564a3a" /></mesh><mesh position={[0, 1.5, 0]}><octahedronGeometry args={[0.19]} /><meshStandardMaterial color="#edce8b" emissive="#d4ac57" emissiveIntensity={1.4} /></mesh></group>))}
     </>}
     <group ref={shadowRoot}><mesh rotation={[-Math.PI/2,0,0]}><circleGeometry args={[.48,24]}/><meshBasicMaterial color="#172a39" transparent opacity={.25} depthWrite={false}/></mesh><mesh rotation={[-Math.PI/2,0,0]} position={[0,.003,0]}><ringGeometry args={[.51,.55,24]}/><meshBasicMaterial color="#f8d474" transparent opacity={.55} depthWrite={false}/></mesh></group>
-    <group ref={heroRoot} rotation={[0, thirdPerson ? Math.PI : 0, 0]} position={[hero.position[0], 0, hero.position[1]]}><HeroAura />{!compact&&<Html position={[0,3*heroProportions(hero.race).height*.74+.3,0]} center style={{pointerEvents:"none"}}><span className="player-name">{hero.name}{title&&<small>«{title}»</small>}</span></Html>}{riding&&<group scale={.65}>{airborne&&mountKind!=="dragon"&&hero.flyingMount?<FlyingMount id={hero.flyingMount} reduced={reduced}/>:<MonsterModel kind={mountKind} boss={false} reduced={reduced}/>}</group>}<group position={[0,riding?(mountKind==="dragon"?1.23:.8):0,0]}><Character race={hero.race} classId={hero.classId} look={look} equipped={gear.map(item=>item.id)} level={hero.level} combatant walking={walking&&!riding} animated={!reduced} /></group>
+    <group ref={heroRoot} rotation={[0, thirdPerson ? Math.PI : 0, 0]} position={[hero.position[0], 0, hero.position[1]]}><ContactShadow radius={.8} opacity={.4} /><HeroAura />{!compact&&<Html position={[0,3*heroProportions(hero.race).height*.74+.3,0]} center style={{pointerEvents:"none"}}><span className="player-name">{hero.name}{title&&<small>«{title}»</small>}</span></Html>}{riding&&<group scale={.65}>{airborne&&mountKind!=="dragon"&&hero.flyingMount?<FlyingMount id={hero.flyingMount} reduced={reduced}/>:<MonsterModel kind={mountKind} boss={false} reduced={reduced}/>}</group>}<group position={[0,riding?(mountKind==="dragon"?1.23:.8):0,0]}><Character race={hero.race} classId={hero.classId} look={look} equipped={gear.map(item=>item.id)} level={hero.level} combatant walking={walking&&!riding} animated={!reduced} /></group>
     </group>
     {companion&&!hero.dead&&!airborne&&<PetFollower kind={companion} player={player} reduced={reduced} combat/>}
     {adventure.pet&&!hero.dead&&<PetFollower kind={adventure.pet as PetId} player={player} reduced={reduced}/>}
