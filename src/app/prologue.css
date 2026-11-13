@@ -1,0 +1,98 @@
+/* Prólogo · O Código Perdido (5.0). Tela cheia, legenda grande, controles discretos. */
+.prologue{position:fixed;inset:0;z-index:200;overflow:hidden;color:#f4e9cf;font-family:Inter,system-ui,sans-serif;
+ background:radial-gradient(ellipse at 50% 35%,#231f52 0%,#0e1430 50%,#05070f 100%)}
+.prologue button{font:inherit;cursor:pointer}
+.pro-gate{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px}
+.pro-gate img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.28;filter:blur(2px)}
+.pro-gate>*:not(img){position:relative}
+.pro-kicker{margin:0;letter-spacing:.4em;font-weight:800;font-size:13px;color:#f2d48a}
+.pro-gate h2{margin:0;font:900 clamp(30px,6vw,58px)/1.05 Cinzel,Georgia,serif;color:#fff1c8;text-shadow:0 4px 24px #000}
+.pro-play{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:0 40px;border-radius:999px;border:2px solid #fff1c4;
+ background:linear-gradient(180deg,#f6dc95,#c08d32 60%,#8a6220);color:#2a1a05;font:900 18px Cinzel,Georgia,serif!important;letter-spacing:.1em;animation:lk-pulse 2.4s ease-out infinite}
+.pro-tip{margin:0;font-size:13px;color:#cfc3a6}
+.pro-skip-link{background:none;border:0;color:#d9c79c;text-decoration:underline;min-height:44px}
+.pro-scene{position:absolute;inset:0;display:grid;place-items:center;animation:pro-fade 1.1s ease-out both}
+@keyframes pro-fade{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
+.pro-title{position:absolute;top:max(22px,env(safe-area-inset-top));left:0;right:0;margin:0;text-align:center;font:700 clamp(13px,1.6vw,18px) Cinzel,Georgia,serif;letter-spacing:.28em;color:#f2d48a;text-transform:uppercase;animation:pro-fade 1.4s .3s ease-out both}
+.pro-subtitle{position:absolute;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(900px,calc(100vw - 40px));margin:0;text-align:center;
+ font:600 clamp(16px,2.3vw,26px)/1.4 Inter,system-ui,sans-serif;color:#fff;text-shadow:0 2px 6px #000,0 0 20px #000;animation:pro-sub .6s ease-out both}
+@keyframes pro-sub{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translateX(-50%)}}
+.pro-controls{position:absolute;left:max(14px,env(safe-area-inset-left));right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));display:flex;align-items:center;gap:10px}
+.pro-controls>button{min-width:44px;min-height:44px;border-radius:12px;border:1px solid #c9a24a88;background:#10182ecc;color:#fff1c8}
+.pro-controls .pro-skip{padding:0 16px}
+.pro-controls .pro-enter{padding:0 22px;border:2px solid #fff1c4;background:linear-gradient(180deg,#f6dc95,#c08d32 60%,#8a6220);color:#2a1a05;font-weight:900;letter-spacing:.06em;animation:lk-pulse 2.4s ease-out infinite}
+.pro-progress{flex:1;height:4px;border-radius:999px;background:#ffffff1f;overflow:hidden}
+.pro-progress i{display:block;height:100%;background:linear-gradient(90deg,#8f6fd1,#f2d48a);transition:width .6s ease}
+/* Logo (abertura e final) */
+.pro-logo{position:relative;width:min(760px,86vw)}
+.pro-logo img{display:block;width:100%;height:auto}
+@keyframes pro-logo-in{0%{opacity:0;filter:blur(14px) brightness(2);transform:scale(.92)}60%{opacity:1;filter:blur(0) brightness(1.2)}100%{filter:none;transform:none}}
+.pro-ring{position:absolute;left:50%;top:50%;border-radius:50%;pointer-events:none}
+.pro-ring-a{width:130%;aspect-ratio:1;transform:translate(-50%,-50%);border:1px dashed #f2d48a55;animation:pro-spin 40s linear infinite}
+.pro-ring-b{width:110%;aspect-ratio:1;transform:translate(-50%,-50%);border:2px solid #8f6fd144;animation:pro-spin 55s linear infinite reverse}
+@keyframes pro-spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+/* Tear de Jacquard: cartões perfurados acendendo */
+.pro-loom{display:flex;flex-direction:column;gap:10px;transform:perspective(900px) rotateX(18deg)}
+.pro-card{display:grid;grid-template-columns:repeat(12,1fr);gap:8px;padding:12px 16px;border-radius:6px;background:linear-gradient(180deg,#d9c39a,#b89a6a);box-shadow:0 8px 20px #000a;animation:pro-card 1s ease-out both}
+.pro-card i{width:clamp(10px,2vw,18px);aspect-ratio:1;border-radius:50%;background:#3b2c18;box-shadow:inset 0 2px 3px #0008}
+.pro-card i.on{background:#fff3c4;box-shadow:0 0 12px #f2c14e,0 0 2px #fff;animation:pro-hole 2.4s ease-in-out infinite}
+@keyframes pro-card{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes pro-hole{0%,100%{opacity:.55}50%{opacity:1}}
+.pro-threads{height:60px;margin-top:6px;background:repeating-linear-gradient(90deg,#8f6fd1 0 3px,#c9a24a 3px 6px,#3fb6c8 6px 9px,transparent 9px 14px);opacity:.75;border-radius:4px}
+/* Máquina de Babbage e a Nota G de Ada */
+.pro-engine{position:relative;width:min(820px,92vw);height:min(420px,60vh)}
+.pro-gear{position:absolute;border-radius:50%;border:clamp(10px,2vw,18px) dotted #c9a24a;box-shadow:inset 0 0 0 10px #8a6a2c55,0 0 30px #f2c14e33}
+.pro-gear-a{width:220px;height:220px;left:4%;top:8%;animation:pro-gear 9s linear infinite}
+.pro-gear-b{width:150px;height:150px;left:24%;top:46%;animation:pro-gear 6s linear infinite reverse}
+.pro-gear-c{width:110px;height:110px;left:2%;top:62%;animation:pro-gear 5s linear infinite}
+@keyframes pro-gear{to{transform:rotate(360deg)}}
+.pro-note{position:absolute;right:2%;top:10%;margin:0;padding:22px 26px;border-radius:10px;background:#f1e3c2;color:#3a2810;font:600 clamp(14px,1.8vw,20px)/1.6 Georgia,serif;box-shadow:0 14px 40px #000b;transform:rotate(-2deg);
+ white-space:pre;overflow:hidden;animation:pro-type 5s steps(60) both}
+@keyframes pro-type{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0)}}
+.pro-ada{position:absolute;right:6%;bottom:6%;font:900 clamp(24px,4vw,44px) Cinzel,Georgia,serif;color:#fff1c8;text-shadow:0 0 24px #f2c14e88;animation:pro-fade 1.5s 3s ease-out both}
+/* Runas de Boole */
+.pro-runes{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(14px,3vw,30px)}
+.pro-runes span{display:grid;place-items:center;width:clamp(64px,11vw,120px);aspect-ratio:1;border-radius:50%;border:2px solid #c9a24a;background:radial-gradient(circle,#2c3f66,#0f1a2b 72%);
+ font:900 clamp(26px,5vw,52px) Cinzel,Georgia,serif;color:#fff1c8;animation:pro-rune 1.2s ease-out both}
+@keyframes pro-rune{0%{opacity:0;transform:scale(.6);box-shadow:none}60%{opacity:1;box-shadow:0 0 40px #f2c14ecc}100%{box-shadow:0 0 16px #f2c14e55}}
+/* Nullarion: tudo vira nulo */
+.pro-void{position:relative;width:100%;height:100%;background:radial-gradient(circle at 50% 45%,#3a0b1e,#05070f 70%)}
+.pro-nulls span{position:absolute;top:-30px;font:800 clamp(14px,2vw,22px) ui-monospace,monospace;color:#ff5c7a;text-shadow:0 0 10px #ff2050;animation:pro-null 3.4s linear infinite}
+@keyframes pro-null{0%{transform:translateY(0);opacity:0}10%{opacity:1}100%{transform:translateY(105vh);opacity:.1}}
+.pro-stage3d{position:absolute;left:50%;top:46%;width:min(560px,80vw);height:min(460px,62vh);transform:translate(-50%,-50%)}
+/* Cidades */
+.pro-cities{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;width:min(1100px,94vw)}
+.pro-city{display:flex;flex-direction:column;justify-content:flex-end;width:clamp(130px,17vw,190px);height:clamp(110px,22vh,210px);padding:14px;box-sizing:border-box;border-radius:14px;border:1px solid #c9a24a88;box-shadow:0 12px 30px #000a;animation:pro-card 1s ease-out both}
+.pro-city b{font:800 clamp(14px,1.6vw,18px) Cinzel,Georgia,serif;color:#fff1c8;text-shadow:0 2px 6px #000}
+.pro-city small{color:#e9dcbc}
+.pro-citadel{width:clamp(220px,30vw,320px);background:radial-gradient(circle at 50% 30%,#7fe6f2,#2b4b8a 45%,#0b1020 85%);border:2px solid #f2d48a;box-shadow:0 0 40px #7fe6f266,0 12px 30px #000a;animation-delay:5.6s}
+/* Mestres */
+.pro-masters{display:flex;flex-wrap:wrap;justify-content:center;gap:18px;width:min(1000px,94vw)}
+.pro-master{display:flex;flex-direction:column;gap:8px;width:clamp(200px,28vw,290px);padding:20px;border-radius:16px;border:1px solid #c9a24a;background:linear-gradient(180deg,#1a2944f2,#0d1626f2);box-shadow:0 12px 30px #000a;animation:pro-card 1s ease-out both}
+.pro-master b{font:900 clamp(22px,3vw,32px) Cinzel,Georgia,serif;color:#f2d48a}
+.pro-master small{font-size:clamp(13px,1.4vw,15px);line-height:1.45;color:#e9dcbc}
+/* Chefes */
+.pro-bosses{position:relative;width:100%;height:100%}
+.pro-boss-name{position:absolute;left:0;right:0;top:12%;display:flex;flex-direction:column;align-items:center;gap:4px;animation:pro-fade .8s ease-out both}
+.pro-boss-name b{font:900 clamp(26px,4.5vw,54px) Cinzel,Georgia,serif;color:#ffd0a0;text-shadow:0 0 24px #e0a04088,0 3px 0 #000}
+.pro-boss-name small{letter-spacing:.2em;text-transform:uppercase;color:#e9dcbc}
+/* Coração do Código Perdido */
+.pro-heart{position:relative;width:100%;height:100%}
+.pro-vortex{position:absolute;left:50%;top:46%;width:min(700px,95vw);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+ background:conic-gradient(from 0deg,#7d45ff00,#7d45ff88,#3fb6c855,#7d45ff00,#b0204a66,#7d45ff00);filter:blur(18px);animation:pro-spin 14s linear infinite}
+/* Herói */
+.pro-hero{display:flex;flex-direction:column;align-items:center;gap:14px}
+.pro-hero .hero-portrait{width:min(340px,42vh)!important;height:auto;border-radius:50%;border:3px solid #f2d48a;box-shadow:0 0 0 8px #0a0f1f,0 0 80px #f2c14e77;background:radial-gradient(circle at 50% 38%,#3a3f6b,#141a33)!important;animation:pro-logo-in 2.4s ease-out both}
+.pro-hero>b{font:900 clamp(26px,4vw,44px) Cinzel,Georgia,serif;color:#fff1c8;text-shadow:0 0 24px #f2c14e88}
+/* iPhone deitado: tudo menor, legenda acima dos controles */
+@media (max-height:500px){.pro-logo{width:min(520px,70vw)}.pro-engine{height:70vh}.pro-gear-a{width:140px;height:140px}.pro-gear-b{width:100px;height:100px}.pro-gear-c{width:70px;height:70px}
+ .pro-subtitle{bottom:calc(64px + env(safe-area-inset-bottom));font-size:16px}.pro-stage3d{height:70vh;top:42%}.pro-hero .hero-portrait{width:46vh!important}}
+@media (prefers-reduced-motion:reduce){.prologue *{animation-duration:.01s!important;animation-iteration-count:1!important}}
+/* A imagem da marca é uma folha: mostra só a arte do topo (logo com o castelo). */
+.pro-logo-crop{display:block;aspect-ratio:1536/597;overflow:hidden;border-radius:20px;border:2px solid #c9a24a;box-shadow:0 0 80px #f2c14e44,0 30px 80px #000c;animation:pro-logo-in 3.2s ease-out both}
+.pro-logo-crop img,.pro-logo img{border:0!important;box-shadow:none!important;border-radius:0!important}
+.pro-logo-end .pro-logo-crop{animation:pro-logo-in 2s ease-out both,lk-breathe 9s 2s ease-in-out infinite}
+.pro-gate img{height:150%!important;object-position:50% 0}
+.pro-bosses .pro-stage3d{top:60%}
+.pro-boss-name{top:12%!important}
+@media (max-height:500px){.pro-gate img{height:230%!important}}
