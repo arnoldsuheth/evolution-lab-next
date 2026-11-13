@@ -62,7 +62,7 @@ export default function RacialCity({ city, paused, approach, openService, openSt
     {city==="goddard"&&<>
       {landmark("codex","Salão dos Precursores",4,-10.7,()=>openService("codex"))}
       <group position={[GODDARD_BOOLE[0],0,GODDARD_BOOLE[1]]} {...cursorOn("point")} onClick={e=>activate(e,...GODDARD_BOOLE,openStory)}>
-        <Character classId="mage" race="human" organic look={{...DEFAULT_LOOK,beard:2,hairColor:4}} />
+        <Character classId="mage" race="human" look={{...DEFAULT_LOOK,beard:2,hairColor:4,hair:3}} />
         <Html center position={[0,2.8,0]} style={{pointerEvents:"none"}}><span className="town-sign">Boole · História principal</span></Html>
       </group>
       {landmark("academy","Estudos",-9,-3,()=>openService("academy"))}

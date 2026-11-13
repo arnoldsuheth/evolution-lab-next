@@ -35,6 +35,8 @@ import TownDistrict from "./TownDistrict";
 import FlyingMount from "./FlyingMount";
 import { guideStop, routeToPoint, type GuideRequest } from "@/lib/questNavigation";
 import RacialCity from "./RacialCity";
+import CityFolk from "./CityFolk";
+import OgrimmarDetails from "./OgrimmarDetails";
 import CityRoutes from "./CityRoutes";
 import {insideCity,oppositeGateSide,roadAt,type CityGate} from "@/lib/overland";
 import {isNewCity,isRacialCity} from "@/lib/kingdomCities";
@@ -580,7 +582,7 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
     {!hero.instance&&<CityMarket region={hero.region} paused={paused} approach={approachInteraction} open={openMarket}/>}
     {!hero.instance&&<CityRoutes region={hero.region} paused={paused} ground={groundClick} cross={crossGate}
       followRoad={point=>{endGuide();followRoad(point);}} approach={(x,z,open)=>{endGuide();approachInteraction(x,z,open);}}/>}
-    {!hero.instance&&isNewCity(hero.region)&&<RacialCity city={hero.region} paused={paused} approach={approachInteraction} openService={openService} openStory={()=>interact("eldrin")}/>}<CampaignWorld paused={paused} approach={approachMonster} approachGate={(x,z,open)=>{endGuide();approachInteraction(x,z,open);}}/>{!hero.instance&&hero.region==="aurora"&&<BiomeDetails region="aurora"/>}{!hero.instance&&hero.region==="aurora"&&<SceneDressing quality={low?"low":quality==="high"?"high":"medium"} groundColor={REGIONS.aurora.color}/>}{hero.region==="aurora"&&!hero.instance&&<>
+    {!hero.instance&&isNewCity(hero.region)&&<RacialCity city={hero.region} paused={paused} approach={approachInteraction} openService={openService} openStory={()=>interact("eldrin")}/>}{!hero.instance&&isNewCity(hero.region)&&<CityFolk city={hero.region} low={low}/>}{!hero.instance&&hero.region==="ogrimmar"&&<OgrimmarDetails low={low}/>}<CampaignWorld paused={paused} approach={approachMonster} approachGate={(x,z,open)=>{endGuide();approachInteraction(x,z,open);}}/>{!hero.instance&&hero.region==="aurora"&&<BiomeDetails region="aurora"/>}{!hero.instance&&hero.region==="aurora"&&<SceneDressing quality={low?"low":quality==="high"?"high":"medium"} groundColor={REGIONS.aurora.color}/>}{hero.region==="aurora"&&!hero.instance&&<>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.028, 0]} onClick={groundClick} receiveShadow><circleGeometry args={[PLAZA_RADIUS, 40]} /><PavingMaterial color="#c7b08c" relief={!low} /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[11, 0.025, -16]} onClick={groundClick}><planeGeometry args={[25, 3]} /><meshStandardMaterial color="#8e8b76" /></mesh>
     <group position={[0, .04, 0]}>

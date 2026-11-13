@@ -61,7 +61,7 @@ function ForeignHead({from,host,classId,skin,hair,eyes,tint,trim}:{from:HeroBase
  return null;
 }
 
-export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairStyle=0,body:bodyShape=2,face=NO_FACE,showHelmet=true,weaponRarity='Comum',gearItems=[],gear,armed,shielded,walking=false,animated=true,combatant=false,preview=false,feminine=false}:{feminine?:boolean;classId:ClassId;race:Race;skin:string;hair?:string;eyes?:string;hairStyle?:number;body?:number;face?:FaceOptions['look'];showHelmet?:boolean;weaponRarity?:string;gearItems?:{slot:string;rarity:string;visual?:string;classId?:ClassId}[];gear:HeroGear;armed:boolean;shielded:boolean;walking?:boolean;animated?:boolean;combatant?:boolean;preview?:boolean}){
+export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairStyle=0,body:bodyShape=2,face=NO_FACE,showHelmet=true,weaponRarity='Comum',gearItems=[],gear,armed,shielded,walking=false,animated=true,combatant=false,preview=false,feminine=false,celestial=false}:{feminine?:boolean;celestial?:boolean;classId:ClassId;race:Race;skin:string;hair?:string;eyes?:string;hairStyle?:number;body?:number;face?:FaceOptions['look'];showHelmet?:boolean;weaponRarity?:string;gearItems?:{slot:string;rarity:string;visual?:string;classId?:ClassId}[];gear:HeroGear;armed:boolean;shielded:boolean;walking?:boolean;animated?:boolean;combatant?:boolean;preview?:boolean}){
  const style=HERO_STYLE[classId],gltf=useGLTF(heroModelUrl(style.base));
  const eventTime=useGame(s=>combatant?s.battleEvent?.time??0:0),hurtTime=useGame(s=>combatant&&s.battleEvent?.received?s.battleEvent.time:0);
  const punch=useGame(s=>combatant&&s.battleEvent?.basicEffect==='punch');
@@ -88,7 +88,10 @@ export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairSty
   // Peças de rosto presas ao osso da cabeça, no mesmo referencial em que a malha foi modelada.
   const headBone=host?(host as THREE.SkinnedMesh).skeleton.bones.find(b=>b.name==='head'):undefined;
   if(host&&headBone){const skeleton=(host as THREE.SkinnedMesh).skeleton,index=skeleton.bones.indexOf(headBone),kit=buildFaceKit({look:{...JSON.parse(faceKey),...(scalp&&!face.brows?{brows:2}:{})},race,covered,extra,hair,skin,feminine,dwarfHair:race==='dwarf'?hairStyle:undefined});
-   const anchor=new THREE.Group();anchor.name='face-anchor';anchor.matrixAutoUpdate=false;anchor.matrix.copy(skeleton.boneInverses[index]);anchor.add(kit);if(classId==='prophet'&&!covered){const halo=new THREE.Mesh(new THREE.TorusGeometry(.5,.035,8,40),new THREE.MeshStandardMaterial({color:'#f2c75c',emissive:'#a8741c',emissiveIntensity:.6,metalness:.7,roughness:.35}));halo.name='prophet-halo';halo.position.set(0,1.82,-.42);kit.add(halo);}headBone.add(anchor);
+   const anchor=new THREE.Group();anchor.name='face-anchor';anchor.matrixAutoUpdate=false;anchor.matrix.copy(skeleton.boneInverses[index]);anchor.add(kit);if(classId==='prophet'&&!covered){const halo=new THREE.Mesh(new THREE.TorusGeometry(.5,.035,8,40),new THREE.MeshStandardMaterial({color:'#f2c75c',emissive:'#a8741c',emissiveIntensity:.6,metalness:.7,roughness:.35}));halo.name='prophet-halo';halo.position.set(0,1.82,-.42);kit.add(halo);}
+   // Celestiais de Goddard (robôs de IA): auréola deitada sobre a cabeça e um ponto de luz na testa.
+   if(celestial){const ring=new THREE.Mesh(new THREE.TorusGeometry(.36,.04,8,40),new THREE.MeshStandardMaterial({color:'#ffe7a3',emissive:'#ffc94a',emissiveIntensity:1.4,metalness:.5,roughness:.3}));ring.name='celestial-halo';ring.rotation.x=Math.PI/2;ring.position.set(0,2.62,-.04);ring.raycast=()=>null;kit.add(ring);
+    const gem=new THREE.Mesh(new THREE.OctahedronGeometry(.05),new THREE.MeshStandardMaterial({color:'#bff6ff',emissive:'#38d6ff',emissiveIntensity:1.6}));gem.position.set(0,1.98,.5);gem.raycast=()=>null;kit.add(gem);}headBone.add(anchor);
    const [headWidth,headHeight,headDepth]=RACE_HEAD_SHAPE[race];
    headBone.scale.set(headWidth*.91,headHeight*.9,headDepth*.93);}
   if(race==='dwarf')model.traverse(node=>{if(node instanceof THREE.Bone&&COMPACT_LEGS.has(node.name))node.scale.y*=.78;});
@@ -106,7 +109,7 @@ export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairSty
   const tall=BODY_HEIGHT[bodyShape]??1;model.scale.set(scale*width,scale*tall,scale*width);model.position.y=-(body.isEmpty()?0:body.min.y)*scale*tall;
   attachGearPieces(model,equipmentLook.slots);
   return {scene:model,host};
- },[equipmentLook,gltf.scene,style,classId,race,skin,hair,eyes,bodyShape,armed,shielded,preview,outfit,hat,cape,head,extra,covered,faceKey,hairStyle,weaponRarity,ownWeapon,ownOffhand,trimKey,headHair,feminine,scalp,face.brows]);
+ },[equipmentLook,gltf.scene,style,classId,race,skin,hair,eyes,bodyShape,armed,shielded,preview,outfit,hat,cape,head,extra,covered,faceKey,hairStyle,weaponRarity,ownWeapon,ownOffhand,trimKey,headHair,feminine,scalp,face.brows,celestial]);
  const wv=weaponItem?.visual??'',ov=offItem?.visual??'';
  const bow=wv==='bow';
  const twoHandMelee=weaponItem?.slot==='twohand'&&['greatsword','axe','hammer'].includes(wv);

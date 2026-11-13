@@ -29,8 +29,9 @@ function Trainer({race, classId, index, door}: {race:Race;classId:ClassId;index:
     npc.rotation.y=Math.cos(phase)>=0?0:Math.PI;
   });
   return <group ref={model} position={[0,0,door-.28]}>
-    <Character race={race} classId={classId} organic animated={!reduced} walking={!reduced}
-      look={{...DEFAULT_LOOK,body:1+index%4,hair:index%5,hairColor:(index+1)%5,beard:index%2?0:2,skin:index%5}} />
+    {/* Mestres montados igual aos heróis; “Mestra” tem corpo feminino. */}
+    <Character race={race} classId={classId} animated={!reduced} walking={!reduced} equipped={[]}
+      look={{...DEFAULT_LOOK,gender:index%2,body:1+index%4,hair:[1,3,2,5,10,11][index%6],hairColor:(index+1)%5,beard:race==='dwarf'?index%6:index%2?0:2,skin:index%3,face:index%6}} />
   </group>;
 }
 
