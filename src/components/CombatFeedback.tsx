@@ -1,10 +1,12 @@
 "use client";
-import {useRef} from 'react';
-import {useFrame} from '@react-three/fiber';
+import {useEffect,useRef} from 'react';
+import {useFrame,useThree} from '@react-three/fiber';
 import {Html} from '@react-three/drei';
 import * as THREE from 'three';
 import {useGame} from '@/lib/store';
 import {effectFor,EFFECT_SECONDS,ENEMY_POWER_EFFECT,type EffectKind} from '@/lib/combatEffects';
+import {HIT_FEEL} from '@/lib/impact';
+import {lootHighlight} from '@/lib/combat';
 
 /** Material brilhante e transparente, somado à cena (luz de magia). Guardado para reaproveitar entre golpes. */
 const cache=new Map<string,THREE.Material|THREE.BufferGeometry>();
@@ -62,18 +64,42 @@ function Effect({kind,color,from,to,time,delay=0}:{kind:EffectKind;color:string;
  return <group ref={root}/>;
 }
 
-function FloatingDamage({time,amount,position,critical=false,received=false}:{time:number;amount:number;position:[number,number];critical?:boolean;received?:boolean}){
+function FloatingDamage({time,amount,position,critical=false,received=false,scale=1}:{time:number;amount:number;position:[number,number];critical?:boolean;received?:boolean;scale?:number}){
  const label=useRef<HTMLDivElement>(null),finished=useRef(false);
  useFrame(()=>{if(!label.current||finished.current)return;const age=Math.max(0,(Date.now()-time)/1000);if(age>=1.15){label.current.style.opacity="0";finished.current=true;return;}label.current.style.opacity=String(Math.max(0,1-age/1.15));label.current.style.translate=`0 ${-age*45}px`;});
  if(!amount)return null;
- return <Html center position={[position[0],received?2.5:3,position[1]]} zIndexRange={[15,0]} style={{pointerEvents:'none'}}><div ref={label} className={`floating-damage ${received?'damage-received':critical?'critical-hit':'damage-caused'}`} aria-label={`${received?'Dano sofrido':critical?'Dano crítico':'Dano causado'}: ${amount}`}>{critical&&<small>CRÍTICO!</small>}{amount}</div></Html>;
+ return <Html center position={[position[0],received?2.5:3,position[1]]} zIndexRange={[15,0]} style={{pointerEvents:'none'}}><div ref={label} style={{scale:String(scale)}} className={`floating-damage ${received?'damage-received':critical?'critical-hit':'damage-caused'}`} aria-label={`${received?'Dano sofrido':critical?'Dano crítico':'Dano causado'}: ${amount}`}>{critical&&<small>CRÍTICO!</small>}{amount}</div></Html>;
+}
+/** QA26: golpes pesados tremem a tela por um instante (desligado com "reduzir movimento"). */
+function ScreenShake({time,amount}:{time:number;amount:number}){
+ const canvas=useThree(s=>s.gl.domElement),reduced=useGame(s=>s.settings.reduceMotion);
+ useEffect(()=>{
+  if(!amount||reduced||Date.now()-time>300||typeof canvas.animate!=='function'||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;
+  const frames:Keyframe[]=[0,1,2,3,4,5].map(i=>{const k=amount*(1-i/6),a=i*2.4;return{transform:`translate(${(Math.cos(a)*k).toFixed(1)}px,${(Math.sin(a*1.7)*k).toFixed(1)}px)`};});
+  const animation=canvas.animate([...frames,{transform:'translate(0,0)'}],{duration:260,easing:'ease-out'});
+  return()=>animation.cancel();
+ },[time,amount,reduced,canvas]);
+ return null;
+}
+/** QA26: feixe de luz onde o monstro caiu quando o loot tem item Épico (roxo) ou Mítico (dourado). */
+const BEAM_SECONDS=2.6;
+function LootBeam({time,position,tier}:{time:number;position:[number,number];tier:'epico'|'mitico'}){
+ const beam=useRef<THREE.Mesh>(null),ring=useRef<THREE.Mesh>(null),color=tier==='mitico'?'#f2c14e':'#b49bd4';
+ useFrame(()=>{const age=(Date.now()-time)/1000,fade=Math.max(0,1-age/BEAM_SECONDS),pulse=.75+Math.sin(age*7)*.25;
+  for(const mesh of [beam.current,ring.current]){if(!mesh)continue;mesh.visible=fade>0;(mesh.material as THREE.MeshBasicMaterial).opacity=fade*(mesh===beam.current?.45*pulse:.8);}
+  ring.current?.scale.setScalar(1+Math.min(1,age/.6)*(tier==='mitico'?1.6:1.1));});
+ return <group position={[position[0],0,position[1]]}>
+  <mesh ref={beam} position={[0,3.2,0]} raycast={()=>null}><cylinderGeometry args={[tier==='mitico'?.42:.32,.55,6.4,18,1,true]}/><meshBasicMaterial color={color} transparent opacity={0} depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.DoubleSide}/></mesh>
+  <mesh ref={ring} position={[0,.06,0]} rotation={[-Math.PI/2,0,0]} raycast={()=>null}><ringGeometry args={[.55,.8,36]}/><meshBasicMaterial color={color} transparent opacity={0} depthWrite={false} blending={THREE.AdditiveBlending}/></mesh>
+ </group>;
 }
 /** Os números acompanham quem recebeu o golpe; crítico corresponde ao cálculo real. */
 export default function CombatFeedback(){
- const event=useGame(s=>s.battleEvent);
+ const event=useGame(s=>s.battleEvent),loot=useGame(s=>s.lootEvent);
  if(!event)return null;
+ const feel=HIT_FEEL[event.weight??'light'],rare=event.won&&loot&&Math.abs(loot.time-event.time)<1500?lootHighlight(loot.items):null;
  const kind=event.basicEffect??effectFor(event.kind,event.classId);
  return <group><Effect key={event.time} kind={kind} color={event.tone} from={[event.hx??event.x,event.hz??event.z]} to={[event.x,event.z]} time={event.time}/>{event.enemyPower&&ENEMY_POWER_EFFECT[event.enemyPower]&&<Effect key={'e'+event.time} kind={ENEMY_POWER_EFFECT[event.enemyPower].kind} color={ENEMY_POWER_EFFECT[event.enemyPower].color} from={[event.x,event.z]} to={[event.hx,event.hz]} time={event.time} delay={.35}/>}
- <FloatingDamage key={'hit'+event.time} time={event.time} amount={event.damage} position={[event.x,event.z]} critical={event.critical}/><FloatingDamage key={'hurt'+event.time} time={event.time} amount={event.received} position={[event.hx,event.hz]} received/>
+ <FloatingDamage key={'hit'+event.time} time={event.time} amount={event.damage} position={[event.x,event.z]} critical={event.critical} scale={feel.scale}/><ScreenShake key={'shake'+event.time} time={event.time} amount={feel.shake}/>{rare&&<LootBeam key={'beam'+event.time} time={event.time} position={[event.x,event.z]} tier={rare}/>}<FloatingDamage key={'hurt'+event.time} time={event.time} amount={event.received} position={[event.hx,event.hz]} received/>
  </group>;
 }

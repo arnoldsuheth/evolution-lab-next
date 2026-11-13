@@ -18,6 +18,7 @@ import {doorsOf} from '@/lib/dungeon';
 import NullarionSanctum from './NullarionSanctum';
 import RealmEntrance from './RealmEntrance';
 import MonsterModel from './MonsterModel';
+import {HIT_FEEL,knockbackAt} from '@/lib/impact';
 /** Só desenha monstros que cabem na tela (com folga); só os próximos fazem sombra. Deixa o jogo bem mais leve. */
 const VIEW_RADIUS=34,SHADOW_RADIUS=16;
 /** Reação do monstro: treme ao levar golpe e avança quando ataca de volta. */
@@ -38,9 +39,11 @@ function Reacting({monster,fight,reduced,children}:{monster:Monster;fight?:[numb
    }
   }
   const e=state.battleEvent;const age=e?(now-e.time)/1000:9;if(reduced||!e||Math.abs(e.x-x)>.01||Math.abs(e.z-z)>.01||age>1){g.position.set(0,0,0);g.scale.setScalar(1);return;}
-  const hit=age<.35?Math.sin(age*60)*.12*(1-age/.35):0,squash=age<.25?1-Math.sin(age/.25*Math.PI)*.12:1;
-  const lunge=e.received>0&&age>.35&&age<.8?Math.sin((age-.35)/.45*Math.PI)*.9:0,dx=e.hx-x,dz=e.hz-z,len=Math.hypot(dx,dz)||1;
-  g.position.set(hit+dx/len*lunge,0,dz/len*lunge);g.scale.set(1/squash,squash,1/squash);});
+  // QA26: golpe com peso. O monstro "trava" um instante no impacto, é empurrado para trás e volta.
+  const tier=e.weight??'light',feel=HIT_FEEL[tier],frozen=e.damage>0&&age<feel.hitstop;
+  const hit=!frozen&&age<.35?Math.sin(age*60)*.12*feel.scale*(1-age/.35):0,squash=frozen?1-.1*feel.scale:age<.25?1-Math.sin(age/.25*Math.PI)*.12:1;
+  const lunge=e.received>0&&age>.35&&age<.8?Math.sin((age-.35)/.45*Math.PI)*.9:0,push=e.damage>0?knockbackAt(age,tier):0,dx=e.hx-x,dz=e.hz-z,len=Math.hypot(dx,dz)||1;
+  g.position.set(hit+dx/len*(lunge-push),0,dz/len*(lunge-push));g.scale.set(1/squash,squash,1/squash);});
  return <group ref={root}>{children}</group>;
 }
 function Patrolling({monster,fight,children}:{monster:Monster;fight?:[number,number];children:ReactNode}){

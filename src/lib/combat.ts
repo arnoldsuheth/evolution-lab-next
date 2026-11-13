@@ -3,7 +3,7 @@ import {NULLARION_SCALE,type MonsterKind} from './campaign';
 import {INSTANCES,type InstanceId} from './instances';
 import { ITEMS,stats, type HeroData } from './game';
 import { activeEquipment, removeItems } from './equipment';
-import { bandFor,HUNTER_ARROW,LEVEL_BANDS } from './catalogue';
+import { bandFor,forgeId,HUNTER_ARROW,LEVEL_BANDS } from './catalogue';
 import { SKILLS,classPowerRequirement,effectiveSkillRank } from './skills';
 import { ATTACK_RANGE, type CombatAction } from './combatEffects';
 import { specOf, SPEC_EFFECT } from './adventure';
@@ -71,11 +71,21 @@ export function resolveCombat(hero:HeroData,enemy:EnemyState,options:{skillId?:s
  const bleed=skill?.bleed?{damage:Math.max(1,Math.round(power*skill.bleed*scale)),turns:2}:enemy.bleed&&enemy.bleed.turns>1?{...enemy.bleed,turns:enemy.bleed.turns-1}:undefined;
  return{hero:next,companionStrike:pet>0,basicEffect:normal?(basic.bow?'arrow':basic.weapon?'slash':'punch') as 'arrow'|'slash'|'punch':undefined,enemy:{...enemy,hp,bleed,resourceCurrent,turn,heroStatus:hp>0?heroStatus:undefined,...(enraged||phaseChange?{phase:2 as const}:{})},phaseChange,error:undefined,won:hp===0,dead:next.hp===0,damage,received,critical,enemySkill:special&&power2?power2.name:undefined,enemyPower:special&&power2?power2.kind:undefined};
 }
-export function battleRewards(hero:HeroData,enemy:EnemyState){
+/** QA26: chance de o equipamento que cai vir Épico ou Mítico. Elite, raro e chefe dão chances maiores. */
+export const DROP_RARITY={normal:{mitico:.01,epico:.1},elite:{mitico:.05,epico:.3},boss:{mitico:.15,epico:.6}} as const;
+export function dropRarity(enemy:Pick<EnemyState,'elite'|'bossId'|'rare'>,roll:number):'comum'|'epico'|'mitico'{
+ const odds=DROP_RARITY[enemy.bossId?'boss':enemy.elite||enemy.rare!==undefined?'elite':'normal'];
+ return roll<odds.mitico?'mitico':roll<odds.epico?'epico':'comum';
+}
+/** Versão do item na raridade sorteada (as versões Épica e Mítica são as mesmas do ferreiro). */
+export function withRarity(id:string,tier:'comum'|'epico'|'mitico'){return tier!=='comum'&&ITEMS[forgeId(id,tier)]?forgeId(id,tier):id;}
+/** Melhor raridade entre os itens recebidos, para o feixe de luz e o aviso de loot. */
+export function lootHighlight(items:string[]):'epico'|'mitico'|null{const r=items.map(id=>ITEMS[id]?.rarity);return r.includes('Mítico')?'mitico':r.includes('Épico')?'epico':null;}
+export function battleRewards(hero:HeroData,enemy:EnemyState,rarityRoll=1){
  const level=enemy.level??hero.level;const tier=bandFor(level),band=LEVEL_BANDS[tier];const drops:string[]=[];
  for(const kind of ['ore','wood','leather','cloth','crystal','parts']){const count=kind==='ore'||kind==='crystal'?enemy.elite?3:1:((hero.kills+tier)%3===0?1:0);for(let i=0;i<count;i++)drops.push(`mat-${kind}-${band}`);}
  if(hero.classId==='hunter')drops.push(...Array<string>(4).fill(HUNTER_ARROW));
- if(enemy.elite||hero.kills%4===3){const pool=Object.values(ITEMS).filter(i=>i.minLevel<=level&&i.minLevel>=band&&i.source!=='trophy'&&i.source!=='chest'&&i.source!=='forge'&&i.category!=='material'&&i.slot!=='consumable'&&(!i.classId||i.classId===hero.classId)&&(!i.classes||i.classes.includes(hero.classId)));if(pool.length)drops.push(pool[hero.kills%pool.length].id);}
+ if(enemy.elite||hero.kills%4===3){const pool=Object.values(ITEMS).filter(i=>i.minLevel<=level&&i.minLevel>=band&&i.source!=='trophy'&&i.source!=='chest'&&i.source!=='forge'&&i.category!=='material'&&i.slot!=='consumable'&&(!i.classId||i.classId===hero.classId)&&(!i.classes||i.classes.includes(hero.classId)));if(pool.length)drops.push(withRarity(pool[hero.kills%pool.length].id,dropRarity(enemy,rarityRoll)));}
  if(enemy.bossId==='boss-master'&&!hero.inventory.includes(NULLARION_SCALE))drops.push(NULLARION_SCALE);
  if(enemy.elite)drops.push(`trophy-${Math.min(7,Math.floor((level-1)/7))}`);
  if(enemy.instanceId&&enemy.instanceId===hero.instance)drops.push(INSTANCES[enemy.instanceId].material);

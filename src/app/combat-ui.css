@@ -205,3 +205,13 @@
 @media(pointer:coarse) and (orientation:landscape),(max-height:540px) and (orientation:landscape){.loot-feed{top:130px;max-width:200px;max-height:calc(100dvh - 172px);gap:3px}.loot-feed>div{font-size:10px;min-height:22px}.loot-art,.loot-art>.game-artwork{width:23px;height:23px}.loot-symbol{width:23px;font-size:16px}.quest-tracker:not(.quest-folded){max-height:98px!important;overflow:auto}.floating-damage{font-size:25px}.critical-hit{font-size:33px}}
 @media(prefers-reduced-motion:reduce){.loot-feed,.critical-hit{animation:none}.floating-damage{will-change:auto}}
 .equipment-icons .rarity-comum .item-icon-art,.item-detail-art[data-rarity="Comum"]{background:#fff}.equipment-icons .rarity-épico .item-icon-art,.item-detail-art[data-rarity="Épico"]{background:#a977cc}.equipment-icons .rarity-mítico .item-icon-art,.item-detail-art[data-rarity="Mítico"]{background:#ffb65c}
+/* QA26: loot com raridade (roxo = Épico, dourado = Mítico). */
+.loot-feed>.loot-rare-banner{justify-content:center;padding:4px 10px;border:1px solid;border-radius:999px;background:#151a2ccc;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.loot-rare-epico{border-color:#b49bd4!important;color:#e6d5ff;box-shadow:0 0 14px #b49bd477;animation:loot-rare-in .45s ease-out}
+.loot-rare-mitico{border-color:#f2c14e!important;color:#ffe7a3;box-shadow:0 0 18px #f2c14e99;animation:loot-rare-in .45s ease-out}
+.loot-feed>.loot-row-epico{padding-right:8px;border-radius:8px;background:linear-gradient(90deg,#b49bd455,transparent)}
+.loot-feed>.loot-row-mitico{padding-right:8px;border-radius:8px;background:linear-gradient(90deg,#f2c14e66,transparent)}
+.loot-rarity{margin-left:6px;font-size:.8em;font-weight:800;opacity:.9}
+.loot-row-epico .loot-rarity{color:#d7c1f5}.loot-row-mitico .loot-rarity{color:#ffd56b}
+@keyframes loot-rare-in{0%{transform:scale(.7);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){.loot-rare-epico,.loot-rare-mitico{animation:none}}
