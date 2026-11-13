@@ -1,6 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { useGame } from '@/lib/store';
 import * as THREE from 'three';
 import { biomeOf, isWater, landmarkDistance, type Landmark } from '@/lib/biomes';
 import type { RegionId } from '@/lib/campaign';
@@ -61,6 +63,14 @@ function Mountain({landmark,low}:{landmark:Landmark;low:boolean}){
   </group>;
 }
 
+/** 5.0: ondas que nascem no meio do lago e se espalham até a margem. */
+function Ripples({lava}:{lava:boolean}){
+  const group=useRef<THREE.Group>(null),motion=useGame(s=>!s.settings.reduceMotion);
+  useFrame(({clock})=>{const g=group.current;if(!g||!motion)return;g.children.forEach((m,i)=>{const t=(clock.elapsedTime*(lava?.08:.14)+i/3)%1,mesh=m as THREE.Mesh;
+    mesh.scale.setScalar(.25+t*.6);(mesh.material as THREE.MeshBasicMaterial).opacity=(1-t)*(lava?.35:.28);});});
+  return <group ref={group}>{[0,1,2].map(i=><mesh key={i} position={[0,0,.04]} raycast={()=>null}><ringGeometry args={[.96,1,48]}/>
+    <meshBasicMaterial color={lava?'#ffb070':'#e4f6f8'} transparent opacity={0} depthWrite={false}/></mesh>)}</group>;
+}
 function Coast({landmark,ice}:{landmark:Landmark;ice:boolean}){
   const {x,z,rx,rz,kind}=landmark,lava=kind==='lava';
   return <group position={[x,.025,z]} rotation={[-Math.PI/2,0,0]} scale={[rx,rz,1]}>
@@ -69,6 +79,7 @@ function Coast({landmark,ice}:{landmark:Landmark;ice:boolean}){
       <circleGeometry args={[1,48]}/><meshStandardMaterial color={lava?['#893822','#ad4a2a','#bd542b'][i]:SHORE[i]}
         emissive={lava?'#b64320':'#163b4c'} emissiveIntensity={lava?.55:.14} roughness={lava?.7:.34}/>
     </mesh>)}
+    <Ripples lava={lava}/>
     {[-1,0,1].map(i=><mesh key={i} position={[.21*i,.18*i,.035]} scale={[.20,.10,1]}>
       <ringGeometry args={[.78,1,26,1,.35,2.45]}/><meshBasicMaterial color={lava?'#ed9952':'#a9d6da'} transparent opacity={.46} depthWrite={false}/>
     </mesh>)}

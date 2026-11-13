@@ -67,6 +67,8 @@ const DEFAULT_LOOK: Look = { body: 2, hair: 0, beard: 2, moustache: 1, skin: 1, 
 function Stone({ position, size = 1, color = "#777e79" }: { position: [number, number, number]; size?: number; color?: string }) { return <mesh position={position} scale={[size, size * 0.6, size * 0.8]} castShadow receiveShadow><icosahedronGeometry args={[1, 1]} /><meshStandardMaterial color={color} roughness={0.9} /></mesh>; }
 function Tree({ x, z, size = 1 }: { x: number; z: number; size?: number }) {
   const crown=useRef<THREE.Group>(null),ray=useRef(new THREE.Ray()),origin=useRef(new THREE.Vector3()),direction=useRef(new THREE.Vector3()),hit=useRef(new THREE.Vector3()),bounds=useRef(new THREE.Box3(new THREE.Vector3(x-2.1*size,1.2*size,z-2.1*size),new THREE.Vector3(x+2.1*size,5.8*size,z+2.1*size)));
+  // 5.0: vento leve. A copa balança a partir da base, cada árvore no seu ritmo (desligado com Reduzir movimento).
+  useFrame(({clock})=>{const g=crown.current;if(!g||useGame.getState().settings.reduceMotion)return;const t=clock.elapsedTime+x*.37+z*.21;g.rotation.z=Math.sin(t*.9)*.03+Math.sin(t*2.3)*.008;g.rotation.x=Math.cos(t*.7)*.02;});
   useFrame(({camera},dt)=>{const state=useGame.getState(),enemy=MONSTERS.find(m=>m.id===state.encounter?.monsterId);const targets=[state.hero.position,...(enemy?[state.encounter?.position??[enemy.x,enemy.z]]:[])];const near=targets.some(p=>Math.hypot(p[0]-x,p[1]-z)<9*size),crowns=crown.current?.children??[];if(!near&&crowns.every(o=>((o as THREE.Mesh).material as THREE.MeshStandardMaterial).opacity>=1))return; // longe do herói: nada a esconder
 // Testa cabeça e pés do herói (e do inimigo): se a copa cobre qualquer parte, ela fica quase transparente.
  const covered=targets.some(p=>[.4,1.3,2.3].some(y=>{origin.current.set(p[0],y,p[1]);direction.current.copy(camera.position).sub(origin.current);const distance=direction.current.length();ray.current.set(origin.current,direction.current.normalize());return !!ray.current.intersectBox(bounds.current,hit.current)&&origin.current.distanceTo(hit.current)<distance;}));crown.current?.children.forEach(o=>{const m=(o as THREE.Mesh).material as THREE.MeshStandardMaterial;if(m){m.opacity=THREE.MathUtils.damp(m.opacity,covered?.12:1,10,Math.min(dt,.1));if(m.opacity>.995)m.opacity=1;m.depthWrite=m.opacity>.95;const see=m.opacity<1;if(m.transparent!==see){m.transparent=see;m.needsUpdate=true;}}});});
@@ -192,7 +194,15 @@ function CitadelSign({name, x, z}: {name: string; x: number; z: number}) {
 
 function Crystal({ small = false }: { small?: boolean }) {
   const root = useRef<THREE.Group>(null); const motion = useGame(s => !s.settings.reduceMotion);
-  useFrame((state, dt) => { if (root.current && motion) { root.current.rotation.y += dt * 0.3; root.current.position.y = 1.65 + Math.sin(state.clock.elapsedTime * 1.5) * 0.12; } });
+  const core = useRef<THREE.MeshStandardMaterial>(null), halo = useRef<THREE.Mesh>(null);
+  useFrame((state, dt) => {
+    const t = state.clock.elapsedTime;
+    if (root.current && motion) { root.current.rotation.y += dt * 0.3; root.current.position.y = 1.65 + Math.sin(t * 1.5) * 0.12; }
+    // 5.0: o cristal pulsa com luz própria e uma auréola respira em volta.
+    const pulse = motion ? .5 + .5 * Math.sin(t * 2.1) : .5;
+    if (core.current) core.current.emissiveIntensity = .55 + pulse * .75;
+    if (halo.current) { halo.current.scale.setScalar(1.15 + pulse * .25); (halo.current.material as THREE.MeshBasicMaterial).opacity = .1 + pulse * .12; }
+  });
   return <group scale={small ? 0.4 : 1}>
     <mesh position={[0, 0.15, 0]} receiveShadow><cylinderGeometry args={[1.4, 1.65, 0.3, 12]} /><meshStandardMaterial color="#c9d6d2" /></mesh>
     <group ref={root} position={[0, 1.65, 0]}>
@@ -202,7 +212,9 @@ function Crystal({ small = false }: { small?: boolean }) {
           <meshStandardMaterial color="#c9a05c" metalness={.62} roughness={.38} />
         </mesh>
       ))}
-      <mesh castShadow><octahedronGeometry args={[0.65]} /><meshStandardMaterial color="#8acdd4" emissive="#3f9ba9" emissiveIntensity={0.5} metalness={0.4} roughness={0.2} flatShading /></mesh>
+      <mesh castShadow><octahedronGeometry args={[0.65]} /><meshStandardMaterial ref={core} color="#8acdd4" emissive="#4fc3d2" emissiveIntensity={0.8} metalness={0.4} roughness={0.2} flatShading /></mesh>
+      <mesh ref={halo} raycast={() => null}><sphereGeometry args={[.72, 20, 14]} /><meshBasicMaterial color="#7fe6f2" transparent opacity={.15} depthWrite={false} blending={THREE.AdditiveBlending} /></mesh>
+      {!small && <pointLight color="#6fe0ee" intensity={2.2} distance={9} decay={2} />}
       {[0, 1, 2].map(i => <mesh key={i} position={[Math.cos(i * 2.094) * 0.8, -0.45, Math.sin(i * 2.094) * 0.8]}><octahedronGeometry args={[0.21]} /><meshStandardMaterial color="#d0bde8" emissive="#8c70bb" emissiveIntensity={0.5} /></mesh>)}
     </group>
   </group>;

@@ -1,9 +1,11 @@
 "use client";
 
-import { useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { createFlowTexture } from '@/lib/waterTexture';
 import { Html } from '@react-three/drei';
 import type { ThreeEvent } from '@react-three/fiber';
-import { BoxGeometry } from 'three';
+import { BoxGeometry, type Group, type Mesh, type MeshBasicMaterial } from 'three';
 import type { RegionId } from '@/lib/campaign';
 import { scenicTrail } from '@/lib/scenicTrails';
 import { BRIDGE_WIDTH, waterwayOf, waterwaySegments } from '@/lib/waterways';
@@ -48,6 +50,7 @@ export default function ScenicRoutes({region,ground}:{region:RegionId;ground:(e:
         <planeGeometry args={[length+.32,river.width]}/><meshStandardMaterial color={river.type==='lava'?'#cb5930':river.type==='ice'?'#78b4c1':'#4d8799'}
           emissive={river.type==='lava'?'#af3517':'#26545f'} emissiveIntensity={river.type==='lava'?.65:.18} roughness={.45}/>
       </mesh>)}
+      <RiverFlow kind={river.type==='lava'?'lava':river.type==='ice'?'ice':'water'} width={river.width} segments={segments}/>
       {river.points.map(([x,z],i)=><mesh key={i} position={[x,.056,z]} rotation={[-Math.PI/2,0,0]}>
         <circleGeometry args={[river.width/2,16]}/><meshStandardMaterial color={river.type==='lava'?'#cb5930':river.type==='ice'?'#78b4c1':'#4d8799'}/>
       </mesh>)}
@@ -59,4 +62,20 @@ export default function ScenicRoutes({region,ground}:{region:RegionId;ground:(e:
       {near&&<Html position={[0,1.95,0]} center style={{pointerEvents:'none'}}><span className="town-sign">{trail.name}</span></Html>}
     </group>}
   </group>;
+}
+
+/** 5.0: correnteza animada por cima do rio (gelo corre bem devagar; lava, devagar e brilhante). */
+function RiverFlow({kind,width,segments}:{kind:'water'|'lava'|'ice';width:number;segments:{cx:number;cz:number;ux:number;uz:number;length:number}[]}){
+  const motion=useGame(s=>!s.settings.reduceMotion),low=useGame(s=>s.settings.quality==='low');
+  const base=useMemo(()=>createFlowTexture(kind),[kind]);
+  const maps=useMemo(()=>segments.map(sg=>{const t=base.clone();t.repeat.set(Math.max(1,(sg.length+.32)/4),1);t.needsUpdate=true;return t;}),[base,segments]);
+  useEffect(()=>()=>{base.dispose();maps.forEach(t=>t.dispose());},[base,maps]);
+  const speed=kind==='ice'?.03:kind==='lava'?.08:.22;
+  const group=useRef<Group>(null);
+  // Desliza a textura de cada trecho pela própria malha (lida pela referência do grupo).
+  useFrame((_,dt)=>{if(!motion||!group.current)return;for(const child of group.current.children){const map=((child as Mesh).material as MeshBasicMaterial).map;if(map)map.offset.x-=dt*speed;}});
+  if(low)return null;
+  return <group ref={group}>{segments.map(({cx,cz,ux,uz,length},i)=><mesh key={i} position={[cx,.061,cz]} rotation={[-Math.PI/2,0,Math.atan2(-uz,ux)]} raycast={()=>null}>
+    <planeGeometry args={[length+.32,width*.92]}/><meshBasicMaterial map={maps[i]} transparent depthWrite={false} opacity={kind==='lava'?.85:.7}/>
+  </mesh>)}</group>;
 }
