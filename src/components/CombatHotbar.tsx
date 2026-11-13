@@ -1,7 +1,7 @@
 "use client";
 import { MONSTERS } from '@/lib/campaign';
 import { monsterPoint } from '@/lib/patrols';
-import {basicAttack} from '@/lib/combat';
+import {attackRange,basicAttack} from '@/lib/combat';
 import {HUNTER_ARROW} from '@/lib/catalogue';
 import {useEffect,useState} from 'react';
 import {useGame} from '@/lib/store';
@@ -17,7 +17,7 @@ function Controls({identity}:{identity:string|null}){
  const encounter=useGame(s=>s.encounter);
  const monster=identity ? MONSTERS.find(m=>m.id===identity&&m.region===hero.region&&(m.instance??null)===(hero.instance??null)) : undefined;
  const point=monster&&monsterPoint(monster,now,hero.position);
- const inRange=!!encounter||!!point&&Math.hypot(hero.position[0]-point[0],hero.position[1]-point[1])<=attack.range;
+ const inRange=!!encounter||!!point&&Math.hypot(hero.position[0]-point[0],hero.position[1]-point[1])<=attackRange(hero)+.5; // mesma folga que o ataque aceita na loja
  const rangeLabel=monster ? (inRange?'Ao alcance':'Fora de alcance') : undefined;
  const canAuto=hero[attack.resource]>=attack.cost&&(!attack.bow||arrows>0);
  const attackLabel=attack.bow?`Disparar · ${arrows} flechas`:attack.weapon?'Atacar':'Socar';

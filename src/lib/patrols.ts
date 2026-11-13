@@ -27,7 +27,8 @@ export function monsterPoint(monster:Monster,time:number,hero?:Point):Point {
     const dx=x-hero[0],dz=z-hero[1],distance=Math.hypot(dx,dz);
     if(distance>.01&&distance<6){
       const step=(6-distance)*.45;
-      for(const scale of [1,.5]){
+      // Tenta fugir menos quando rio ou parede bloqueiam: evita o cervo "pular" de volta.
+      for(const scale of [1,.75,.5,.25]){
         const moveX=dx/distance*step*scale,moveZ=dz/distance*step*scale;
         if([.25,.5,.75,1].every(t=>walkable(x+moveX*t,z+moveZ*t,monster.region)))return [x+moveX,z+moveZ];
       }
