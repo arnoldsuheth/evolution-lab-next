@@ -125,3 +125,18 @@
 .enemy-telegraph{display:block;margin-top:3px;font:800 11px/1.2 Inter,system-ui,sans-serif;font-style:normal;color:#ffb4a0;text-shadow:0 1px 2px #000;animation:fx-warn .9s ease-in-out infinite}
 @keyframes fx-warn{0%,100%{opacity:.65}50%{opacity:1}}
 .lk-reduced :is(.combo-ready,.supremo-ready,.enemy-telegraph){animation:none!important}
+/* iPhone deitado: a arte da logo vira o fundo da tela de início (só a faixa de cima da folha da marca). */
+.lk-start-fx .lk-start-art,.lk-start-fx .lk-start-shade{display:none}
+@media (orientation:landscape) and (max-height:540px){
+ .lk-start-fx .lk-start-art{display:block;position:absolute;left:50%;top:0;width:118%;max-width:none;height:auto;transform:translateX(-50%);opacity:.6;animation:lk-breathe 12s ease-in-out infinite}
+ .lk-start-fx .lk-start-shade{display:block;inset:0;background:linear-gradient(180deg,#070b1855,#070b18cc 70%,#070b18)}
+ .lk-start-fx .lk-rune{display:none}
+}
+@media (orientation:landscape) and (max-height:540px){
+ .lk-select .lk-select-top{display:block!important;position:absolute;left:50%;top:max(8px,env(safe-area-inset-top));z-index:3;width:min(212px,25vw);margin:0;transform:translateX(-53%);padding:0;background:none;border:0}
+ .lk-select .lk-select-top>:not(.lovelace-brand-banner){display:none!important}
+ .lk-select .lk-select-top .lovelace-brand-banner{width:100%!important;max-width:none!important;margin:0!important}
+ .lk-select .lk-hero-stage{padding-top:min(92px,11vw);align-self:start}
+ .lk-select .lk-hero-stage>*{width:min(190px,24vw,calc(100dvh - 150px))!important;min-width:0!important}
+ .lk-start-fx .lk-start-art{opacity:.35}
+}
