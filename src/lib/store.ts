@@ -33,7 +33,7 @@ import { PRACTICE_CONCEPTS, nextMastery, BLITZ_PASS, dayKey, blitzReward, battle
 import { persist } from "zustand/middleware";
 import { SKILLS, classPowerRequirement, skillRank, skillRequirement, passiveBonuses } from "./skills";
 import { isEquipment, itemRequirement, removeItems, countItem } from "./equipment";
-import { attackRange, enemyVitals, resolveCombat, battleRewards, STATUS_NAMES, type EnemyState } from "./combat";
+import { attackRange, enemyVitals, resolveCombat, battleRewards, STATUS_NAMES, COMBO_WINDOW_MS, COMBO_BONUS, SUPREMO_MAX, SUPREMO_MULT, supremoGain, type EnemyState } from "./combat";
 import { hitWeight, type HitTier } from "./impact";
 import { type CombatAction, type EffectKind } from "./combatEffects";
 import { NEXUS_SECONDS, cleanNexus, nexusFull } from "./nexus";
@@ -76,8 +76,10 @@ interface GameStore extends SaveData {
   enterInstance:(id:InstanceId)=>void;leaveInstance:()=>void; repair:()=>void;learnProfession:(id:Profession)=>void; bindAction:(id:string,slot:number)=>void; relocation:number; mounted:boolean; /** Sentado: recupera HP, MP e vigor 3x mais rápido fora de combate. */ sitting:boolean; /** Caminhar (mais devagar) em vez de correr. */ walking:boolean; toggleSit:()=>void; toggleWalk:()=>void; toggleMount:()=>void; chooseMount:(id:MountId)=>void; buyFlyingMount:(id:FlyingMountId)=>void; trainClass:(id:ClassId)=>void;
   ready: boolean; saveError: string; notice: string; encounter: Encounter | null; buff: number; lastAttack: number; cooldowns: Record<string,number>; now: number; effects: {kind:string;amount:number;remaining:number}[];
   openDiscovery:()=>void;
+  /** 5.0: barra do Golpe Supremo (0–100, só na sessão) e a última habilidade usada (para o Combo). */
+  supremo:number; lastSkill:{id:string;time:number}|null;
   lootEvent?:{time:number;xp:number;gold:number;items:string[]};
-  battleEvent:{weight?:HitTier;critical?:boolean;companionStrike?:boolean;time:number;damage:number;received:number;x:number;z:number;tone:string;kind:"attack"|"power"|"skill";basicEffect?:EffectKind;classId:ClassId;skill?:string;hx:number;hz:number;won?:boolean;enemySkill?:string;enemyPower?:string}|null;
+  battleEvent:{combo?:boolean;supremo?:boolean;weight?:HitTier;critical?:boolean;companionStrike?:boolean;time:number;damage:number;received:number;x:number;z:number;tone:string;kind:"attack"|"power"|"skill";basicEffect?:EffectKind;classId:ClassId;skill?:string;hx:number;hz:number;won?:boolean;enemySkill?:string;enemyPower?:string}|null;
   /** Monstros vencidos voltam depois de um tempo; pontos de coleta também (só durante a sessão). */
   slain:Record<string,number>; gathered:Record<string,number>;
   /** Monstro selecionado com um clique e a ação esperando o herói chegar ao alcance. */
@@ -117,16 +119,19 @@ export function replaceFromCloud(snapshot:SaveData,backup:boolean){
  const next=migrateSave(snapshot);
  if(backup){const previous=localStorage.getItem(SAVE_KEY);if(previous)localStorage.setItem(SAVE_KEY+'-before-cloud-'+Date.now(),previous);}
  blocked=false;storageIssue='';
- useGame.setState({...next,ready:true,encounter:null,challenge:null,battleEvent:null,cooldowns:{},lastAttack:0,effects:[],buff:0,saveError:''});
+ useGame.setState({...next,ready:true,encounter:null,challenge:null,battleEvent:null,supremo:0,lastSkill:null,cooldowns:{},lastAttack:0,effects:[],buff:0,saveError:''});
  if(blocked)throw Error(storageIssue);
 }
 function executeBattle(id:string|undefined,starter:boolean,set:(value:Partial<GameStore>)=>void,get:()=>GameStore){
- const s=get(),enemy=s.encounter!;
- const result=resolveCombat(s.hero,enemy,{skillId:id,starter,criticalRoll:Math.random(),attackBuff:s.effects.filter(e=>e.kind==='attack').reduce((n,e)=>n+e.amount,0),defenseBuff:(s.buff>0?5:0)+s.effects.filter(e=>e.kind==='defense').reduce((n,e)=>n+e.amount,0)});
+ const s=get(),enemy=s.encounter!,t0=Date.now();
+ // 5.0: Combo = habilidade diferente da anterior dentro da janela; Supremo = poder com a barra cheia.
+ const combo=!!id&&!!s.lastSkill&&s.lastSkill.id!==id&&t0-s.lastSkill.time<=COMBO_WINDOW_MS,supremo=starter&&s.supremo>=SUPREMO_MAX;
+ const result=resolveCombat(s.hero,enemy,{skillId:id,starter,damageMult:(combo?COMBO_BONUS:1)*(supremo?SUPREMO_MULT:1),criticalRoll:Math.random(),attackBuff:s.effects.filter(e=>e.kind==='attack').reduce((n,e)=>n+e.amount,0),defenseBuff:(s.buff>0?5:0)+s.effects.filter(e=>e.kind==='defense').reduce((n,e)=>n+e.amount,0)});
  if(result.error){set({notice:result.error});return;}
  result.hero={...result.hero,durability:{...result.hero.durability,...Object.fromEntries(s.hero.equipped.filter(id=>ITEMS[id]&&ITEMS[id].slot!=="pet").map(id=>[id,Math.max(0,(s.hero.durability?.[id]??100)-1)]))}};
  const target=MONSTERS.find(m=>m.id===enemy.monsterId);
- const feedback={battleEvent:{weight:hitWeight({damage:result.damage,maxHp:enemy.maxHp,critical:!!result.critical,kind:id?'skill':starter?'power':'attack',won:result.won}),critical:!!result.critical,companionStrike:!!target&&result.companionStrike,time:Date.now(),damage:result.damage,received:result.received,x:enemy.position?.[0]??target?.x??s.hero.position[0],z:enemy.position?.[1]??target?.z??s.hero.position[1],tone:id||starter?CLASSES[s.hero.classId].color:'#efd49a',kind:(id?'skill':starter?'power':'attack') as 'attack'|'power'|'skill',classId:s.hero.classId,basicEffect:result.basicEffect,skill:id,hx:s.hero.position[0],hz:s.hero.position[1],won:result.won,enemySkill:result.enemySkill,enemyPower:result.enemyPower}};
+ const kindNow=(id?'skill':starter?'power':'attack') as 'attack'|'power'|'skill',supremoNext=supremo?0:Math.min(SUPREMO_MAX,s.supremo+supremoGain(kindNow,!!result.critical));
+ const feedback={supremo:supremoNext,lastSkill:id?{id,time:t0}:s.lastSkill,battleEvent:{combo,supremo,weight:hitWeight({damage:result.damage,maxHp:enemy.maxHp,critical:!!result.critical,kind:id?'skill':starter?'power':'attack',won:result.won}),critical:!!result.critical,companionStrike:!!target&&result.companionStrike,time:Date.now(),damage:result.damage,received:result.received,x:enemy.position?.[0]??target?.x??s.hero.position[0],z:enemy.position?.[1]??target?.z??s.hero.position[1],tone:id||starter?CLASSES[s.hero.classId].color:'#efd49a',kind:(id?'skill':starter?'power':'attack') as 'attack'|'power'|'skill',classId:s.hero.classId,basicEffect:result.basicEffect,skill:id,hx:s.hero.position[0],hz:s.hero.position[1],won:result.won,enemySkill:result.enemySkill,enemyPower:result.enemyPower}};
  const skillBuff=id?SKILLS[id].buff:undefined;
  const effects=skillBuff?[...s.effects.filter(e=>e.kind!==skillBuff.kind),{kind:skillBuff.kind,amount:Math.round(skillBuff.amount*(1+(skillRank(s.hero,id!)-1)*.14)),remaining:skillBuff.duration}]:s.effects;
  const now=Date.now(),cooldowns={...s.cooldowns,...(id?{[id]:now+SKILLS[id].cooldown*1000}:{})};
@@ -144,7 +149,7 @@ function nearLegacySite(state: GameStore, site: { x: number; z: number }) {
     && Math.hypot(hero.position[0] - site.x, hero.position[1] - site.z) <= 3.7;
 }
 export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>((set, get) => ({
-  ...freshSave(), rareSeen:0, restPending:0, relocation:0,mounted:false,sitting:false,walking:false, battleEvent:null, slain:{}, gathered:{}, target:null, queued:null, challenge:null, ready: false, saveError: "", notice: "", encounter: null, buff: 0, lastAttack: 0, cooldowns: {}, now: 0, effects: [],
+  ...freshSave(), rareSeen:0, restPending:0, relocation:0,mounted:false,sitting:false,walking:false, battleEvent:null, supremo:0, lastSkill:null, slain:{}, gathered:{}, target:null, queued:null, challenge:null, ready: false, saveError: "", notice: "", encounter: null, buff: 0, lastAttack: 0, cooldowns: {}, now: 0, effects: [],
   enterInstance:id=>{const s=get();if(s.encounter||s.challenge||s.hero.instance)return;const reason=instanceRequirement(s.hero,s.education.completed,id);if(reason){set({notice:reason});return;}const place=INSTANCES[id];if(Math.hypot(s.hero.position[0]-place.x,s.hero.position[1]-place.z)>4.5){set({notice:'Aproxime-se da entrada para entrar.'});return;}set({mounted:false,relocation:s.relocation+1,hero:{...s.hero,instance:id,instanceProgress:[],position:[0,8]},notice:place.name+' · inimigos mais fortes, XP dobrado. Use a saída ao sul para retornar.'});},
   leaveInstance:()=>{const s=get(),id=s.hero.instance;if(!id||s.encounter||s.challenge||s.hero.dead)return;if(Math.hypot(s.hero.position[0],s.hero.position[1]-10)>4.5){set({notice:'A saída fica ao sul da instância.'});return;}const place=INSTANCES[id];set({mounted:false,relocation:s.relocation+1,hero:{...s.hero,instance:null,position:[place.x,place.z+2]},notice:'Você retornou da expedição.'});},
   repair:()=>{const s=get();if(s.hero.dead||s.encounter||!atForge(s.hero)){set({notice:'Procure Babbage na vila para reparar.'});return;}const fee=discounted(repairCost(s.hero.equipped,s.hero.durability??{},ITEMS),repPercent(adventureOf(s.hero),'ferreiros'));if(!fee||s.hero.gold<fee)return;set({hero:{...s.hero,gold:s.hero.gold-fee,durability:{...s.hero.durability,...Object.fromEntries(s.hero.equipped.map(id=>[id,100]))}},notice:'Equipamento reparado.'});},

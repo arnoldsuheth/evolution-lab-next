@@ -31,7 +31,16 @@ export function attackRange(hero: HeroData, action?: CombatAction) {
   || action?.kind==='skill'&&action.skill&&effectiveSkillRank(hero,action.skill)>0
   ? ATTACK_RANGE[hero.classId] : basicAttack(hero).range;
 }
-export function resolveCombat(hero:HeroData,enemy:EnemyState,options:{skillId?:string;starter?:boolean;attackBuff?:number;defenseBuff?:number;criticalRoll?:number}={}){
+/** 5.0: aviso antecipado. Diz qual poder o monstro vai usar na próxima reação (para o jogador se defender). */
+export function nextEnemyPower(enemy:Pick<EnemyState,'kind'|'turn'|'phase'|'resource'|'resourceCurrent'|'hp'>){
+ if(!enemy.kind||enemy.hp<=0)return null;const power=MONSTER_POWER[enemy.kind];if(!power)return null;
+ const cost=enemy.resource==='mp'?12:8,reserve=enemy.resourceCurrent===undefined||enemy.resourceCurrent>=cost;
+ return reserve&&((enemy.turn??0)+1)%(enemy.phase===2?2:power.every)===0?power.name:null;
+}
+/** 5.0: Combo (habilidade logo após outra, diferente) e Golpe Supremo (barra que enche golpeando). */
+export const COMBO_WINDOW_MS=4000,COMBO_BONUS=1.2,SUPREMO_MAX=100,SUPREMO_MULT=2.5;
+export function supremoGain(kind:'attack'|'power'|'skill',critical:boolean){return (kind==='attack'?12:kind==='skill'?18:0)+(critical?8:0);}
+export function resolveCombat(hero:HeroData,enemy:EnemyState,options:{skillId?:string;starter?:boolean;attackBuff?:number;defenseBuff?:number;criticalRoll?:number;damageMult?:number}={}){
  const st=stats(hero),skill=options.skillId?SKILLS[options.skillId]:undefined;const rank=skill?effectiveSkillRank(hero,skill.id):1;
  if(options.skillId&&(!skill||skill.classId!==hero.classId||skill.kind!=='active'||!rank||hero.level<skill.minLevel))return{hero,enemy,error:'Habilidade indisponível',won:false,dead:false,damage:0,received:0};
  const powerLock=options.starter?classPowerRequirement(hero):undefined;
@@ -49,7 +58,7 @@ export function resolveCombat(hero:HeroData,enemy:EnemyState,options:{skillId?:s
  const status=enemy.heroStatus&&enemy.heroStatus.turns>0?enemy.heroStatus:undefined,weaken=status?.kind==='freeze'?.5:status?.kind==='slow'?.75:1;
  const spec=specOf(hero),specFx=spec?SPEC_EFFECT[spec.style]:undefined;
  const critical=(options.criticalRoll??1)<Math.min(.25,.05+st.dexterity*.002);
- const damage=Math.max(0,Math.round((power*(skill?skill.damage*scale:options.starter?1.8*(specFx?.powerDamage??1):1)+pet)*weaken*(critical?1.5:1)+dot));
+ const damage=Math.max(0,Math.round((power*(skill?skill.damage*scale:options.starter?1.8*(specFx?.powerDamage??1):1)+pet)*weaken*(critical?1.5:1)*(options.damageMult??1)+dot));
  const hp=Math.max(0,enemy.hp-damage);
  const next={...hero,inventory,[resource]:hero[resource]-cost};
  const heal=(skill?Math.round(st.maxHp*skill.heal*scale):options.starter&&['paladin','prophet','shaman'].includes(hero.classId)?Math.round(st.maxHp*(hero.classId==='paladin'?.07:.24)):0)+(options.starter&&specFx?Math.round(st.maxHp*specFx.powerHeal):0);

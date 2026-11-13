@@ -54,7 +54,7 @@
 .game-shell .game-menu-panel footer{color:#d9c79c!important;border-top-color:#c9a24a44!important}
 
 /* ---------- 5.0 · Efeitos da barra de habilidades e da roda (prévia aprovada) ---------- */
-:is(.console-skill,.radial-hud>button,.desktop-attack){position:relative;overflow:visible}
+:is(.console-skill,.desktop-attack){position:relative}:is(.console-skill,.radial-hud>button,.desktop-attack){overflow:visible}
 /* Pronta: fio de luz percorrendo a borda */
 :is(.console-skill,.radial-skill).is-ready::after{content:"";position:absolute;inset:-2px;border-radius:inherit;padding:2px;pointer-events:none;
  background:linear-gradient(110deg,transparent 30%,#fff6d9 50%,transparent 70%) no-repeat;background-size:60% 100%;animation:fx-shimmer 2.6s ease-in-out infinite;
@@ -104,3 +104,24 @@
 @keyframes lk-sweep{0%{transform:translateX(-120%) skewX(-18deg)}55%,100%{transform:translateX(560%) skewX(-18deg)}}
 @keyframes lk-pulse{0%,100%{box-shadow:0 0 0 0 #f2d48a66,0 8px 22px #000a}50%{box-shadow:0 0 0 10px #f2d48a00,0 8px 22px #000a}}
 @media (prefers-reduced-motion:reduce){.lk-start-fx i,.lk-sweep,.lovelace-brand-banner img,.lk-hero-info .lk-enter{animation:none!important}.lk-mote{display:none!important}}
+
+/* ---------- 5.0 · Mecânicas novas: Combo, Golpe Supremo, aviso do inimigo e rastro da vida ---------- */
+:is(.console-skill,.radial-skill).combo-ready{border-color:#a98bff!important;animation:fx-combo 1.4s ease-in-out infinite}
+@keyframes fx-combo{0%,100%{box-shadow:0 0 0 2px #8f6fd1,0 0 12px #8f6fd188}50%{box-shadow:0 0 0 3px #c9b2ff,0 0 26px #a98bffcc}}
+.fx-cast-combo{background:radial-gradient(circle,#efe6ffee,#a98bff99 42%,transparent 70%)}
+.fx-cast-supremo{inset:-14px;background:radial-gradient(circle,#ffffff,#f2c14ecc 35%,#8f6fd188 55%,transparent 72%)}
+.fx-word-arcane{color:#e2d6ff!important;text-shadow:0 2px 0 #2b1a55,0 0 14px #a98bff!important}
+/* Botão Poder: anel mostra a carga do Supremo; cheio, brilha roxo */
+.class-power{position:relative}
+:is(.class-power,.radial-power)::before{content:"";position:absolute;inset:-4px;border-radius:inherit;pointer-events:none;
+ background:conic-gradient(#f2d48a var(--sup,0deg),#ffffff14 0);-webkit-mask:radial-gradient(closest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));mask:radial-gradient(closest-side,transparent calc(100% - 4px),#000 calc(100% - 3px))}
+:is(.class-power,.radial-power).supremo-ready{animation:fx-supremo 1.2s ease-in-out infinite}
+@keyframes fx-supremo{0%,100%{box-shadow:0 0 0 2px #a98bff,0 0 16px #8f6fd1aa}50%{box-shadow:0 0 0 4px #d9c8ff,0 0 34px #a98bffee}}
+/* Vida do alvo: a barra cai na hora e um rastro claro acompanha devagar */
+
+.world-resource.health>i{z-index:1;transition:width .15s ease-out}
+.world-resource.health>.hp-ghost{position:absolute;left:0;top:0;bottom:0;background:#fff1c4bb;transition:width .6s ease-out .35s}
+/* Aviso do golpe forte do inimigo */
+.enemy-telegraph{display:block;margin-top:3px;font:800 11px/1.2 Inter,system-ui,sans-serif;font-style:normal;color:#ffb4a0;text-shadow:0 1px 2px #000;animation:fx-warn .9s ease-in-out infinite}
+@keyframes fx-warn{0%,100%{opacity:.65}50%{opacity:1}}
+.lk-reduced :is(.combo-ready,.supremo-ready,.enemy-telegraph){animation:none!important}

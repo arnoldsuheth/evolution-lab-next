@@ -57,3 +57,20 @@ test('QA26: elite derrotado com sorte entrega equipamento Mítico e aviso dourad
   assert.equal(lootHighlight(lucky), 'mitico');
   assert.ok(!plain.some(id => ITEMS[id]?.source === 'forge'), 'sem sorteio continua igual ao de antes');
 });
+
+import { nextEnemyPower, resolveCombat, supremoGain, SUPREMO_MULT } from './combat';
+test('5.0: aviso aparece na reação anterior ao poder do monstro', () => {
+  assert.equal(nextEnemyPower({ kind: 'spider', turn: 1, hp: 10 }), null);
+  assert.equal(nextEnemyPower({ kind: 'spider', turn: 2, hp: 10 }), 'Picada venenosa');
+  assert.equal(nextEnemyPower({ kind: 'spider', turn: 2, hp: 0 }), null, 'morto não avisa');
+  assert.equal(nextEnemyPower({ kind: 'spider', turn: 2, hp: 10, resource: 'stamina', resourceCurrent: 2 }), null, 'sem reserva não usa poder');
+  assert.equal(nextEnemyPower({ kind: 'spider', turn: 1, hp: 10, phase: 2 }), 'Picada venenosa', 'furioso usa a cada 2');
+});
+test('5.0: Supremo enche golpeando e multiplica o dano', () => {
+  assert.ok(supremoGain('skill', false) > supremoGain('attack', false));
+  assert.equal(supremoGain('power', false), 0, 'o próprio poder não carrega a barra');
+  const hero = { ...freshSave().hero, created: true, level: 10, mp: 999, stamina: 999 };
+  const enemy = { id: 'x', name: 'Alvo', hp: 99999, maxHp: 99999, power: 1, reward: 1, elite: false, level: 10 };
+  const plain = resolveCombat(hero, enemy, { criticalRoll: 1 }).damage, strong = resolveCombat(hero, enemy, { criticalRoll: 1, damageMult: SUPREMO_MULT }).damage;
+  assert.ok(strong >= Math.round(plain * SUPREMO_MULT) - 1);
+});
