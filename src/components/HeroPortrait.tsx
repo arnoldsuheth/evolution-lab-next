@@ -13,9 +13,11 @@ import { ClassPortrait } from './ApprovedArtwork';
  * Enquanto a foto não fica pronta, mostra a arte da classe.
  */
 type Props = { classId: ClassId; race: Race; look: Look; equipped: string[]; level: number; selection?: boolean };
-const PREFIX = 'lc-portrait-v4:';
+const PREFIX = 'lc-portrait-v5:'; // v5: descarta fotos vazias salvas antes do boneco carregar
 const cache = new Map<string, string>(), failed = new Set<string>(), queue: string[] = [], subs = new Set<() => void>();
 let owner: string | null = null, version = 0;
+// Limpa uma vez as fotos antigas (v4), que podiam ter sido salvas vazias e ocupam espaço do navegador.
+try { if (typeof localStorage !== 'undefined') for (const k of Object.keys(localStorage)) if (k.includes('lc-portrait-v4:')) localStorage.removeItem(k); } catch { /* sem armazenamento */ }
 const emit = () => { version++; subs.forEach(f => f()); };
 const subscribe = (f: () => void) => { subs.add(f); return () => { subs.delete(f); }; };
 function stored(key: string) {
@@ -34,18 +36,20 @@ function hash(text: string) { let h = 2166136261; for (let i = 0; i < text.lengt
 
 /** Espera os modelos carregarem e alguns quadros desenharem; então guarda a imagem. */
 function Snap({ id, head }: { id: string; head: number }) {
-  const { gl, camera } = useThree(), { active } = useProgress(), calm = useRef(0), start = useRef(0), sent = useRef(false);
+  const { gl, camera, scene } = useThree(), { active } = useProgress(), calm = useRef(0), start = useRef(0), sent = useRef(false);
   useEffect(() => { camera.lookAt(0, head - .04, 0); }, [camera, head]);
   useFrame(({ clock }) => {
     if (sent.current) return;
     if (!start.current) start.current = clock.elapsedTime;
-    calm.current = active ? 0 : calm.current + 1;
+    // Só conta quadros calmos depois que o boneco já tem malhas na cena (antes disso a foto sairia vazia).
+    let meshes = 0; scene.traverse(o => { if ((o as { isMesh?: boolean }).isMesh && o.visible) meshes++; });
+    calm.current = active || meshes < 3 ? 0 : calm.current + 1;
     const late = clock.elapsedTime - start.current > 9;
     if (calm.current < 12 && !late) return;
     sent.current = true;
     let url: string | null = null;
     try { url = gl.domElement.toDataURL('image/webp', .86); if (!url.startsWith('data:image/webp')) url = gl.domElement.toDataURL('image/png'); } catch { url = null; }
-    finish(id, late && active ? null : url);
+    finish(id, late && (active || calm.current < 12) ? null : url);
   });
   return null;
 }
@@ -54,7 +58,8 @@ function Studio({ id, classId, race, look, equipped, level, selection }: Props &
   const height = heroProportions(race).height;
   const head = (selection ? 2.35 : 2.5) * height;
   const distance = selection ? Math.max(4.8, 7.2 * height) : Math.max(3, 4.8 * height);
-  return <div aria-hidden style={{ position: 'fixed', left: -4000, top: 0, width: 192, height: 192, pointerEvents: 'none' }}>
+  const size = selection ? 384 : 192; // seleção: foto maior para não ficar borrada no círculo grande
+  return <div aria-hidden style={{ position: 'fixed', left: -4000, top: 0, width: size, height: size, pointerEvents: 'none' }}>
     <Canvas dpr={1} gl={{ preserveDrawingBuffer: true, alpha: true, antialias: true }} camera={{ position: [distance * .07, head + .06, distance], fov: 30 }}>
       <ambientLight intensity={1.15} /><hemisphereLight args={['#c8dce4', '#504130', 1.7]} />
       <directionalLight position={[2.5, 4, 5]} intensity={2.2} color="#f3e9da" /><directionalLight position={[-4, 3, -2]} intensity={1} color="#94b3d1" />

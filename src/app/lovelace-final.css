@@ -1,0 +1,54 @@
+/* BLOCO INTERFACE LOVELACE · carregado por último: o visual das prévias vence os estilos antigos.
+   Paleta: azul-noite #0f1a2b, dourado #c9a24a / #f2d48a, roxo arcano #8f6fd1. */
+:root{--lk-night:#0f1a2b;--lk-night2:#17253b;--lk-gold:#c9a24a;--lk-gold2:#f2d48a;--lk-arcane:#8f6fd1}
+
+/* ---------- Toque (iPhone): a roda fica sempre visível, como na prévia 6 ---------- */
+@media (pointer:coarse), (max-width:960px){
+ .combat-console.combat-pad.without-target{display:block!important}
+ .radial-hud>button{border:2px solid var(--lk-gold)!important;background:radial-gradient(circle at 35% 28%,#2c3f66,var(--lk-night) 72%)!important;
+  color:#fff4cd!important;box-shadow:0 3px 10px #000a,inset 0 0 0 2px #0a1220,0 0 0 1px #00000080!important}
+ .radial-hud .radial-attack{width:78px!important;height:78px!important;border-width:3px!important;
+  background:radial-gradient(circle at 35% 25%,#f6dc95,#c08d32 55%,#6d4a14)!important;color:#2a1a05!important;
+  box-shadow:0 0 0 3px #1a1206,0 0 18px #f2c14e66,0 4px 12px #000b!important}
+ .radial-hud .radial-attack span{font-size:30px}.radial-hud .radial-attack b{color:#2a1a05}
+ .radial-hud .radial-attack:disabled{opacity:.72!important;filter:saturate(.75)}
+ .radial-hud .radial-power{background:radial-gradient(circle at 35% 28%,#6c4fb0,#231a44 72%)!important;border-color:var(--lk-arcane)!important}
+ .radial-hud .radial-auto[aria-pressed="true"]{box-shadow:0 0 0 2px var(--lk-gold2),0 0 14px #f2d48a99!important}
+}
+
+/* ---------- Painéis do HUD (computador e celular): moldura azul-noite com fio dourado ---------- */
+.game-shell :is(.quest-tracker,.left-hud) .hud-content{
+ background:linear-gradient(180deg,#1a2944f2,#0d1626f2)!important;border:1px solid var(--lk-gold)!important;border-radius:12px!important;
+ box-shadow:0 0 0 1px #05080f,inset 0 0 0 1px #f2d48a22,0 8px 22px #000a!important}
+.game-shell .quest-tracker .hud-content{position:relative}
+.game-shell .quest-tracker .hud-content::before{content:"";position:absolute;left:14px;right:14px;top:-1px;height:2px;background:linear-gradient(90deg,transparent,var(--lk-gold2),transparent)}
+.game-shell .quest-route-button{background:linear-gradient(180deg,#d9b25a,#9c7426)!important;color:#22170a!important;border:1px solid #f6dc95!important;
+ font-weight:800!important;letter-spacing:.02em;box-shadow:0 2px 8px #0008,inset 0 1px 0 #fff3c4aa!important;text-shadow:none!important}
+.game-shell .quest-tracker :is(h2,h3,strong,.desktop-quest-title){color:var(--lk-gold2)!important}
+.game-shell .game-menu-toggle{background:linear-gradient(180deg,#22365a,#111c30)!important;border:2px solid var(--lk-gold)!important;color:#fff1c8!important;
+ box-shadow:0 4px 12px #000a,inset 0 1px 0 #f2d48a44!important}
+/* Barra de XP mais grossa, dourada, com a ponta brilhando */
+.game-shell .experience-track{height:auto!important}
+.game-shell .experience-inline{min-height:20px;border:1px solid #8a6a2c;border-radius:10px;background:#0b1220e6!important;box-shadow:inset 0 1px 3px #000c}
+.game-shell .experience-inline :is(.experience-fill,[class*="fill"]){background:linear-gradient(90deg,#8f6fd1,#c9a24a 60%,#f6dc95)!important;box-shadow:0 0 10px #f2c14e66}
+/* Barra de habilidades do computador: espaços vazios discretos, com o número da tecla */
+.combat-console .console-skill.empty-skill{background:#0e1726cc!important;border-style:dashed!important;border-color:#c9a24a55!important}
+.combat-console .console-skill.empty-skill span[aria-hidden="true"]{opacity:.25}
+
+/* ---------- Seleção de personagem: herói num palco escuro com luz dourada, sem cortar embaixo ---------- */
+.lk-hero-stage>*{background:radial-gradient(circle at 50% 38%,#3a3f6b,#1a2140 55%,#0b1020 100%)!important;
+ width:min(380px,100%,calc(100dvh - 470px))!important;min-width:220px}
+.lk-hero-stage .class-portrait.hero-portrait image{filter:drop-shadow(0 6px 10px #000a)}
+@media (min-width:961px){.lk-select .lovelace-brand-banner{max-width:min(520px,60vw)!important;margin-inline:auto}}
+.character-slot .hero-portrait{background:radial-gradient(circle at 50% 38%,#3a3f6b,#141a33)!important}
+
+/* ---------- Menu principal: abre logo abaixo do botão Menu, sem sair da tela, em azul-noite e dourado ---------- */
+@media (min-width:1000px) and (min-height:541px) and (pointer:fine){
+ .game-shell .game-menu.open .game-menu-panel{position:fixed;right:18px;top:270px;width:min(440px,calc(100vw - 40px));max-height:calc(100dvh - 300px);z-index:45}
+}
+.game-shell .game-menu-panel{background:linear-gradient(165deg,#1b2a47f7,#0c1424fa 70%)!important;border:1px solid var(--lk-gold)!important;
+ box-shadow:0 0 0 1px #05080f,inset 0 0 0 1px #f2d48a1f,0 18px 50px #000b!important}
+.game-shell .game-menu-panel :is(.game-menu-grid>button,.game-menu-grid>a){border-color:#c9a24a66!important;background:linear-gradient(180deg,#22345499,#121c30cc)!important}
+.game-shell .game-menu-panel :is(.game-menu-grid>button,.game-menu-grid>a):hover{border-color:var(--lk-gold2)!important;box-shadow:0 0 12px #f2d48a44!important}
+.game-shell .game-menu-panel .menu-icon{color:var(--lk-gold2)!important;filter:drop-shadow(0 0 6px #f2d48a55)}
+.game-shell .game-menu-panel footer{color:#d9c79c!important;border-top-color:#c9a24a44!important}
