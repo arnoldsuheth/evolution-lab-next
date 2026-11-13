@@ -8,7 +8,7 @@ import { Component, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useSt
 import * as THREE from "three";
 import KingdomDetails from './KingdomDetails';
 import CombatFeedback from './CombatFeedback';
-import {advanceJump,isEditingTarget} from '@/lib/controls';
+import {advanceJump,isEditingTarget,MOVEMENT_REST,movementRelativeToCamera,movementStep} from '@/lib/controls';
 import BiomeDetails from "./BiomeDetails";
 import MaterialCraftStand from "./MaterialCraftStand";
 import OriginalPilot from "./OriginalPilot";
@@ -22,7 +22,7 @@ import PetFollower from "./PetFollower";
 import { adventureOf, titleOf, mountOf, mountSpeed, MOUNT_LEVEL, type PetId } from "@/lib/adventure";
 import { doorBetween } from "@/lib/dungeon";
 import { PLAZA_RADIUS, CITADEL_SECTORS, TOWN_SERVICES, type Interior, type InteriorPanel, type TownService } from "@/lib/town";
-import { FLIGHT_HEIGHT, frameWorld, WORLD_ZOOM, worldCameraOptions, worldCameraTargetHeight } from "@/lib/worldCamera";
+import { FLIGHT_HEIGHT, frameWorld, WORLD_ORBIT, WORLD_ZOOM, worldCameraOptions, worldCameraTargetHeight } from "@/lib/worldCamera";
 import WorldDetails, { HouseDetails } from "./WorldDetails";
 import {MONSTERS,REGIONS,AGGRO_RADIUS,SAFE_TOWN_RADIUS,isAggressive,monsterRequirement} from "@/lib/campaign";
 import CampaignWorld from "./CampaignWorld";
@@ -241,7 +241,7 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
   // Pausado (janela aberta) o mundo não desenha; só tira uma "foto" nova se algo terminar de carregar ou a tela mudar de tamanho.
   const advance = useThree(s => s.advance), size = useThree(s => s.size), loading = useProgress(s => s.active);
   useEffect(() => { if (!paused || loading) return; const id = requestAnimationFrame(t => advance(t)); return () => cancelAnimationFrame(id); }, [paused, loading, size, advance]);
-  const controls = useRef<ComponentRef<typeof OrbitControls>>(null); const shadowRoot=useRef<THREE.Group>(null);const jump=useRef({height:0,velocity:0});const touch=useRef({x:0,z:0}); const heroRoot = useRef<THREE.Group>(null);
+  const controls = useRef<ComponentRef<typeof OrbitControls>>(null); const shadowRoot=useRef<THREE.Group>(null);const jump=useRef({height:0,velocity:0});const movement=useRef(MOVEMENT_REST);const canvasPointer=useRef(""); const heroRoot = useRef<THREE.Group>(null);
   const mounted=useGame(s=>s.mounted); const encounter=useGame(s=>s.encounter); const relocation=useGame(s=>s.relocation); const lastRelocation=useRef(relocation); const hero = useGame(s => s.hero); const riding=mounted&&hero.level>=MOUNT_LEVEL&&!hero.dead&&!encounter&&!hero.instance; const walkMode = useGame(s => s.walking); const speed=4.5*(riding?mountSpeed(hero):walkMode?.55:1); const mount=mountOf(hero);const airborne=riding&&(mount?.id==="dragon"||mount?.id==="griffin"&&!!hero.flyingMount);const mountKind=mount?.id==="dragon"?"dragon":mount?.id==="boar"?"boar":"wolf"; const adventure=adventureOf(hero); const title=hero.chamberComplete ? "Guardião dos Dez Artefatos" : titleOf(adventure); const doorNote=useRef(0); const look = useGame(s => s.look); const education = useGame(s => s.education.completed); const reduced = useGame(s => s.settings.reduceMotion);
   const gear = activeEquipment(hero, ITEMS);
   const companion = hunterCompanion(hero, gear);
@@ -260,7 +260,12 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
     .sort((a,b)=>a.distance-b.distance).slice(0,compact?2:4);
   const labeledNpcs = new Set(encounter ? [] : nearbyNames.map(npc=>npc.id));
   const camera = useThree(s => s.camera);const invalidate=useThree(s=>s.invalidate); const canvas=useThree(s=>s.gl.domElement);
-  useEffect(()=>{bindCursor(canvas);return()=>bindCursor(null);},[canvas]); useEffect(()=>{setCombatCursor(!!encounter);},[encounter]); const temp = useRef(new THREE.Vector3()); const offset = useRef(new THREE.Vector3());
+  useEffect(()=>{
+    const rememberPointer=(event:PointerEvent)=>{canvasPointer.current=event.pointerType;};
+    bindCursor(canvas);
+    canvas.addEventListener("pointerdown",rememberPointer);
+    return ()=>{canvas.removeEventListener("pointerdown",rememberPointer);bindCursor(null);};
+  },[canvas]); useEffect(()=>{setCombatCursor(!!encounter);},[encounter]); const temp = useRef(new THREE.Vector3()); const offset = useRef(new THREE.Vector3());
   useLayoutEffect(()=>{const c=controls.current;if(!c)return;const p=player.current;temp.current.set(p.x,worldCameraTargetHeight(thirdPerson, false),p.z);offset.current.copy(temp.current).sub(c.target);camera.position.add(offset.current);c.target.copy(temp.current);c.update();invalidate();},[camera,invalidate,thirdPerson]);
   const pausedRef = useRef(paused); useEffect(() => { pausedRef.current = paused; }, [paused]);
   const [light, setLight] = useState(0.8);
@@ -270,8 +275,8 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
   }, [hero.position, hero.dead, hero.region, relocation,player,camera,invalidate,thirdPerson,airborne]);
   useEffect(() => {
     const down = (e: KeyboardEvent) => { if (pausedRef.current||e.ctrlKey||e.altKey||e.metaKey||isEditingTarget(e.target))return;if(e.code==="Space"){e.preventDefault();if(!e.repeat)keys.current.add("jump");return;} const k = e.key.toLowerCase(); if (["e"].includes(k)) { e.preventDefault(); keys.current.add(k); } };
-    const up = (e: KeyboardEvent) => keys.current.delete(e.key.toLowerCase()); const blur = () => keys.current.clear();
-    const onJump=()=>{if(!pausedRef.current)keys.current.add("jump");},onInteract=()=>{if(!pausedRef.current)keys.current.add("e");},onMove=(e:Event)=>{const p=(e as CustomEvent<{x:number;z:number}>).detail;if(p&&Number.isFinite(p.x)&&Number.isFinite(p.z))touch.current=p;};window.addEventListener("lions-cave-jump",onJump);window.addEventListener("lions-cave-interact",onInteract);window.addEventListener("lions-cave-move",onMove);
+    const up = (e: KeyboardEvent) => keys.current.delete(e.key.toLowerCase()); const blur = () => {keys.current.clear();movement.current=MOVEMENT_REST;};
+    const onJump=()=>{if(!pausedRef.current)keys.current.add("jump");},onInteract=()=>{if(!pausedRef.current)keys.current.add("e");},onMove=(e:Event)=>{const p=(e as CustomEvent<{x:number;z:number}>).detail;if(p&&Number.isFinite(p.x)&&Number.isFinite(p.z))movement.current=pausedRef.current?MOVEMENT_REST:p;};window.addEventListener("lions-cave-jump",onJump);window.addEventListener("lions-cave-interact",onInteract);window.addEventListener("lions-cave-move",onMove);
     window.addEventListener("keydown", down); window.addEventListener("keyup", up); window.addEventListener("blur", blur);
     return () => {window.removeEventListener("lions-cave-jump",onJump);window.removeEventListener("lions-cave-interact",onInteract);window.removeEventListener("lions-cave-move",onMove); window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); window.removeEventListener("blur", blur); };
   }, []);
@@ -369,7 +374,8 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
   useFrame((_, delta) => {
     const dt = Math.min(delta, 0.05); let moving = false;
     if (!paused && !hero.dead && !useGame.getState().encounter) {
-      if (guide && (handledGuide.current?.request !== guide || handledGuide.current.region !== hero.region)) {
+      const input=movement.current;
+      if (!input.x && !input.z && guide && (handledGuide.current?.request !== guide || handledGuide.current.region !== hero.region)) {
         handledGuide.current = { request: guide, region: hero.region };
         if (stop?.overland) followRoad(stop.point);
         else if (stop) approachInteraction(...stop.point, () => {
@@ -403,8 +409,23 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
       if(useGame.getState().hero.region!==hero.region)return;
       const fromZ = player.current.z;
       const k = keys.current;
-      if (path.current.length && !walkable(...path.current[0],worldRegion, airborne)) path.current=[];
-      if (path.current.length) { const p = path.current[0]; temp.current.set(p[0] - player.current.x, 0, p[1] - player.current.z); if (temp.current.length() < 0.14) path.current.shift(); else { const step = Math.min(temp.current.length(), dt * speed); temp.current.normalize().multiplyScalar(step); player.current.add(temp.current); moving = true; } }
+      if(input.x||input.z){
+        if(guide)endGuide();
+        path.current=[];pending.current=null;gatherTarget.current=null;monsterTarget.current=null;
+        const state=useGame.getState();
+        if(state.queued)state.setTarget(state.target);
+        const orbitTarget=controls.current?.target??player.current;
+        const direction=movementRelativeToCamera(input,camera.position.x-orbitTarget.x,camera.position.z-orbitTarget.z);
+        const playerPosition=player.current;
+        const [x,z]=movementStep(playerPosition.x,playerPosition.z,direction.x*speed*dt,direction.z*speed*dt,
+          (nextX,nextZ)=>walkable(nextX,nextZ,worldRegion,airborne));
+        temp.current.set(x-playerPosition.x,0,z-playerPosition.z);
+        moving=temp.current.lengthSq()>0;
+        playerPosition.add(temp.current);
+      } else {
+        if (path.current.length && !walkable(...path.current[0],worldRegion, airborne)) path.current=[];
+        if (path.current.length) { const p = path.current[0]; temp.current.set(p[0] - player.current.x, 0, p[1] - player.current.z); if (temp.current.length() < 0.14) path.current.shift(); else { const step = Math.min(temp.current.length(), dt * speed); temp.current.normalize().multiplyScalar(step); player.current.add(temp.current); moving = true; } }
+      }
       if (moving && crossBoundary()) return;
       // Masmorra: a porta de código fechada segura o herói na sala atual.
       if (hero.instance && moving) { const sealed = doorBetween(hero.instance, adventure.doors, fromZ, player.current.z); if (sealed) { player.current.z = sealed.z + .6; path.current = []; monsterTarget.current = null; if (useGame.getState().queued) useGame.setState({ queued: null }); if (Date.now() - doorNote.current > 4000) { doorNote.current = Date.now(); report(`🔒 ${sealed.title}: clique na porta e resolva o código.`); } } }
@@ -440,7 +461,7 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
       if(gatherTarget.current){const g=gatherTarget.current;if(Math.hypot(player.current.x-g.x,player.current.z-g.z)<3){path.current=[];gatherTarget.current=null;useGame.getState().move([player.current.x,player.current.z]);useGame.getState().gather(g.id);}}
       if (k.has("e")) { k.delete("e"); const npc = NPCS_LIVE.find(n => Math.hypot(player.current.x - n.x, player.current.z - n.z) < 3.3); if (npc) { useGame.getState().move([player.current.x, player.current.z]); interact(npc.id); } }
     } else { keys.current.clear(); path.current = []; pending.current = null; handledGuide.current = null; if (guide && useGame.getState().encounter) endGuide(); }
-    if(!paused&&!hero.dead&&!useGame.getState().encounter){if(keys.current.delete("jump")&&jump.current.height===0)jump.current.velocity=6.2;jump.current=advanceJump(jump.current.height,jump.current.velocity,dt);}else{keys.current.delete("jump");touch.current={x:0,z:0};}
+    if(!paused&&!hero.dead&&!useGame.getState().encounter){if(keys.current.delete("jump")&&jump.current.height===0)jump.current.velocity=6.2;jump.current=advanceJump(jump.current.height,jump.current.velocity,dt);}else{keys.current.delete("jump");movement.current=MOVEMENT_REST;}
     if (moving !== wasWalking.current) { setWalking(moving); wasWalking.current = moving; }
     const relief=airborne?flightRelief(hero.region,player.current.x,player.current.z):0;
     if(heroRoot.current){heroRoot.current.position.copy(player.current);heroRoot.current.position.y=jump.current.height+(airborne?FLIGHT_HEIGHT+relief:0);}if(shadowRoot.current){shadowRoot.current.position.set(player.current.x,.045,player.current.z);shadowRoot.current.scale.setScalar(1-jump.current.height*.13);}
@@ -482,7 +503,7 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
     checkpoint.current += dt;
     if (checkpoint.current > 0.7) { checkpoint.current = 0; const p = useGame.getState().hero.position; if (Math.hypot(p[0] - player.current.x, p[1] - player.current.z) > 0.05) useGame.getState().move([player.current.x, player.current.z]); }
   });
-  const groundClick = (e: ThreeEvent<MouseEvent>) => { if (e.button !== 0 || e.delta > 6 || paused) return; e.stopPropagation(); if(useGame.getState().encounter)return;endGuide();useGame.getState().setTarget(null);pending.current = null;monsterTarget.current=null;gatherTarget.current=null; travel(e.point.x, e.point.z); };
+  const groundClick = (e: ThreeEvent<MouseEvent>) => { if (e.button !== 0 || e.delta > 6 || paused) return; e.stopPropagation(); if(canvasPointer.current==="touch" || useGame.getState().encounter)return;endGuide();useGame.getState().setTarget(null);pending.current = null;monsterTarget.current=null;gatherTarget.current=null; travel(e.point.x, e.point.z); };
   const horizon = hero.instance ? undefined : biomeOf(hero.region)?.horizon;
   const sky = new THREE.Color("#596882").lerp(new THREE.Color(horizon??"#c2d9d9"),
     Math.max(0,Math.min(1,(light-.36)/.64))).getStyle();
@@ -547,7 +568,7 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
     </group>
     {companion&&!hero.dead&&!airborne&&<PetFollower kind={companion} player={player} reduced={reduced} combat/>}
     {adventure.pet&&!hero.dead&&<PetFollower kind={adventure.pet as PetId} player={player} reduced={reduced}/>}
-    <OrbitControls ref={controls} enablePan={false} enabled={!paused} enableDamping={!reduced} dampingFactor={0.08} minZoom={WORLD_ZOOM.min} maxZoom={WORLD_ZOOM.max} minDistance={desktopCamera ? 5.5 : 8} maxDistance={desktopCamera ? 32 : thirdPerson ? 25 : 13} minPolarAngle={desktopCamera ? .38 : thirdPerson ? .94 : .84} maxPolarAngle={desktopCamera ? 1.46 : thirdPerson ? 1.32 : .84} mouseButtons={{ LEFT: undefined, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE }} touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }} />
+    <OrbitControls ref={controls} enablePan={false} enabled={!paused} enableDamping={!reduced} dampingFactor={0.08} minZoom={WORLD_ZOOM.min} maxZoom={WORLD_ZOOM.max} minDistance={desktopCamera ? 5.5 : 8} maxDistance={desktopCamera ? 32 : thirdPerson ? 25 : 13} minPolarAngle={WORLD_ORBIT.minPolarAngle} maxPolarAngle={WORLD_ORBIT.maxPolarAngle} rotateSpeed={WORLD_ORBIT.rotateSpeed} mouseButtons={{ LEFT: undefined, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE }} touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }} />
   </>;
 }
 export default function GameWorld(props: { guide: GuideRequest | null; endGuide: () => void; paused: boolean; interact: (id: NpcId) => void; openService: (id: TownService | InteriorPanel | "mounts" | "journey" | "workshop") => void; report: (text: string) => void; openMarket: (id: MarketStall) => void }) {

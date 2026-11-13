@@ -1,4 +1,46 @@
-/* Combat UI has no movement control; click/tap the ground to travel. */
+/* Movement control sits above the XP bar and outside the camera gesture area. */
+.movement-pad {
+  position: absolute;
+  left: max(16px, env(safe-area-inset-left));
+  bottom: calc(env(safe-area-inset-bottom) + 44px);
+  z-index: 11;
+  display: grid;
+  place-items: center;
+  width: clamp(68px, 12vmin, 102px);
+  aspect-ratio: 1;
+  min-height: 0;
+  padding: 0;
+  border: 1px solid #e0c391aa;
+  border-radius: 50%;
+  background: radial-gradient(circle,#314b58b8,#112330c9);
+  box-shadow: inset 0 0 0 4px #ebd5a121, 0 3px 10px #06121c66;
+  touch-action: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+.movement-pad:focus-visible { outline: 2px solid #fff1cc; outline-offset: 3px; }
+.movement-pad-directions { position: absolute; inset: 4px; pointer-events: none; }
+.movement-pad-directions i { position: absolute; color: #f3d99b; font: normal 10px/1 sans-serif; }
+.movement-pad-directions i:nth-child(1) { left: 50%; top: 1px; transform: translateX(-50%); }
+.movement-pad-directions i:nth-child(2) { right: 1px; top: 50%; transform: translateY(-50%); }
+.movement-pad-directions i:nth-child(3) { left: 50%; bottom: 1px; transform: translateX(-50%); }
+.movement-pad-directions i:nth-child(4) { left: 1px; top: 50%; transform: translateY(-50%); }
+.movement-pad-thumb {
+  width: 40%;
+  aspect-ratio: 1;
+  border: 1px solid #f4d69a;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 30%,#658494,#284652 76%);
+  box-shadow: 0 2px 6px #09172499;
+  pointer-events: none;
+}
+@media (orientation: landscape) and (max-height: 540px) {
+  .movement-pad {
+    left: calc(var(--screen-left, 14px) + min(150px, 26vw) + 10px);
+    bottom: calc(var(--screen-bottom, 8px) + 26px);
+  }
+}
+
 .game-shell {
   --combat-control-size: 48px;
   --combat-attack-size: 64px;

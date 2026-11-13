@@ -28,3 +28,27 @@ export function autoAttackStep(s:{identity:string|null;dead:boolean;stamina:numb
  if(s.hidden||s.dead||s.identity!==target||!(s.canAttack??s.stamina>=9))return 'stop';
  return s.encounter?'attack':s.queued?'wait':'approach';
 }
+
+export type MovementVector = { x:number; z:number };
+export const MOVEMENT_REST:MovementVector = {x:0,z:0};
+
+export function movementStick(x:number,z:number):MovementVector {
+  const length=Math.hypot(x,z),deadZone=.13;
+  if(length<=deadZone)return MOVEMENT_REST;
+  const strength=((Math.min(length,1)-deadZone)/(1-deadZone))**1.35;
+  return {x:x/length*strength,z:z/length*strength};
+}
+
+export function movementRelativeToCamera(input:MovementVector,backX:number,backZ:number):MovementVector {
+  const length=Math.hypot(backX,backZ);
+  if(length<.001)return input;
+  return {x:(input.x*backZ+input.z*backX)/length,z:(input.z*backZ-input.x*backX)/length};
+}
+
+export function movementStep(x:number,z:number,dx:number,dz:number,canMove:(x:number,z:number)=>boolean):[number,number] {
+  const alongX=canMove(x+dx,z),alongZ=canMove(x,z+dz);
+  if(alongX&&alongZ&&canMove(x+dx,z+dz))return [x+dx,z+dz];
+  if(alongX&&(!alongZ||Math.abs(dx)>=Math.abs(dz)))return [x+dx,z];
+  if(alongZ)return [x,z+dz];
+  return [x,z];
+}

@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import {strict as assert} from 'node:assert';
-import {advanceJump,HOTBAR_KEYS,hotbarIndex,normalizeHotbar} from './controls';
+import {advanceJump,HOTBAR_KEYS,movementRelativeToCamera,movementStep,movementStick,hotbarIndex,normalizeHotbar} from './controls';
 import {cleanHud,clampHud} from './hud';
 import {freshSave,migrateSave,DEFAULT_LOOK,HAIR,EYES} from './game';
 import {buildCartoonAvatar,CLASS_STYLE} from './cartoonAvatar';
@@ -15,3 +15,20 @@ test('volume, ambiente e mudo são preservados sem apagar o volume anterior',()=
 test('pilares decorativos bloqueiam caminhos fora da vila',()=>{const p=REGION_PILLARS[0];assert.equal(walkable(p.x,p.z, 'ruins'),false);const path=findPath([0,7],[6,-18], 'ruins');assert.ok(path.length);for(const [x,z]of path)assert.ok(walkable(x,z, 'ruins'));});
 test('as nove classes possuem identidade própria e juntas de animação',()=>{const emblems=new Set<string>();for(const classId of Object.keys(CLASS_STYLE) as (keyof typeof CLASS_STYLE)[]){const root=buildCartoonAvatar({race:'human',classId,look:DEFAULT_LOOK,hairColor:HAIR[0],eyeColor:EYES[0],gear:new Set()});emblems.add(root.userData.emblem);for(const joint of ['head','armLeft','armRight','legLeft','legRight','weaponAnchor','offhandAnchor'])assert.ok(root.getObjectByName(joint),classId+': '+joint);assert.equal(root.userData.classId,classId);disposeAvatar(root);}assert.equal(emblems.size,9);});
 test('novo modelo usa índices de aparência sem alterar o salvamento',()=>{const look={...DEFAULT_LOOK,nose:5,beard:4,skin:3,body:5};const before=JSON.stringify(look);const root=buildCartoonAvatar({race:'gnome',classId:'hacker',look,hairColor:HAIR[2],eyeColor:EYES[1],gear:new Set(['head','chest'])});assert.equal(JSON.stringify(look),before);assert.deepEqual(root.userData.appearance,look);disposeAvatar(root);});
+
+test('direcional ignora toque próximo ao centro, dosa a velocidade e limita a diagonal',()=>{
+ assert.deepEqual(movementStick(.08,.07),{x:0,z:0});
+ const partial=movementStick(.5,0);
+ assert.ok(partial.x>0&&partial.x<.5);
+ const diagonal=movementStick(2,-2);
+ assert.ok(Math.abs(Math.hypot(diagonal.x,diagonal.z)-1)<1e-9);
+});
+
+test('direcional acompanha o ângulo da câmera e desliza junto à muralha sem atravessar o canto',()=>{
+ assert.deepEqual(movementRelativeToCamera({x:0,z:-1},0,4),{x:0,z:-1});
+ const rotated=movementRelativeToCamera({x:0,z:-1},4,0);
+ assert.ok(rotated.x===-1&&rotated.z===0);
+ assert.deepEqual(movementStep(0,0,.1,.1,x=>x<=0),[0,.1]);
+ assert.deepEqual(movementStep(0,0,.1,.2,(x,z)=>x===0||z===0),[0,.2]);
+ assert.deepEqual(movementStep(0,0,.1,.1,()=>false),[0,0]);
+});

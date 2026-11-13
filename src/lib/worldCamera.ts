@@ -1,5 +1,6 @@
 import type { OrthographicCamera } from 'three';
 
+export const WORLD_ORBIT = { minPolarAngle: .20, maxPolarAngle: 1.59, rotateSpeed: .66 };
 export const WORLD_ZOOM = { min: 18, max: 58 };
 export const FLIGHT_HEIGHT = 4.45;
 

@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import {strict as assert} from 'node:assert';
 import {OrthographicCamera,PerspectiveCamera,Vector3} from 'three';
-import { FLIGHT_HEIGHT, frameWorld, WORLD_ZOOM, worldCameraOptions, worldCameraTargetHeight } from './worldCamera';
+import { FLIGHT_HEIGHT, frameWorld, WORLD_ORBIT, WORLD_ZOOM, worldCameraOptions, worldCameraTargetHeight } from './worldCamera';
 test('mapa mantém área jogável no desktop, iPhone e após redimensionamento',()=>{
  const camera=new OrthographicCamera();camera.zoom=worldCameraOptions(false, false).zoom!;
  for(const [width,height]of [[2048,728],[1366,768],[393,852],[852,393],[0,0]]){
@@ -49,4 +49,10 @@ test('o foco da câmera acompanha a subida em ambas as projeções', () => {
   const flying = worldCameraTargetHeight(thirdPerson, true);
   assert.ok(flying > ground && flying < ground + FLIGHT_HEIGHT);
  }
+});
+
+test('a inclinação permite ver o terreno de cima e alcançar o horizonte sem afundar a câmera',()=>{
+ assert.ok(WORLD_ORBIT.minPolarAngle<Math.PI/6);
+ assert.ok(WORLD_ORBIT.maxPolarAngle>=Math.PI/2);
+ assert.ok(worldCameraTargetHeight(false,false)+32*Math.cos(WORLD_ORBIT.maxPolarAngle)>.25);
 });

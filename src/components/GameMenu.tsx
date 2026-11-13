@@ -35,7 +35,7 @@ export default function GameMenu({hidden=false,open:openPanel,keys,rest,canRest,
     <button role="menuitem" onClick={()=>choose(()=>openPanel('bank'))}><span className="menu-icon" aria-hidden>🏦</span><b>Banco</b><small>Guardar com juros</small></button>
     <button role="menuitem" onClick={()=>choose(()=>openPanel('wagon'))}><span className="menu-icon" aria-hidden>🐴</span><b>Carroça</b><small>Viagem · 2,5 prata</small></button></div>
    <div className="game-menu-row"><AudioControls/><button onClick={()=>choose(switchCharacter)}>Trocar personagem</button><button onClick={()=>choose(()=>openPanel('settings'))}>⚙ Configurações</button><button onClick={()=>choose(()=>window.dispatchEvent(new Event(MENU_EDIT_EVENT)))}>▦ Organizar a tela</button></div>
-   <p className="game-menu-help">Clique no chão para andar · clique no monstro para lutar · roda ou pinça dá zoom</p>
+   <p className="game-menu-help">Use o direcional para andar · arraste para girar a câmera no celular · roda ou pinça dá zoom</p>
    <footer><span>LOVELACE KINGDOM {version}</span><span>{error?'Exportação necessária':<CloudIndicator/>}</span></footer>
   </div>}
  </div>;
