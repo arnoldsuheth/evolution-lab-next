@@ -54,6 +54,7 @@ export function faceParts({ look: chosen, race, covered, extra, dwarfHair, femin
     5: mirror({ part: 'shade', shape: 'capsule', color: 'shade', position: [F.eyeX, F.eyeY - .065, .468], scale: [.012, .05, .01], rotation: [0, 0, Math.PI / 2] }),
   };
   if (details[chosen.face ?? 0]) add(...details[chosen.face ?? 0]);
+  if (feminine && (chosen.face ?? 0) !== 2) add(...mirror({ part: 'cheek', shape: 'sphere', color: 'blush', position: [.27, 1.47, .45], scale: [.06, .035, .02] }));
   if (race === 'dwarf') {
     // Traços do anão: nariz de batata, testa marcada e bochechas coradas.
     add({ part: 'nose', shape: 'sphere', color: 'skin', position: [0, F.noseY - .03, .53], scale: [.13, .1, .12] },

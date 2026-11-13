@@ -38,7 +38,7 @@ import { hitWeight, type HitTier } from "./impact";
 import { type CombatAction, type EffectKind } from "./combatEffects";
 import { NEXUS_SECONDS, cleanNexus, nexusFull } from "./nexus";
 import { QUESTS, GATHER_NODES, GATHER_RESPAWN_MS, MONSTER_RESPAWN_MS, acceptQuest as acceptLog, progressQuests, turnInQuest as turnInLog, cleanLog, goal, type QuestEvent } from "./quests";
-import { CLASSES, ITEMS, LESSONS, evaluateLesson, freshHero, freshSave, grantStarterGear, migrateSave, stats, withXp, type SaveData, type ClassId, type Look, type Settings, type Race, validRaceClass, raceForClass } from "./game";
+import { CLASSES, ITEMS, LESSONS, evaluateLesson, freshHero, freshSave, grantStarterGear, grantStarterWeapon, migrateSave, stats, withXp, type SaveData, type ClassId, type Look, type Settings, type Race, validRaceClass, raceForClass } from "./game";
 /** Serviços da vila (banco, carroça): só dentro da Pedra da Aurora, fora de masmorra. */
 const atForge=(hero:{instance?:string|null;region:RegionId;position:[number,number]})=>!hero.instance&&(hero.region==='aurora'
   ?Math.hypot(hero.position[0]+7,hero.position[1])<=8
@@ -430,5 +430,5 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
   setPet:id=>{const s=get(),adv=adventureOf(s.hero);if(id&&!unlockedPets(adv).includes(id as PetId))return;set({hero:{...s.hero,adventure:{...adv,pet:id}}});},
   openDoor:(id,code)=>{const s=get(),d=DOORS.find(d=>d.id===id),result=tryDoor(id,code);if(!d||s.hero.dead)return result;if(s.hero.instance!==d.instance||Math.abs(s.hero.position[1]-d.z)>10){set({notice:'Chegue perto da porta para usar o código.'});return {...result,passed:false,results:[...result.results,{label:'Lugar',passed:false,message:'O código está certo! Agora chegue perto desta porta, dentro da masmorra, e execute de novo.'}]};}const adv=adventureOf(s.hero);if(!result.passed||adv.doors.includes(id))return result;const xp=40+s.hero.level*6;set({hero:{...withXp(s.hero,xp),adventure:{...adv,doors:[...adv.doors,id]}},notice:`A porta “${d.title}” se abriu! +${xp} XP.`});return result;},
   clearNotice: () => set({ notice: "" }),
-}), { name: SAVE_KEY, version: 4, skipHydration: true, storage: optimizedStorage, partialize: savedState, migrate: state => migrateSave(state), merge: (saved, current) => ({ ...current, ...migrateSave(saved) }), onRehydrateStorage: () => (_s, error) => { if (error) { blocked = true; storageIssue ||= "Seu salvamento foi preservado, mas precisa de recuperação."; } } }));
+}), { name: SAVE_KEY, version: 4, skipHydration: true, storage: optimizedStorage, partialize: savedState, migrate: state => migrateSave(state), merge: (saved, current) => { const next = migrateSave(saved); return { ...current, ...next, hero: grantStarterWeapon(next.hero) }; }, onRehydrateStorage: () => (_s, error) => { if (error) { blocked = true; storageIssue ||= "Seu salvamento foi preservado, mas precisa de recuperação."; } } }));
 
