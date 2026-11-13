@@ -6,7 +6,8 @@ import {clone} from 'three/examples/jsm/utils/SkeletonUtils.js';
 import type {ClassId,Race} from '@/lib/game';
 import {HEAD_MESH,OFFHAND_MESH,WEAPON_MESH,headLook,BODY_WIDTH,BODY_HEIGHT,HERO_BASE_FILES,HERO_HAT_MESHES,HERO_HIT,HERO_PARTS,HERO_PUNCH,HERO_STYLE,HERO_WALK,HERO_WEAPON_MESHES,heroDress,heroProportions,recolorAtlas,type HeroBase,type HeroGear,type RecolorOptions} from '@/lib/heroModels';
 import {useGame} from '@/lib/store';
-import {buildFaceKit,RACE_HEAD_SHAPE,type FaceOptions} from '@/lib/faceKit';
+import {buildFaceKit,RACE_EARS,RACE_HEAD_SHAPE,type FaceOptions} from '@/lib/faceKit';
+import {trimHead,type TrimParts} from '@/lib/headTrim';
 import {gearLook,rarityTier} from '@/lib/gearPieces';
 import {BorrowedPiece,SimpleWeapon} from './HeroGear';
 import {attachGearPieces,GearAura} from './GearPieces';
@@ -23,7 +24,7 @@ const NOT_BODY=(name:string)=>HERO_HAT_MESHES.includes(name)||(HERO_WEAPON_MESHE
 const NO_FACE:FaceOptions['look']={beard:0,moustache:0,brows:0,nose:0,ears:0,scar:0,tattoo:0,accessory:0};
 /** Preserva as proporções raciais quando as animações definem a escala dos ossos. */
 const clipCache=new WeakMap<THREE.AnimationClip[],THREE.AnimationClip[]>();
-function headFreeClips(clips:THREE.AnimationClip[]){let out=clipCache.get(clips);if(!out){out=clips.map(c=>{const k=c.clone();k.tracks=k.tracks.filter(t=>t.name!=='head.scale'&&!Array.from(COMPACT_LEGS).some(name=>t.name===name+'.scale'));return k;});clipCache.set(clips,out);}return out;}
+function headFreeClips(clips:THREE.AnimationClip[]){let out=clipCache.get(clips);if(!out){out=clips.map(c=>{const k=c.clone();k.tracks=k.tracks.filter(t=>!t.name.endsWith('.scale'));return k;});clipCache.set(clips,out);}return out;}
 /** Capuz (armadura): só a cor muda com a raridade. */
 const HOOD_TINT:Record<string,string|undefined>={common:undefined,epic:'#7a52c9',mythic:'#d9a531'};
 const materials=new Map<string,THREE.Material>();
@@ -46,26 +47,30 @@ function recolored(source:THREE.MeshStandardMaterial,key:string,classId:ClassId,
 }
 
 /** Cabeça (penteado ou capuz) vinda de outro corpo-base; todos usam o mesmo esqueleto. */
-function ForeignHead({from,host,classId,skin,hair,eyes,tint}:{from:HeroBase;host:THREE.SkinnedMesh;classId:ClassId;skin:string;hair:string;eyes?:string;tint?:string}){
+function ForeignHead({from,host,classId,skin,hair,eyes,tint,trim}:{from:HeroBase;host:THREE.SkinnedMesh;classId:ClassId;skin:string;hair:string;eyes?:string;tint?:string;trim:string}){
  const gltf=useGLTF(heroModelUrl(from));
  useLayoutEffect(()=>{
   let source:THREE.SkinnedMesh|undefined;gltf.scene.traverse(o=>{if(o instanceof THREE.SkinnedMesh&&o.name===HERO_PARTS[from].head)source=o;});
   const parent=host.parent;if(!source||!parent)return;
   const material=source.material instanceof THREE.MeshStandardMaterial?recolored(source.material,`${from}|${classId}|${skin}|head|${hair}|${eyes}|${tint??''}`,classId,skin,{hair:{base:from,color:hair},eyes},tint):source.material;
-  const head=new THREE.SkinnedMesh(source.geometry,material);head.name='foreign-head';head.castShadow=true;
+  const head=new THREE.SkinnedMesh(trimHead(source.geometry,JSON.parse(trim) as TrimParts),material);head.name='foreign-head';head.castShadow=true;
   head.position.copy(host.position);head.quaternion.copy(host.quaternion);head.scale.copy(host.scale);
   head.bind(host.skeleton,source.bindMatrix);parent.add(head);
   return()=>{head.removeFromParent();};
- },[gltf.scene,from,host,classId,skin,hair,eyes,tint]);
+ },[gltf.scene,from,host,classId,skin,hair,eyes,tint,trim]);
  return null;
 }
 
-export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairStyle=0,body:bodyShape=2,face=NO_FACE,showHelmet=true,weaponRarity='Comum',gearItems=[],gear,armed,shielded,walking=false,animated=true,combatant=false,preview=false}:{classId:ClassId;race:Race;skin:string;hair?:string;eyes?:string;hairStyle?:number;body?:number;face?:FaceOptions['look'];showHelmet?:boolean;weaponRarity?:string;gearItems?:{slot:string;rarity:string;visual?:string;classId?:ClassId}[];gear:HeroGear;armed:boolean;shielded:boolean;walking?:boolean;animated?:boolean;combatant?:boolean;preview?:boolean}){
+export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairStyle=0,body:bodyShape=2,face=NO_FACE,showHelmet=true,weaponRarity='Comum',gearItems=[],gear,armed,shielded,walking=false,animated=true,combatant=false,preview=false,feminine=false}:{feminine?:boolean;classId:ClassId;race:Race;skin:string;hair?:string;eyes?:string;hairStyle?:number;body?:number;face?:FaceOptions['look'];showHelmet?:boolean;weaponRarity?:string;gearItems?:{slot:string;rarity:string;visual?:string;classId?:ClassId}[];gear:HeroGear;armed:boolean;shielded:boolean;walking?:boolean;animated?:boolean;combatant?:boolean;preview?:boolean}){
  const style=HERO_STYLE[classId],gltf=useGLTF(heroModelUrl(style.base));
  const eventTime=useGame(s=>combatant?s.battleEvent?.time??0:0),hurtTime=useGame(s=>combatant&&s.battleEvent?.received?s.battleEvent.time:0);
  const punch=useGame(s=>combatant&&s.battleEvent?.basicEffect==='punch');
  const gearKey=gearItems.map(i=>`${i.slot}:${i.rarity}`).join('|'),equipmentLook=useMemo(()=>gearLook(gearKey?gearKey.split('|').map(e=>{const [slot,rarity]=e.split(':');return {slot,rarity};}):[]),[gearKey]);
  const dress=heroDress(classId,gear,hairStyle,showHelmet,race),{outfit,cape,head,extra,covered}=dress,faceKey=JSON.stringify(face);
+ // 5.0: peças originais que saem da malha quando o jogador escolhe outra (não ficam mais uma por cima da outra).
+ // Moicano e raspado: o cabelo do modelo vira couro cabeludo (pele um pouco mais escura) e a crista vem por cima.
+ const scalp=extra==='mohawk'||extra==='shaved',headHair=scalp?'#'+new THREE.Color(skin).lerp(new THREE.Color('#3a2a20'),.3).getHexString():hair;
+ const trimKey=JSON.stringify({brows:!covered&&(face.brows>0||scalp),nose:face.nose>0||race==='dwarf',ears:!covered&&(face.ears||RACE_EARS[race])>0});
  // Item equipado manda: arma, escudo e elmo aparecem iguais ao ícone (peças nativas da classe só sem item).
  const weaponItem=gearItems.find(i=>i.slot==='weapon'||i.slot==='twohand'),offItem=gearItems.find(i=>i.slot==='offhand'),headItem=gearItems.find(i=>i.slot==='head');
  const headKind=headItem?headLook(headItem.classId??classId):null,wornHat=!!(dress.hat||dress.covered)&&headKind!==null&&headKind!=='hood'?HEAD_MESH[headKind]:null;
@@ -78,15 +83,22 @@ export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairSty
    else if(HERO_HAT_MESHES.includes(o.name))o.visible=o.name===hat;
    else if(o.name===parts.cape)o.visible=cape;
    if(!(o.material instanceof THREE.MeshStandardMaterial))return;
-   if(o.name===parts.head){if(o instanceof THREE.SkinnedMesh)host=o;o.visible=head===style.base;o.material=recolored(o.material,`${style.base}|${classId}|${skin}|head|${hair}|${eyes}`,classId,skin,{hair:{base:style.base,color:hair},eyes});}
+   if(o.name===parts.head){if(o instanceof THREE.SkinnedMesh)host=o;o.visible=head===style.base;const mesh=o as THREE.Mesh;mesh.userData.baseGeometry??=mesh.geometry;mesh.geometry=trimHead(mesh.userData.baseGeometry,JSON.parse(trimKey) as TrimParts);o.material=recolored(o.material,`${style.base}|${classId}|${skin}|head|${headHair}|${eyes}`,classId,skin,{hair:{base:style.base,color:headHair},eyes});}
    else{const rags=outfit==='rags'&&!weapon;o.material=recolored(o.material,`${style.base}|${classId}|${skin}|${rags?'rags':'class'}`,classId,skin,{rags});if(weapon&&o.visible)o.material=glowing(o.material,weaponRarity);}});
   // Peças de rosto presas ao osso da cabeça, no mesmo referencial em que a malha foi modelada.
   const headBone=host?(host as THREE.SkinnedMesh).skeleton.bones.find(b=>b.name==='head'):undefined;
-  if(host&&headBone){const skeleton=(host as THREE.SkinnedMesh).skeleton,index=skeleton.bones.indexOf(headBone),kit=buildFaceKit({look:JSON.parse(faceKey),race,covered,extra,hair,skin,dwarfHair:race==='dwarf'?hairStyle:undefined});
+  if(host&&headBone){const skeleton=(host as THREE.SkinnedMesh).skeleton,index=skeleton.bones.indexOf(headBone),kit=buildFaceKit({look:{...JSON.parse(faceKey),...(scalp&&!face.brows?{brows:2}:{})},race,covered,extra,hair,skin,feminine,dwarfHair:race==='dwarf'?hairStyle:undefined});
    const anchor=new THREE.Group();anchor.name='face-anchor';anchor.matrixAutoUpdate=false;anchor.matrix.copy(skeleton.boneInverses[index]);anchor.add(kit);if(classId==='prophet'&&!covered){const halo=new THREE.Mesh(new THREE.TorusGeometry(.5,.035,8,40),new THREE.MeshStandardMaterial({color:'#f2c75c',emissive:'#a8741c',emissiveIntensity:.6,metalness:.7,roughness:.35}));halo.name='prophet-halo';halo.position.set(0,1.82,-.42);kit.add(halo);}headBone.add(anchor);
    const [headWidth,headHeight,headDepth]=RACE_HEAD_SHAPE[race];
    headBone.scale.set(headWidth*.91,headHeight*.9,headDepth*.93);}
   if(race==='dwarf')model.traverse(node=>{if(node instanceof THREE.Bone&&COMPACT_LEGS.has(node.name))node.scale.y*=.78;});
+  // Corpo feminino: ombros e tronco mais estreitos, quadril um pouco mais largo e silhueta mais esguia.
+  if(feminine){const bones:Record<string,THREE.Bone>={};model.traverse(n=>{if(n instanceof THREE.Bone)bones[n.name]=n;});
+   bones.spine?.scale.multiply(new THREE.Vector3(.94,1,.96));bones.chest?.scale.multiply(new THREE.Vector3(.86,1,.92));
+   for(const arm of ['upperarm.l','upperarm.r'])bones[arm]?.scale.multiply(new THREE.Vector3(1/.84*.9,1,1/.9*.92));
+   bones.head?.scale.multiply(new THREE.Vector3(1/.84*.96,.98,1/.9*.97));
+   bones.hips?.scale.multiply(new THREE.Vector3(1.06,1,1.02));
+   for(const leg of ['upperleg.l','upperleg.r'])bones[leg]?.scale.multiply(new THREE.Vector3(1/1.06*.94,1,1/1.02*.95));}
   model.updateMatrixWorld(true);
   model.traverse(node=>{if(node instanceof THREE.SkinnedMesh)node.skeleton.update();});
   const body=new THREE.Box3();model.updateMatrixWorld(true);model.traverse(o=>{if(o instanceof THREE.Mesh&&!NOT_BODY(o.name)){if(o instanceof THREE.SkinnedMesh)o.computeBoundingBox();body.expandByObject(o);}});
@@ -94,7 +106,7 @@ export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairSty
   const tall=BODY_HEIGHT[bodyShape]??1;model.scale.set(scale*width,scale*tall,scale*width);model.position.y=-(body.isEmpty()?0:body.min.y)*scale*tall;
   attachGearPieces(model,equipmentLook.slots);
   return {scene:model,host};
- },[equipmentLook,gltf.scene,style,classId,race,skin,hair,eyes,bodyShape,armed,shielded,preview,outfit,hat,cape,head,extra,covered,faceKey,hairStyle,weaponRarity,ownWeapon,ownOffhand]);
+ },[equipmentLook,gltf.scene,style,classId,race,skin,hair,eyes,bodyShape,armed,shielded,preview,outfit,hat,cape,head,extra,covered,faceKey,hairStyle,weaponRarity,ownWeapon,ownOffhand,trimKey,headHair,feminine,scalp,face.brows]);
  const wv=weaponItem?.visual??'',ov=offItem?.visual??'';
  const bow=wv==='bow';
  const twoHandMelee=weaponItem?.slot==='twohand'&&['greatsword','axe','hammer'].includes(wv);
@@ -110,7 +122,7 @@ export default function HeroModel({classId,race,skin,hair='#825235',eyes,hairSty
   {weaponItem&&(mainMesh?<Suspense fallback={null}><BorrowedPiece piece={mainMesh} bone="handslot.r" scene={scene} rarity={weaponItem.rarity} kind="weapon"/></Suspense>:wv&&<SimpleWeapon visual={wv} bone={bow?'handslot.l':'handslot.r'} scene={scene} rarity={weaponItem.rarity}/>)}
   {offItem&&(OFFHAND_MESH[ov]?<Suspense fallback={null}><BorrowedPiece piece={OFFHAND_MESH[ov]} bone="handslot.l" scene={scene} rarity={offItem.rarity} kind="weapon"/></Suspense>:ov&&<SimpleWeapon visual={ov} bone="handslot.l" scene={scene} rarity={offItem.rarity} small/>)}
   {wornHat&&headItem&&<Suspense fallback={null}><BorrowedPiece piece={wornHat} bone="head" scene={scene} rarity={headItem.rarity} kind="armor"/></Suspense>}
-  {host&&head!==style.base&&<Suspense fallback={null}><ForeignHead from={head} host={host} classId={classId} skin={skin} hair={hair} eyes={eyes} tint={headKind==='hood'&&headItem?HOOD_TINT[rarityTier(headItem.rarity)]:undefined}/></Suspense>}
+  {host&&head!==style.base&&<Suspense fallback={null}><ForeignHead from={head} host={host} classId={classId} skin={skin} hair={headHair} eyes={eyes} trim={trimKey} tint={headKind==='hood'&&headItem?HOOD_TINT[rarityTier(headItem.rarity)]:undefined}/></Suspense>}
  </group>;
 }
 

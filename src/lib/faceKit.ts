@@ -21,6 +21,8 @@ export const NOSES = ['Do modelo', 'Pequeno', 'Redondo', 'Grande', 'Pontudo', 'B
 export const EARS = ['Da raça', 'Arredondadas', 'Grandes', 'Pontudas', 'Longas pontudas', 'De abano'];
 export const SCARS = ['Sem cicatriz', 'Bochecha', 'Olho', 'Queixo', 'Testa', 'Cruz'];
 export const PAINTS = ['Sem pintura', 'Faixas', 'Pontos', 'Linha', 'Tribal', 'Lágrima'];
+/** Detalhes do rosto (campo `face` do visual). */
+export const FACES = ['Padrão', 'Sardas', 'Bochechas coradas', 'Covinhas', 'Pinta', 'Olheiras'];
 export const ACCESSORIES = ['Nenhum', 'Brinco', 'Dois brincos', 'Tapa-olho', 'Faixa na testa', 'Argola no nariz'];
 /** Orelha usada quando a opção é “Da raça”. */
 export const RACE_EARS: Record<Race, number> = { human: 0, dwarf: 0, elf: 4, orc: 3, gnome: 2 };
@@ -29,15 +31,29 @@ export const RACE_HEAD: Record<Race, number> = { human: 1, elf: 1, orc: 1.03, dw
 /** Formato da cabeça (largura, altura, profundidade): o anão tem rosto largo e baixo. */
 export const RACE_HEAD_SHAPE: Record<Race, [number, number, number]> = { human: [1, 1, 1], elf: [1, 1, 1], orc: [1.03, 1.03, 1.03], dwarf: [1.4, 1.2, 1.28], gnome: [1.2, 1.2, 1.2] };
 
-export type FacePart = { part: string; shape: 'sphere' | 'cone' | 'capsule' | 'box' | 'torus' | 'cylinder'; color: 'hair' | 'skin' | 'scar' | 'paint' | 'gold' | 'ivory' | 'dark' | 'blush'; position: [number, number, number]; scale: [number, number, number]; rotation?: [number, number, number] };
-export interface FaceOptions { look: Pick<Look, 'beard' | 'moustache' | 'brows' | 'nose' | 'ears' | 'scar' | 'tattoo' | 'accessory'>; race: Race; covered: boolean; extra?: 'ponytail' | 'bun'; dwarfHair?: number }
+/** Peças extras de penteado presas à cabeça. */
+export type HairExtra = 'ponytail' | 'bun' | 'mohawk' | 'spiky' | 'afro' | 'braids' | 'shaved';
+export type FacePart = { part: string; shape: 'sphere' | 'cone' | 'capsule' | 'box' | 'torus' | 'cylinder'; color: 'hair' | 'skin' | 'scar' | 'paint' | 'gold' | 'ivory' | 'dark' | 'blush' | 'freckle' | 'shade' | 'lips'; position: [number, number, number]; scale: [number, number, number]; rotation?: [number, number, number] };
+export interface FaceOptions { look: Pick<Look, 'beard' | 'moustache' | 'brows' | 'nose' | 'ears' | 'scar' | 'tattoo' | 'accessory'> & { face?: number }; race: Race; covered: boolean; feminine?: boolean; extra?: HairExtra; dwarfHair?: number }
 
 const mirror = (p: FacePart): FacePart[] => [p, { ...p, position: [-p.position[0], p.position[1], p.position[2]], rotation: p.rotation ? [p.rotation[0], -p.rotation[1], -p.rotation[2]] : undefined }];
 const braid = (x: number, top: number, links: number, z = .5): FacePart[] => [...Array.from({ length: links }, (_, i): FacePart => ({ part: 'beard', shape: 'sphere', color: 'hair', position: [x, top - i * .11, z - i * .015], scale: [.075 - i * .006, .07, .07] })), { part: 'beard', shape: 'torus', color: 'gold', position: [x, top - links * .11 + .03, z - links * .015], scale: [.05, .05, .05], rotation: [Math.PI / 2, 0, 0] }];
 
 /** Lista pura das peças (testável sem renderizar). */
-export function faceParts({ look, race, covered, extra, dwarfHair }: FaceOptions): FacePart[] {
+export function faceParts({ look: chosen, race, covered, extra, dwarfHair, feminine }: FaceOptions): FacePart[] {
   const parts: FacePart[] = [], add = (...list: FacePart[]) => parts.push(...list), F = FACE;
+  // Corpo feminino: sem barba nem bigode (a anã mantém a barba da raça), com cílios e lábios.
+  const look = feminine && race !== 'dwarf' ? { ...chosen, beard: 0, moustache: 0 } : chosen;
+  if (feminine) add(...mirror({ part: 'lash', shape: 'box', color: 'dark', position: [F.eyeX + .075, F.eyeY + .04, .468], scale: [.055, .014, .02], rotation: [0, 0, -.55] }),
+    { part: 'lips', shape: 'capsule', color: 'lips', position: [0, F.mouthY + .005, .478], scale: [.022, .05, .014], rotation: [0, 0, Math.PI / 2] });
+  const details: Record<number, FacePart[]> = {
+    1: [0, 1, 2, 3].flatMap(i => mirror({ part: 'freckle', shape: 'sphere', color: 'freckle', position: [.16 + (i % 2) * .07 + i * .012, 1.5 - Math.floor(i / 2) * .045, .49 - i * .012], scale: [.013, .013, .008] })),
+    2: mirror({ part: 'cheek', shape: 'sphere', color: 'blush', position: [.27, 1.47, .45], scale: [.075, .045, .025] }),
+    3: mirror({ part: 'dimple', shape: 'sphere', color: 'freckle', position: [.13, F.mouthY - .01, .49], scale: [.012, .016, .008] }),
+    4: [{ part: 'mole', shape: 'sphere', color: 'dark', position: [-.19, 1.43, .49], scale: [.017, .017, .01] }],
+    5: mirror({ part: 'shade', shape: 'capsule', color: 'shade', position: [F.eyeX, F.eyeY - .065, .468], scale: [.012, .05, .01], rotation: [0, 0, Math.PI / 2] }),
+  };
+  if (details[chosen.face ?? 0]) add(...details[chosen.face ?? 0]);
   if (race === 'dwarf') {
     // Traços do anão: nariz de batata, testa marcada e bochechas coradas.
     add({ part: 'nose', shape: 'sphere', color: 'skin', position: [0, F.noseY - .03, .53], scale: [.13, .1, .12] },
@@ -99,9 +115,8 @@ export function faceParts({ look, race, covered, extra, dwarfHair }: FaceOptions
     if (ear === 4) add(...mirror({ part: 'ear', shape: 'cone', color: 'skin', position: [F.earX + .1, F.earY + .14, -.04], scale: [.06, .36, .06], rotation: [-.35, 0, -1.0] }));
     if (ear === 5) add(...mirror({ part: 'ear', shape: 'sphere', color: 'skin', position: [F.earX + .07, F.earY, .03], scale: [.04, .14, .12], rotation: [0, -.7, 0] }));
     // Sobrancelhas acima das pintadas.
-    // O modelo já tem sobrancelhas esculpidas. As opções ficam por cima delas, um pouco maiores,
-    // para cobrir as originais (antes ficava uma sobrancelha em cima da outra).
-    const brow = (y: number, sx: number, sy: number, tilt: number): FacePart[] => mirror({ part: 'brow', shape: 'box', color: 'hair', position: [F.eyeX + .02, y, .474], scale: [sx + .03, sy, .05], rotation: [0, 0, tilt] });
+    // As sobrancelhas esculpidas do modelo são retiradas da malha (headTrim), então a escolhida fica sozinha e no tamanho natural.
+    const brow = (y: number, sx: number, sy: number, tilt: number): FacePart[] => mirror({ part: 'brow', shape: 'box', color: 'hair', position: [F.eyeX + .01, y, .468], scale: [sx - .04, sy * .8, .04], rotation: [0, 0, tilt] });
     const by = F.browY - .03;
     if (look.brows === 1) add(...brow(by, .26, .072, -.04));
     if (look.brows === 2) add(...brow(by - .004, .27, .1, -.04));
@@ -126,15 +141,46 @@ export function faceParts({ look, race, covered, extra, dwarfHair }: FaceOptions
     5: [{ part: 'paint', shape: 'sphere', color: 'paint', position: [.2, 1.48, .49], scale: [.025, .04, .015] }],
   };
   if (paint[look.tattoo] && !(covered && look.tattoo === 3)) add(...paint[look.tattoo]);
-  if (look.accessory === 1 && !covered) add({ part: 'accessory', shape: 'torus', color: 'gold', position: [F.earX + .02, F.earY - .14, .03], scale: [.04, .04, .04], rotation: [0, Math.PI / 2, 0] });
-  if (look.accessory === 2 && !covered) add(...mirror({ part: 'accessory', shape: 'torus', color: 'gold', position: [F.earX + .02, F.earY - .14, .03], scale: [.04, .04, .04], rotation: [0, Math.PI / 2, 0] }));
+  // Brinco preso no lóbulo (antes ficava solto, longe da orelha).
+  const earring: FacePart = { part: 'accessory', shape: 'torus', color: 'gold', position: [F.earX - .025, F.earY - .17, .02], scale: [.032, .032, .032], rotation: [0, Math.PI / 2, 0] };
+  if (look.accessory === 1 && !covered) add(earring, { ...earring, shape: 'sphere', position: [F.earX - .03, F.earY - .14, .02], scale: [.018, .018, .018] });
+  if (look.accessory === 2 && !covered) add(...mirror(earring), ...mirror({ ...earring, shape: 'sphere', position: [F.earX - .03, F.earY - .14, .02], scale: [.018, .018, .018] }));
   if (look.accessory === 3) add({ part: 'accessory', shape: 'cylinder', color: 'dark', position: [-F.eyeX, F.eyeY, .455], scale: [.11, .02, .1], rotation: [Math.PI / 2, 0, 0] }, { part: 'accessory', shape: 'box', color: 'dark', position: [0, 1.72, .43], scale: [.56, .025, .02], rotation: [0, 0, .32] });
   if (look.accessory === 4 && !covered) add({ part: 'accessory', shape: 'torus', color: 'paint', position: [0, 1.86, -.02], scale: [.53, .5, .04], rotation: [Math.PI / 2, 0, 0] });
-  if (look.accessory === 5) add({ part: 'accessory', shape: 'torus', color: 'gold', position: [.03, F.noseY - .06, .53], scale: [.03, .03, .03] });
+  if (look.accessory === 5) add({ part: 'accessory', shape: 'torus', color: 'gold', position: [.035, F.noseY - .035, .505], scale: [.022, .022, .022], rotation: [0, .5, 0] });
   // Prendedores de cabelo (penteados com rabo de cavalo ou coque).
   if (!covered && extra === 'ponytail') add(...[0, 1, 2, 3].map((i): FacePart => ({ part: 'hair', shape: 'sphere', color: 'hair', position: [0, 1.82 - i * .16, -.52 - i * .03], scale: [.12 - i * .015, .11, .11] })), { part: 'hair', shape: 'torus', color: 'gold', position: [0, 1.88, -.5], scale: [.07, .07, .07], rotation: [0, 0, 0] });
   if (!covered && extra === 'bun') add({ part: 'hair', shape: 'sphere', color: 'hair', position: [0, 2.12, -.3], scale: [.18, .16, .18] }, { part: 'hair', shape: 'torus', color: 'gold', position: [0, 2.02, -.27], scale: [.12, .12, .12], rotation: [Math.PI / 2 - .4, 0, 0] });
+  if (!covered && extra) add(...hairExtra(extra));
   return parts;
+}
+
+/** Penteados montados com peças: moicano, arrepiado, black power e tranças (raspado só escurece o couro). */
+function hairExtra(extra: HairExtra): FacePart[] {
+  const H = (position: [number, number, number], scale: [number, number, number], shape: FacePart['shape'] = 'sphere', rotation?: [number, number, number]): FacePart => ({ part: 'hair', shape, color: 'hair', position, scale, ...(rotation ? { rotation } : {}) });
+  // As cabeças KayKit são quase cúbicas: topo do cabelo em y ≈ 2,3, lados em x ±0,44, frente z 0,5 e nuca z −0,47.
+  const top = (x: number, z: number) => 2.3 - Math.max(0, Math.abs(x) - .28) * 1.3 - Math.max(0, Math.abs(z) - .3) * 1.3;
+  if (extra === 'mohawk') {
+    const crest = [.4, .27, .14, .01, -.12, -.25].map((z, i) => H([0, top(0, z) + .1 - Math.abs(i - 2) * .008, z], [.11, .22 - Math.abs(i - 2.5) * .012, .1]));
+    return [...crest, H([0, 2.18, -.46], [.075, .16, .09]), H([0, 1.98, -.52], [.07, .14, .08])];
+  }
+  if (extra === 'spiky') {
+    const spikes: FacePart[] = [];
+    for (const x of [-.3, -.1, .1, .3]) for (const z of [.28, .02, -.26]) spikes.push(H([x, top(x, z) + .08, z], [.09, .26, .09], 'cone', [z * 1.3 + .15, 0, -x * 1.4]));
+    for (const side of [-1, 1]) for (const z of [.15, -.2]) spikes.push(H([side * .47, 2.08, z], [.08, .22, .08], 'cone', [z, 0, -side * 1.15]));
+    for (const x of [-.22, .22]) spikes.push(H([x, 2.08, -.5], [.08, .22, .08], 'cone', [-1.15, 0, -x]));
+    return spikes;
+  }
+  if (extra === 'afro') {
+    const puffs = Array.from({ length: 12 }, (_, i) => { const a = i / 12 * Math.PI * 2; return H([Math.sin(a) * .62, 2.16 + (i % 2 ? .1 : -.06), Math.cos(a) * .55 - .14], [.24, .22, .24]); }).filter(p => p.position[2] < .3);
+    return [H([0, 2.16, -.14], [.66, .46, .6]), H([0, 2.42, -.14], [.46, .22, .44]), ...puffs];
+  }
+  if (extra === 'braids') {
+    const rows = [-.3, -.1, .1, .3].flatMap(x => [...[.4, .26, .12, -.02, -.16, -.3].map(z => H([x, top(x, z) + .02, z], [.07, .05, .08])), ...[2.12, 1.98, 1.84].map(y => H([x, y, -.5], [.07, .08, .05]))]);
+    const tails = [-.2, .2].flatMap(x => [...Array.from({ length: 5 }, (_, i) => H([x * (1 + i * .05), 1.72 - i * .13, -.53 - i * .02], [.07 - i * .005, .08, .07])), { part: 'hair', shape: 'torus', color: 'gold', position: [x * 1.25, 1.1, -.62], scale: [.045, .045, .045], rotation: [Math.PI / 2, 0, 0] } as FacePart]);
+    return [...rows, ...tails];
+  }
+  return [];
 }
 
 const geometries = new Map<string, THREE.BufferGeometry>();
@@ -153,7 +199,7 @@ const paint = (color: string, metal = false) => { const key = color + metal; let
 export function buildFaceKit(options: FaceOptions & { hair: string; skin: string }): THREE.Group {
   const group = new THREE.Group(); group.name = 'face-kit';
   const hair = new THREE.Color(options.hair).multiplyScalar(.92).getStyle(), skin = new THREE.Color(options.skin).multiplyScalar(.97).getStyle();
-  const colors: Record<FacePart['color'], THREE.MeshStandardMaterial> = { hair: paint(hair), skin: paint(skin), scar: paint('#b4544c'), paint: paint('#2f5f93'), gold: paint('#e2b54f', true), ivory: paint('#f3ead2'), dark: paint('#2a2522'), blush: paint('#d97a6c') };
+  const colors: Record<FacePart['color'], THREE.MeshStandardMaterial> = { hair: paint(hair), skin: paint(skin), scar: paint('#b4544c'), paint: paint('#2f5f93'), gold: paint('#e2b54f', true), ivory: paint('#f3ead2'), dark: paint('#2a2522'), blush: paint('#d97a6c'), freckle: paint('#9c5a38'), shade: paint('#6e5463'), lips: paint('#b9545a') };
   for (const p of faceParts(options)) {
     const mesh = new THREE.Mesh(unit(p.shape), colors[p.color]);
     mesh.name = 'face-' + p.part; mesh.position.set(...p.position); mesh.scale.set(...p.scale); if (p.rotation) mesh.rotation.set(...p.rotation);

@@ -1,3 +1,4 @@
+import type { HairExtra } from './faceKit';
 import type { ClassId, Race } from './game';
 import { CLASS_STYLE } from './cartoonAvatar';
 
@@ -68,9 +69,10 @@ export const HERO_WALK = 'Walking_A', HERO_PUNCH = 'Unarmed_Melee_Attack_Punch_A
 export const HERO_ANIMATIONS = [...new Set(['Idle', HERO_WALK, HERO_PUNCH, HERO_HIT, ...Object.values(HERO_STYLE).flatMap(s => [s.idle, s.attack])])];
 
 /** Penteados: cada opção usa a cabeça (com cabelo) de um corpo-base, às vezes com um prendedor. 0 = o da classe. */
-export const HERO_HAIRSTYLES: { label: string; base: HeroBase | null; extra?: 'ponytail' | 'bun' }[] = [
+export const HERO_HAIRSTYLES: { label: string; base: HeroBase | null; extra?: HairExtra }[] = [
   { label: 'Da classe', base: null }, { label: 'Curto', base: 'knight' }, { label: 'Longo', base: 'rogue' }, { label: 'Repartido', base: 'mage' }, { label: 'Rabo de cavalo', base: 'knight', extra: 'ponytail' }, { label: 'Coque', base: 'mage', extra: 'bun' },
   { label: 'Longo preso', base: 'rogue', extra: 'ponytail' }, { label: 'Coque baixo', base: 'knight', extra: 'bun' }, { label: 'Selvagem', base: 'barbarian' }, { label: 'Longo com coque', base: 'rogue', extra: 'bun' },
+  { label: 'Moicano', base: 'knight', extra: 'mohawk' }, { label: 'Arrepiado', base: 'knight', extra: 'spiky' }, { label: 'Black power', base: 'knight', extra: 'afro' }, { label: 'Tranças', base: 'knight', extra: 'braids' }, { label: 'Raspado', base: 'knight', extra: 'shaved' },
 ];
 /** Penteado escondido no criador: a opção Selvagem virou barba. Quem já usa continua com ela. */
 export const HIDDEN_HAIRSTYLES = [8];
@@ -80,13 +82,13 @@ export const BODY_WIDTH = [.9, .95, 1, 1.05, 1.1, 1.15];
 export const BODY_HEIGHT = [1.03, 1.015, 1, .99, .975, .96];
 
 export interface HeroGear { head: boolean; chest: boolean; back: boolean }
-export interface HeroDress { outfit: 'rags' | 'class'; hat: string | null; cape: boolean; head: HeroBase; extra?: 'ponytail' | 'bun'; covered: boolean }
+export interface HeroDress { outfit: 'rags' | 'class'; hat: string | null; cape: boolean; head: HeroBase; extra?: HairExtra; covered: boolean }
 /**
  * O iniciante veste roupas remendadas: sem elmo, sem capa e sem as cores da classe.
  * Peitoral traz as cores da classe; item de cabeça mostra o elmo (se o jogador quiser); capa vem com peitoral ou costas.
  */
 /** Cabelos do anão: careca e penteados sobre a cabeça do bárbaro; a juba usa a cabeça de cabelo longo. */
-export const DWARF_HAIRSTYLES: { label: string; base: HeroBase; extra?: 'ponytail' | 'bun' }[] = [
+export const DWARF_HAIRSTYLES: { label: string; base: HeroBase; extra?: HairExtra }[] = [
   { label: 'Careca de forja', base: 'barbarian' }, { label: 'Coroa trançada', base: 'barbarian' }, { label: 'Moicano de pedra', base: 'barbarian' },
   { label: 'Tranças nas têmporas', base: 'barbarian' }, { label: 'Coque de ferreiro', base: 'barbarian', extra: 'bun' }, { label: 'Juba longa', base: 'rogue' },
 ];
