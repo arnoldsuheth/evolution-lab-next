@@ -3,10 +3,10 @@ import { findPath } from './navigation';
 import { insideCity } from './overland';
 
 type Point = [number,number];
-type Trail = { name:string; from:Point; to:Point };
+type Trail = { name:string; from:Point; to:Point; via?:Point[] };
 const TRAILS:Partial<Record<RegionId,Trail>>={
   aurora:{name:'Trilha das Nascentes',from:[0,26],to:[-39,43]},
-  bosque:{name:'Mirante do Mar das Folhas',from:[27,3],to:[47,28]},
+  bosque:{name:'Mirante do Mar das Folhas',from:[27,3],via:[[32,14]],to:[47,28]},
   'iron-forge':{name:'Mirante do Degelo',from:[-25,3],to:[-44,39]},
   gnomolandia:{name:'Trilha da Costa da Névoa',from:[25,3],to:[43,18]},
   ogrimmar:{name:'Mirante do Vulcão Rubro',from:[25,3],to:[57,-14]},
@@ -21,8 +21,12 @@ export function scenicTrail(region:string){
   if(!trail)return;
   const saved=paths.get(region);
   if(saved)return saved;
-  const route=[trail.from,...findPath(trail.from,trail.to,region)];
-  if(route.length<2)return;
+  const route=[trail.from];
+  for(const point of [...(trail.via??[]),trail.to]){
+    const leg=findPath(route[route.length-1],point,region);
+    if(!leg.length)return;
+    route.push(...leg);
+  }
   const points=route.filter(([x,z],i)=>{
     if(i===0||i===route.length-1)return true;
     return x-route[i-1][0]!==route[i+1][0]-x||z-route[i-1][1]!==route[i+1][1]-z;

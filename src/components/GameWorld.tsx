@@ -44,6 +44,7 @@ import ExplorationEncounters from "./ExplorationEncounters";
 import PavingMaterial from "./PavingMaterial";
 import {biomeOf,flightRelief} from "@/lib/biomes";
 import ScenicRoutes from "./ScenicRoutes";
+import DiscoverySite from "./DiscoverySite";
 import { scenicTrailPath } from "@/lib/scenicTrails";
 import {monsterPoint} from "@/lib/patrols";
 import Wildlands from "./Wildlands";
@@ -408,7 +409,8 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
             }
           } else {
             endGuide();
-            if (stop.gather) state.gather(stop.gather);
+            if ('discovery' in stop.target) state.openDiscovery();
+            else if (stop.gather) state.gather(stop.gather);
             else if (stop.monster) state.setTarget(stop.monster);
             else if ('npc' in stop.target) interact(stop.target.npc);
             else if ('trainer' in stop.target) {
@@ -457,7 +459,7 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
         if(!monster||(state.slain[monster.id]??0)>now){
           useGame.setState({queued:null,target:null});monsterTarget.current=null;
         }else{
-          const [x,z]=monsterPoint(monster,now),action=state.queued;
+          const [x,z]=monsterPoint(monster,now,state.hero.position),action=state.queued;
           if(Math.hypot(player.current.x-x,player.current.z-z)<=attackRange(state.hero,action)){
             path.current=[];monsterTarget.current=null;
             if(heroRoot.current)heroRoot.current.rotation.y=Math.atan2(x-player.current.x,z-player.current.z);
@@ -497,7 +499,7 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
         const angry=MONSTERS.find(m=>{
           if(m.region!==st.hero.region||(m.instance??null)!==(st.hero.instance??null)
             ||!isAggressive(m)||(st.slain[m.id]??0)>now||Math.hypot(p.x-m.x,p.z-m.z)>AGGRO_RADIUS+2)return false;
-          const [x,z]=monsterPoint(m,now);
+          const [x,z]=monsterPoint(m,now,st.hero.position);
           return Math.hypot(p.x-x,p.z-z)<AGGRO_RADIUS
             &&!monsterRequirement(st.hero,st.education,m.id)
             &&(!st.hero.instance||!doorBetween(st.hero.instance,adventure.doors,p.z,z))
@@ -535,7 +537,7 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
       <mesh onClick={groundClick} receiveShadow><boxGeometry args={[39,.7,34]}/><meshStandardMaterial color={REGIONS.goddard.color}/></mesh>
       <mesh position={[0,-2.7,0]} rotation={[Math.PI,0,0]} scale={[1,.7,.85]}><coneGeometry args={[22,6,7]}/><meshStandardMaterial color="#4e5068" flatShading/></mesh>
     </group>:<TerrainSurface region={hero.instance?"instance":hero.region} onClick={groundClick} color={REGIONS[hero.region].color}/>}
-    {!hero.instance&&<><Wildlands region={hero.region} low={low}/><ScenicRoutes region={hero.region} ground={groundClick}/></>}
+    {!hero.instance&&<><Wildlands region={hero.region} low={low}/><ScenicRoutes region={hero.region} ground={groundClick}/><DiscoverySite region={hero.region} paused={paused} approach={(x,z,open)=>{endGuide();approachInteraction(x,z,open);}}/></>}
     {!hero.instance&&isRacialCity(hero.region)&&<TrainerDistrict city={hero.region} paused={paused} approach={approachInteraction} openJourney={()=>openService("journey")}/>}
     {!hero.instance&&<CityMarket region={hero.region} paused={paused} approach={approachInteraction} open={openMarket}/>}
     {!hero.instance&&<CityRoutes region={hero.region} paused={paused} ground={groundClick} cross={crossGate}

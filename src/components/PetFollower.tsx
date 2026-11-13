@@ -24,18 +24,22 @@ export default function PetFollower({ kind, player, reduced, combat = false }: {
 
     const followDistance = Math.hypot(pet.position.x - hero.x, pet.position.z - hero.z);
     goal.current.set(hero.x + (combat ? -1.15 : .95), 0, hero.z + .75);
-    const hit = combat && !reduced ? useGame.getState().battleEvent : null;
+    const state=useGame.getState();
+    const hit=combat&&!reduced ? state.battleEvent : null;
+    const enemy=combat ? state.encounter?.position : undefined;
     const age = hit ? Date.now() - hit.time : Infinity;
     const attacking = hit?.companionStrike && age >= 0 && age < 470
       && Math.hypot(hero.x - hit.hx, hero.z - hit.hz) < 3;
 
-    if (attacking && hit) {
-      heading.current.set(hero.x - hit.x, 0, hero.z - hit.z).normalize();
-      goal.current.set(hit.x, 0, hit.z).addScaledVector(heading.current, .85);
+    const opponent=attacking&&hit ? [hit.x,hit.z] : enemy;
+    if(opponent){
+      const [x,z]=opponent;
+      heading.current.set(hero.x-x,0,hero.z-z).normalize();
+      goal.current.set(x,0,z).addScaledVector(heading.current,attacking?.68:1.7);
     }
 
     pet.position.y = 0;
-    if (!initialized.current || (followDistance > 8 && !attacking && age > 1100)) {
+    if (!initialized.current || (followDistance > 8 && !opponent && age > 1100)) {
       pet.position.copy(goal.current);
       initialized.current = true;
     } else {
@@ -43,8 +47,8 @@ export default function PetFollower({ kind, player, reduced, combat = false }: {
       const distance = heading.current.length();
       if (distance > .13) {
         pet.rotation.y = Math.atan2(heading.current.x, heading.current.z);
-        pet.position.addScaledVector(heading.current, Math.min(1, (attacking ? 40 : 8) * delta / distance));
-      }
+        pet.position.addScaledVector(heading.current, Math.min(1, (attacking ? 32 : enemy ? 15 : 8) * delta / distance));
+      } else if(opponent) pet.rotation.y=Math.atan2(opponent[0]-pet.position.x,opponent[1]-pet.position.z);
     }
 
     const moving = pet.position.distanceToSquared(goal.current) > .08;

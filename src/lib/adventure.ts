@@ -1,3 +1,4 @@
+import { DISCOVERIES } from './discoveries';
 import { cleanBank, type BankState } from './bank';
 import { cleanDog, type DogState } from './dog';
 import type { ClassId, HeroData, NpcId } from './game';
@@ -16,6 +17,7 @@ export interface AdventureState {
   dailyDone: number; achievements: string[]; title: string; rep: Record<Faction, number>; spec: string; doors: string[]; pet: string;
   /** Pontos de código da vila já construídos (lanterna, flores, ponte...). */
   built: string[];
+  discoveries: Record<string, "seen" | "cleared" | "claimed">;
   /** Caramelo, o vira-lata da cidade: amizade, última refeição e quantas vezes comeu. */
   dog: DogState;
   /** Banco da Aurora: saldo guardado e desde quando rende juros. */
@@ -26,8 +28,15 @@ const rec = (v: unknown) => v && typeof v === 'object' && !Array.isArray(v) ? v 
 const strs = (v: unknown) => Array.isArray(v) ? [...new Set(v.filter((x): x is string => typeof x === 'string'))] : [];
 export function cleanAdventure(input: unknown): AdventureState {
   const a = rec(input), d = rec(a.daily), rep = rec(a.rep), kinds = rec(a.kinds);
+  const discoveryRecords=rec(a.discoveries);
+  const discoveries:AdventureState['discoveries']={};
+  for(const {id} of DISCOVERIES){
+    const state=discoveryRecords[id];
+    if(state==='seen'||state==='cleared'||state==='claimed')discoveries[id]=state;
+  }
   const ids = strs(d.ids).filter(id => DAILY_POOL.some(t => t.id === id)).slice(0, 3);
   return {
+    discoveries,
     daily: { day: typeof d.day === 'string' ? d.day : '', ids, progress: ids.map((_, i) => Math.floor(num(Array.isArray(d.progress) ? d.progress[i] : 0, 0, 999))), claimed: ids.map((_, i) => Array.isArray(d.claimed) && d.claimed[i] === true) },
     hearthAt: num(a.hearthAt), rested: Math.floor(num(a.rested)), gathers: Math.floor(num(a.gathers)), rares: Math.floor(num(a.rares)), rareDone: Math.floor(num(a.rareDone)), dailyDone: Math.floor(num(a.dailyDone)),
     kinds: Object.fromEntries(Object.entries(kinds).filter(([k]) => MONSTER_KINDS.some(kind=>kind===k)).map(([k, v]) => [k, Math.floor(num(v))])),

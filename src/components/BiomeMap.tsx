@@ -1,9 +1,13 @@
+import { useGame } from '@/lib/store';
+import { discoveryIn } from '@/lib/discoveries';
+import type { RegionId } from '@/lib/campaign';
 import { scenicTrail } from '@/lib/scenicTrails';
 import { waterwayOf, waterwaySegments } from '@/lib/waterways';
 import { biomeOf, isWater } from '@/lib/biomes';
 
-export default function BiomeMap({region,local}: {region:string;local:boolean}){
-  const biome=biomeOf(region);
+export default function BiomeMap({region,local}: {region:RegionId;local:boolean}){
+  const biome=biomeOf(region),site=discoveryIn(region);
+  const found=useGame(s=>site&&s.hero.adventure?.discoveries?.[site.id]);
   if(!biome)return null;
   const river=waterwayOf(region),trail=scenicTrail(region);
   return <g>{biome.landmarks.map(mark=>{
@@ -14,7 +18,11 @@ export default function BiomeMap({region,local}: {region:string;local:boolean}){
       {!isWater(mark)&&<path d={`M${-.54*rx} ${.27*rz} ${-.17*rx} ${-.46*rz} 0 ${-.14*rz} ${.22*rx} ${-.59*rz} ${.62*rx} ${.27*rz}Z`}
         fill={kind==='ice'?'#e3ede9':kind==='volcano'?'#773f3a':'#514c41'} opacity=".72"/>}
       {!local&&<text y={isWater(mark)?0:rz*.43} textAnchor="middle">{name}</text>}
-    </g>;
+      {site&&found&&<g transform={`translate(${site.point.join(' ')})`}>
+      <rect x="-1.1" y="-.85" width="2.2" height="1.7" rx=".25" fill={found==='claimed'?'#b5b7a9':'#efba67'} stroke="#352b21" strokeWidth=".3"/>
+      <title>{site.name}{found==='claimed'?' · explorado':''}</title>
+    </g>}
+  </g>;
   })}
     {river&&<g>
       <polyline points={river.points.map(p=>p.join(',')).join(' ')} fill="none" stroke={river.type==='lava'?'#bb5834':'#6097a7'}
@@ -29,5 +37,9 @@ export default function BiomeMap({region,local}: {region:string;local:boolean}){
     </polyline><g transform={`translate(${trail.end.join(' ')})`}>
       <path d="M0 -1.65 1.65 0 0 1.65 -1.65 0Z" fill="#f2ca88" stroke="#422e25" strokeWidth=".35"><title>{trail.name}</title></path>
     </g></>}
+    {site&&found&&<g transform={`translate(${site.point.join(' ')})`}>
+      <rect x="-1.1" y="-.85" width="2.2" height="1.7" rx=".25" fill={found==='claimed'?'#b5b7a9':'#efba67'} stroke="#352b21" strokeWidth=".3"/>
+      <title>{site.name}{found==='claimed'?' · explorado':''}</title>
+    </g>}
   </g>;
 }

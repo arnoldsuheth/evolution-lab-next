@@ -10,6 +10,7 @@ import { INSTANCES } from "@/lib/instances";
 import { findPath, followRoadPath } from "@/lib/navigation";
 import { roadAt } from "@/lib/overland";
 import { scenicTrailPath } from "@/lib/scenicTrails";
+import { discoveryIn } from "@/lib/discoveries";
 import { mountOf } from "@/lib/adventure";
 import { CitadelMap } from "./CitadelMap";
 import AreaMap from "./AreaMap";
@@ -34,6 +35,8 @@ export default function WorldMap({ guide, follow }: { guide: GuideRequest | null
   const pins = instance ? [] : regionPins(shown);
   const exits = instance ? [] : areaDestinations(shown);
   const scenic = instance ? undefined : scenicPin(shown);
+  const site = instance ? undefined : discoveryIn(shown);
+  const discovery = site && hero.adventure?.discoveries?.[site.id];
   const activeStop = position && guide?.heroId === hero.id ? guideStop(hero, guide.target, useGame.getState()) : undefined;
   const focus = selection ?? activeStop;
   const destination = DESTINATIONS.find(item => item.name === sector);
@@ -77,6 +80,10 @@ export default function WorldMap({ guide, follow }: { guide: GuideRequest | null
           <span aria-hidden="true">◆ </span>{scenic.name}
         </button>
       </nav>}
+      {site&&discovery&&<div className="map-route-action"><strong>{site.name}</strong>
+        <small>{discovery==='claimed'?'Baú já aberto':discovery==='cleared'?'Vigia derrotado. Abra o baú.':site.hint}</small>
+        {position&&discovery!=='claimed'&&<button onClick={()=>follow({discovery:site.id})}>Ir até a descoberta</button>}
+      </div>}
       {pins.length > 0 && <nav className="tabs map-people" aria-label="Personagens desta área">
         {pins.map(pin => <button key={pin.name} aria-pressed={selection?.name === pin.name} onClick={() => { setSelection(pin); setSector(""); }}>{pin.name}</button>)}
       </nav>}

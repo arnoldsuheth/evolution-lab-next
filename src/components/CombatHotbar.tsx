@@ -1,4 +1,6 @@
 "use client";
+import { MONSTERS } from '@/lib/campaign';
+import { monsterPoint } from '@/lib/patrols';
 import {basicAttack} from '@/lib/combat';
 import {HUNTER_ARROW} from '@/lib/catalogue';
 import {useEffect,useState} from 'react';
@@ -12,6 +14,11 @@ import {SkillArtwork,ItemArtwork} from './GameArtwork';
 function Controls({identity}:{identity:string|null}){
  const hero=useGame(s=>s.hero),now=useGame(s=>s.now),cooldowns=useGame(s=>s.cooldowns),walking=useGame(s=>s.walking),sitting=useGame(s=>s.sitting),[automatic,setAutomatic]=useState(false),[food,setFood]=useState(''),[potion,setPotion]=useState(''),[utilities,setUtilities]=useState(false);
  const attack=basicAttack(hero),arrows=countItem(hero.inventory,HUNTER_ARROW),powerLock=classPowerRequirement(hero);
+ const encounter=useGame(s=>s.encounter);
+ const monster=identity ? MONSTERS.find(m=>m.id===identity&&m.region===hero.region&&(m.instance??null)===(hero.instance??null)) : undefined;
+ const point=monster&&monsterPoint(monster,now,hero.position);
+ const inRange=!!encounter||!!point&&Math.hypot(hero.position[0]-point[0],hero.position[1]-point[1])<=attack.range;
+ const rangeLabel=monster ? (inRange?'Ao alcance':'Fora de alcance') : undefined;
  const canAuto=hero[attack.resource]>=attack.cost&&(!attack.bow||arrows>0);
  const attackLabel=attack.bow?`Disparar · ${arrows} flechas`:attack.weapon?'Atacar':'Socar';
  useEffect(()=>{if(!automatic||!identity)return;const stop=()=>setAutomatic(false),visibility=()=>{if(document.hidden)stop();};const timer=setInterval(()=>{const s=useGame.getState(),attack=basicAttack(s.hero),step=autoAttackStep({identity:s.encounter?.monsterId??s.target,dead:s.hero.dead,stamina:s.hero.stamina,canAttack:s.hero[attack.resource]>=attack.cost&&(!attack.bow||s.hero.inventory.includes(HUNTER_ARROW)),encounter:!!s.encounter,queued:!!s.queued,hidden:document.hidden},identity);if(step==='stop')stop();else if(step==='attack')s.attack();else if(step==='approach')s.act({kind:'attack'});},700);window.addEventListener('blur',stop);document.addEventListener('visibilitychange',visibility);return()=>{clearInterval(timer);window.removeEventListener('blur',stop);document.removeEventListener('visibilitychange',visibility);};},[automatic,identity]);
@@ -19,6 +26,7 @@ function Controls({identity}:{identity:string|null}){
  const quick=(kind:'food'|'potion')=>{const list=kind==='food'?foods:potions,id=(kind==='food'?food:potion),item=list.find(i=>i.id===id)??list[0],left=Math.max(0,Math.ceil(((cooldowns.consumable??0)-now)/1000));return <div className={`quick-item quick-${kind}`}><button className="quick-use" aria-label={`${kind==='food'?'Usar alimento':'Usar poção'}${item?': '+item.name:''}`} disabled={!item||left>0} title={item?.name??'Sem itens na mochila'} onClick={()=>item&&useGame.getState().useItem(item.id)}>{item?<ItemArtwork item={item}/>:<span>{kind==='food'?'♨':'♜'}</span>}<small>{left?left+'s':item?'×'+countItem(hero.inventory,item.id):kind==='food'?'Alimento':'Poção'}</small></button><select aria-label={kind==='food'?'Escolher alimento rápido':'Escolher poção rápida'} disabled={!list.length} value={item?.id??''} onChange={e=>kind==='food'?setFood(e.target.value):setPotion(e.target.value)}>{!list.length&&<option value="">Vazio</option>}{list.map(i=><option key={i.id} value={i.id}>{i.name}</option>)}</select></div>;};
  const positions=[[1,1],[1,2],[1,3],[2,1],[2,3],[3,1],[3,2],[3,3],[4,2]];
  return <section className={`combat-pad combat-console ${!identity?'without-target':''} ${automatic?'auto-active':''}`} aria-label="Controle de combate"><div className="combat-console-head"><span>{automatic?'Ataque automático':'Combate'}</span>{!powerLock&&<button className="class-power" disabled={hero.mp<18} onClick={()=>useGame.getState().act({kind:'power'})} aria-label={'Poder da classe: '+(specOf(hero)?.power??CLASSES[hero.classId].skill)} title={'R · '+(specOf(hero)?.power??CLASSES[hero.classId].skill)}>✦</button>}</div><div className="combat-console-grid">
+ {attack.bow&&<div className="hunter-desktop-status"><b>{arrows} flechas</b>{rangeLabel&&<span>{rangeLabel}</span>}</div>}
  <button className="desktop-attack" aria-label={`1: ${attackLabel}`} title={`1 · ${attackLabel}`} disabled={!identity} onClick={()=>useGame.getState().act({kind:'attack'})}><kbd>1</kbd><span aria-hidden="true">⚔</span></button>
  <button className="auto-attack" aria-pressed={automatic} aria-label={automatic?'Parar ataque automático':'Iniciar ataque automático'} title="Ataque automático · toque novamente para parar" disabled={!identity||!canAuto&&!automatic} onClick={()=>{setAutomatic(!automatic);if(!automatic)useGame.getState().act({kind:'attack'});}}><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
    <path d="m4 4 5 1 9 9-3 3-9-9-2-4Zm16 0-5 1-3 3m-3 3-3 3 3 3 3-3m-8 2 4 4m8-4 4 4M4 20l2-2m12 0 2 2"/>
@@ -44,7 +52,8 @@ function Controls({identity}:{identity:string|null}){
     </button>;
   })}
   {!powerLock&&<button className="radial-power" disabled={hero.mp<18} onClick={()=>useGame.getState().act({kind:'power'})} aria-label={'Poder da classe: '+(specOf(hero)?.power??CLASSES[hero.classId].skill)}>✦<small>Poder</small></button>}
-  <button className="radial-attack" disabled={!identity} aria-label={attackLabel} onClick={()=>useGame.getState().act({kind:'attack'})}><span aria-hidden="true">{attack.bow?'↗':attack.weapon?'⚔':'✊'}</span><b>{attack.bow?`Flechas ${arrows}`:attackLabel}</b></button>
+  {attack.bow&&<div className={`hunter-ammo${arrows===0?' empty':''}`}><b>{arrows}</b> flechas</div>}
+  <button className={`radial-attack${attack.bow&&monster?(inRange?' target-in-range':' target-out-of-range'):''}`} disabled={!identity} aria-label={attackLabel} onClick={()=>useGame.getState().act({kind:'attack'})}><span aria-hidden="true">{attack.bow?'↗':attack.weapon?'⚔':'✊'}</span><b>{attack.bow?(rangeLabel??"Disparar"):attackLabel}</b></button>
   <button className="radial-auto" aria-pressed={automatic} disabled={!identity||!canAuto&&!automatic} onClick={()=>{setAutomatic(!automatic);if(!automatic)useGame.getState().act({kind:'attack'});}} aria-label={automatic?'Parar ataque automático':'Ataque automático'}>◎<small>{automatic?'Parar':'Auto'}</small></button>
   <button className="radial-more" aria-expanded={utilities} aria-label={utilities?"Recolher ações rápidas":"Mostrar ações rápidas"} onClick={()=>setUtilities(!utilities)}>{utilities?'×':'⋯'}<small>Ações</small></button>
   <button className="radial-run" aria-pressed={!walking} onClick={()=>useGame.getState().toggleWalk()} aria-label={walking?'Correr':'Caminhar'}>{walking?'🚶':'🏃'}<small>{walking?'Andar':'Correr'}</small></button>

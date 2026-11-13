@@ -86,3 +86,22 @@
   .game-shell .quest-tracker .quest-extra > summary { font-size: 11px; }
   .world-container .citadel-plaque, .world-container .citadel-signpost { display: none; }
 }
+
+
+.hunter-desktop-status {
+  position: absolute; right: 0; bottom: calc(100% + 8px);
+  display: flex; gap: 8px; white-space: nowrap;
+  color: #ffe5ad; background: #142732ed; border: 1px solid #b49c70;
+  border-radius: 8px; padding: 4px 7px; font-size: 11px;
+}
+@media (pointer: coarse), (max-width: 960px) {
+  .radial-hud .hunter-ammo {
+    position: absolute; right: 0; bottom: -4px; z-index: 1;
+    border-radius: 9px; padding: 3px 7px; background: #122430;
+    color: #ffe5ad; border: 1px solid #c4a777;
+    font-size: 11px; line-height: 1.2; white-space: nowrap;
+  }
+  .radial-hud .hunter-ammo.empty { color: #ffc5b6; border-color: #e49784; }
+  .radial-hud .radial-attack.target-in-range { border-color: #98e5b8; }
+  .radial-hud .radial-attack.target-out-of-range { border-color: #e5ad78; }
+}

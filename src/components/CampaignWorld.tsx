@@ -29,8 +29,8 @@ function Reacting({monster,fight,reduced,children}:{monster:Monster;fight?:[numb
   const state=useGame.getState(),now=Date.now();
   const [x,z]=fight??[monster.x,monster.z];
   if(!reduced&&(fight||monster.id.startsWith('wild-'))){
-   const origin=fight??monsterPoint(monster,now-100);
-   const destination=fight?state.hero.position:monsterPoint(monster,now+100);
+   const origin=fight??monsterPoint(monster,now-100,state.hero.position);
+   const destination=fight?state.hero.position:monsterPoint(monster,now+100,state.hero.position);
    const dx=destination[0]-origin[0],dz=destination[1]-origin[1];
    if(Math.hypot(dx,dz)>.025){
     const turn=Math.atan2(dx,dz)-g.rotation.y;
@@ -46,7 +46,7 @@ function Reacting({monster,fight,reduced,children}:{monster:Monster;fight?:[numb
 function Patrolling({monster,fight,children}:{monster:Monster;fight?:[number,number];children:ReactNode}){
  const ref=useRef<THREE.Group>(null);
  useFrame(()=>{
-  const [x,z]=fight??monsterPoint(monster,Date.now());
+  const [x,z]=fight??monsterPoint(monster,Date.now(),useGame.getState().hero.position);
   ref.current?.position.set(x-monster.x,0,z-monster.z);
  });
  return <group ref={ref}>{children}</group>;

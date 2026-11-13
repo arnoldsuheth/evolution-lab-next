@@ -6,11 +6,12 @@ import { GATHER_NODES, type QuestObjective } from './quests';
 import { INSTANCES, instanceRequirement, type InstanceId } from './instances';
 import { overlandRoads, roadItinerary, roadTo } from './overland';
 import { findPath } from './navigation';
+import { discoveryIn } from './discoveries';
 import { scenicTrail } from './scenicTrails';
 
 export type GuideTarget = { npc: NpcId } | { trainer: ClassId }
   | { objective: Exclude<QuestObjective, { type: 'talk' }> | 'trial' }
-  | { scenic: HeroData['region'] } | { road: RacialCity; from: HeroData['region'] } | { monster: string } | { instance: InstanceId } | { region: HeroData['region']; via?: 'portal' };
+  | { discovery: string } | { scenic: HeroData['region'] } | { road: RacialCity; from: HeroData['region'] } | { monster: string } | { instance: InstanceId } | { region: HeroData['region']; via?: 'portal' };
 export type GuideWorld = { education: Education; slain?: Record<string, number>; gathered?: Record<string, number>; now?: number };
 export type GuideRequest = { target: GuideTarget; heroId: string };
 export type MapPin = { target: GuideTarget; name: string; point: [number, number] };
@@ -40,6 +41,13 @@ export function guideStop(hero: HeroData, target: GuideTarget, world?: GuideWorl
     Math.hypot(hero.position[0]-a.x,hero.position[1]-a.z)-Math.hypot(hero.position[0]-b.x,hero.position[1]-b.z))[0];
   let destination: HeroData['region'] = 'aurora';
 
+  if ('discovery' in target) {
+    const site=discoveryIn(region);
+    const status=site&&hero.adventure?.discoveries?.[site.id];
+    if(!hero.instance&&site?.id===target.discovery&&status&&status!=='claimed')
+      return {target,name:site.name,point:site.point};
+    return;
+  }
   if ('scenic' in target) return !hero.instance&&region===target.scenic ? scenicPin(region) : undefined;
 
   if ('npc' in target || 'trainer' in target) {

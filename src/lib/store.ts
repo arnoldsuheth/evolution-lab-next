@@ -3,6 +3,7 @@ import { cityMarket, marketOpen, marketStocks, type MarketStall } from './cityMa
 import {FLYING_MOUNTS,FLYING_MOUNT_PRICE,MOUNT_VENDOR,type FlyingMountId} from "./flyingMounts";
 import {RACE_CLASSES} from "./game";
 import {isNewCity,isRacialCity,CITY_BANK,GODDARD_BOOLE,CITY_FORGE,CITY_WAGON,CITY_SPAWN,RACIAL_CITIES,trainerPosition,cityForRace,goddardExit,cityPortal,type RacialCity} from "./kingdomCities";
+import { discoveryIn, discoveryDistance, DISCOVERY_OPEN_RANGE, DISCOVERY_REVEAL_RANGE } from "./discoveries";
 import {monsterPoint} from "./patrols";
 import {walkable} from "./navigation";
 import { roadArrival, roadAt } from "./overland";
@@ -73,6 +74,7 @@ export type Encounter = EnemyState;
 interface GameStore extends SaveData {
   enterInstance:(id:InstanceId)=>void;leaveInstance:()=>void; repair:()=>void;learnProfession:(id:Profession)=>void; bindAction:(id:string,slot:number)=>void; relocation:number; mounted:boolean; /** Sentado: recupera HP, MP e vigor 3x mais rápido fora de combate. */ sitting:boolean; /** Caminhar (mais devagar) em vez de correr. */ walking:boolean; toggleSit:()=>void; toggleWalk:()=>void; toggleMount:()=>void; chooseMount:(id:MountId)=>void; buyFlyingMount:(id:FlyingMountId)=>void; trainClass:(id:ClassId)=>void;
   ready: boolean; saveError: string; notice: string; encounter: Encounter | null; buff: number; lastAttack: number; cooldowns: Record<string,number>; now: number; effects: {kind:string;amount:number;remaining:number}[];
+  openDiscovery:()=>void;
   lootEvent?:{time:number;xp:number;gold:number;items:string[]};
   battleEvent:{critical?:boolean;companionStrike?:boolean;time:number;damage:number;received:number;x:number;z:number;tone:string;kind:"attack"|"power"|"skill";basicEffect?:EffectKind;classId:ClassId;skill?:string;hx:number;hz:number;won?:boolean;enemySkill?:string;enemyPower?:string}|null;
   /** Monstros vencidos voltam depois de um tempo; pontos de coleta também (só durante a sessão). */
@@ -127,7 +129,7 @@ function executeBattle(id:string|undefined,starter:boolean,set:(value:Partial<Ga
  const skillBuff=id?SKILLS[id].buff:undefined;
  const effects=skillBuff?[...s.effects.filter(e=>e.kind!==skillBuff.kind),{kind:skillBuff.kind,amount:Math.round(skillBuff.amount*(1+(skillRank(s.hero,id!)-1)*.14)),remaining:skillBuff.duration}]:s.effects;
  const now=Date.now(),cooldowns={...s.cooldowns,...(id?{[id]:now+SKILLS[id].cooldown*1000}:{})};
- if(result.won){const reward=battleRewards(s.hero,enemy);let adv=accrueRest(currentAdventure(s),s.hero.level,s.restPending);const kind=target?.kind??enemy.kind;if(kind)adv=progressDaily({...adv,kinds:{...adv.kinds,[kind]:(adv.kinds[kind]??0)+1}},{type:'kill',kind});const rested=restBonus(adv,reward.xp),rare=enemy.rare!==undefined,gold=reward.gold*(rare?2:1);adv={...adv,rested:adv.rested-rested,...(rare?{rares:adv.rares+1,rareDone:enemy.rare}:{})};const hunted=target?progressQuests(cleanLog(s.hero.quests),{type:'kill',kind:target.kind,id:target.id}):null;const questNote=hunted?.changed.map(qid=>{const q=QUESTS.find(q=>q.id===qid)!,p=hunted.log.active[qid];return q.objectives.map((o,i)=>o.type==='kill'?` · ${o.label}: ${p[i]}/${goal(o)}`:'').join('');}).join('')??'';const slain=target&&!target.boss&&!target.instance?{...s.slain,[target.id]:Date.now()+MONSTER_RESPAWN_MS}:s.slain;const trial=s.hero.classTrial;const classTrial=trial&&target&&!target.instance&&target.level<=3&&target.region===cityForRace(s.hero.race)?{...trial,kills:Math.min(3,trial.kills+1)}:trial;const inventory=[...result.hero.inventory],accepted:string[]=[];for(const drop of reward.drops){const item=ITEMS[drop];if(item&&countItem(inventory,drop)<item.maxStack){inventory.push(drop);accepted.push(drop);}}set({...feedback,lootEvent:{time:now,xp:reward.xp+rested,gold,items:accepted},hero:{...withXp(result.hero,reward.xp+rested),classTrial,gold:result.hero.gold+gold,materials:result.hero.materials+reward.fragments+(rare?4:0),instanceProgress:enemy.instanceId?[...new Set([...(result.hero.instanceProgress??[]),enemy.monsterId!])]:result.hero.instanceProgress,kills:result.hero.kills+1,defeatedBosses:enemy.bossId?[...new Set([...result.hero.defeatedBosses,enemy.bossId])]:result.hero.defeatedBosses,inventory,quests:hunted?.log??result.hero.quests,adventure:adv},slain,restPending:0,target:null,queued:null,encounter:null,cooldowns,effects,now,lastAttack:now,notice:`${rare?'✦ Monstro raro vencido! ':''}${rested?`💤 XP descansado: +${rested}. `:''}${questNote}`.trim()});return;}
+ if(result.won){const reward=battleRewards(s.hero,enemy);let adv=accrueRest(currentAdventure(s),s.hero.level,s.restPending);const site=discoveryIn(s.hero.region);if(site?.guard&&site.guard===target?.id&&adv.discoveries[site.id]!=='claimed')adv={...adv,discoveries:{...adv.discoveries,[site.id]:'cleared'}};const kind=target?.kind??enemy.kind;if(kind)adv=progressDaily({...adv,kinds:{...adv.kinds,[kind]:(adv.kinds[kind]??0)+1}},{type:'kill',kind});const rested=restBonus(adv,reward.xp),rare=enemy.rare!==undefined,gold=reward.gold*(rare?2:1);adv={...adv,rested:adv.rested-rested,...(rare?{rares:adv.rares+1,rareDone:enemy.rare}:{})};const hunted=target?progressQuests(cleanLog(s.hero.quests),{type:'kill',kind:target.kind,id:target.id}):null;const questNote=hunted?.changed.map(qid=>{const q=QUESTS.find(q=>q.id===qid)!,p=hunted.log.active[qid];return q.objectives.map((o,i)=>o.type==='kill'?` · ${o.label}: ${p[i]}/${goal(o)}`:'').join('');}).join('')??'';const slain=target&&!target.boss&&!target.instance?{...s.slain,[target.id]:Date.now()+MONSTER_RESPAWN_MS}:s.slain;const trial=s.hero.classTrial;const classTrial=trial&&target&&!target.instance&&target.level<=3&&target.region===cityForRace(s.hero.race)?{...trial,kills:Math.min(3,trial.kills+1)}:trial;const inventory=[...result.hero.inventory],accepted:string[]=[];for(const drop of reward.drops){const item=ITEMS[drop];if(item&&countItem(inventory,drop)<item.maxStack){inventory.push(drop);accepted.push(drop);}}set({...feedback,lootEvent:{time:now,xp:reward.xp+rested,gold,items:accepted},hero:{...withXp(result.hero,reward.xp+rested),classTrial,gold:result.hero.gold+gold,materials:result.hero.materials+reward.fragments+(rare?4:0),instanceProgress:enemy.instanceId?[...new Set([...(result.hero.instanceProgress??[]),enemy.monsterId!])]:result.hero.instanceProgress,kills:result.hero.kills+1,defeatedBosses:enemy.bossId?[...new Set([...result.hero.defeatedBosses,enemy.bossId])]:result.hero.defeatedBosses,inventory,quests:hunted?.log??result.hero.quests,adventure:adv},slain,restPending:0,target:null,queued:null,encounter:null,cooldowns,effects,now,lastAttack:now,notice:`${rare?'✦ Monstro raro vencido! ':''}${rested?`💤 XP descansado: +${rested}. `:''}${questNote}`.trim()});return;}
  if(result.dead&&s.hero.mode==='hardcore'){const h=result.hero;const ancestor={id:h.id,name:h.name,classId:h.classId,level:h.level,diedAt:now,cause:enemy.name,legacy:Math.min(100,Math.max(0,Math.floor((h.xp-h.inherited)*.15))),claimed:false};set({...feedback,target:null,queued:null,hero:{...h,hp:0,dead:true},ancestors:s.ancestors.some(a=>a.id===h.id)?s.ancestors:[...s.ancestors,ancestor],encounter:null,cooldowns,effects,now,lastAttack:now,notice:'Aventura encerrada. Educação e portfólio preservados.'});return;}
  if(result.dead){if(hasDogJoy(result.hero)){set({...feedback,target:null,queued:null,hero:{...result.hero,hp:Math.round(stats(result.hero).maxHp*.5)},encounter:null,cooldowns,effects,now,lastAttack:now,notice:`🐕 ${DOG_NAME} latiu e te pôs de pé! Alegria do Caramelo: você voltou aqui mesmo.`});return;}set({...feedback,target:null,queued:null,hero:{...result.hero,hp:Math.round(stats(result.hero).maxHp*.6),instance:null,region:"aurora",position:[0,5]},encounter:null,cooldowns,effects,now,lastAttack:now,notice:'Lion levou você à vila. Seu progresso foi preservado.'});return;}
  set({...feedback,hero:result.hero,encounter:result.enemy,cooldowns,effects,now,lastAttack:now,notice:('phaseChange' in result&&result.phaseChange?`⚠ Fase 2! ${enemy.name} ficou furioso: bate mais forte e usa o poder mais vezes. `:'')+(result.enemySkill?`${enemy.name} usou ${result.enemySkill}!${result.enemy.heroStatus?` Você está ${STATUS_NAMES[result.enemy.heroStatus.kind].toLowerCase()}.`:''}`:'')});
@@ -229,7 +231,27 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     const hero = { ...s.hero, classId, race: raceForClass(classId,race ?? s.hero.race), talents: [0, 0, 0], hotbar:s.hero.hotbar.filter(id=>SKILLS[id]?.classId===classId), equipped:s.hero.equipped.filter(id=>{const item=ITEMS[id];return !item||!itemRequirement({...s.hero,classId},item);}) };
     const limits = stats(hero); set({ hero: { ...hero, hp: Math.min(hero.hp, limits.maxHp), mp: Math.min(hero.mp, limits.maxMp),stamina:Math.min(hero.stamina,limits.maxStamina) }, notice: "Novo caminho. Educação, itens, XP e bronze preservados; talentos devolvidos." });
   },
-  move: position => { const s = get(); if (!s.hero.dead && !s.encounter) set({ hero: { ...s.hero, position }, ...(s.sitting ? { sitting: false } : {}) }); },
+  move: position => {
+    const s=get();
+    if(s.hero.dead||s.encounter)return;
+    const hero={...s.hero,position};
+    const site=s.hero.instance?undefined:discoveryIn(hero.region);
+    if(site&&discoveryDistance(site,position)<=DISCOVERY_REVEAL_RANGE&&!hero.adventure?.discoveries?.[site.id]){
+      const adventure=adventureOf(hero);
+      set({hero:{...hero,adventure:{...adventure,discoveries:{...adventure.discoveries,[site.id]:'seen'}}},
+        ...(s.sitting?{sitting:false}:{}),notice:`Descoberta: ${site.name}. Local registrado no mapa.`});
+    }else set({hero,...(s.sitting?{sitting:false}:{})});
+  },
+  openDiscovery:()=>{
+    const s=get(),site=discoveryIn(s.hero.region);
+    if(!site||s.hero.dead||s.hero.instance||s.encounter||s.challenge||discoveryDistance(site,s.hero.position)>DISCOVERY_OPEN_RANGE)return;
+    const adventure=adventureOf(s.hero),status=adventure.discoveries[site.id];
+    if(status==='claimed')return;
+    if(site.guard&&status!=='cleared'){set({notice:site.hint});return;}
+    set({hero:{...withXp(s.hero,site.xp),gold:s.hero.gold+site.bronze,
+      adventure:{...adventure,discoveries:{...adventure.discoveries,[site.id]:'claimed'}}},
+      lootEvent:{time:Date.now(),xp:site.xp,gold:site.bronze,items:[]},notice:`Baú aberto em ${site.name}.`});
+  },
   toggleSit: () => { const s = get(); if (s.hero.dead) return; if (s.encounter) { set({ sitting: false, notice: 'Não dá para sentar em combate.' }); return; } set({ sitting: !s.sitting, notice: s.sitting ? 'Você se levantou.' : '🧘 Sentado: recuperando HP, MP e vigor 3x mais rápido. Andar ou lutar levanta.' }); },
   toggleWalk: () => set(s => ({ walking: !s.walking, notice: s.walking ? 'Correndo.' : 'Caminhando.' })),
   bankDeposit:amount=>{const s=get();if(s.encounter||s.hero.dead)return;if(!atTownService(s.hero)){set({notice:'Aproxime-se do banco da cidade.'});return;}const adv=adventureOf(s.hero),r=bankDeposit(adv.bank,s.hero.gold,amount,Date.now());if(!r.ok){set({notice:r.message});return;}set({hero:{...s.hero,gold:r.wallet,adventure:{...adv,bank:r.bank}},notice:`🏦 Guardado no banco. Saldo: ${currency(r.bank.balance)}.`});},
@@ -314,7 +336,7 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     if((s.slain[monster.id]??0)>Date.now())return;
     if(s.hero.instance){const sealed=doorBetween(s.hero.instance,adventureOf(s.hero).doors,s.hero.position[1],monster.z);if(sealed){set({notice:`Porta selada: ${sealed.title}. Resolva o código da porta primeiro.`});return;}}
     const rare=rareNow(Date.now(),s.hero.region),isRare=!s.hero.instance&&!!rare&&rare.monsterId===monster.id&&adventureOf(s.hero).rareDone!==rare.window;
-    const position=monsterPoint(monster,Date.now());
+    const position=monsterPoint(monster,Date.now(),s.hero.position);
     if(Math.hypot(s.hero.position[0]-position[0],s.hero.position[1]-position[1])>attackRange(s.hero,action)+.5){set({notice:'Fora de alcance. Chegue mais perto do alvo.'});return;}
     const level=monster.boss?monster.level:Math.max(monster.level,Math.min(60,s.hero.level+3,Number.isFinite(requestedLevel)?Math.floor(requestedLevel!):s.hero.level));
     const vitals=enemyVitals(monster.kind,level,monster.boss);
