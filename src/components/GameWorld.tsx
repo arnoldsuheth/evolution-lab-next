@@ -529,8 +529,10 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
       <Html center position={[0,4.25,0]} zIndexRange={[12,0]} style={{pointerEvents:"none"}}><strong className="quest-world-pin">{stop.name}</strong></Html>
     </group>}
     <color attach="background" args={[sky]} /><fog attach="fog" args={[sky,...distanceFog]} />
-    <ambientLight intensity={.28+light*.23} /><hemisphereLight args={["#e3edff", "#69705b", 1.05]} />
-    <directionalLight position={[-13, 23, 10]} intensity={.92+light*1.65} color="#ffe3b9" castShadow shadow-mapSize={quality==="high"?[2048,2048]:[1024,1024]} shadow-camera-left={-22} shadow-camera-right={22} shadow-camera-top={20} shadow-camera-bottom={-25} shadow-bias={-0.00035} shadow-normalBias={.035} />
+    {/* 5.0: luz com mais contraste: sol quente, céu azulado, chão terroso e uma luz fria de recorte por trás. */}
+    <ambientLight intensity={.14+light*.14} /><hemisphereLight args={["#b9d4ff", "#5b4a33", .8+light*.35]} />
+    <directionalLight position={[14, 9, -16]} intensity={.3+light*.35} color="#9fb8ff" />
+    <directionalLight position={[-13, 23, 10]} intensity={1.15+light*1.95} color="#ffd8a4" castShadow shadow-mapSize={quality==="high"?[2048,2048]:[1024,1024]} shadow-camera-left={-22} shadow-camera-right={22} shadow-camera-top={20} shadow-camera-bottom={-25} shadow-bias={-0.00035} shadow-normalBias={.035} />
     <GatherNodes paused={paused} approach={approachGather}/>
     {hero.region!=="goddard"&&<KingdomDetails region={hero.region} low={low}/>}<CombatFeedback />
     {hero.region==="goddard"&&!hero.instance?<group position={[0,-.35,-4.5]}>
