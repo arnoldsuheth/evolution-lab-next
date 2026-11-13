@@ -164,6 +164,19 @@ function CitadelInterior({ room, onGroundClick, read }: {
   </group>;
 }
 
+/** 5.0: céu em degradê (azul profundo no alto, cor do bioma no horizonte). Acompanha a câmera e fica atrás de tudo. */
+function SkyDome({ top, horizon }: { top: string; horizon: string }) {
+  const mesh = useRef<THREE.Mesh>(null);
+  const geometry = useMemo(() => {
+    const g = new THREE.SphereGeometry(100, 32, 16), p = g.getAttribute("position"), colors = new Float32Array(p.count * 3);
+    const a = new THREE.Color(horizon), b = new THREE.Color(top), c = new THREE.Color();
+    for (let i = 0; i < p.count; i++) { const t = Math.max(0, Math.min(1, p.getY(i) / 100)); c.copy(a).lerp(b, Math.pow(t, .55)).toArray(colors, i * 3); }
+    g.setAttribute("color", new THREE.BufferAttribute(colors, 3)); return g;
+  }, [top, horizon]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  useFrame(({ camera }) => { mesh.current?.position.copy(camera.position); });
+  return <mesh ref={mesh} geometry={geometry} renderOrder={-10} raycast={() => null} frustumCulled={false}><meshBasicMaterial vertexColors side={THREE.BackSide} depthWrite={false} depthTest={false} fog={false} /></mesh>;
+}
 function CitadelSectors() {
   return <>{CITADEL_SECTORS.map(sector => <CitadelSign key={sector.name} {...sector} />)}</>;
 }
@@ -528,7 +541,7 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
       <mesh rotation={[-Math.PI / 2,0,0]} raycast={() => null}><ringGeometry args={[.9,1.2,32]} /><meshBasicMaterial color="#63ebff" depthTest={false} /></mesh>
       <Html center position={[0,4.25,0]} zIndexRange={[12,0]} style={{pointerEvents:"none"}}><strong className="quest-world-pin">{stop.name}</strong></Html>
     </group>}
-    <color attach="background" args={[sky]} /><fog attach="fog" args={[sky,...distanceFog]} />
+    <color attach="background" args={[sky]} /><fog attach="fog" args={[sky,...distanceFog]} /><SkyDome top={new THREE.Color("#101833").lerp(new THREE.Color("#3f6db5"),Math.round(Math.max(0,Math.min(1,(light-.3)/.7))*20)/20).getStyle()} horizon={sky} />
     {/* 5.0: luz com mais contraste: sol quente, céu azulado, chão terroso e uma luz fria de recorte por trás. */}
     <ambientLight intensity={.14+light*.14} /><hemisphereLight args={["#b9d4ff", "#5b4a33", .8+light*.35]} />
     <directionalLight position={[14, 9, -16]} intensity={.3+light*.35} color="#9fb8ff" />
@@ -545,7 +558,7 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
     {!hero.instance&&<CityRoutes region={hero.region} paused={paused} ground={groundClick} cross={crossGate}
       followRoad={point=>{endGuide();followRoad(point);}} approach={(x,z,open)=>{endGuide();approachInteraction(x,z,open);}}/>}
     {!hero.instance&&isNewCity(hero.region)&&<RacialCity city={hero.region} paused={paused} approach={approachInteraction} openService={openService} openStory={()=>interact("eldrin")}/>}<CampaignWorld paused={paused} approach={approachMonster} approachGate={(x,z,open)=>{endGuide();approachInteraction(x,z,open);}}/>{!hero.instance&&hero.region==="aurora"&&<BiomeDetails region="aurora"/>}{!hero.instance&&hero.region==="aurora"&&<SceneDressing quality={low?"low":quality==="high"?"high":"medium"} groundColor={REGIONS.aurora.color}/>}{hero.region==="aurora"&&!hero.instance&&<>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.028, 0]} onClick={groundClick} receiveShadow><circleGeometry args={[PLAZA_RADIUS, 40]} /><PavingMaterial color="#b9b6a8" relief={!low} /></mesh>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.028, 0]} onClick={groundClick} receiveShadow><circleGeometry args={[PLAZA_RADIUS, 40]} /><PavingMaterial color="#c7b08c" relief={!low} /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[11, 0.025, -16]} onClick={groundClick}><planeGeometry args={[25, 3]} /><meshStandardMaterial color="#8e8b76" /></mesh>
     <group position={[0, .04, 0]}>
       <mesh rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[3.8, 3.9, 48]} /><meshBasicMaterial color="#c2a15e" side={THREE.DoubleSide} /></mesh>
