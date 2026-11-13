@@ -1,3 +1,4 @@
+import { renderTrack, type TrackId } from './soundtrack';
 /** Render the original melody once, off the main thread. Its playback then needs one looping source. */
 export async function renderKingdomMusic(sampleRate:number):Promise<AudioBuffer>{
  const beat=60/68,period=32*beat,tail=8*beat,length=Math.ceil((period+tail)*sampleRate),ctx=new OfflineAudioContext(1,length,sampleRate);
@@ -11,6 +12,11 @@ export class KingdomAudio {
  private context:AudioContext|null=null;
  private score:Promise<AudioBuffer>|null=null;
  private scoreSource:AudioBufferSourceNode|null=null;
+ /** 5.0: trilha atual (região/momento/combate), o volume dela para a troca suave e as já geradas. */
+ private track:TrackId='cidade';
+ private trackGain:GainNode|null=null;
+ private fading:{source:AudioBufferSourceNode;gain:GainNode}[]=[];
+ private tracks=new Map<TrackId,Promise<AudioBuffer>>();
  private master:GainNode|null=null;
  private music:GainNode|null=null;
  private ambience:GainNode|null=null;
@@ -24,7 +30,8 @@ export class KingdomAudio {
  async play(volume:number,environment=.55){
   const generation=++this.generation;
   if(!this.context){
-   const ctx=new AudioContext();this.context=ctx;this.master=ctx.createGain();this.music=ctx.createGain();this.ambience=ctx.createGain();this.master.gain.value=0;
+   // 'playback' usa um buffer maior: a música não engasga quando o jogo pesa no celular.
+   const ctx=new AudioContext({latencyHint:'playback'});this.context=ctx;this.master=ctx.createGain();this.music=ctx.createGain();this.ambience=ctx.createGain();this.master.gain.value=0;
    this.music.connect(this.master);this.ambience.connect(this.master);
    const compressor=ctx.createDynamicsCompressor();compressor.threshold.value=-20;compressor.ratio.value=4;this.master.connect(compressor);compressor.connect(ctx.destination);
    this.nodes.push(compressor);this.createEnvironment(ctx);
@@ -33,13 +40,29 @@ export class KingdomAudio {
   if(generation!==this.generation||this.context!==ctx)return;
   this.setVolume(volume);this.setAmbience(environment);
   if(typeof OfflineAudioContext!=='undefined'){
-   try{this.score??=renderKingdomMusic(ctx.sampleRate);const buffer=await this.score;if(generation!==this.generation||this.context!==ctx)return;if(!this.scoreSource){const source=ctx.createBufferSource();source.buffer=buffer;source.loop=true;source.connect(this.music!);source.start();this.scoreSource=source;if(this.timer===null){const chirp=()=>{if(ctx.state!=='running')return;this.tone(94,ctx.currentTime+.08,.2,.035,'sine',true);this.tone(97,ctx.currentTime+.35,.16,.025,'sine',true);};this.timer=setInterval(chirp,16*60/68*1000);}}}catch{this.score=null;if(generation!==this.generation||this.context!==ctx)return;this.startScheduler(ctx);}
+   try{const buffer=await this.bufferFor(this.track,ctx);if(generation!==this.generation||this.context!==ctx)return;if(!this.scoreSource){const source=ctx.createBufferSource(),gain=ctx.createGain();gain.gain.value=1;gain.connect(this.music!);source.buffer=buffer;source.loop=true;source.connect(gain);source.start();this.scoreSource=source;this.trackGain=gain;if(this.timer===null){const chirp=()=>{if(ctx.state!=='running')return;this.tone(94,ctx.currentTime+.08,.2,.035,'sine',true);this.tone(97,ctx.currentTime+.35,.16,.025,'sine',true);};this.timer=setInterval(chirp,16*60/68*1000);}}}catch{this.score=null;if(generation!==this.generation||this.context!==ctx)return;this.startScheduler(ctx);}
   }else this.startScheduler(ctx);
  }
  private startScheduler(ctx:AudioContext){if(this.timer===null){this.next=ctx.currentTime+.08;this.schedule();this.timer=setInterval(()=>this.schedule(),250);}}
+ private bufferFor(id:TrackId,ctx:AudioContext){
+  if(id==='cidade'){this.score??=renderKingdomMusic(ctx.sampleRate);return this.score;}
+  let buffer=this.tracks.get(id);if(!buffer){buffer=renderTrack(id,ctx.sampleRate);this.tracks.set(id,buffer);}return buffer;
+ }
+ /** Troca de trilha com transição suave (combate entra rápido; o resto em ~2 s). */
+ async setTrack(id:TrackId){
+  if(id===this.track)return;const leavingCombat=this.track==='combate';this.track=id;
+  const ctx=this.context,generation=this.generation;if(!ctx||ctx.state!=='running'||!this.scoreSource||!this.music)return;
+  let buffer:AudioBuffer;try{buffer=await this.bufferFor(id,ctx);}catch{return;}
+  if(generation!==this.generation||this.context!==ctx||this.track!==id||!this.scoreSource)return;
+  const fade=id==='combate'?.25:leavingCombat?.9:.7,now=ctx.currentTime;
+  const old={source:this.scoreSource,gain:this.trackGain!};old.gain.gain.setTargetAtTime(0,now,fade);this.fading.push(old);
+  setTimeout(()=>{try{old.source.stop();}catch{}old.source.disconnect();old.gain.disconnect();this.fading=this.fading.filter(f=>f!==old);},fade*6000);
+  const source=ctx.createBufferSource(),gain=ctx.createGain();gain.gain.value=0;gain.connect(this.music);source.buffer=buffer;source.loop=true;source.connect(gain);source.start();gain.gain.setTargetAtTime(1,now,fade);
+  this.scoreSource=source;this.trackGain=gain;
+ }
  setVolume(value:number){if(this.context&&this.master)this.master.gain.setTargetAtTime(Math.max(0,Math.min(1,value))*.32,this.context.currentTime,.15);}
  setAmbience(value:number){if(this.context&&this.ambience)this.ambience.gain.setTargetAtTime(Math.max(0,Math.min(1,value)),this.context.currentTime,.25);}
- pause(){this.generation++;if(this.scoreSource){try{this.scoreSource.stop();}catch{}this.scoreSource.disconnect();this.scoreSource=null;}if(this.context&&this.master)this.master.gain.setValueAtTime(0,this.context.currentTime);if(this.timer!==null)clearInterval(this.timer);this.timer=null;this.voices.forEach(v=>{try{v.stop();}catch{}});this.voices.clear();void this.context?.suspend().catch(()=>{});}
+ pause(){this.generation++;if(this.scoreSource){try{this.scoreSource.stop();}catch{}this.scoreSource.disconnect();this.scoreSource=null;}this.trackGain?.disconnect();this.trackGain=null;this.fading.forEach(f=>{try{f.source.stop();}catch{}f.source.disconnect();f.gain.disconnect();});this.fading=[];if(this.context&&this.master)this.master.gain.setValueAtTime(0,this.context.currentTime);if(this.timer!==null)clearInterval(this.timer);this.timer=null;this.voices.forEach(v=>{try{v.stop();}catch{}});this.voices.clear();void this.context?.suspend().catch(()=>{});}
  close(){this.pause();this.score=null;this.beds.forEach(b=>{try{b.stop();}catch{}b.disconnect();});this.beds=[];this.nodes.forEach(n=>n.disconnect());this.nodes=[];void this.context?.close().catch(()=>{});this.context=null;this.master=null;this.music=null;this.ambience=null;}
  private createEnvironment(ctx:AudioContext){
   const buffer=ctx.createBuffer(1,ctx.sampleRate*6,ctx.sampleRate),data=buffer.getChannelData(0);let last=0;

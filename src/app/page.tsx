@@ -7,6 +7,8 @@ import { PracticeCard } from "@/components/PracticeQuiz";
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { KingdomAudio } from "@/lib/kingdomAudio";
+import { trackFor } from "@/lib/soundtrack";
+import { regionWeather } from "@/lib/weather";
 import { useGame, savedState, SAVE_KEY, BACKUP_KEY } from "@/lib/store";
 import { CLASSES, RACES, RACE_CLASSES, HAIR, EYES, ITEMS, LESSONS, CURRICULUM, RELEASE, EXTRA_CHALLENGES, evaluateExtra, stats, type ClassId, type Race, type Look, type NpcId, type evaluateLesson } from "@/lib/game";
 import { activeEquipment } from "@/lib/equipment";
@@ -237,6 +239,14 @@ export default function Home() {
     window.addEventListener('pointerdown',start);window.addEventListener('keydown',start);document.addEventListener('visibilitychange',visibility);
     return ()=>{window.removeEventListener('pointerdown',start);window.removeEventListener('keydown',start);document.removeEventListener('visibilitychange',visibility);};
   },[entered,settings.volume,settings.ambienceVolume,settings.muted]);
+  // 5.0: trilha certa para cada momento. Combate entra assim que a luta começa; o resto segue região, noite e chuva.
+  useEffect(()=>{
+    const pick=()=>{const music=audio.current;if(!music)return;const st=useGame.getState(),hour=Number(new Intl.DateTimeFormat("en",{timeZone:"America/Sao_Paulo",hour:"numeric",hourCycle:"h23"}).format(new Date()));
+      void music.setTrack(trackFor({region:st.hero.region,instance:!!st.hero.instance,combat:!!st.encounter,night:hour<6||hour>=19,raining:regionWeather(st.hero.region).kind==='rain'}));};
+    pick();const timer=window.setInterval(pick,15000);
+    const off=useGame.subscribe((st,prev)=>{if(!!st.encounter!==!!prev.encounter||st.hero.region!==prev.hero.region||st.hero.instance!==prev.hero.instance)pick();});
+    return ()=>{window.clearInterval(timer);off();};
+  },[entered]);
 
   const close = useCallback(() => { useGame.getState().cancelChallenge(); setPanel("none"); setInitialBag("all"); }, []);
   useEffect(()=>{
