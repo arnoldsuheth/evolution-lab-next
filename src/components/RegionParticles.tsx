@@ -1,8 +1,9 @@
 "use client";
-import { useEffect, useMemo, useRef, type RefObject } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useGame } from '@/lib/store';
+import { WORLD_BOUNDS } from '@/lib/worldBounds';
 
 type Mood = { color: string; count: number; size: number; fall: number; drift: number; wobble: number; glow: boolean; nightBoost?: boolean; opacity: number };
 /** 5.0: clima de cada região (partículas em volta do herói). fall < 0 sobe (brasas). */
@@ -17,7 +18,8 @@ export const REGION_MOOD: Record<string, Mood> = {
   heart: { color: '#b48cff', count: 120, size: 0.28, fall: -.25, drift: .3, wobble: 1.2, glow: true, opacity: .9 },
   goddard: { color: '#fff1c4', count: 50, size: 0.21, fall: -.08, drift: .2, wobble: .8, glow: true, opacity: .7 },
 };
-const BOX = { x: 26, y: 9, z: 26 };
+// Clima da região: as partículas ficam espalhadas pelo mapa inteiro (não seguem o herói).
+const BOX = { x: WORLD_BOUNDS.x * 2, y: 10, z: WORLD_BOUNDS.maxZ - WORLD_BOUNDS.minZ }, MID_Z = (WORLD_BOUNDS.maxZ + WORLD_BOUNDS.minZ) / 2, SPREAD = 8;
 /** Sorteio fixo por índice (mesmo resultado a cada desenho). */
 const rand = (n: number) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 
@@ -29,9 +31,9 @@ function dotTexture() {
   dot = new THREE.DataTexture(data, n, n, THREE.RGBAFormat); dot.magFilter = dot.minFilter = THREE.LinearFilter; dot.needsUpdate = true; return dot;
 }
 
-export default function RegionParticles({ region, center, light }: { region: string; center: RefObject<THREE.Vector3>; light: number }) {
+export default function RegionParticles({ region, light }: { region: string; light: number }) {
   const mood = REGION_MOOD[region], low = useGame(s => s.settings.quality === 'low'), reduced = useGame(s => s.settings.reduceMotion);
-  const count = mood ? (low ? Math.round(mood.count * .4) : mood.count) : 0;
+  const count = mood ? Math.round(mood.count * SPREAD * (low ? .35 : 1)) : 0;
   const { geometry, seeds } = useMemo(() => {
     const g = new THREE.BufferGeometry(), p = new Float32Array(count * 3), seeds = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) { p[i * 3] = (rand(i) - .5) * BOX.x; p[i * 3 + 1] = rand(i + 1e3) * BOX.y; p[i * 3 + 2] = (rand(i + 2e3) - .5) * BOX.z; seeds[i * 3] = rand(i + 3e3) * 6.28; seeds[i * 3 + 1] = .6 + rand(i + 4e3) * .8; seeds[i * 3 + 2] = rand(i + 5e3) * 6.28; }
@@ -41,7 +43,6 @@ export default function RegionParticles({ region, center, light }: { region: str
   const points = useRef<THREE.Points>(null);
   useFrame(({ clock }, dt) => {
     const pts = points.current; if (!pts || !mood) return;
-    pts.position.set(center.current.x, 0, center.current.z);
     const material = pts.material as THREE.PointsMaterial;
     material.opacity = mood.opacity * (mood.nightBoost ? .35 + (1 - light) * .65 : 1);
     if (reduced) return;
@@ -51,7 +52,7 @@ export default function RegionParticles({ region, center, light }: { region: str
       a[k] += (Math.sin(t * mood.wobble * s + seeds[k]) * mood.drift + mood.drift * .3) * step;
       a[k + 1] -= mood.fall * s * step; a[k + 1] += Math.sin(t * 1.3 * s + seeds[k + 2]) * .08 * step * mood.wobble;
       a[k + 2] += Math.cos(t * mood.wobble * .8 * s + seeds[k + 2]) * mood.drift * step;
-      // Reaparece do outro lado ao sair da caixa em volta do herói.
+      // Reaparece do outro lado ao sair dos limites do mapa.
       if (a[k + 1] < 0) a[k + 1] += BOX.y; else if (a[k + 1] > BOX.y) a[k + 1] -= BOX.y;
       if (a[k] > BOX.x / 2) a[k] -= BOX.x; else if (a[k] < -BOX.x / 2) a[k] += BOX.x;
       if (a[k + 2] > BOX.z / 2) a[k + 2] -= BOX.z; else if (a[k + 2] < -BOX.z / 2) a[k + 2] += BOX.z;
@@ -59,7 +60,7 @@ export default function RegionParticles({ region, center, light }: { region: str
     pos.needsUpdate = true;
   });
   if (!mood || count === 0) return null;
-  return <points ref={points} geometry={geometry} frustumCulled={false} raycast={() => null}>
+  return <points ref={points} position={[0, 0, MID_Z]} geometry={geometry} frustumCulled={false} raycast={() => null}>
     <pointsMaterial map={dotTexture()} color={mood.color} size={mood.size} sizeAttenuation transparent depthWrite={false} opacity={mood.opacity} blending={mood.glow ? THREE.AdditiveBlending : THREE.NormalBlending} />
   </points>;
 }
