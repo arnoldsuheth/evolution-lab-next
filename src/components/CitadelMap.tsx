@@ -1,4 +1,6 @@
 "use client";
+import MapFocus from './MapFocus';
+import { minimapViewBox } from '@/lib/minimap';
 import { worldViewBox } from "@/lib/worldBounds";
 import { trainerHouses } from "@/lib/kingdomCities";
 
@@ -21,7 +23,7 @@ export function CitadelMap({ position, local = false, route = [], focus, selecte
   focus?: MapPin;
 }) {
   const cave = INSTANCES.cavern;
-  const view = local && position ? `${position[0] - 13} ${position[1] - 13} 26 26` : worldViewBox();
+  const view = local && position ? minimapViewBox(position) : worldViewBox();
   return (
     <svg viewBox={view} role="img" aria-label={local ? "Minimapa da Cidadela" : "Mapa da Cidadela"}>
       <rect x="-110" y="-110" width="220" height="220" fill="#16283b" />
@@ -73,7 +75,7 @@ export function CitadelMap({ position, local = false, route = [], focus, selecte
       <circle cx={AURORA_PORTAL[0]} cy={AURORA_PORTAL[1]} r=".8" fill="#7dd8d4"><title>Portal para Goddard</title></circle>
       {trainerHouses("aurora").map(({x,z,w,d})=><rect key={x+":"+z} x={x-w} y={z-d} width={w*2} height={d*2} rx=".3" fill="#645883" stroke="#bf9c5f" strokeWidth=".25"/>)}
       {regionPins('aurora').map(({name,point:[x,z]})=><circle key={name} cx={x} cy={z} r=".65" fill="#ffe6a3" stroke="#382f2e" strokeWidth=".2"><title>{name}</title></circle>)}
-      {focus && <g transform={`translate(${focus.point.join(' ')})`}><circle r="1.25" fill="#72e5eb" stroke="#09212f" strokeWidth=".3" /><title>{focus.name}</title>{!local && <text x="1.6" y=".45">{focus.name}</text>}</g>}
+      {focus && <MapFocus focus={focus} local={local} position={position} />}
       {position && <circle cx={position[0]} cy={position[1]} r={local ? 1 : .8} fill="#fff7db" stroke="#16283b" strokeWidth=".4" />}
     </svg>
   );

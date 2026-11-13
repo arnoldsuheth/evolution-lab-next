@@ -1,3 +1,5 @@
+import MapFocus from './MapFocus';
+import { minimapViewBox } from '@/lib/minimap';
 import { MONSTERS, REGIONS, isAggressive, type RegionId } from '@/lib/campaign';
 import { INSTANCES, type InstanceId } from '@/lib/instances';
 import { cityBuildings, isNewCity, trainerHouses } from '@/lib/kingdomCities';
@@ -16,7 +18,7 @@ export default function AreaMap({ region, instance, position, local=false, focus
 }) {
   if (region === 'aurora' && !instance) return <CitadelMap position={position} local={local} focus={focus} route={route} />;
   const city = !instance && isNewCity(region) ? region : undefined;
-  const viewBox = local && position ? `${position[0]-13} ${position[1]-13} 26 26`
+  const viewBox = local && position ? minimapViewBox(position)
     : instance ? '-14 -25 28 39'
     : city === 'goddard' ? '-21 -23 42 37'
     : worldViewBox();
@@ -36,7 +38,7 @@ export default function AreaMap({ region, instance, position, local=false, focus
     {portals.map(({name,point:[x,z]})=><circle key={name} cx={x} cy={z} r="1.1" fill={name.startsWith("Estrada")?"#e2b878":"#7dd8d4"}><title>{name}</title></circle>)}
     {position && route.length>0 && <polyline points={[position,...route].map(p=>p.join(',')).join(' ')} fill="none" stroke="#72e5eb" strokeWidth=".65" />}
     {pins.map(({name,point:[x,z]})=><circle key={name} cx={x} cy={z} r=".75" fill="#ffe6a3" stroke="#382f2e" strokeWidth=".2"><title>{name}</title></circle>)}
-    {focus && <g transform={`translate(${focus.point.join(' ')})`}><circle r="1.25" fill="#72e5eb" stroke="#09212f" strokeWidth=".3" /><title>{focus.name}</title>{!local && <text x="1.6" y=".4">{focus.name}</text>}</g>}
+    {focus && <MapFocus focus={focus} local={local} position={position} />}
     {position && <circle cx={position[0]} cy={position[1]} r=".9" fill="#fff7db" stroke="#16283b" strokeWidth=".4"><title>Você</title></circle>}
   </svg>;
 }
