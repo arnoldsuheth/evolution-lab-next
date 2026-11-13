@@ -107,9 +107,10 @@ const HUNTER_COMPANIONS = ['wolf', 'fox', 'owl', 'boar', 'lynx', 'crystal'] as c
 export type HunterCompanion = typeof HUNTER_COMPANIONS[number];
 
 export function hunterCompanion(hero: HeroData, gear = activeEquipment(hero, ITEMS)): HunterCompanion | undefined {
-  if (hero.classId !== 'hunter' || !gear.some(item => item.slot === 'weapon' || item.slot === 'twohand')) return;
+  // Hunter e Shaman lutam com um companheiro (o Shaman começa com um lince espiritual).
+  if ((hero.classId !== 'hunter' && hero.classId !== 'shaman') || !gear.some(item => item.slot === 'weapon' || item.slot === 'twohand')) return;
   const pet = gear.find(item => item.slot === 'pet');
-  return HUNTER_COMPANIONS.find(kind => kind === pet?.visual) ?? 'wolf';
+  return HUNTER_COMPANIONS.find(kind => kind === pet?.visual) ?? (hero.classId === 'shaman' ? 'lynx' : 'wolf');
 }
 
 export function stats(hero: HeroData) {

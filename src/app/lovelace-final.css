@@ -214,3 +214,11 @@
 /* Abas ativas: o texto de dentro (ícone e rótulo) também fica escuro, legível sobre o dourado */
 .modal :is(.tabs,.category-chips,.inventory-filters)>button:is(.active,[aria-pressed="true"],[aria-selected="true"]) *{color:#22170a!important;fill:currentColor}
 .sheet-model{background:radial-gradient(circle at 50% 38%,#3a3f6b,#141a33)!important}
+
+/* Rodada 5: botão da Forma de Lobo do Shaman (nível 10). */
+.radial-wolf{position:absolute;width:44px;height:44px;right:250px;bottom:4px;font-size:16px}
+.radial-wolf[aria-pressed="true"]{box-shadow:0 0 0 2px #6dffa0,0 0 16px #6dffa088}
+@media (pointer: coarse), (max-width: 960px) {
+  .radial-hud .radial-wolf { right: 178px; bottom: 100px; }
+  .radial-hud:not(.utilities-open) > .radial-wolf { display: none; }
+}

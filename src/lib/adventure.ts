@@ -205,6 +205,8 @@ export const MOUNTS = [
 ] as const;
 export type MountId = typeof MOUNTS[number]['id'];
 export const MOUNT_LEVEL = MOUNTS[0].level;
+/** Shaman vira lobo espiritual a partir do nível 10 (antes da primeira montaria). */
+export const WOLF_FORM_LEVEL = 10, WOLF_FORM_SPEED = 1.4;
 type Rider = Pick<HeroData,'level'> & Partial<Pick<HeroData,'inventory'|'flyingMount'|'selectedMount'>>;
 export const mountAvailable = (hero: Rider, mount: typeof MOUNTS[number]) =>
   hero.level >= mount.level

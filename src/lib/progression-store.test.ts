@@ -1,5 +1,5 @@
 import { test } from 'node:test';import { strict as assert } from 'node:assert';
-import { freshSave,ITEMS,stats } from './game';import { SKILLS } from './skills';
+import { freshSave,ITEMS,stats,hunterCompanion } from './game';import { SKILLS } from './skills';
 const mem=new Map<string,string>();Object.defineProperty(globalThis,'localStorage',{configurable:true,value:{getItem:(k:string)=>mem.get(k)??null,setItem:(k:string,v:string)=>mem.set(k,v)}});
 import { useGame,SAVE_KEY } from './store';
 function reset(level=1){useGame.setState({...freshSave(),encounter:null,effects:[],cooldowns:{},lastAttack:0,buff:0});useGame.getState().createCharacter('Teste','paladin','normal');useGame.setState(s=>({hero:{...s.hero,level,gold:100000,inventory:[],equipped:[]}}));}
@@ -21,4 +21,11 @@ test('todo herói novo começa com uma arma simples da classe',()=>{
   const h=useGame.getState().hero;assert.ok(h.inventory.includes(weapon),classId);assert.ok(h.equipped.includes(weapon),classId);assert.ok(stats(h).attack>stats({...h,equipped:[]}).attack,classId);
  }
  useGame.setState({...freshSave(),encounter:null});useGame.getState().createCharacter('Arqueira','hunter','normal');assert.ok(!useGame.getState().hero.inventory.some(i=>i.startsWith('starter-')));
+});
+test('shaman tem companheiro e vira lobo no nível 10',()=>{
+ useGame.setState({...freshSave(),encounter:null});useGame.getState().createCharacter('Xamã','shaman','normal');
+ assert.equal(hunterCompanion(useGame.getState().hero),'lynx');
+ useGame.getState().toggleWolf();assert.equal(useGame.getState().wolfForm,false);
+ useGame.setState(s=>({hero:{...s.hero,level:10}}));useGame.getState().toggleWolf();assert.equal(useGame.getState().wolfForm,true);
+ useGame.getState().toggleWolf();assert.equal(useGame.getState().wolfForm,false);
 });

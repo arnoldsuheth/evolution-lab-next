@@ -8,7 +8,7 @@ import {useGame} from '@/lib/store';
 import {SKILLS,classPowerRequirement,effectiveSkillRank} from '@/lib/skills';
 import {autoAttackStep,ATTACK_SLOT,BAR_SLOTS,barForKey,hotbarIndex,isEditingTarget,keyForBar} from '@/lib/controls';
 import {ITEMS,CLASSES} from '@/lib/game';
-import {specOf} from '@/lib/adventure';
+import {specOf,WOLF_FORM_LEVEL} from '@/lib/adventure';
 import {itemRequirement,countItem} from '@/lib/equipment';
 import {SkillArtwork,ItemArtwork} from './GameArtwork';
 import type {CSSProperties} from 'react';
@@ -17,7 +17,7 @@ function CastFx({at,crit,combo,supremo}:{at:number|null;crit?:boolean;combo?:boo
 const cdStyle=(frac:number)=>({'--cd':`${Math.round(Math.max(0,Math.min(1,frac))*360)}deg`}) as CSSProperties;
 const RES_LABEL={mp:'SEM MP',stamina:'SEM STM'} as const;
 function Controls({identity}:{identity:string|null}){
- const hero=useGame(s=>s.hero),now=useGame(s=>s.now),cooldowns=useGame(s=>s.cooldowns),walking=useGame(s=>s.walking),sitting=useGame(s=>s.sitting),[automatic,setAutomatic]=useState(false),[food,setFood]=useState(''),[potion,setPotion]=useState(''),[utilities,setUtilities]=useState(false);
+ const hero=useGame(s=>s.hero),wolfForm=useGame(s=>s.wolfForm),now=useGame(s=>s.now),cooldowns=useGame(s=>s.cooldowns),walking=useGame(s=>s.walking),sitting=useGame(s=>s.sitting),[automatic,setAutomatic]=useState(false),[food,setFood]=useState(''),[potion,setPotion]=useState(''),[utilities,setUtilities]=useState(false);
  const attack=basicAttack(hero),arrows=countItem(hero.inventory,HUNTER_ARROW),powerLock=classPowerRequirement(hero);
  const encounter=useGame(s=>s.encounter);
  const ev=useGame(s=>s.battleEvent),fresh=ev&&now-ev.time<1500?ev:null;
@@ -69,12 +69,13 @@ function Controls({identity}:{identity:string|null}){
   <button className="radial-more" aria-expanded={utilities} aria-label={utilities?"Recolher ações rápidas":"Mostrar ações rápidas"} onClick={()=>setUtilities(!utilities)}>{utilities?'×':'⋯'}<small>Ações</small></button>
   <button className="radial-run" aria-pressed={!walking} onClick={()=>useGame.getState().toggleWalk()} aria-label={walking?'Correr':'Caminhar'}>{walking?'🚶':'🏃'}<small>{walking?'Andar':'Correr'}</small></button>
   <button className="radial-sit" aria-pressed={sitting} disabled={!!identity&&!!useGame.getState().encounter} onClick={()=>useGame.getState().toggleSit()} aria-label={sitting?'Levantar':'Sentar para recuperar'}>🧘<small>{sitting?'Levantar':'Sentar'}</small></button>
+  {hero.classId==='shaman'&&hero.level>=WOLF_FORM_LEVEL&&<button className="radial-wolf" aria-pressed={wolfForm} disabled={!!useGame.getState().encounter||!!hero.instance} onClick={()=>useGame.getState().toggleWolf()} aria-label={wolfForm?'Voltar à forma normal':'Forma de Lobo'}>🐺<small>{wolfForm?'Voltar':'Lobo'}</small></button>}
   {(['food','potion'] as const).map(kind=>{const list=kind==='food'?foods:potions,id=kind==='food'?food:potion,item=list.find(i=>i.id===id)??list[0],left=Math.max(0,Math.ceil(((cooldowns.consumable??0)-now)/1000));return <button key={kind} className={`radial-${kind}`} disabled={!item||left>0} onClick={()=>item&&useGame.getState().useItem(item.id)} aria-label={(kind==='food'?'Comer: ':'Poção: ')+(item?.name??'nenhum')}>{item?<ItemArtwork item={item}/>:<span>{kind==='food'?'🍞':'🧪'}</span>}<small>{left?left+'s':item?'×'+countItem(hero.inventory,item.id):'—'}</small></button>;})}
  </div></section>;
 }
 export default function CombatHotbar({paused}:{paused:boolean}){
  const dead=useGame(s=>s.hero.dead),enemy=useGame(s=>s.encounter),target=useGame(s=>s.target);
- useEffect(()=>{const key=(e:KeyboardEvent)=>{if(paused||e.repeat||e.altKey||e.ctrlKey||e.metaKey||isEditingTarget(e.target))return;const s=useGame.getState(),index=hotbarIndex(e.key);if(index===ATTACK_SLOT||e.key.toLowerCase()==='f'){e.preventDefault();s.act({kind:'attack'});}else if(index>0){e.preventDefault();const id=s.hero.hotbar[barForKey(e.key)];if(id){if(id.startsWith('item:'))s.useItem(id.slice(5));else s.act({kind:'skill',skill:id});}}else if(e.key.toLowerCase()==='r'){e.preventDefault();s.act({kind:'power'});}else if(e.key==='Escape'&&!s.encounter)s.setTarget(null);};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[paused]);
+ useEffect(()=>{const key=(e:KeyboardEvent)=>{if(paused||e.repeat||e.altKey||e.ctrlKey||e.metaKey||isEditingTarget(e.target))return;const s=useGame.getState(),index=hotbarIndex(e.key);if(index===ATTACK_SLOT||e.key.toLowerCase()==='f'){e.preventDefault();s.act({kind:'attack'});}else if(index>0){e.preventDefault();const id=s.hero.hotbar[barForKey(e.key)];if(id){if(id.startsWith('item:'))s.useItem(id.slice(5));else s.act({kind:'skill',skill:id});}}else if(e.key.toLowerCase()==='r'){e.preventDefault();s.act({kind:'power'});}else if(e.key.toLowerCase()==='l'&&s.hero.classId==='shaman'&&!Object.values(s.settings.keybindings??{}).includes('l')){e.preventDefault();s.toggleWolf();}else if(e.key==='Escape'&&!s.encounter)s.setTarget(null);};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[paused]);
  const identity=enemy?.monsterId??target;
  if(dead||paused)return null;
  return <Controls key={identity??"peace"} identity={identity??null}/>;

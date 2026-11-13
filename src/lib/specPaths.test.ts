@@ -8,7 +8,7 @@ const caster = (classId: HeroData['classId'], spec: string): HeroData => {
   const base = freshSave().hero;
   return { ...base, created: true, classId, level: 12, hp: 60, mp: 300, stamina: 300, adventure: { ...(base.adventure ?? {}), spec } as HeroData['adventure'] };
 };
-const enemy = { id: 'e', name: 'Alvo', hp: 5000, maxHp: 5000, power: 40, reward: 1 };
+const enemy = { id: 'e', name: 'Alvo', hp: 5000, maxHp: 5000, power: 40, reward: 1, elite: false };
 
 test('mago e shaman têm três caminhos com elemento e efeito próprio', () => {
   assert.deepEqual(SPECS.mage.map(s => s.element), ['frost', 'fire', 'shadow']);
