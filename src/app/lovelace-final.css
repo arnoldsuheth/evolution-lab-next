@@ -174,3 +174,24 @@
 .monster-vitals .world-resource.health>i{background:linear-gradient(90deg,#b8323f,#f05a5a)!important}
 .combat-console .combat-console-head{border-bottom:1px solid #c9a24a44!important}
 .combat-console .combat-console-head>span{font-family:Cinzel,Georgia,serif;color:var(--lk-gold2)!important;letter-spacing:.04em}
+
+/* ---------- 5.0 · Clima na tela: bem de leve, só nas bordas, sem bloquear toques ---------- */
+.screen-weather{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden;transition:opacity 4s ease;
+ -webkit-mask-image:radial-gradient(ellipse 62% 58% at 50% 55%,transparent 55%,#000 92%);mask-image:radial-gradient(ellipse 62% 58% at 50% 55%,transparent 55%,#000 92%)}
+.screen-weather i{position:absolute;display:block;border-radius:50%}
+/* Pingos na tela: gota com brilho, escorre devagar e some */
+.sw-rain i{border-radius:50% 50% 46% 46%;background:radial-gradient(circle at 34% 28%,#ffffffee 0 12%,#e6f1ffaa 22%,#b9d0ec55 48%,#6f8fb044 66%,transparent 74%);
+ border:1px solid #ffffff55;box-shadow:inset -2px -3px 3px #ffffff55,0 1px 2px #0003;backdrop-filter:blur(1.5px);-webkit-backdrop-filter:blur(1.5px);animation:sw-drop linear infinite}
+@keyframes sw-drop{0%{transform:translateY(-6px) scale(.6);opacity:0}12%{opacity:.85;transform:translateY(0) scale(1)}70%{opacity:.7}100%{transform:translateY(60px) scaleY(1.4);opacity:0}}
+.sw-rain::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#9fb6d012,transparent 30%,transparent 70%,#9fb6d012)}
+/* Neve: flocos caindo e balançando */
+.sw-snow i{background:radial-gradient(circle,#ffffff,#ffffffaa 40%,transparent 70%);animation:sw-flake linear infinite}
+@keyframes sw-flake{0%{transform:translate(0,-20px);opacity:0}15%{opacity:.9}50%{transform:translate(12px,80px)}100%{transform:translate(-8px,180px);opacity:0}}
+/* Fuligem de carvão: grãos escuros subindo, com a borda um pouco enfumaçada */
+.sw-soot i{width:4px!important;height:4px!important;background:#1a1410;box-shadow:0 0 3px #ff8a3a55;animation:sw-ash linear infinite}
+@keyframes sw-ash{0%{transform:translate(0,30px);opacity:0}20%{opacity:.7}100%{transform:translate(20px,-140px);opacity:0}}
+.sw-soot::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 55%,transparent 55%,#2a1a1022 80%,#1a0f0844)}
+/* Poeira: grãos claros levados pelo vento e um tom quente nas bordas */
+.sw-dust i{width:3px!important;height:3px!important;background:#e9d7b0;animation:sw-dust linear infinite}
+@keyframes sw-dust{0%{transform:translate(-30px,0);opacity:0}20%{opacity:.75}100%{transform:translate(140px,-20px);opacity:0}}
+.sw-dust::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 55%,transparent 55%,#c9a87022 85%,#a07a4033)}

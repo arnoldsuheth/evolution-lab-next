@@ -55,6 +55,8 @@ import { useGame } from "@/lib/store";
 import { ContactShadow } from "./GroundFx";
 import RegionParticles from "./RegionParticles";
 import WorldHorizon from "./WorldHorizon";
+import SkyLife from "./SkyLife";
+import RainField from "./RainField";
 import { bindCursor, cursorOn, setCombatCursor } from "@/lib/cursor";
 import { isRangedClass } from "@/lib/combatEffects";
 import { attackRange } from "@/lib/combat";
@@ -561,7 +563,7 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
       <mesh rotation={[-Math.PI / 2,0,0]} raycast={() => null}><ringGeometry args={[.9,1.2,32]} /><meshBasicMaterial color="#63ebff" depthTest={false} /></mesh>
       <Html center position={[0,4.25,0]} zIndexRange={[12,0]} style={{pointerEvents:"none"}}><strong className="quest-world-pin">{stop.name}</strong></Html>
     </group>}
-    <color attach="background" args={[sky]} /><fog attach="fog" args={[sky,...distanceFog]} /><SkyDome top={new THREE.Color("#101833").lerp(new THREE.Color("#3f6db5"),Math.round(Math.max(0,Math.min(1,(light-.3)/.7))*20)/20).getStyle()} horizon={sky} />{!hero.instance&&<><RegionParticles region={hero.region} light={light} /><WorldHorizon region={hero.region} /></>}
+    <color attach="background" args={[sky]} /><fog attach="fog" args={[sky,...distanceFog]} /><SkyDome top={new THREE.Color("#101833").lerp(new THREE.Color("#3f6db5"),Math.round(Math.max(0,Math.min(1,(light-.3)/.7))*20)/20).getStyle()} horizon={sky} />{!hero.instance&&<><RegionParticles region={hero.region} light={light} /><WorldHorizon region={hero.region} /><SkyLife light={light} region={hero.region} /><RainField region={hero.region} /></>}
     {/* 5.0: luz com mais contraste: sol quente, céu azulado, chão terroso e uma luz fria de recorte por trás. */}
     <ambientLight intensity={.14+light*.14} /><hemisphereLight args={["#b9d4ff", "#5b4a33", .8+light*.35]} />
     <directionalLight position={[14, 9, -16]} intensity={.3+light*.35} color="#9fb8ff" />
