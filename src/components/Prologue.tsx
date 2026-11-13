@@ -107,7 +107,7 @@ export default function Prologue({ onClose }: { onClose: () => void }) {
     {!started ? <div className="pro-gate">
       <Image src={base + '/lovelace-identidade.jpeg'} width={1536} height={1024} alt="" aria-hidden="true" unoptimized priority />
       <p className="pro-kicker">PRÓLOGO</p><h2>O Código Perdido</h2>
-      <button className="pro-play" onClick={begin}><span aria-hidden="true">▶</span> Assistir</button>
+      <button className="pro-play" onClick={begin}><span aria-hidden="true">{"\u25B6\uFE0E"}</span> Assistir</button>
       <p className="pro-tip">Narrado e legendado · cerca de 2 minutos</p>
       <button className="pro-skip-link" onClick={close}>Pular e jogar</button>
     </div> : <>
@@ -117,7 +117,7 @@ export default function Prologue({ onClose }: { onClose: () => void }) {
       </div>
       <p key={current.id + line} className="pro-subtitle" aria-live="polite">{text}</p>
       <div className="pro-controls">
-        <button onClick={() => setPaused(!paused)} aria-label={paused ? 'Continuar' : 'Pausar'}>{paused ? '▶' : '❚❚'}</button>
+        <button onClick={() => setPaused(!paused)} aria-label={paused ? 'Continuar' : 'Pausar'}>{paused ? '\u25B6\uFE0E' : '❚❚'}</button>
         <button onClick={toggleSound} aria-label={sound ? 'Desligar narração' : 'Ligar narração'} aria-pressed={sound}>{sound ? '🔊' : '🔇'}</button>
         <span className="pro-progress" aria-hidden="true"><i style={{ width: `${(scene + (line + 1) / current.lines.length) / PROLOGUE.length * 100}%` }} /></span>
         {last ? <button className="pro-enter" onClick={close}>Entrar no Reino</button> : <button className="pro-skip" onClick={close}>Pular ⏭</button>}

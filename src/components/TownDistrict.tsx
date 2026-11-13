@@ -18,7 +18,7 @@ function Roads({onClick}:{onClick:(e:ThreeEvent<MouseEvent>)=>void}){
  const base=useMemo(()=>createPavingTextures(),[]);
  const paved=useMemo(()=>new Map(ROADS.filter(r=>r.kind==='road').map(r=>{const len=Math.hypot(r.b[0]-r.a[0],r.b[1]-r.a[1]);const map=base.map.clone(),bump=base.bumpMap.clone();for(const t of [map,bump]){t.repeat.set(Math.max(1,r.width/2.2),Math.max(1,len/2.2));t.needsUpdate=true;}return[r.id,{map,bump}];})),[base]);
  useLayoutEffect(()=>()=>{base.map.dispose();base.bumpMap.dispose();paved.forEach(t=>{t.map.dispose();t.bump.dispose();});},[base,paved]);
- return <group>{ROADS.map(r=>{const [ax,az]=r.a,[bx,bz]=r.b,len=Math.hypot(bx-ax,bz-az),angle=Math.atan2(bx-ax,bz-az),color=r.kind==='road'?ROAD:TRAIL,y=r.kind==='road'?.022:.02,tex=paved.get(r.id);
+ return <group>{ROADS.map(r=>{const [ax,az]=r.a,[bx,bz]=r.b,len=Math.hypot(bx-ax,bz-az),angle=Math.atan2(bx-ax,bz-az),color=r.kind==='road'?ROAD:TRAIL,y=r.kind==='road'?.05:.032 /* camadas bem separadas: no celular 2 mm de diferença faziam o chão tremer */,tex=paved.get(r.id);
   return <group key={r.id}><mesh position={[(ax+bx)/2,y,(az+bz)/2]} rotation={[-Math.PI/2,0,angle]} onClick={onClick} receiveShadow><planeGeometry args={[r.width,len]}/>{tex?<meshStandardMaterial color={color} map={tex.map} bumpMap={tex.bump} bumpScale={.06} roughness={.9}/>:std(color,{roughness:.95})}</mesh>
    {[r.a,r.b].map((p,i)=><mesh key={i} position={[p[0],y-.001,p[1]]} rotation={[-Math.PI/2,0,0]} onClick={onClick} receiveShadow><circleGeometry args={[r.width/2,20]}/>{std(color,{roughness:.9})}</mesh>)}</group>;})}</group>;
 }

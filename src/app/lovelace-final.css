@@ -195,3 +195,22 @@
 .sw-dust i{width:3px!important;height:3px!important;background:#e9d7b0;animation:sw-dust linear infinite}
 @keyframes sw-dust{0%{transform:translate(-30px,0);opacity:0}20%{opacity:.75}100%{transform:translate(140px,-20px);opacity:0}}
 .sw-dust::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 55%,transparent 55%,#c9a87022 85%,#a07a4033)}
+
+/* ---------- Transição entre regiões (no lugar da tela vazia enquanto o mundo carrega) ---------- */
+.region-transition{position:fixed;inset:0;z-index:90;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;pointer-events:all;
+ background:radial-gradient(ellipse at 50% 42%,#2a2560 0%,#121a3a 50%,#05070f 100%);color:#f4e9cf;text-align:center;animation:rt-in .35s ease-out both}
+@keyframes rt-in{from{opacity:0}to{opacity:1}}
+.rt-emblem{width:96px;height:96px;border-radius:24px;background-size:cover;box-shadow:0 0 0 2px #c9a24a,0 0 40px #f2c14e55;animation:lk-breathe 3s ease-in-out infinite}
+.rt-kicker{margin:8px 0 0;font:700 12px/1 Inter,system-ui,sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#f2d48a}
+.region-transition h2{margin:0;font:900 clamp(26px,5vw,44px)/1.1 Cinzel,Georgia,serif;color:#fff1c8;text-shadow:0 0 24px #f2c14e66}
+.rt-bar{width:min(260px,60vw);height:4px;border-radius:999px;background:#ffffff1f;overflow:hidden;margin-top:8px}
+.rt-bar i{display:block;width:40%;height:100%;background:linear-gradient(90deg,#8f6fd1,#f2d48a);animation:rt-load 1.1s ease-in-out infinite}
+@keyframes rt-load{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}
+
+/* ---------- Avisos: em balões legíveis, nunca por cima das janelas nem dos botões de ação ---------- */
+.action-log.behind-panel{visibility:hidden}
+.action-log p{background:#0d1626d9;border:1px solid #c9a24a55;border-radius:10px;padding:4px 8px;margin:0 0 4px!important;text-shadow:none!important;color:#f1e7cf!important;box-shadow:0 3px 10px #0008}
+@media (pointer:coarse),(max-width:960px){.action-log p:nth-last-child(n+3){display:none}}
+/* Abas ativas: o texto de dentro (ícone e rótulo) também fica escuro, legível sobre o dourado */
+.modal :is(.tabs,.category-chips,.inventory-filters)>button:is(.active,[aria-pressed="true"],[aria-selected="true"]) *{color:#22170a!important;fill:currentColor}
+.sheet-model{background:radial-gradient(circle at 50% 38%,#3a3f6b,#141a33)!important}

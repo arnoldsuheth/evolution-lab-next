@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useGame } from '@/lib/store';
@@ -33,7 +33,9 @@ function dotTexture() {
 
 export default function RegionParticles({ region, light }: { region: string; light: number }) {
   const mood = REGION_MOOD[region], low = useGame(s => s.settings.quality === 'low'), reduced = useGame(s => s.settings.reduceMotion);
-  const count = mood ? Math.round(mood.count * SPREAD * (low ? .35 : 1)) : 0;
+  // Celular (toque) usa metade das partículas; modo leve, um terço.
+  const [touch] = useState(() => typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches);
+  const count = mood ? Math.round(mood.count * SPREAD * (low ? .35 : touch ? .5 : 1)) : 0;
   const { geometry, seeds } = useMemo(() => {
     const g = new THREE.BufferGeometry(), p = new Float32Array(count * 3), seeds = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) { p[i * 3] = (rand(i) - .5) * BOX.x; p[i * 3 + 1] = rand(i + 1e3) * BOX.y; p[i * 3 + 2] = (rand(i + 2e3) - .5) * BOX.z; seeds[i * 3] = rand(i + 3e3) * 6.28; seeds[i * 3 + 1] = .6 + rand(i + 4e3) * .8; seeds[i * 3 + 2] = rand(i + 5e3) * 6.28; }

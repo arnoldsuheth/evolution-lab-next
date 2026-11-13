@@ -37,6 +37,14 @@ function peaks(seed: number) {
   return list;
 }
 
+/** Moldura retangular (4 faixas) em volta de um retângulo interno. */
+function Frame({ inner, width, y, color }: { inner: [number, number]; width: number; y: number; color: string }) {
+  const [hx, hz] = inner, ox = hx + width, strips: [number, number, number, number][] = [
+    [0, -(hz + width / 2), ox * 2, width], [0, hz + width / 2, ox * 2, width], [-(hx + width / 2), 0, width, hz * 2], [hx + width / 2, 0, width, hz * 2]];
+  return <>{strips.map(([x, z, w, d], i) => <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[x, y, z]} raycast={() => null}>
+    <planeGeometry args={[w, d]} /><meshStandardMaterial color={color} roughness={.95} />
+  </mesh>)}</>;
+}
 export default function WorldHorizon({ region }: { region: string }) {
   const look = LOOK[region] ?? LOOK.aurora, ground = biomeOf(region)?.ground?.[0] ?? '#586b44';
   const motion = useGame(s => !s.settings.reduceMotion), low = useGame(s => s.settings.quality === 'low');
@@ -50,18 +58,14 @@ export default function WorldHorizon({ region }: { region: string }) {
   useFrame(({ clock }) => { const m = sea.current; if (!m || !motion) return; (m.material as THREE.MeshStandardMaterial).emissiveIntensity = .12 + Math.sin(clock.elapsedTime * .6) * .05; });
   return <group position={[0, 0, MID_Z]}>
     {/* Mar até o horizonte (abaixo do chão do mapa) */}
-    <mesh ref={sea} rotation={[-Math.PI / 2, 0, 0]} position={[0, -.45, 0]} raycast={() => null} receiveShadow={false}>
+    <mesh ref={sea} rotation={[-Math.PI / 2, 0, 0]} position={[0, -.7, 0]} raycast={() => null} receiveShadow={false}>
       <planeGeometry args={[900, 900]} /><meshStandardMaterial color={look.sea} emissive={look.sea} emissiveIntensity={.12} roughness={.35} metalness={.15} />
     </mesh>
-    {/* Faixa de terra além do limite: o mapa não termina num corte seco */}
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -.06, 0]} raycast={() => null}>
-      <planeGeometry args={[(HALF_X + SHORE) * 2, (HALF_Z + SHORE) * 2]} /><meshStandardMaterial color={ground} roughness={.95} />
-    </mesh>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -.2, 0]} raycast={() => null}>
-      <planeGeometry args={[(HALF_X + SHORE + 4) * 2, (HALF_Z + SHORE + 4) * 2]} /><meshStandardMaterial color={look.shore} roughness={1} />
-    </mesh>
+    {/* Faixa de terra e praia só em volta do mapa (moldura), nunca por baixo dele: evita o chão tremendo */}
+    <Frame inner={[HALF_X, HALF_Z]} width={SHORE} y={-.08} color={ground} />
+    <Frame inner={[HALF_X + SHORE, HALF_Z + SHORE]} width={5} y={-.3} color={look.shore} />
     {/* Montanhas e ilhas */}
-    {(low ? list.filter((_, i) => i % 2 === 0) : list).map((p, i) => <group key={i} position={[p.x, p.island ? -.45 : -.1, p.z]}>
+    {(low ? list.filter((_, i) => i % 2 === 0) : list).map((p, i) => <group key={i} position={[p.x, p.island ? -.7 : -.1, p.z]}>
       <mesh geometry={geometry} position={[0, p.h / 2, 0]} scale={[p.r, p.h, p.r]} rotation={[0, i, 0]} raycast={() => null}><meshStandardMaterial color={look.rock} roughness={.95} flatShading /></mesh>
       {look.cap && p.h > 18 && <mesh geometry={cap} position={[0, p.h * .86, 0]} scale={[p.r * .32, p.h * .28, p.r * .32]} rotation={[0, i, 0]} raycast={() => null}><meshStandardMaterial color={look.cap} roughness={.8} flatShading /></mesh>}
     </group>)}

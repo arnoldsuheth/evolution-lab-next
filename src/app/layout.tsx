@@ -22,13 +22,14 @@ import "./lovelace-final.css";
 import "./prologue.css";
 import {CloudRuntime,CloudGate} from "@/components/CloudAccount";
 
-const base = "";
+// Caminho do site no GitHub Pages (ex.: /evolution-lab-next). Sem ele o iPhone não achava o ícone e mostrava um "L" genérico.
+const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 export const viewport:Viewport={width:"device-width",initialScale:1,viewportFit:"cover",themeColor:"#0B1F3B"};
 export const metadata: Metadata = {
   title: "Lovelace Kingdom",
   applicationName: "Lovelace Kingdom",
-  icons: { icon: [{url:`${base}/lovelace-icon-192.png`,sizes:"192x192",type:"image/png"}] },
+  icons: { icon: [{url:`${base}/lovelace-icon-192.png`,sizes:"192x192",type:"image/png"}], apple: [{url:`${base}/apple-touch-icon.png`,sizes:"180x180",type:"image/png"}] },
   manifest: `${base}/manifest.webmanifest`,
   appleWebApp: { capable: true, title: "Lovelace Kingdom", statusBarStyle: "black-translucent" },
   description: "Explore a Pedra da Aurora, domine as runas da programação e descubra O Legado dos Precursores.",

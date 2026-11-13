@@ -53,6 +53,7 @@ test('o foco da câmera acompanha a subida em ambas as projeções', () => {
 
 test('a inclinação permite ver o terreno de cima e alcançar o horizonte sem afundar a câmera',()=>{
  assert.ok(WORLD_ORBIT.minPolarAngle<Math.PI/6);
- assert.ok(WORLD_ORBIT.maxPolarAngle>=Math.PI/2);
+ // Baixa o bastante para ver o horizonte (mar e montanhas), mas sem encostar no chão nem atravessar muros.
+ assert.ok(WORLD_ORBIT.maxPolarAngle>=1.25&&WORLD_ORBIT.maxPolarAngle<Math.PI/2);
  assert.ok(worldCameraTargetHeight(false,false)+32*Math.cos(WORLD_ORBIT.maxPolarAngle)>.25);
 });

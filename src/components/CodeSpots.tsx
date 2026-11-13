@@ -24,8 +24,7 @@ function Lamp({ lit }: { lit: boolean }) {
     <mesh position={[0, 3.36, 0]}><coneGeometry args={[.42, .32, 4]} />{mat('#3d4350')}</mesh>
     {lit && <><mesh ref={flame} position={[0, 2.95, 0]}><coneGeometry args={[.11, .34, 8]} /><meshBasicMaterial color="#ff8a1f" /></mesh>
       <mesh ref={halo} position={[0, 2.95, 0]}><sphereGeometry args={[1.05, 16, 12]} /><meshBasicMaterial color="#ffd36b" transparent opacity={.3} depthWrite={false} /></mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, .05, 0]}><circleGeometry args={[2.4, 32]} /><meshBasicMaterial color="#ffd36b" transparent opacity={.22} depthWrite={false} /></mesh>
-      <pointLight position={[0, 2.95, 0]} color="#ffcf7a" intensity={10} distance={9} /></>}</group>;
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, .05, 0]}><circleGeometry args={[2.4, 32]} /><meshBasicMaterial color="#ffd36b" transparent opacity={.22} depthWrite={false} /></mesh></>}{/* Sem pointLight: acender uma luz nova recompila a iluminação da cena inteira e trava o celular. */}</group>;
 }
 function Bed({ flowers, colors = FLOWER, wet = true }: { flowers: number; colors?: string[]; wet?: boolean }) {
   return <group><mesh position={[0, .07, 0]} receiveShadow><cylinderGeometry args={[1.05, 1.12, .14, 24]} />{mat('#e6dcc2', { roughness: 1 })}</mesh>

@@ -1,6 +1,7 @@
 import type { OrthographicCamera } from 'three';
 
-export const WORLD_ORBIT = { minPolarAngle: .20, maxPolarAngle: 1.59, rotateSpeed: .66 };
+// Teto de 76°: a câmera não desce até o chão (antes 91° deixava atravessar muros e o piso).
+export const WORLD_ORBIT = { minPolarAngle: .20, maxPolarAngle: 1.32, rotateSpeed: .66 };
 export const WORLD_ZOOM = { min: 18, max: 58 };
 export const FLIGHT_HEIGHT = 4.45;
 
@@ -8,7 +9,7 @@ export function worldCameraOptions(thirdPerson: boolean, rangedView: boolean) {
  const position: [number, number, number] = thirdPerson
   ? [0, 7.5, rangedView ? 16.5 : 14.2]
   : [14, 18, 14];
- if (thirdPerson) return { position, fov: rangedView ? 62 : 56, near: .15, far: 135 };
+ if (thirdPerson) return { position, fov: rangedView ? 62 : 56, near: .35, far: 135 }; // near maior = mais precisão de profundidade (menos chão tremendo)
  return { position, zoom: rangedView ? 28 : 34, left: -840, right: 840, top: 420, bottom: -420, near: .1, far: 220 };
 }
 

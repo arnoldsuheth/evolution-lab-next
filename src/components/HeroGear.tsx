@@ -71,10 +71,9 @@ export function SimpleWeapon({visual,bone,scene,rarity,small=false}:{visual:stri
  if(!target)return null;
  const rotation: [number,number,number]=[0,visual==='bow'?-Math.PI/2:visual==='gun'?Math.PI/2:bone==='handslot.l'?0:Math.PI,0];
  const muzzle = visual === 'gun';
- const glowPosition: [number,number,number] = muzzle ? [0,.21,.84] : [0,.6,0];
  return createPortal(<group ref={grip} rotation={rotation}>
   <EquipmentVisual visual={visual} tone={rarityTone(rarity)} small={small}/>
-  {tier!=='common'&&<pointLight position={glowPosition} color={tier==='mythic'?'#ffb43a':'#b48cff'} intensity={tier==='mythic'?1.2:.5} distance={1.6}/>}
+  {/* Sem pointLight: trocar de equipamento não recompila mais a iluminação da cena (travava no celular). */}
   {tier==='mythic'&&<WeaponFire from={muzzle?new THREE.Vector3(0,.21,.48):new THREE.Vector3(0,.22,0)} to={muzzle?new THREE.Vector3(0,.21,.88):new THREE.Vector3(0,.62,0)}/>}
  </group>,target);
 }
