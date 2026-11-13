@@ -6,10 +6,11 @@ import { GATHER_NODES, type QuestObjective } from './quests';
 import { INSTANCES, instanceRequirement, type InstanceId } from './instances';
 import { overlandRoads, roadItinerary, roadTo } from './overland';
 import { findPath } from './navigation';
+import { scenicTrail } from './scenicTrails';
 
 export type GuideTarget = { npc: NpcId } | { trainer: ClassId }
   | { objective: Exclude<QuestObjective, { type: 'talk' }> | 'trial' }
-  | { road: RacialCity; from: HeroData['region'] } | { monster: string } | { instance: InstanceId } | { region: HeroData['region']; via?: 'portal' };
+  | { scenic: HeroData['region'] } | { road: RacialCity; from: HeroData['region'] } | { monster: string } | { instance: InstanceId } | { region: HeroData['region']; via?: 'portal' };
 export type GuideWorld = { education: Education; slain?: Record<string, number>; gathered?: Record<string, number>; now?: number };
 export type GuideRequest = { target: GuideTarget; heroId: string };
 export type MapPin = { target: GuideTarget; name: string; point: [number, number] };
@@ -27,12 +28,19 @@ export function regionPins(region: HeroData['region']): MapPin[] {
   return [...npcs, ...trainers];
 }
 
+export function scenicPin(region:HeroData['region']):MapPin|undefined {
+  const trail=scenicTrail(region);
+  if(trail)return {target:{scenic:region},name:trail.name,point:trail.end};
+}
+
 export function guideStop(hero: HeroData, target: GuideTarget, world?: GuideWorld): GuideStop | undefined {
   if (hero.dead) return;
   const region = hero.region, time = world?.now ?? 0;
   const nearest = <T extends { x: number; z: number }>(candidates: T[]) => candidates.sort((a,b) =>
     Math.hypot(hero.position[0]-a.x,hero.position[1]-a.z)-Math.hypot(hero.position[0]-b.x,hero.position[1]-b.z))[0];
   let destination: HeroData['region'] = 'aurora';
+
+  if ('scenic' in target) return !hero.instance&&region===target.scenic ? scenicPin(region) : undefined;
 
   if ('npc' in target || 'trainer' in target) {
     const matches = (pin: MapPin) => 'npc' in target

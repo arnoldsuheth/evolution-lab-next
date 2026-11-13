@@ -24,8 +24,10 @@ export default function BiomeMap({region,local}: {region:string;local:boolean}){
         y1={s.cz+s.ux*(river.width/2+1)} y2={s.cz-s.ux*(river.width/2+1)}
         stroke="#e2c597" strokeWidth="1.6"/>)}
     </g>}
-    {trail&&<polyline points={trail.points.map(p=>p.join(',')).join(' ')} fill="none" stroke="#c9b284" strokeWidth=".8" strokeDasharray="1.3 1">
+    {trail&&<><polyline points={trail.points.map(p=>p.join(',')).join(' ')} fill="none" stroke="#c9b284" strokeWidth=".8" strokeDasharray="1.3 1">
       <title>{trail.name}</title>
-    </polyline>}
+    </polyline><g transform={`translate(${trail.end.join(' ')})`}>
+      <path d="M0 -1.65 1.65 0 0 1.65 -1.65 0Z" fill="#f2ca88" stroke="#422e25" strokeWidth=".35"><title>{trail.name}</title></path>
+    </g></>}
   </g>;
 }

@@ -4,11 +4,12 @@ import { useMemo, useState } from "react";
 import { useGame } from "@/lib/store";
 import { REGIONS, regionRequirement, type RegionId } from "@/lib/campaign";
 import { CITADEL_SECTORS, TOWN_SERVICES } from "@/lib/town";
-import { areaDestinations, guideStop, regionPins, routeToPoint, type GuideRequest, type GuideTarget, type MapPin } from "@/lib/questNavigation";
+import { areaDestinations, guideStop, regionPins, routeToPoint, scenicPin, type GuideRequest, type GuideTarget, type MapPin } from "@/lib/questNavigation";
 import { isRacialCity } from "@/lib/kingdomCities";
 import { INSTANCES } from "@/lib/instances";
 import { findPath, followRoadPath } from "@/lib/navigation";
 import { roadAt } from "@/lib/overland";
+import { scenicTrailPath } from "@/lib/scenicTrails";
 import { mountOf } from "@/lib/adventure";
 import { CitadelMap } from "./CitadelMap";
 import AreaMap from "./AreaMap";
@@ -32,6 +33,7 @@ export default function WorldMap({ guide, follow }: { guide: GuideRequest | null
   const reason = region === "atlas" || shown === hero.region ? undefined : regionRequirement(hero, education, shown);
   const pins = instance ? [] : regionPins(shown);
   const exits = instance ? [] : areaDestinations(shown);
+  const scenic = instance ? undefined : scenicPin(shown);
   const activeStop = position && guide?.heroId === hero.id ? guideStop(hero, guide.target, useGame.getState()) : undefined;
   const focus = selection ?? activeStop;
   const destination = DESTINATIONS.find(item => item.name === sector);
@@ -41,6 +43,7 @@ export default function WorldMap({ guide, follow }: { guide: GuideRequest | null
       const road=roadAt(hero.region,...focus.point);
       if(road)return followRoadPath(position,road,hero.region,airborne);
     }
+    if (focus && "scenic" in focus.target) return scenicTrailPath(position,hero.region,airborne);
     if (focus) return routeToPoint(position, focus.point, hero);
     return destination ? findPath(position, destination.entrance) : [];
   }, [position, focus, activeStop, destination, hero, airborne]);
@@ -69,6 +72,11 @@ export default function WorldMap({ guide, follow }: { guide: GuideRequest | null
       {focus && <div className="map-route-action"><strong>{focus.name}</strong>
         {(position || guideStop(hero, focus.target, useGame.getState())) && <button className="primary" disabled={!guideStop(hero, focus.target, useGame.getState())} onClick={() => follow(focus.target)}>Ir até {focus.name}</button>}
       </div>}
+      {scenic && <nav className="tabs map-people" aria-label="Trilhas e mirantes">
+        <button type="button" aria-pressed={selection?.name===scenic.name} onClick={()=>{setSelection(scenic);setSector("");}}>
+          <span aria-hidden="true">◆ </span>{scenic.name}
+        </button>
+      </nav>}
       {pins.length > 0 && <nav className="tabs map-people" aria-label="Personagens desta área">
         {pins.map(pin => <button key={pin.name} aria-pressed={selection?.name === pin.name} onClick={() => { setSelection(pin); setSector(""); }}>{pin.name}</button>)}
       </nav>}

@@ -5,8 +5,10 @@ import { MONSTERS, REGIONS, isAggressive, type RegionId } from './campaign';
 import { findPath, walkable } from './navigation';
 import { insideCity, overlandRoads } from './overland';
 import { monsterPoint } from './patrols';
-import { scenicTrail } from './scenicTrails';
+import { scenicTrail, scenicTrailPath } from './scenicTrails';
 import { waterwayOf, waterwaySegments } from './waterways';
+import { freshSave } from './game';
+import { guideStop, scenicPin } from './questNavigation';
 
 test('relevo e água ocupam o terreno, mas o voo contorna a altura dos picos',()=>{
   for(const region of Object.keys(REGIONS).filter(id=>id!=='goddard') as RegionId[]){
@@ -69,4 +71,24 @@ test('criaturas patrulham em terreno transitável e chefes mantêm sua posição
   }
   const boss=MONSTERS.find(m=>m.boss)!;
   assert.deepEqual(monsterPoint(boss,4000),[boss.x,boss.z]);
+});
+
+test('o guia de exploração chega aos oito pontos do mapa pelas trilhas ou voando',()=>{
+  const {hero}=freshSave();
+  for(const region of Object.keys(REGIONS) as RegionId[]){
+    const pin=scenicPin(region);
+    if(region==='goddard'){assert.equal(pin,undefined);continue;}
+    assert.ok(pin,region);
+    assert.deepEqual(guideStop({...hero,region},pin.target),pin);
+    assert.equal(guideStop({...hero,region,instance:'cavern'},pin.target),undefined);
+    assert.equal(guideStop({...hero,region:'goddard'},pin.target),undefined);
+    for(const airborne of [false,true]){
+      const route=scenicTrailPath([0,5],region,airborne);
+      assert.deepEqual(route.at(-1),pin.point,region);
+      assert.ok(route.every(point=>walkable(...point,region,airborne)),region);
+    }
+    const trail=scenicTrail(region)!;
+    const middle=Math.floor(trail.route.length/2);
+    assert.deepEqual(scenicTrailPath(trail.route[middle],region),trail.route.slice(middle+1));
+  }
 });

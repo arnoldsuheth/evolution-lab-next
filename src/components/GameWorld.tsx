@@ -44,6 +44,7 @@ import ExplorationEncounters from "./ExplorationEncounters";
 import PavingMaterial from "./PavingMaterial";
 import {biomeOf,flightRelief} from "@/lib/biomes";
 import ScenicRoutes from "./ScenicRoutes";
+import { scenicTrailPath } from "@/lib/scenicTrails";
 import {monsterPoint} from "@/lib/patrols";
 import Wildlands from "./Wildlands";
 import TerrainSurface from "./TerrainSurface";
@@ -378,6 +379,18 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
       if (!input.x && !input.z && guide && (handledGuide.current?.request !== guide || handledGuide.current.region !== hero.region)) {
         handledGuide.current = { request: guide, region: hero.region };
         if (stop?.overland) followRoad(stop.point);
+        else if (stop && 'scenic' in stop.target) {
+          const [x,z]=stop.point;
+          const state=useGame.getState();
+          state.setTarget(null);
+          monsterTarget.current=null;gatherTarget.current=null;pending.current=null;
+          const origin:[number,number]=[player.current.x,player.current.z];
+          path.current=scenicTrailPath(origin,hero.region,airborne);
+          const arrive=()=>{endGuide();report(`Você chegou a ${stop.name}.`);};
+          if(Math.hypot(origin[0]-x,origin[1]-z)<.55){path.current=[];arrive();}
+          else if(path.current.length)pending.current={x,z,range:.55,open:arrive};
+          else {endGuide();report('Caminho até a trilha indisponível.');}
+        }
         else if (stop) approachInteraction(...stop.point, () => {
           const state = useGame.getState();
           if (stop.portal || stop.campaign || stop.leaveInstance || stop.enterInstance) {
