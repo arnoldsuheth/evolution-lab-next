@@ -140,3 +140,37 @@
  .lk-select .lk-hero-stage>*{width:min(190px,24vw,calc(100dvh - 150px))!important;min-width:0!important}
  .lk-start-fx .lk-start-art{opacity:.35}
 }
+
+/* ---------- 5.0 · Janelas do jogo (Personagem, Mochila, Talentos, Diário, Banco...): moldura Lovelace ---------- */
+.modal{background:linear-gradient(165deg,#1b2a47fa,#0c1424fc 70%)!important;border:1px solid var(--lk-gold)!important;border-radius:16px!important;
+ box-shadow:0 0 0 1px #05080f,inset 0 0 0 1px #f2d48a1f,0 24px 70px #000c!important;color:#f1e7cf}
+.modal>.modal-head{position:relative;background:linear-gradient(90deg,#c9a24a2e,transparent 70%)!important;border-bottom:1px solid #c9a24a55!important}
+.modal>.modal-head::after{content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,var(--lk-gold2),transparent)}
+.modal>.modal-head :is(h1,h2,h3,strong){font-family:Cinzel,Georgia,serif!important;color:var(--lk-gold2)!important;letter-spacing:.03em}
+.modal>.modal-head .eyebrow{color:#d9c79c!important}
+.modal .icon-button{border:1px solid #c9a24a88!important;background:#10182ecc!important;color:#fff1c8!important;border-radius:999px!important}
+.modal .icon-button:hover{border-color:var(--lk-gold2)!important;box-shadow:0 0 10px #f2d48a55}
+/* Abas e filtros: escuro com fio dourado; o ativo vira dourado */
+.modal :is(.tabs,.category-chips,.inventory-filters)>button{border:1px solid #c9a24a55!important;background:linear-gradient(180deg,#22345499,#121c30cc)!important;color:#e9dcbc!important}
+.modal :is(.tabs,.category-chips,.inventory-filters)>button:hover{border-color:var(--lk-gold2)!important;color:#fff1c8!important}
+.modal :is(.tabs,.category-chips,.inventory-filters)>button:is(.active,[aria-pressed="true"],[aria-selected="true"]){background:linear-gradient(180deg,#e2bd68,#a77d2c)!important;color:#22170a!important;border-color:#f6dc95!important;font-weight:800;box-shadow:inset 0 1px 0 #fff3c4aa}
+/* Equipamento: o boneco num cartão dourado e os espaços como molduras */
+.modal .inventory-loadout{background:radial-gradient(circle at 50% 18%,#2d3a66,#121a33 70%)!important;border:1px solid var(--lk-gold)!important;border-radius:14px!important;box-shadow:inset 0 0 30px #00000066}
+.modal .inventory-loadout :is(h2,h3,strong):first-child{font-family:Cinzel,Georgia,serif;color:var(--lk-gold2)}
+.modal .loadout-slots>*{border:1px solid #c9a24a99!important;background:radial-gradient(circle at 35% 25%,#2c3f66,#0f1a2b 75%)!important;border-radius:10px!important;box-shadow:inset 0 0 0 1px #0a1220,0 2px 6px #0008;transition:box-shadow .15s,border-color .15s}
+.modal .loadout-slots>*:hover{border-color:var(--lk-gold2)!important;box-shadow:0 0 12px #f2d48a55,inset 0 0 0 1px #0a1220}
+.modal .item-icon-grid>*{border-color:#c9a24a55!important;background:#0e1628cc!important;border-radius:10px}
+.modal .item-icon-grid>*:hover{border-color:var(--lk-gold2)!important;box-shadow:0 0 12px #f2d48a44}
+.modal :is(.empty-state,.catalogue-summary){color:#d9c79c!important}
+.modal .catalogue-pagination button{border:1px solid #c9a24a66!important;background:#10182ecc!important;color:#e9dcbc!important}
+.modal details summary{color:#e9dcbc}
+
+/* ---------- 5.0 · Painel do alvo: placa do monstro e cabeçalho de combate no estilo Lovelace ---------- */
+.monster-vitals{background:linear-gradient(180deg,#1a2944f0,#0d1626f0)!important;border:1px solid #c9a24a99!important;border-radius:10px!important;box-shadow:0 4px 14px #000a!important;padding:4px 8px 5px!important}
+.monster-vitals.targeted{border-color:var(--lk-gold2)!important;box-shadow:0 0 0 1px #05080f,0 0 16px #f2c14e55,0 4px 14px #000a!important}
+.monster-vitals strong{font-family:Cinzel,Georgia,serif!important;color:#ffe3b8!important;text-shadow:0 1px 2px #000}
+.monster-vitals strong.rare-name{color:#ffd56b!important}
+.monster-vitals .world-resource{border-radius:999px;overflow:hidden;border:1px solid #00000099}
+.monster-vitals .world-resource.health>i{background:linear-gradient(90deg,#b8323f,#f05a5a)!important}
+.combat-console .combat-console-head{border-bottom:1px solid #c9a24a44!important}
+.combat-console .combat-console-head>span{font-family:Cinzel,Georgia,serif;color:var(--lk-gold2)!important;letter-spacing:.04em}
