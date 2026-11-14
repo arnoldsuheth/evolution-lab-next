@@ -3,7 +3,7 @@ import { PRECURSORS, precursorForNpc } from "@/lib/precursorCatalog";
 import { hasAllArtifacts, LOVELACE_QUESTS } from "@/lib/precursors";
 import {heroProportions} from "@/lib/heroModels";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
-import { Html, OrbitControls, useProgress } from "@react-three/drei";
+import { Html, OrbitControls, useGLTF, useProgress } from "@react-three/drei";
 import { Component, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type ComponentRef, type RefObject } from "react";
 import * as THREE from "three";
 import KingdomDetails from './KingdomDetails';
@@ -73,17 +73,20 @@ export class WorldBoundary extends Component<{ children: ReactNode }, { failed: 
 }
 const DEFAULT_LOOK: Look = { body: 2, hair: 0, beard: 2, moustache: 1, skin: 1, hairColor: 2, eyes: 0, face: 1, nose: 1, brows: 1, scar: 0, tattoo: 0, accessory: 0, cloth: 1, helmet: 1, ears: 0 };
 function Stone({ position, size = 1, color = "#777e79" }: { position: [number, number, number]; size?: number; color?: string }) { return <mesh position={position} scale={[size, size * 0.6, size * 0.8]} castShadow receiveShadow><icosahedronGeometry args={[1, 1]} /><meshStandardMaterial color={color} roughness={0.9} /></mesh>; }
+const TREE_KITS=['CommonTree_1','CommonTree_3','CommonTree_5','Pine_1'].map(n=>(process.env.NEXT_PUBLIC_BASE_PATH??'')+`/models/previa/nature/${n}.glb`);
+if(typeof window!=='undefined')TREE_KITS.forEach(f=>useGLTF.preload(f));
 function Tree({ x, z, size = 1 }: { x: number; z: number; size?: number }) {
-  const crown=useRef<THREE.Group>(null),ray=useRef(new THREE.Ray()),origin=useRef(new THREE.Vector3()),direction=useRef(new THREE.Vector3()),hit=useRef(new THREE.Vector3()),bounds=useRef(new THREE.Box3(new THREE.Vector3(x-2.1*size,1.2*size,z-2.1*size),new THREE.Vector3(x+2.1*size,5.8*size,z+2.1*size)));
+  const crown=useRef<THREE.Group>(null),meshes=useRef<THREE.Mesh[]>([]),ray=useRef(new THREE.Ray()),origin=useRef(new THREE.Vector3()),direction=useRef(new THREE.Vector3()),hit=useRef(new THREE.Vector3()),bounds=useRef(new THREE.Box3(new THREE.Vector3(x-2.1*size,1.2*size,z-2.1*size),new THREE.Vector3(x+2.1*size,5.8*size,z+2.1*size)));
   // 5.0: vento leve. A copa balança a partir da base, cada árvore no seu ritmo (desligado com Reduzir movimento).
   useFrame(({clock})=>{const g=crown.current;if(!g||useGame.getState().settings.reduceMotion)return;const t=clock.elapsedTime+x*.37+z*.21;g.rotation.z=Math.sin(t*.9)*.03+Math.sin(t*2.3)*.008;g.rotation.x=Math.cos(t*.7)*.02;});
-  useFrame(({camera},dt)=>{const state=useGame.getState(),enemy=MONSTERS.find(m=>m.id===state.encounter?.monsterId);const targets=[state.hero.position,...(enemy?[state.encounter?.position??[enemy.x,enemy.z]]:[])];const near=targets.some(p=>Math.hypot(p[0]-x,p[1]-z)<9*size),crowns=crown.current?.children??[];if(!near&&crowns.every(o=>((o as THREE.Mesh).material as THREE.MeshStandardMaterial).opacity>=1))return; // longe do herói: nada a esconder
+  useFrame(({camera},dt)=>{const state=useGame.getState(),enemy=MONSTERS.find(m=>m.id===state.encounter?.monsterId);const targets=[state.hero.position,...(enemy?[state.encounter?.position??[enemy.x,enemy.z]]:[])];const near=targets.some(p=>Math.hypot(p[0]-x,p[1]-z)<9*size),crowns=meshes.current;if(!near&&crowns.every(o=>((o as THREE.Mesh).material as THREE.MeshStandardMaterial).opacity>=1))return; // longe do herói: nada a esconder
 // Testa cabeça e pés do herói (e do inimigo): se a copa cobre qualquer parte, ela fica quase transparente.
- const covered=targets.some(p=>[.4,1.3,2.3].some(y=>{origin.current.set(p[0],y,p[1]);direction.current.copy(camera.position).sub(origin.current);const distance=direction.current.length();ray.current.set(origin.current,direction.current.normalize());return !!ray.current.intersectBox(bounds.current,hit.current)&&origin.current.distanceTo(hit.current)<distance;}));crown.current?.children.forEach(o=>{const m=(o as THREE.Mesh).material as THREE.MeshStandardMaterial;if(m){m.opacity=THREE.MathUtils.damp(m.opacity,covered?.12:1,10,Math.min(dt,.1));if(m.opacity>.995)m.opacity=1;m.depthWrite=m.opacity>.95;const see=m.opacity<1;if(m.transparent!==see){m.transparent=see;m.needsUpdate=true;}}});});
-  return <group position={[x, 0, z]} scale={size}>
-    <mesh position={[0, 1.6, 0]} castShadow><cylinderGeometry args={[0.2, 0.42, 3.2, 10]} /><meshStandardMaterial color="#a06a3f" roughness={0.9} /></mesh>
-    <group ref={crown}>{[0, 1, 2].map(i => <mesh key={i} position={[Math.sin(i*2)*.35,2.6+i*.8,Math.cos(i*2)*.25]} scale={[1,.8,1]} castShadow={i===0}><icosahedronGeometry args={[1.65-i*.3,2]} /><meshStandardMaterial color={["#4fa84a", "#6fc04e", "#9ad45e"][i]} roughness={0.85} /></mesh>)}</group>
-  </group>;
+ const covered=targets.some(p=>[.4,1.3,2.3].some(y=>{origin.current.set(p[0],y,p[1]);direction.current.copy(camera.position).sub(origin.current);const distance=direction.current.length();ray.current.set(origin.current,direction.current.normalize());return !!ray.current.intersectBox(bounds.current,hit.current)&&origin.current.distanceTo(hit.current)<distance;}));meshes.current.forEach(o=>{const m=(o as THREE.Mesh).material as THREE.MeshStandardMaterial;if(m){m.opacity=THREE.MathUtils.damp(m.opacity,covered?.12:1,10,Math.min(dt,.1));if(m.opacity>.995)m.opacity=1;m.depthWrite=m.opacity>.95;const see=m.opacity<1;if(m.transparent!==see){m.transparent=see;m.needsUpdate=true;}}});});
+  // 2.0: árvores do pacote Stylized Nature (folhas de verdade), uma de três formas, girada ao acaso.
+  const variant=TREE_KITS[Math.abs(Math.round(x*7+z*13))%TREE_KITS.length],kit=useGLTF(variant);
+  const {model,list}=useMemo(()=>{const m=kit.scene.clone(true),list:THREE.Mesh[]=[];m.traverse(o=>{const mesh=o as THREE.Mesh;if(!mesh.isMesh)return;mesh.material=(mesh.material as THREE.Material).clone();mesh.castShadow=true;list.push(mesh);});m.rotation.y=(x*1.7+z*2.3)%(Math.PI*2);return {model:m,list};},[kit.scene,x,z]);
+  useEffect(()=>{meshes.current=list;},[list]);
+  return <group position={[x, 0, z]} scale={size*.8}><group ref={crown}><primitive object={model}/></group></group>;
 }
 /** Peças paradas da casa, juntas em poucas malhas (mesma aparência, bem menos desenhos). */
 const WALLS = ["#f1d6a5", "#e7cbaa", "#e6d6bd", "#ebcc97"];

@@ -38,7 +38,7 @@ const RACE_BODY: Record<Race, [string, string]> = {
 const RACE_SCALE: Record<Race, number> = { human: 1, elf: 1.03, orc: 1.06, dwarf: .82, gnome: .7 };
 const HAIRS = ['Hair_SimpleParted', 'Hair_Buzzed', 'Hair_Long', 'Hair_Buns', 'Hair_BuzzedFemale'];
 /** Arma do item equipado vira uma das armas do pacote (o resto usa a da classe). */
-const ITEM_WEAPON: Record<string, KWeapon> = { sword: 'sword', axe: 'axe', hammer: 'axe', club: 'axe', shield: 'shield', pickaxe: 'pickaxe', tool: 'pickaxe', gadget: 'pickaxe', staff: 'staff', focus: 'wand', wand: 'wand', bow: 'bow', crossbow: 'bow', slingshot: 'bow', dagger: 'dagger', gun: 'dagger' };
+const ITEM_WEAPON: Record<string, KWeapon> = { sword: 'sword', axe: 'axe', hammer: 'axe', shield: 'shield', pickaxe: 'pickaxe', tool: 'pickaxe', gadget: 'pickaxe', staff: 'staff', focus: 'wand', wand: 'wand', bow: 'bow', crossbow: 'bow', slingshot: 'bow', dagger: 'dagger', gun: 'dagger' };
 export const kingdomWeapon = (visual?: string) => visual ? ITEM_WEAPON[visual] : undefined;
 export const KINGDOM_FILES = [MR, MP, FR, FP, 'UAL1', 'Superhero_Male_FullBody', 'Superhero_Female_FullBody', 'Eyebrows_Regular', 'Eyebrows_Female', 'Hair_Beard', ...HAIRS].map(C);
 export const KINGDOM_PROPS = ['Sword_Bronze', 'Axe_Bronze', 'Shield_Wooden', 'Pickaxe_Bronze'].map(PROP);
@@ -84,7 +84,7 @@ function weaponMesh(kind: KWeapon, props: Record<string, THREE.Group>, gem: stri
 export type KingdomHeroProps = {
   classId: ClassId; race: Race; female: boolean; skin: string; hair: string; hairStyle: number; beard: boolean;
   right?: KWeapon | null; left?: KWeapon | null; tier: 0 | 1 | 2; glow: string | null; tint?: string;
-  walking?: boolean; animated?: boolean; combatant?: boolean; halo?: boolean;
+  walking?: boolean; animated?: boolean; combatant?: boolean; halo?: boolean; preview?: boolean;
 };
 const HEIGHT = 2.2;
 
@@ -105,7 +105,7 @@ export default function KingdomHero(p: KingdomHeroProps) {
     const custom = RACE_BODY[p.race][0] !== 'Superhero_Male_FullBody';
     const paint = (m: THREE.SkinnedMesh) => {
       const mats = (Array.isArray(m.material) ? m.material : [m.material]).map(mt => {
-        if (/Regular|skin/i.test(mt.name)) return tinted(mt, p.skin);
+        if (/Regular|skin/i.test(mt.name)) return tinted(mt, p.skin, 1.3);
         const c = tinted(mt, tint, 1.7) as THREE.MeshStandardMaterial;
         if (p.tier > 0) { c.metalness = p.tier === 2 ? .55 : .3; c.roughness = p.tier === 2 ? .35 : .5; c.emissive = new THREE.Color(accent); c.emissiveIntensity = p.tier === 2 ? .2 : .07; }
         return c;
@@ -123,7 +123,7 @@ export default function KingdomHero(p: KingdomHeroProps) {
     for (const [file, re] of parts) attach(outfits[file], m => { const kind = m.name.replace(/^(Male|Female)_(Ranger|Peasant)_/, '').replace(/_.*$/, ''); const ok = re.test(m.name) && (!seen.has(kind) || /Acc|Belt|Bracer|Hood/.test(m.name)); if (ok) seen.add(kind); return ok; }, paint);
     const hairTint = (m: THREE.SkinnedMesh) => { m.material = tinted(m.material as THREE.Material, p.hair); };
     attach(body.scene, () => true, m => {
-      if (/body|superhero|retopology/i.test(m.name)) { headOnly(m); m.material = tinted(m.material as THREE.Material, p.skin); }
+      if (/body|superhero|retopology/i.test(m.name)) { headOnly(m); m.material = tinted(m.material as THREE.Material, p.skin, 1.3); }
       else if (/hair|horns/i.test(m.name)) hairTint(m);
     });
     if (!custom) { if (p.hairStyle >= 0) attach(hair.scene, () => true, hairTint); attach(brows.scene, () => true, hairTint); if (p.beard) attach(beard.scene, () => true, hairTint); }
@@ -164,5 +164,5 @@ export default function KingdomHero(p: KingdomHeroProps) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => hurtTime && p.animated !== false ? once('Hit_Chest', 420) : undefined, [hurtTime]);
   useFrame((_, dt) => { mixer.update(Math.min(dt, .1)); });
-  return <primitive object={root} />;
+  return <group scale={p.preview ? 1 / .74 : 1}><primitive object={root} /></group>;
 }

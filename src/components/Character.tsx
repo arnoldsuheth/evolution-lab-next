@@ -52,7 +52,7 @@ export default function Character(props:CharacterProps){
   const rank={D:0,C:1,B:2,A:3,S:4} as const,grades=gear.map(i=>gradeOf(i)).filter((g):g is NonNullable<typeof g>=>!!g);
   const top=grades.sort((a,b)=>rank[b]-rank[a])[0],tier=top==='S'?2:top==='A'||top==='B'?1:0;
   const hairStyle=female?[2,3,4,2,3][look.hair%5]:[0,1,0,1,1][look.hair%5];
-  return <ModelBoundary fallback={fallback}><Suspense fallback={null}><KingdomHero classId={classId} race={race} female={female} skin={skinOverride??skinColor(race,look.skin)} hair={HAIR[look.hairColor]??HAIR[1]} hairStyle={hairStyle} beard={!female&&(look.beard>0||race==='dwarf')} right={right} left={left} tier={props.fullGear&&!top?1:tier as 0|1|2} glow={top&&rank[top]>=2?gradeInfo(top).color:null} walking={props.walking} animated={props.animated} combatant={props.combatant} halo={props.celestial}/></Suspense></ModelBoundary>;
+  return <ModelBoundary fallback={fallback}><Suspense fallback={null}><KingdomHero classId={classId} race={race} female={female} skin={skinOverride??skinColor(race,look.skin)} hair={HAIR[look.hairColor]??HAIR[1]} hairStyle={hairStyle} beard={!female&&(look.beard>0||race==='dwarf')} right={right} left={left} tier={props.fullGear&&!top?1:tier as 0|1|2} glow={top&&rank[top]>=2?gradeInfo(top).color:null} walking={props.walking} animated={props.animated} combatant={props.combatant} halo={props.celestial} preview={props.preview}/></Suspense></ModelBoundary>;
  }
  const armed=gear.some(i=>i.slot==='weapon'||i.slot==='twohand'),shielded=gear.some(i=>i.slot==='offhand');
  const worn={head:gear.some(i=>i.slot==='head'),chest:gear.some(i=>i.slot==='chest'),back:gear.some(i=>i.slot==='back')},dressed=props.fullGear?{head:true,chest:true,back:true}:worn;

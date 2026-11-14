@@ -5,6 +5,7 @@ import { useProgress } from '@react-three/drei';
 import type { ClassId, Look, Race } from '@/lib/game';
 import { heroProportions } from '@/lib/heroModels';
 import Character from './Character';
+import { useGame } from '@/lib/store';
 import { ClassPortrait } from './ApprovedArtwork';
 
 /**
@@ -13,11 +14,11 @@ import { ClassPortrait } from './ApprovedArtwork';
  * Enquanto a foto não fica pronta, mostra a arte da classe.
  */
 type Props = { classId: ClassId; race: Race; look: Look; equipped: string[]; level: number; selection?: boolean };
-const PREFIX = 'lc-portrait-v5:'; // v5: descarta fotos vazias salvas antes do boneco carregar
+const PREFIX = 'lc-portrait-v7:'; // v6: fotos dos personagens novos (2.0)
 const cache = new Map<string, string>(), failed = new Set<string>(), queue: string[] = [], subs = new Set<() => void>();
 let owner: string | null = null, version = 0;
 // Limpa uma vez as fotos antigas (v4), que podiam ter sido salvas vazias e ocupam espaço do navegador.
-try { if (typeof localStorage !== 'undefined') for (const k of Object.keys(localStorage)) if (k.includes('lc-portrait-v4:')) localStorage.removeItem(k); } catch { /* sem armazenamento */ }
+try { if (typeof localStorage !== 'undefined') for (const k of Object.keys(localStorage)) if (/lc-portrait-v[456]:/.test(k)) localStorage.removeItem(k); } catch { /* sem armazenamento */ }
 const emit = () => { version++; subs.forEach(f => f()); };
 const subscribe = (f: () => void) => { subs.add(f); return () => { subs.delete(f); }; };
 function stored(key: string) {
@@ -55,9 +56,10 @@ function Snap({ id, head }: { id: string; head: number }) {
 }
 
 function Studio({ id, classId, race, look, equipped, level, selection }: Props & { id: string }) {
-  const height = heroProportions(race).height;
-  const head = (selection ? 2.35 : 2.5) * height;
-  const distance = selection ? Math.max(4.8, 7.2 * height) : Math.max(3, 4.8 * height);
+  const height = heroProportions(race).height, classic = useGame(s => !!s.settings.classicCharacters);
+  // 2.0: o boneco novo é mais alto e magro; a foto chega mais perto do rosto.
+  const head = classic ? (selection ? 2.35 : 2.5) * height : (selection ? 2.2 : 2.62) * height;
+  const distance = classic ? (selection ? Math.max(4.8, 7.2 * height) : Math.max(3, 4.8 * height)) : (selection ? Math.max(4.4, 6 * height) : Math.max(1.9, 2.5 * height));
   const size = selection ? 384 : 192; // seleção: foto maior para não ficar borrada no círculo grande
   return <div aria-hidden style={{ position: 'fixed', left: -4000, top: 0, width: size, height: size, pointerEvents: 'none' }}>
     <Canvas dpr={1} gl={{ preserveDrawingBuffer: true, alpha: true, antialias: true }} camera={{ position: [distance * .07, head + .06, distance], fov: 30 }}>
