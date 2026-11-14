@@ -83,14 +83,20 @@ export const PREVIEW_RACES = [
   { name: 'Elfa', file: 'Elf_Female', x: -2.4, z: -2.2, turn: .3 }, { name: 'Elfo', file: 'Elf_Male', x: -.8, z: -2, turn: .1 },
   { name: 'Orc', file: 'Orc_Male', x: .8, z: -2, turn: -.1 }, { name: 'Orca', file: 'Orc_Female', x: 2.4, z: -2.2, turn: -.3 },
 ];
-function Ready({ file, x, z, turn, move }: { file: string; x: number; z: number; turn: number; move: Move }) {
-  const g = useGLTF(C(file)), anims = useGLTF(C('UAL1'));
+/** Pacote antigo Ultimate Modular Women: modelos low-poly com animações próprias. */
+export const PREVIEW_LOWPOLY = [
+  { name: 'Bruxa', file: 'W_Witch', x: -2.4, z: 2.6, turn: .3 }, { name: 'Medieval', file: 'W_Medieval', x: -.8, z: 2.9, turn: .1 },
+  { name: 'Aventureira', file: 'W_Adventurer', x: .8, z: 2.9, turn: -.1 }, { name: 'Trabalhadora', file: 'W_Worker', x: 2.4, z: 2.6, turn: -.3 },
+];
+const OWN: Record<Move, string> = { Idle_Loop: 'Idle', Walk_Loop: 'Walk', Jog_Fwd_Loop: 'Run', Sword_Attack: 'Sword_Slash', Spell_Simple_Shoot: 'Interact', Punch_Jab: 'Punch_Right', Dance_Loop: 'Wave' };
+function Ready({ file, x, z, turn, move, own }: { file: string; x: number; z: number; turn: number; move: Move; own?: boolean }) {
+  const g = useGLTF(C(file)), lib = useGLTF(C('UAL1')), anims = own ? { animations: g.animations } : lib;
   const root = useMemo(() => { const c = cloneSkinned(g.scene) as THREE.Group; c.traverse(o => { o.castShadow = true; o.frustumCulled = false; }); return c; }, [g.scene]);
   const mixer = useMemo(() => new THREE.AnimationMixer(root), [root]);
   useEffect(() => {
-    const clip = anims.animations.find(a => a.name === move); if (!clip) return;
+    const clip = anims.animations.find(a => a.name === (own ? OWN[move] : move)); if (!clip) return;
     const action = mixer.clipAction(clip); action.reset().fadeIn(.25).play(); return () => { action.fadeOut(.25); };
-  }, [mixer, anims.animations, move]);
+  }, [mixer, anims.animations, move, own]);
   useFrame((_, dt) => mixer.update(dt));
   return <group position={[x, 0, z]} rotation={[0, turn, 0]}><primitive object={root} /></group>;
 }
@@ -98,7 +104,7 @@ function Ready({ file, x, z, turn, move }: { file: string; x: number; z: number;
 const PLANTS: [string, number, number, number, number][] = [
   ['CommonTree_1', -7, -7, 1, 0], ['CommonTree_3', 7, -8, .9, 1], ['CommonTree_5', -10, -2, .9, 2], ['Pine_1', 10, -3, 1, 0], ['Pine_3', -4, -12, 1.1, 1],
   ['TwistedTree_1', 3, -13, .5, 2], ['Bush_Common', -4.5, -3, 1, 0], ['Bush_Common_Flowers', 4.5, -3.5, 1, 1], ['Fern_1', -4.4, 1.6, 1, 0], ['Fern_1', 4.6, 1.4, 1, 2],
-  ['Flower_3_Group', -4, 3.4, .35, 0], ['Flower_4_Group', 4.2, 3.2, .35, 1], ['Rock_Medium_1', -6.5, 1.5, .6, 0], ['Rock_Medium_2', 6.5, 1, .6, 1], ['Mushroom_Common', -5, -4.5, 1, 0],
+  ['Flower_3_Group', -4.6, 4.4, .35, 0], ['Flower_4_Group', 4.6, 4.2, .35, 1], ['Rock_Medium_1', -6.5, 1.5, .6, 0], ['Rock_Medium_2', 6.5, 1, .6, 1], ['Mushroom_Common', -5, -4.5, 1, 0],
   ['Plant_1', 5.5, -5, 1, 0], ['Grass_Common_Tall', -2.5, -2.4, .4, 0], ['Grass_Common_Tall', 2.4, -2, .4, 1], ['Grass_Wispy_Tall', 0, -3.5, .4, 0], ['Grass_Wispy_Tall', -6, 3.5, .4, 2],
   ['Flower_3_Group', 1, -2.8, .3, 2], ['Flower_4_Group', -1.2, -3, .3, 0],
 ];
@@ -108,17 +114,18 @@ function Plant({ name, x, z, s, r }: { name: string; x: number; z: number; s: nu
 }
 
 export default function PreviewScene({ move }: { move: Move }) {
-  return <Canvas shadows camera={{ position: [0, 3.2, 8.5], fov: 44 }} dpr={[1, 2]} gl={{ antialias: true }}>
+  return <Canvas shadows camera={{ position: [0, 3.6, 10.5], fov: 44 }} dpr={[1, 2]} gl={{ antialias: true }}>
     <color attach="background" args={['#a9d4ef']} />
     <fog attach="fog" args={['#a9d4ef', 14, 30]} />
     <hemisphereLight args={['#fff6e0', '#4c6b3a', 1.6]} />
     <directionalLight position={[6, 10, 5]} intensity={2.2} castShadow shadow-mapSize={[2048, 2048]} shadow-camera-left={-12} shadow-camera-right={12} shadow-camera-top={12} shadow-camera-bottom={-12} />
     <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow><circleGeometry args={[30, 48]} /><meshStandardMaterial color="#7fae52" roughness={1} /></mesh>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, .01, -.2]} receiveShadow><planeGeometry args={[7.5, 5.5]} /><meshStandardMaterial color="#c9a774" roughness={1} /></mesh>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, .01, .4]} receiveShadow><planeGeometry args={[7.5, 7.5]} /><meshStandardMaterial color="#c9a774" roughness={1} /></mesh>
     <Suspense fallback={null}>
       {PLANTS.map(([n, x, z, s, r], i) => <Plant key={i} name={n} x={x} z={z} s={s} r={r} />)}
       {PREVIEW_HEROES.map(h => <Character key={h.name} hero={h} move={move} />)}
       {PREVIEW_RACES.map(r => <Ready key={r.name} {...r} move={move} />)}
+      {PREVIEW_LOWPOLY.map(r => <Ready key={r.name} {...r} move={move} own />)}
     </Suspense>
     <OrbitControls target={[0, 1, 0]} minDistance={3} maxDistance={16} maxPolarAngle={1.45} />
   </Canvas>;
