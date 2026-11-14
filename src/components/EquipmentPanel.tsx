@@ -10,7 +10,7 @@ import {currency} from "@/lib/economy";
 import { useEffect, useRef, useState } from 'react';
 import { useGame } from '@/lib/store';
 import {ItemArtwork} from './GameArtwork';
-import {gradeOf,gradeInfo} from '@/lib/grades';
+import {gradeOf,gradeInfo,GRADES} from '@/lib/grades';
 import { ITEMS,CLASSES,stats } from '@/lib/game';
 import { CATEGORY_NAMES,SLOT_NAMES,LEVEL_BANDS,type Item } from '@/lib/catalogue';
 import { activeEquipment,bagCount,countItem,isEquipment,itemRequirement } from '@/lib/equipment';
@@ -82,7 +82,7 @@ export default function EquipmentPanel({shop=false,vendor="borin",market,edit=()
  const [side,setSide]=useState<'buy'|'sell'>('buy');
  const [slotFilter,setSlotFilter]=useState<string|null>(null);
  const [filtersOpen,setFiltersOpen]=useState(false);
- const [view,setView]=useState(shop?'shop':'bag'),[query,setQuery]=useState(''),[category,setCategory]=useState('all'),[classFilter,setClassFilter]=useState('mine'),[rarity,setRarity]=useState('all'),[band,setBand]=useState('all'),[locked,setLocked]=useState(true),[page,setPage]=useState(0);
+ const [view,setView]=useState(shop?'shop':'bag'),[query,setQuery]=useState(''),[category,setCategory]=useState('all'),[classFilter,setClassFilter]=useState('mine'),[rarity,setRarity]=useState('all'),[band,setBand]=useState('all'),[gradeF,setGradeF]=useState('all'),[locked,setLocked]=useState(true),[page,setPage]=useState(0);
  const [bagFilter,setBagFilter]=useState(initialBag);
  const inventory=hero.inventory,limits=stats(hero);
  const bags=inventorySections(inventory,hero.equipped);
@@ -104,7 +104,7 @@ export default function EquipmentPanel({shop=false,vendor="borin",market,edit=()
   if(shop&&view==='shop'&&vendor==='dorin'&&!['paladin','warrior','engineer'].includes(item.classId??'')&&!['ore','parts','gadget','tool','shield'].includes(item.visual))return false;
   if(view==='forge'&&!item.ingredients&&!item.recipe)return false;
   if(query&&!`${item.name} ${item.description} ${item.id}`.toLocaleLowerCase('pt-BR').includes(query.toLocaleLowerCase('pt-BR')))return false;
-  if(category!=='all'&&item.category!==category||rarity!=='all'&&item.rarity!==rarity||band!=='all'&&item.minLevel!==Number(band))return false;
+  if(category!=='all'&&item.category!==category||rarity!=='all'&&item.rarity!==rarity||band!=='all'&&item.minLevel!==Number(band)||gradeF!=='all'&&gradeOf(item)!==gradeF)return false;
   if(classFilter==='mine'&&(item.classId&&item.classId!==hero.classId||item.classes&&!item.classes.includes(hero.classId)))return false;
   if(!locked&&itemRequirement(hero,item))return false;return true;
  }).sort((a,b)=>a.minLevel-b.minLevel||a.name.localeCompare(b.name,'pt-BR'));
@@ -131,7 +131,7 @@ export default function EquipmentPanel({shop=false,vendor="borin",market,edit=()
    {bags.sections.map(bag=><button key={bag.id} aria-pressed={bagFilter===bag.id} onClick={()=>{setBagFilter(bag.id);setPage(0);setInspected(null);}}>{bag.id==='backpack'?'Mochila':`Bolsa ${bag.size}`} · {bag.items.length}/{bag.size}</button>)}
    {(bags.overflow.length>0||bagFilter==='overflow')&&<button aria-pressed={bagFilter==='overflow'} onClick={()=>{setBagFilter('overflow');setPage(0);setInspected(null);}}>Excedente · {bags.overflow.length}</button>}
  </nav>}
- <div className="category-chips" role="tablist" aria-label="Categorias">{CATEGORY_CHIPS.map(([id,label])=><button key={id} type="button" role="tab" aria-selected={category===id} className={category===id?'active':''} onClick={()=>{setCategory(id);setPage(0);setInspected(null);}}>{label}</button>)}</div>
+ <div className="category-chips" role="tablist" aria-label="Categorias">{CATEGORY_CHIPS.map(([id,label])=><button key={id} type="button" role="tab" aria-selected={category===id} className={category===id?'active':''} onClick={()=>{setCategory(id);setPage(0);setInspected(null);}}>{label}</button>)}</div><div className="grade-drawers" role="tablist" aria-label="Gavetas por grau"><button type="button" role="tab" aria-selected={gradeF==='all'} className={gradeF==='all'?'active':''} onClick={()=>{setGradeF('all');setPage(0);setInspected(null);}}>Todos os graus</button>{GRADES.map((g,k)=><button key={g.grade} type="button" role="tab" aria-selected={gradeF===g.grade} className={`grade-${g.grade.toLowerCase()}${gradeF===g.grade?' active':''}`} onClick={()=>{setGradeF(g.grade);setPage(0);setInspected(null);}}><b>{g.grade}</b><small>Nv {g.from}{GRADES[k+1]?`–${GRADES[k+1].from-1}`:'+'}</small></button>)}</div>
  <div id="inventory-filter-options" className="inventory-filters" hidden={!filtersOpen}><div className="catalogue-controls"><label>Buscar<input value={query} onChange={e=>{setQuery(e.target.value);setPage(0);}} placeholder="Nome, material ou tipo de item"/></label><label>Tipo<select value={category} onChange={select(setCategory)}><option value="all">Todos os tipos</option>{Object.entries(CATEGORY_NAMES).map(([id,name])=><option key={id} value={id}>{name}</option>)}</select></label><label>Classe<select value={classFilter} onChange={select(setClassFilter)}><option value="mine">Minha classe e universais</option><option value="all">Todas as classes</option></select></label><label>Nível mínimo<select value={band} onChange={select(setBand)}><option value="all">Todas as faixas</option>{LEVEL_BANDS.map(n=><option key={n} value={n}>Nível {n}+</option>)}</select></label><label>Raridade<select value={rarity} onChange={select(setRarity)}><option value="all">Todas</option>{['Comum','Incomum','Raro','Épico','Lendário','Mítico'].map(r=><option key={r}>{r}</option>)}</select></label></div>
  <label className="check-row"><input type="checkbox" checked={locked} onChange={e=>{setLocked(e.target.checked);setPage(0);}}/>Mostrar itens que ainda não posso usar</label></div>
  <div className="catalogue-summary"><b>{matching.length.toLocaleString('pt-BR')} {view==='bag'?'na mochila':'itens'}{slotFilter&&view==='bag'?` · ${SLOT_NAMES[slotFilter as keyof typeof SLOT_NAMES]}`:''}</b><span>Nv. {hero.level}</span></div>

@@ -316,3 +316,15 @@
 :root body .modal .item-icon.grade-s .item-icon-art,:root body .modal .item-icon.grade-a .item-icon-art{filter:drop-shadow(0 0 6px var(--grade))}
 :root body .modal .grade-tag{color:var(--grade);font-family:var(--lk-display)}
 :root body .modal .item-detail-art[class*="grade-"]{box-shadow:inset 0 0 30px color-mix(in srgb,var(--grade) 45%,transparent),0 0 0 1px var(--grade)}
+:root body .modal .grade-drawers{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+:root body .modal .grade-drawers button{font-size:13px;
+  display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:4px;cursor:pointer;
+  background:linear-gradient(180deg,var(--lk-box-hi),var(--lk-box));border:1px solid #c9a55a55;color:var(--lk-cream);
+}
+:root body .modal .grade-drawers button b{
+  display:grid;place-items:center;width:20px;height:20px;border-radius:3px;font:700 12px/1 var(--lk-display);
+  background:var(--grade);color:#10161c;
+}
+:root body .modal .grade-drawers button small{color:var(--lk-cream-dim);font-size:11px}
+:root body .modal .grade-drawers button.active{border-color:var(--grade,var(--lk-teal));box-shadow:0 0 12px color-mix(in srgb,var(--grade,#3fd6cf) 55%,transparent)}
+:root body .modal .grade-drawers button:first-child.active{border-color:var(--lk-teal);background:linear-gradient(180deg,#1fb5ae,var(--lk-teal-deep));color:#fff}
