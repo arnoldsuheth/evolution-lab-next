@@ -101,6 +101,88 @@ function Ready({ file, x, z, turn, move, own }: { file: string; x: number; z: nu
   return <group position={[x, 0, z]} rotation={[0, turn, 0]}><primitive object={root} /></group>;
 }
 
+/** Uma classe de cada, só com o grátis: peças das 2 roupas misturadas, cores, raças e armas. */
+type Part = [string, RegExp];
+type Weapon = 'sword' | 'axe' | 'shield' | 'pickaxe' | 'staff' | 'wand' | 'bow' | 'dagger';
+type ClassLook = { name: string; race: string; female: boolean; body?: string; parts: Part[]; tint: string; skin?: string; hair?: string; beard?: boolean; hairColor: string; right?: Weapon; left?: Weapon; gem?: string; halo?: boolean; scale?: number };
+const MR = 'Male_Ranger', MP = 'Male_Peasant', FR = 'Female_Ranger', FP = 'Female_Peasant';
+export const PREVIEW_CLASSES: ClassLook[] = [
+  { name: 'Paladino', race: 'Humano', female: false, parts: [[MP, /Body|Legs|Arms/], [MR, /Pauldron|Feet/]], tint: '#b9c6e0', hair: 'Hair_SimpleParted', beard: true, hairColor: '#c99a45', right: 'sword', left: 'shield' },
+  { name: 'Guerreiro', race: 'Orc', female: false, body: 'Orc_Male', skin: '#86a85c', parts: [[MP, /Body|Legs|Arms|Feet/], [MR, /Pauldron/]], tint: '#c27a5c', hairColor: '#1f1a17', right: 'axe' },
+  { name: 'Caçador', race: 'Elfo', female: false, body: 'Elf_Male', skin: '#ffe6d2', parts: [[MR, /.*/]], tint: '#ffffff', hairColor: '#e8d7a8', left: 'bow' },
+  { name: 'Maga', race: 'Humana', female: true, parts: [[FP, /Body|Legs|Arms|Feet/], [FR, /Hood/]], tint: '#a48fe6', hair: 'Hair_Long', hairColor: '#e8c070', right: 'staff', gem: '#6fc8ff' },
+  { name: 'Profeta', race: 'Elfa', female: true, body: 'Elf_Female', skin: '#ffe6d2', parts: [[FP, /Body|Legs|Arms|Feet/], [FR, /Belt/]], tint: '#f2e3b8', hairColor: '#f3ead2', right: 'wand', gem: '#ffd76a', halo: true },
+  { name: 'Shaman', race: 'Orc', female: true, body: 'Orc_Female', skin: '#86a85c', parts: [[FP, /Body|Legs|Arms/], [FR, /Belt|Feet|Bracer/]], tint: '#a9bd84', hairColor: '#1f1a17', right: 'staff', gem: '#7dff9a' },
+  { name: 'Engenheiro', race: 'Anão (provisório)', female: false, scale: .84, parts: [[MP, /Body|Legs|Arms/], [MR, /Feet/]], tint: '#d6a25c', hair: 'Hair_Buzzed', beard: true, hairColor: '#8a4a22', right: 'pickaxe' },
+  { name: 'Hacker', race: 'Elfa', female: true, body: 'Elf_Female', skin: '#ffe6d2', parts: [[FR, /^(?!.*Pauldron).*/]], tint: '#7d6bb5', hairColor: '#2a2050', right: 'dagger', left: 'dagger' },
+  { name: 'Duelista', race: 'Elfo', female: false, body: 'Elf_Male', skin: '#ffe6d2', parts: [[MR, /^(?!.*Hood).*/]], tint: '#d77a7a', hairColor: '#e8d7a8', right: 'sword', left: 'dagger' },
+];
+const PROP = (n: string) => `${base}/props/${n}.glb`;
+const lighter = (m: THREE.Material, c: string) => { const t = (m as THREE.MeshStandardMaterial).clone(); t.color = new THREE.Color(c).multiplyScalar(1.7); return t; };
+
+/** Arma pronta (do pacote de objetos) ou feita aqui (cajado, varinha, arco, adaga). */
+function weaponMesh(kind: Weapon, props: Record<string, THREE.Group>, gem = '#6fc8ff'): THREE.Object3D {
+  const std = (color: string, extra: Partial<THREE.MeshStandardMaterialParameters> = {}) => new THREE.MeshStandardMaterial({ color, roughness: .6, ...extra });
+  const g = new THREE.Group();
+  if (kind === 'sword') { const s = props.Sword_Bronze.clone(); s.scale.setScalar(.85); g.add(s); }
+  if (kind === 'axe') { const s = props.Axe_Bronze.clone(); s.rotation.z = Math.PI / 2; s.position.y = .35; g.add(s); }
+  if (kind === 'pickaxe') { const s = props.Pickaxe_Bronze.clone(); s.scale.setScalar(.8); g.add(s); }
+  if (kind === 'shield') { const s = props.Shield_Wooden.clone(); s.scale.setScalar(.9); g.add(s); }
+  if (kind === 'dagger') { const blade = new THREE.Mesh(new THREE.ConeGeometry(.035, .32, 4), std('#c9d2de', { metalness: .8, roughness: .25 })); blade.position.y = .24; const grip = new THREE.Mesh(new THREE.CylinderGeometry(.02, .02, .12, 6), std('#3a2a20')); g.add(blade, grip); }
+  if (kind === 'staff' || kind === 'wand') {
+    const long = kind === 'staff', h = long ? 1.6 : .42;
+    const rod = new THREE.Mesh(new THREE.CylinderGeometry(long ? .025 : .015, long ? .03 : .012, h, 7), std('#6b4a2e')); rod.position.y = long ? .45 : h / 2;
+    const orb = new THREE.Mesh(new THREE.IcosahedronGeometry(long ? .08 : .035, 0), std(gem, { emissive: gem, emissiveIntensity: 1.4 })); orb.position.y = rod.position.y + h / 2 + .05;
+    g.add(rod, orb);
+  }
+  if (kind === 'bow') {
+    const arc = new THREE.Mesh(new THREE.TorusGeometry(.55, .02, 6, 24, Math.PI * .8), std('#7a5230')); arc.rotation.z = Math.PI / 2 + Math.PI * .1; arc.position.x = -.12;
+    const string = new THREE.Mesh(new THREE.CylinderGeometry(.004, .004, 1.05, 4), std('#e9e2cf')); string.position.x = .3;
+    g.add(arc, string);
+  }
+  g.traverse(o => { o.castShadow = true; });
+  return g;
+}
+
+function ClassHero({ look, x, z, turn, move }: { look: ClassLook; x: number; z: number; turn: number; move: Move }) {
+  const mr = useGLTF(C(MR)), mp = useGLTF(C(MP)), fr = useGLTF(C(FR)), fp = useGLTF(C(FP));
+  const body = useGLTF(C(look.body ?? (look.female ? 'Superhero_Female_FullBody' : 'Superhero_Male_FullBody')));
+  const hair = useGLTF(C(look.hair ?? 'Hair_Buzzed')), brows = useGLTF(C(look.female ? 'Eyebrows_Female' : 'Eyebrows_Regular')), beard = useGLTF(C('Hair_Beard')), anims = useGLTF(C('UAL1'));
+  const sword = useGLTF(PROP('Sword_Bronze')), axe = useGLTF(PROP('Axe_Bronze')), shield = useGLTF(PROP('Shield_Wooden')), pick = useGLTF(PROP('Pickaxe_Bronze'));
+  const root = useMemo(() => {
+    const outfits: Record<string, THREE.Group> = { [MR]: mr.scene, [MP]: mp.scene, [FR]: fr.scene, [FP]: fp.scene };
+    const props: Record<string, THREE.Group> = { Sword_Bronze: sword.scene, Axe_Bronze: axe.scene, Shield_Wooden: shield.scene, Pickaxe_Bronze: pick.scene };
+    const scene = cloneSkinned(outfits[look.parts[0][0]]) as THREE.Group, bones: Record<string, THREE.Bone> = {};
+    scene.traverse(o => { if ((o as THREE.Bone).isBone) bones[o.name] = o as THREE.Bone; });
+    const drop: THREE.Object3D[] = []; scene.traverse(o => { if ((o as THREE.Mesh).isMesh) drop.push(o); }); drop.forEach(o => o.removeFromParent());
+    const paint = (m: THREE.SkinnedMesh) => { const mats = (Array.isArray(m.material) ? m.material : [m.material]).map(mt => /Regular/.test(mt.name) ? (look.skin ? tintMaterial(mt, look.skin) : mt) : lighter(mt, look.tint)); m.material = Array.isArray(m.material) ? mats : mats[0]; };
+    const attach = (src: THREE.Object3D, keep: (m: THREE.SkinnedMesh) => boolean, edit?: (m: THREE.SkinnedMesh) => void) => {
+      cloneSkinned(src).traverse(o => { const m = o as THREE.SkinnedMesh; if (!m.isSkinnedMesh || !keep(m)) return; edit?.(m);
+        const mesh = new THREE.SkinnedMesh(m.geometry, m.material); mesh.name = m.name; mesh.frustumCulled = false; mesh.castShadow = true;
+        mesh.bind(new THREE.Skeleton(m.skeleton.bones.map(b => bones[b.name] ?? b), m.skeleton.boneInverses), m.bindMatrix); scene.add(mesh); });
+    };
+    const seen = new Set<string>();
+    for (const [file, re] of look.parts) attach(outfits[file], m => { const kind = m.name.replace(/^(Male|Female)_(Ranger|Peasant)_/, '').replace(/_.*$/, ''); const ok = re.test(m.name) && (!seen.has(kind) || /Acc|Belt|Bracer|Hood/.test(m.name)); if (ok) seen.add(kind); return ok; }, paint);
+    const hairTint = (m: THREE.SkinnedMesh) => { m.material = tintMaterial(m.material as THREE.Material, look.hairColor); };
+    attach(body.scene, () => true, m => { if (/body|superhero/i.test(m.name)) { headOnly(m); if (look.skin && look.body) m.material = tintMaterial(m.material as THREE.Material, look.skin); } else if (/hair|horns/i.test(m.name)) hairTint(m); });
+    if (!look.body) { if (look.hair) attach(hair.scene, () => true, hairTint); attach(brows.scene, () => true, hairTint); if (look.beard) attach(beard.scene, () => true, hairTint); }
+    // Mão: o osso aponta para os dedos (X). A arma fica de pé quando a mão está fechada.
+    const hold = (kind: Weapon, bone: string, side: number) => { const hand = bones[bone]; if (!hand) return; const holder = new THREE.Group(); holder.position.set(side * .09, side * .03, 0); const r = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('rot')?.split(',').map(Number) : null; if (r) holder.rotation.set(r[0], r[1] * side, r[2] * side); else holder.rotation.set(0, 0, Math.PI); holder.add(weaponMesh(kind, props, look.gem)); hand.add(holder); };
+    if (look.right) hold(look.right, 'hand_r', 1);
+    if (look.left) hold(look.left, 'hand_l', -1);
+    if (look.halo) { const ring = new THREE.Mesh(new THREE.TorusGeometry(.17, .016, 8, 32), new THREE.MeshStandardMaterial({ color: '#ffe7a3', emissive: '#ffc94a', emissiveIntensity: 1.5 })); ring.rotation.x = Math.PI / 2; ring.position.set(0, .3, 0); bones.Head?.add(ring); }
+    scene.traverse(o => { o.castShadow = true; if ((o as THREE.Mesh).isMesh) o.frustumCulled = false; });
+    if (look.scale) scene.scale.setScalar(look.scale);
+    return scene;
+  }, [mr.scene, mp.scene, fr.scene, fp.scene, body.scene, hair.scene, brows.scene, beard.scene, sword.scene, axe.scene, shield.scene, pick.scene, look]);
+  const mixer = useMemo(() => new THREE.AnimationMixer(root), [root]);
+  useEffect(() => { const clip = anims.animations.find(a => a.name === move); if (!clip) return; const a = mixer.clipAction(clip); a.reset().fadeIn(.25).play(); return () => { a.fadeOut(.25); }; }, [mixer, anims.animations, move]);
+  useFrame((_, dt) => mixer.update(dt));
+  return <group position={[x, 0, z]} rotation={[0, turn, 0]}><primitive object={root} /></group>;
+}
+
+export const PREVIEW_MONSTERS = [{ name: 'Imp', file: 'M_Imp', x: -1.4, z: -3.2, turn: .4 }, { name: 'Puglin', file: 'M_Puglin', x: 1.4, z: -3.2, turn: -.4 }];
+
 const PLANTS: [string, number, number, number, number][] = [
   ['CommonTree_1', -7, -7, 1, 0], ['CommonTree_3', 7, -8, .9, 1], ['CommonTree_5', -10, -2, .9, 2], ['Pine_1', 10, -3, 1, 0], ['Pine_3', -4, -12, 1.1, 1],
   ['TwistedTree_1', 3, -13, .5, 2], ['Bush_Common', -4.5, -3, 1, 0], ['Bush_Common_Flowers', 4.5, -3.5, 1, 1], ['Fern_1', -4.4, 1.6, 1, 0], ['Fern_1', 4.6, 1.4, 1, 2],
@@ -113,7 +195,7 @@ function Plant({ name, x, z, s, r }: { name: string; x: number; z: number; s: nu
   return <primitive object={obj} position={[x, 0, z]} scale={s} rotation={[0, r * 2.1, 0]} />;
 }
 
-export default function PreviewScene({ move }: { move: Move }) {
+export default function PreviewScene({ move, classes = false }: { move: Move; classes?: boolean }) {
   return <Canvas shadows camera={{ position: [0, 3.6, 10.5], fov: 44 }} dpr={[1, 2]} gl={{ antialias: true }}>
     <color attach="background" args={['#a9d4ef']} />
     <fog attach="fog" args={['#a9d4ef', 14, 30]} />
@@ -123,9 +205,10 @@ export default function PreviewScene({ move }: { move: Move }) {
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, .01, .4]} receiveShadow><planeGeometry args={[7.5, 7.5]} /><meshStandardMaterial color="#c9a774" roughness={1} /></mesh>
     <Suspense fallback={null}>
       {PLANTS.map(([n, x, z, s, r], i) => <Plant key={i} name={n} x={x} z={z} s={s} r={r} />)}
+      {classes ? <>{PREVIEW_CLASSES.map((c, i) => <ClassHero key={c.name} look={c} move={move} x={(i % 5 - 2) * 1.5 + (i >= 5 ? .75 : 0)} z={i >= 5 ? 1.8 : 0} turn={-(i % 5 - 2) * .12} />)}{PREVIEW_MONSTERS.map(m => <Ready key={m.name} {...m} move={move} />)}</> : <>
       {PREVIEW_HEROES.map(h => <Character key={h.name} hero={h} move={move} />)}
       {PREVIEW_RACES.map(r => <Ready key={r.name} {...r} move={move} />)}
-      {PREVIEW_LOWPOLY.map(r => <Ready key={r.name} {...r} move={move} own />)}
+      {PREVIEW_LOWPOLY.map(r => <Ready key={r.name} {...r} move={move} own />)}</>}
     </Suspense>
     <OrbitControls target={[0, 1, 0]} minDistance={3} maxDistance={16} maxPolarAngle={1.45} />
   </Canvas>;
