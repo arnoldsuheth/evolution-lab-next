@@ -10,6 +10,8 @@ import {buildAvatar,disposeAvatar} from '@/lib/avatarMesh';
 import {useGame} from '@/lib/store';
 import EquipmentVisual,{rarityTone} from './EquipmentVisual';
 import HeroModel from './HeroModel';
+import KingdomHero,{CLASS_LOOK,kingdomWeapon} from './KingdomHero';
+import {gradeOf,gradeInfo} from '@/lib/grades';
 import {skinColor} from '@/lib/visual';
 function ProceduralCharacter({classId,look,equipped=[],walking=false,animated=true,preview=false,skinOverride,level=1,race:selectedRace,combatant=false,organic=false}:{classId:ClassId;look:Look;equipped?:string[];walking?:boolean;animated?:boolean;preview?:boolean;skinOverride?:string;level?:number;race?:Race;combatant?:boolean;organic?:boolean;fullGear?:boolean;celestial?:boolean}){
  const race=selectedRace??CLASSES[classId].race,modelRef=useRef<THREE.Group>(null),phase=useRef(0),event=useGame(s=>combatant?s.battleEvent:null);
@@ -39,8 +41,19 @@ export default function Character(props:CharacterProps){
  const {classId,look,equipped=[],level=1,race:selectedRace,skinOverride,organic=false,preview=false}=props;
  const race=selectedRace??CLASSES[classId].race,equipmentKey=equipped.join('|');
  const gear=useMemo(()=>activeEquipment({classId,level,dead:false,equipped:equipmentKey.split('|').filter(Boolean)},ITEMS),[classId,level,equipmentKey]);
+ const classic=useGame(s=>!!s.settings.classicCharacters);
  if(organic)return <ProceduralCharacter {...props}/>;
  const fallback=<ProceduralCharacter {...props} organic/>;
+ if(!classic){
+  const cl=CLASS_LOOK[classId],female=look.gender===1,weapon=gear.find(i=>i.slot==='weapon'||i.slot==='twohand'),off=gear.find(i=>i.slot==='offhand');
+  const showArms=!!weapon||!!props.fullGear,showOff=!!off||!!props.fullGear;
+  let right=showArms?kingdomWeapon(weapon?.visual)??cl.right??null:null,left=showOff?kingdomWeapon(off?.visual)??cl.left??null:null;
+  if(right==='bow'){left=right;right=null;}
+  const rank={D:0,C:1,B:2,A:3,S:4} as const,grades=gear.map(i=>gradeOf(i)).filter((g):g is NonNullable<typeof g>=>!!g);
+  const top=grades.sort((a,b)=>rank[b]-rank[a])[0],tier=top==='S'?2:top==='A'||top==='B'?1:0;
+  const hairStyle=female?[2,3,4,2,3][look.hair%5]:[0,1,0,1,1][look.hair%5];
+  return <ModelBoundary fallback={fallback}><Suspense fallback={null}><KingdomHero classId={classId} race={race} female={female} skin={skinOverride??skinColor(race,look.skin)} hair={HAIR[look.hairColor]??HAIR[1]} hairStyle={hairStyle} beard={!female&&(look.beard>0||race==='dwarf')} right={right} left={left} tier={props.fullGear&&!top?1:tier as 0|1|2} glow={top&&rank[top]>=2?gradeInfo(top).color:null} walking={props.walking} animated={props.animated} combatant={props.combatant} halo={props.celestial}/></Suspense></ModelBoundary>;
+ }
  const armed=gear.some(i=>i.slot==='weapon'||i.slot==='twohand'),shielded=gear.some(i=>i.slot==='offhand');
  const worn={head:gear.some(i=>i.slot==='head'),chest:gear.some(i=>i.slot==='chest'),back:gear.some(i=>i.slot==='back')},dressed=props.fullGear?{head:true,chest:true,back:true}:worn;
  return <ModelBoundary fallback={fallback}><Suspense fallback={null}><group scale={preview?1:.74}><HeroModel classId={classId} race={race} skin={skinOverride??skinColor(race,look.skin)} hair={HAIR[look.hairColor]??HAIR[1]} eyes={props.celestial?'#7fe8ff':look.eyes>0?EYES[look.eyes]:undefined} celestial={props.celestial} hairStyle={look.gender===1&&look.hair===0?(race==='dwarf'?3:2):look.hair} feminine={look.gender===1} face={{face:look.face,beard:look.beard,moustache:look.moustache,brows:look.brows,nose:look.nose,ears:look.ears??0,scar:look.scar,tattoo:look.tattoo,accessory:look.accessory}} body={look.body} showHelmet={look.helmet!==0} weaponRarity={gear.find(i=>i.slot==='weapon'||i.slot==='twohand')?.rarity} gearItems={gear} gear={dressed} armed={armed||!!props.fullGear} shielded={shielded||!!props.fullGear} walking={props.walking} animated={props.animated} combatant={props.combatant} preview={preview}/>{preview&&<mesh rotation={[-Math.PI/2,0,0]} position={[0,-.025,0]}><ringGeometry args={[.8,.82,48]}/><meshBasicMaterial color={CLASSES[classId].color} transparent opacity={.5}/></mesh>}</group></Suspense></ModelBoundary>;
