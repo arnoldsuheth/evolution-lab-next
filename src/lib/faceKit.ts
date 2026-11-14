@@ -177,7 +177,7 @@ function hairExtra(extra: HairExtra): FacePart[] {
     return [H([0, 2.16, -.14], [.66, .46, .6]), H([0, 2.42, -.14], [.46, .22, .44]), ...puffs];
   }
   if (extra === 'braids') {
-    const rows = [-.3, -.1, .1, .3].flatMap(x => [...[.4, .26, .12, -.02, -.16, -.3].map(z => H([x, top(x, z) + .02, z], [.07, .05, .08])), ...[2.12, 1.98, 1.84].map(y => H([x, y, -.5], [.07, .08, .05]))]);
+    const rows = [-.3, -.1, .1, .3].flatMap(x => [...[.4, .26, .12, -.02, -.16, -.3].map(z => H([x, top(x, z) - .005, z], [.05, .03, .075])), ...[2.12, 1.98, 1.84].map(y => H([x, y, -.49], [.05, .07, .03]))]);
     const tails = [-.2, .2].flatMap(x => [...Array.from({ length: 5 }, (_, i) => H([x * (1 + i * .05), 1.72 - i * .13, -.53 - i * .02], [.07 - i * .005, .08, .07])), { part: 'hair', shape: 'torus', color: 'gold', position: [x * 1.25, 1.1, -.62], scale: [.045, .045, .045], rotation: [Math.PI / 2, 0, 0] } as FacePart]);
     return [...rows, ...tails];
   }

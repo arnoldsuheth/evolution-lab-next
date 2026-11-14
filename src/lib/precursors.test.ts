@@ -91,3 +91,15 @@ test('as 45 missões adicionais registram artefatos e destravam a Câmara sem re
   assert.deepEqual(restored.education, save.education);
   assert.equal(restored.hero.xp, save.hero.xp);
 });
+
+test('Boole aceita a resposta na praça de Goddard', async () => {
+  const { PRECURSORS } = await import('./precursorCatalog');
+  const { GODDARD_BOOLE } = await import('./kingdomCities');
+  const save = freshSave();
+  useGame.setState({ ...save, ready: true, saveError: '', hero: { ...save.hero, created: true, region: 'goddard', position: [GODDARD_BOOLE[0], GODDARD_BOOLE[1] + 3] } });
+  const quest = PRECURSORS.boole.quests[0];
+  assert.equal(useGame.getState().submitPrecursor('boole', 0, quest.answer), null);
+  assert.equal(useGame.getState().hero.precursorProgress?.boole, 1);
+  useGame.setState(s => ({ hero: { ...s.hero, position: [20, 20] } }));
+  assert.match(String(useGame.getState().submitPrecursor('boole', 1, PRECURSORS.boole.quests[1].answer)), /Aproxime-se/);
+});

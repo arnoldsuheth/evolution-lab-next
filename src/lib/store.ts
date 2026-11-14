@@ -143,11 +143,11 @@ function executeBattle(id:string|undefined,starter:boolean,set:(value:Partial<Ga
 }
 /** Aventura com as missões de hoje já sorteadas (sem gravar nada a cada segundo). */
 export const currentAdventure=(s:{hero:SaveData["hero"];education:{completed:string[]}})=>ensureDaily(adventureOf(s.hero),Date.now(),s.hero.id,s.hero.level,s.education.completed);
-function nearLegacySite(state: GameStore, site: { x: number; z: number }) {
+function nearLegacySite(state: GameStore, site: { x: number; z: number }, region: string = "aurora") {
   const { hero } = state;
   return state.ready && !state.saveError && !hero.dead && !state.encounter && !state.challenge
-    && !hero.instance && hero.region === "aurora"
-    && Math.hypot(hero.position[0] - site.x, hero.position[1] - site.z) <= 3.7;
+    && !hero.instance && hero.region === region
+    && Math.hypot(hero.position[0] - site.x, hero.position[1] - site.z) <= (region === "goddard" ? 5 : 3.7);
 }
 export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>((set, get) => ({
   ...freshSave(), rareSeen:0, restPending:0, relocation:0,mounted:false,wolfForm:false,sitting:false,walking:false, battleEvent:null, supremo:0, lastSkill:null, slain:{}, gathered:{}, target:null, queued:null, challenge:null, ready: false, saveError: "", notice: "", encounter: null, buff: 0, lastAttack: 0, cooldowns: {}, now: 0, effects: [],
@@ -192,7 +192,9 @@ export const useGame = create<GameStore>()(persist<GameStore, [], [], SaveData>(
     const state = get();
     const { hero } = state;
     const precursor = PRECURSORS[id];
-    if (!precursor || !nearLegacySite(state, precursor)) return "Aproxime-se do precursor com a jornada pronta para salvar.";
+    // Boole também atende na praça de Goddard (a primeira runa é entregue lá).
+    const inGoddard = id === "boole" && hero.region === "goddard";
+    if (!precursor || !(inGoddard ? nearLegacySite(state, { x: GODDARD_BOOLE[0], z: GODDARD_BOOLE[1] }, "goddard") : nearLegacySite(state, precursor))) return "Aproxime-se do precursor com a jornada pronta para salvar.";
     const current = hero.precursorProgress?.[id] ?? 0;
     const quest = precursor.quests[current];
     if (step !== current || !quest) return "Esta etapa já foi registrada.";
