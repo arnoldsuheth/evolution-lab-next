@@ -5,6 +5,7 @@ import { OrbitControls, useGLTF } from '@react-three/drei';
 import { Suspense, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js';
+import VillageHouse from './VillageHouse';
 
 /**
  * Prévia dos personagens e da natureza novos (pacotes CC0 do Quaternius).
@@ -222,6 +223,7 @@ export default function PreviewScene({ move, classes = false, tier = 0 }: { move
       {PLANTS.map(([n, x, z, s, r], i) => <Plant key={i} name={n} x={x} z={z} s={s} r={r} />)}
       {classes ? <>{PREVIEW_CLASSES.map((c, i) => <ClassHero key={c.name} look={c} move={move} tier={tier} x={(i % 5 - 2) * 1.5 + (i >= 5 ? .75 : 0)} z={i >= 5 ? 1.8 : 0} turn={-(i % 5 - 2) * .12} />)}{PREVIEW_MONSTERS.map(m => <Ready key={m.name} {...m} move={move} />)}</> : <>
       {PREVIEW_HEROES.map(h => <Character key={h.name} hero={h} move={move} />)}
+      <Suspense fallback={null}><group position={[-9, 0, -12]}><VillageHouse spec={{ w: 2, d: 2 }} /></group><group position={[0, 0, -13]}><VillageHouse spec={{ w: 3, d: 3, floors: 2, brick: true, seed: 1 }} /></group><group position={[9, 0, -12]} rotation={[0, -.4, 0]}><VillageHouse spec={{ w: 2, d: 3, floors: 2 }} /></group></Suspense>
       {PREVIEW_RACES.map(r => <Ready key={r.name} {...r} move={move} />)}
       {PREVIEW_LOWPOLY.map(r => <Ready key={r.name} {...r} move={move} own />)}</>}
     </Suspense>

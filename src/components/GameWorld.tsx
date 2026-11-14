@@ -63,7 +63,8 @@ import RainField from "./RainField";
 import { bindCursor, cursorOn, setCombatCursor } from "@/lib/cursor";
 import { isRangedClass } from "@/lib/combatEffects";
 import { attackRange } from "@/lib/combat";
-import { BUILDINGS, TREES, findPath, followRoadPath, walkable } from "@/lib/navigation";
+import { BUILDINGS, TREES, VILLAGE_HOUSES, findPath, followRoadPath, walkable } from "@/lib/navigation";
+import VillageHouse from "./VillageHouse";
 import { NPCS_LIVE, type NpcId, type Look, type ClassId, type Race } from "@/lib/game";
 
 export class WorldBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
@@ -126,7 +127,7 @@ function House({ x, z, index, citadel }: { x: number; z: number; index: number; 
   const roofMaterial=useRef<THREE.MeshStandardMaterial>(null),ray=useRef(new THREE.Ray()),origin=useRef(new THREE.Vector3()),direction=useRef(new THREE.Vector3()),hit=useRef(new THREE.Vector3()),bounds=useRef(new THREE.Box3(new THREE.Vector3(x-3.1,3,z-3.1),new THREE.Vector3(x+3.1,5.8,z+3.1)));
   useFrame(({camera},dt)=>{if(!roofMaterial.current)return;const p=useGame.getState().hero.position;origin.current.set(p[0],1.7,p[1]);direction.current.copy(camera.position).sub(origin.current);const distance=direction.current.length();ray.current.set(origin.current,direction.current.normalize());const covered=ray.current.intersectBox(bounds.current,hit.current)&&origin.current.distanceTo(hit.current)<distance;roofMaterial.current.opacity=THREE.MathUtils.damp(roofMaterial.current.opacity,covered?.28:1,10,dt);roofMaterial.current.depthWrite=roofMaterial.current.opacity>.95;});
   return <group position={[x, 0, z]} rotation={[0, index % 2 ? -0.12 : 0.1, 0]}>
-    {citadel ? <>
+    {!citadel ? <Suspense fallback={null}><VillageHouse spec={{ w: 2, d: 2, floors: index % 2 ? 2 : 1, brick: index > 1, seed: index }} /></Suspense> : citadel ? <>
       <MergedParts parts={() => CITADEL_FACADE(index)} castShadow receiveShadow />
       <mesh position={[0, 4.04, 0]} castShadow><boxGeometry args={[4.45, 1.45, 4.22]} /><meshStandardMaterial ref={roofMaterial} transparent color="#293654" /></mesh>
       <MergedParts parts={() => [-1.7, -.57, .57, 1.7].flatMap((x): Part[] => [
@@ -155,10 +156,10 @@ function CitadelInterior({ room, onGroundClick, read }: {
       <boxGeometry args={[room.w * 2,.08,room.d * 2]} /><PavingMaterial color="#b7a894" />
     </mesh>
     <MergedParts parts={() => [
-      { g: box(room.w * 2,2.4,.35), p: [0,1.2,-2.3], c: "#626e88" },
+      { g: box(room.w * 2,2.4,.35), p: [0,1.2,-2.3], c: "#9a8f7c" },
       ...[-1,1].flatMap((side): Part[] => [
-        { g: box(.35,1.25,4.6), p: [side*(room.w - .2),.625,0], c: "#626e88" },
-        { g: box(1.8,.7,.3), p: [side*1.7,.35,2.35], c: "#626e88" },
+        { g: box(.35,1.25,4.6), p: [side*(room.w - .2),.625,0], c: "#9a8f7c" },
+        { g: box(1.8,.7,.3), p: [side*1.7,.35,2.35], c: "#9a8f7c" },
         { g: box(1.65,1.5,.28), p: [side*1.55,.9,-2.03], c: "#513927" },
         ...Array.from({length:6},(_,i): Part => ({g:box(.19,.32,.22),p:[side*(.88+i*.23),1.13,-1.83],c:[room.accent,"#547f87","#884a59"][i%3]})),
       ]),
@@ -613,6 +614,7 @@ function Scene({ paused, interact, openService, openMarket, report, thirdPerson,
       }
     }} /> : <House key={i} x={b.x} z={b.z} index={i%4} citadel={i >= 4} />)}
     {TREES.map((t, i) => <Tree key={i} {...t} />)}
+    <Suspense fallback={null}>{VILLAGE_HOUSES.map((h, i) => <group key={`v${i}`} position={[h.x, 0, h.z]} rotation={[0, h.rot, 0]}><VillageHouse spec={{ w: h.cells[0], d: h.cells[1], floors: h.floors, brick: h.brick, seed: i }} /></group>)}</Suspense>
     {[-1, 1].flatMap(side => [0, 1, 2, 3, 4].map(i => <Tree key={`${side}-${i}`} x={side * (17 + i % 2 * 3)} z={10 - i * 6} size={0.9 + i * 0.11} />))}
     {Array.from({ length: 22 }, (_, i) => <Stone key={i} position={[Math.sin(i * 7.3) * 25, 0.2, -30 + Math.cos(i * 4.1) * 4]} size={1.6 + i % 3} color="#697879" />)}
     {Array.from({ length: 14 }, (_, i) => <mesh key={i} position={[Math.sin(i * 3.7) * 15, 0.13, 10 + Math.cos(i * 4.2) * 3]} rotation={[-Math.PI / 2, 0, i]}><circleGeometry args={[0.55, 7]} /><meshStandardMaterial color="#809367" /></mesh>)}

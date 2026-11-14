@@ -38,7 +38,7 @@ function Gate({ gate, destination, paused, cross }: { gate: CityGate; destinatio
       <mesh position={[0,4.11,0]}><boxGeometry args={[1.26,.33,1.65]}/><meshStandardMaterial color="#8b929d"/></mesh>
       <mesh position={[-side*.35,2.45,.72]}><octahedronGeometry args={[.17]}/><meshStandardMaterial color="#e4a965" emissive="#e4a965" emissiveIntensity={.55}/></mesh>
     </group>)}
-    <mesh position={[0,3.75,0]} castShadow><boxGeometry args={[4.25,.55,1.25]}/><meshStandardMaterial color="#626e80" roughness={.88}/></mesh>
+    <mesh position={[0,3.75,0]} castShadow><boxGeometry args={[4.25,.55,1.25]}/><meshStandardMaterial color="#8d8474" roughness={.88}/></mesh>
     <group ref={portcullis}><MergedParts parts={grille}/></group>
     {close&&<Html center position={[0,4.5,0]} style={{pointerEvents:'none'}}><span className="gate-label">{destination?gate.name+" · "+destination:gate.name}</span></Html>}
   </group>;
@@ -56,11 +56,11 @@ export default function CityRoutes({ region, paused, ground, cross, followRoad, 
       const x=(a[0]+b[0])/2,z=(a[1]+b[1])/2;
       const segments=Math.max(1,Math.floor(length/2.1));
       return [
-        {g:new BoxGeometry(horizontal?length:.98,2.75,horizontal?.98:length),p:[x,1.37,z],c:'#536171'},
-        {g:new BoxGeometry(horizontal?length:1.13,.24,horizontal?1.13:length),p:[x,2.76,z],c:'#748292'},
+        {g:new BoxGeometry(horizontal?length:.98,2.75,horizontal?.98:length),p:[x,1.37,z],c:'#8d8474'},
+        {g:new BoxGeometry(horizontal?length:1.13,.24,horizontal?1.13:length),p:[x,2.76,z],c:'#a89d88'},
         ...Array.from({length:segments},(_,i):Part=>{
           const shift=(i+.5)*length/segments-length/2;
-          return {g:new BoxGeometry(.69,.47,.69),p:[x+(horizontal?shift:0),3.06,z+(horizontal?0:shift)],c:'#697687'};
+          return {g:new BoxGeometry(.69,.47,.69),p:[x+(horizontal?shift:0),3.06,z+(horizontal?0:shift)],c:'#968b77'};
         }),
       ] satisfies Part[];
     }),[walls]);
