@@ -73,3 +73,10 @@
   :root body .desktop-game-menu>button:nth-of-type(4){display:none}
   :root body .combat-console,:root body .combat-console.combat-pad.without-target{max-width:calc(100vw - 170px - 180px)}
 }
+
+/* nomes que encavalam: some o de menor prioridade */
+:root body .lk-hidden-label{opacity:0!important;pointer-events:none!important;transition:opacity .2s}
+/* "40 flechas" aparecia duas vezes no celular: fica só o de cima da barra */
+@media (pointer:coarse), (max-width:960px){
+  :root body .hunter-ammo{display:none!important}
+}

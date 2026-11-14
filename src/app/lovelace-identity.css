@@ -340,3 +340,7 @@
   :root body .modal .item-icon-grid{grid-template-rows:none!important;grid-auto-rows:max-content!important;align-content:start}
   :root body .modal .item-icon-grid>.item-icon{height:auto!important;min-height:0!important}
 }
+/* missão: o texto não encosta nos cantos dourados */
+:root body .quest-tracker .hud-content{padding:12px 16px!important}
+:root body .quest-tracker h3{padding-right:18px}
+:root body .left-hud .hero-card{padding-left:14px!important;padding-right:14px!important}
