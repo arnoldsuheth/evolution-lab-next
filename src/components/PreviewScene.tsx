@@ -78,6 +78,23 @@ function Character({ hero, move }: { hero: Hero; move: Move }) {
   return <group position={[hero.x, 0, hero.z]} rotation={[0, hero.turn, 0]}><primitive object={root} /></group>;
 }
 
+/** Personagens prontos (corpo, cabelo e roupa juntos): elfos e orcs do kit Fantasy Races. */
+export const PREVIEW_RACES = [
+  { name: 'Elfa', file: 'Elf_Female', x: -2.4, z: -2.2, turn: .3 }, { name: 'Elfo', file: 'Elf_Male', x: -.8, z: -2, turn: .1 },
+  { name: 'Orc', file: 'Orc_Male', x: .8, z: -2, turn: -.1 }, { name: 'Orca', file: 'Orc_Female', x: 2.4, z: -2.2, turn: -.3 },
+];
+function Ready({ file, x, z, turn, move }: { file: string; x: number; z: number; turn: number; move: Move }) {
+  const g = useGLTF(C(file)), anims = useGLTF(C('UAL1'));
+  const root = useMemo(() => { const c = cloneSkinned(g.scene) as THREE.Group; c.traverse(o => { o.castShadow = true; o.frustumCulled = false; }); return c; }, [g.scene]);
+  const mixer = useMemo(() => new THREE.AnimationMixer(root), [root]);
+  useEffect(() => {
+    const clip = anims.animations.find(a => a.name === move); if (!clip) return;
+    const action = mixer.clipAction(clip); action.reset().fadeIn(.25).play(); return () => { action.fadeOut(.25); };
+  }, [mixer, anims.animations, move]);
+  useFrame((_, dt) => mixer.update(dt));
+  return <group position={[x, 0, z]} rotation={[0, turn, 0]}><primitive object={root} /></group>;
+}
+
 const PLANTS: [string, number, number, number, number][] = [
   ['CommonTree_1', -7, -7, 1, 0], ['CommonTree_3', 7, -8, .9, 1], ['CommonTree_5', -10, -2, .9, 2], ['Pine_1', 10, -3, 1, 0], ['Pine_3', -4, -12, 1.1, 1],
   ['TwistedTree_1', 3, -13, .5, 2], ['Bush_Common', -4.5, -3, 1, 0], ['Bush_Common_Flowers', 4.5, -3.5, 1, 1], ['Fern_1', -4.4, 1.6, 1, 0], ['Fern_1', 4.6, 1.4, 1, 2],
@@ -91,16 +108,17 @@ function Plant({ name, x, z, s, r }: { name: string; x: number; z: number; s: nu
 }
 
 export default function PreviewScene({ move }: { move: Move }) {
-  return <Canvas shadows camera={{ position: [0, 2.6, 7.5], fov: 42 }} dpr={[1, 2]} gl={{ antialias: true }}>
+  return <Canvas shadows camera={{ position: [0, 3.2, 8.5], fov: 44 }} dpr={[1, 2]} gl={{ antialias: true }}>
     <color attach="background" args={['#a9d4ef']} />
     <fog attach="fog" args={['#a9d4ef', 14, 30]} />
     <hemisphereLight args={['#fff6e0', '#4c6b3a', 1.6]} />
     <directionalLight position={[6, 10, 5]} intensity={2.2} castShadow shadow-mapSize={[2048, 2048]} shadow-camera-left={-12} shadow-camera-right={12} shadow-camera-top={12} shadow-camera-bottom={-12} />
     <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow><circleGeometry args={[30, 48]} /><meshStandardMaterial color="#7fae52" roughness={1} /></mesh>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, .01, 1]} receiveShadow><planeGeometry args={[7.5, 3]} /><meshStandardMaterial color="#c9a774" roughness={1} /></mesh>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, .01, -.2]} receiveShadow><planeGeometry args={[7.5, 5.5]} /><meshStandardMaterial color="#c9a774" roughness={1} /></mesh>
     <Suspense fallback={null}>
       {PLANTS.map(([n, x, z, s, r], i) => <Plant key={i} name={n} x={x} z={z} s={s} r={r} />)}
       {PREVIEW_HEROES.map(h => <Character key={h.name} hero={h} move={move} />)}
+      {PREVIEW_RACES.map(r => <Ready key={r.name} {...r} move={move} />)}
     </Suspense>
     <OrbitControls target={[0, 1, 0]} minDistance={3} maxDistance={16} maxPolarAngle={1.45} />
   </Canvas>;
