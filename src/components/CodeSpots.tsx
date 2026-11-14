@@ -18,10 +18,13 @@ function Lamp({ lit }: { lit: boolean }) {
   useFrame(({ clock }) => { const t = clock.elapsedTime, f = 1 + Math.sin(t * 9) * .12 + Math.sin(t * 23) * .06;
     if (flame.current) flame.current.scale.set(f, 1 + (f - 1) * 2, f);
     if (halo.current) halo.current.scale.setScalar(1 + Math.sin(t * 2.4) * .1); });
-  return <group><mesh position={[0, .08, 0]} castShadow><cylinderGeometry args={[.26, .32, .16, 10]} />{mat('#3d4350', { metalness: .4 })}</mesh>
+  return <group><mesh position={[0, .08, 0]} castShadow><cylinderGeometry args={[.22, .28, .16, 8]} />{mat('#7a7f8a', { metalness: .2 })}</mesh>
     <mesh position={[0, 1.4, 0]} castShadow><cylinderGeometry args={[.08, .11, 2.7, 8]} />{mat('#3d4350', { metalness: .4 })}</mesh>
-    <mesh position={[0, 2.95, 0]}><boxGeometry args={[.5, .6, .5]} />{mat(lit ? '#fff1b8' : '#5d6168', { emissive: lit ? '#ffb43a' : '#000000', emissiveIntensity: lit ? 2.6 : 0, transparent: true, opacity: lit ? .9 : 1 })}</mesh>
-    <mesh position={[0, 3.36, 0]}><coneGeometry args={[.42, .32, 4]} />{mat('#3d4350')}</mesh>
+    <mesh position={[0, 2.62, 0]}><boxGeometry args={[.6, .06, .6]} />{mat('#3d4350', { metalness: .4 })}</mesh>
+    <mesh position={[0, 2.95, 0]}><boxGeometry args={[.46, .6, .46]} />{mat(lit ? '#fff1b8' : '#b39a62', { emissive: lit ? '#ffb43a' : '#3a2a10', emissiveIntensity: lit ? 2.6 : .4, transparent: true, opacity: lit ? .9 : 1 })}</mesh>
+    {[[-.23, -.23], [.23, -.23], [-.23, .23], [.23, .23]].map(([x, z]) => <mesh key={`${x}${z}`} position={[x, 2.95, z]}><boxGeometry args={[.05, .62, .05]} />{mat('#3d4350', { metalness: .4 })}</mesh>)}
+    <mesh position={[0, 3.4, 0]} rotation={[0, Math.PI / 4, 0]}><coneGeometry args={[.46, .32, 4]} />{mat('#3d4350', { metalness: .3 })}</mesh>
+    <mesh position={[0, 3.62, 0]}><sphereGeometry args={[.07, 8, 6]} />{mat('#d6b06a', { metalness: .6, roughness: .4 })}</mesh>
     {lit && <><mesh ref={flame} position={[0, 2.95, 0]}><coneGeometry args={[.11, .34, 8]} /><meshBasicMaterial color="#ff8a1f" /></mesh>
       <mesh ref={halo} position={[0, 2.95, 0]}><sphereGeometry args={[1.05, 16, 12]} /><meshBasicMaterial color="#ffd36b" transparent opacity={.3} depthWrite={false} /></mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, .05, 0]}><circleGeometry args={[2.4, 32]} /><meshBasicMaterial color="#ffd36b" transparent opacity={.22} depthWrite={false} /></mesh></>}{/* Sem pointLight: acender uma luz nova recompila a iluminação da cena inteira e trava o celular. */}</group>;

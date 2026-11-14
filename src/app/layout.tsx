@@ -23,6 +23,7 @@ import "./prologue.css";
 import "@fontsource/cinzel/600.css";
 import "@fontsource/cinzel/700.css";
 import "./lovelace-identity.css";
+import "./mobile-bar.css";
 import {CloudRuntime,CloudGate} from "@/components/CloudAccount";
 
 // Caminho do site no GitHub Pages (ex.: /evolution-lab-next). Sem ele o iPhone não achava o ícone e mostrava um "L" genérico.

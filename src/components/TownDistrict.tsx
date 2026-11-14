@@ -24,7 +24,8 @@ function Roads({onClick}:{onClick:(e:ThreeEvent<MouseEvent>)=>void}){
 }
 /** Todos os postes da cidade num só desenho por peça (poste, lanterna, tampa e brilho): bem mais leve. */
 const LAMP_PARTS:{y:number;geo:THREE.BufferGeometry;lit?:boolean}[]=[
- {y:1.1,geo:new THREE.CylinderGeometry(.07,.1,2.2,8)},{y:2.3,geo:new THREE.BoxGeometry(.32,.4,.32),lit:true},{y:2.58,geo:new THREE.ConeGeometry(.28,.22,4)}];
+ {y:.07,geo:new THREE.CylinderGeometry(.16,.2,.14,8)},{y:1.1,geo:new THREE.CylinderGeometry(.06,.08,2.2,8)},{y:2.1,geo:new THREE.BoxGeometry(.38,.05,.38)},
+ {y:2.32,geo:new THREE.BoxGeometry(.3,.4,.3),lit:true},{y:2.62,geo:new THREE.ConeGeometry(.3,.26,4).rotateY(Math.PI/4)},{y:2.8,geo:new THREE.SphereGeometry(.05,8,6)}];
 const LAMP_GLOW=new THREE.SphereGeometry(.55,12,10);
 function InstancedParts({points,geo,y,children}:{points:{x:number;z:number}[];geo:THREE.BufferGeometry;y:number;children:ReactNode}){
  const ref=useRef<THREE.InstancedMesh>(null);
@@ -33,7 +34,7 @@ function InstancedParts({points,geo,y,children}:{points:{x:number;z:number}[];ge
 }
 function LampPosts({lit}:{lit:boolean}){
  const points=useMemo(()=>PROPS.filter(p=>p.kind==='lamp'),[]);
- return <group>{LAMP_PARTS.map((part,i)=><InstancedParts key={i} points={points} geo={part.geo} y={part.y}>{part.lit?std(lit?'#ffe08a':'#6c6f74',{emissive:lit?'#ffb43a':'#000000',emissiveIntensity:lit?1.6:0}):std('#3d4350',i===0?{metalness:.4}:{})}</InstancedParts>)}
+ return <group>{LAMP_PARTS.map((part,i)=><InstancedParts key={i} points={points} geo={part.geo} y={part.y}>{part.lit?std(lit?'#ffe08a':'#b39a62',{emissive:lit?'#ffb43a':'#3a2a10',emissiveIntensity:lit?1.6:.4}):std(i===0?'#6b6f7a':'#3d4350',{metalness:.35,roughness:.55})}</InstancedParts>)}
   {lit&&<InstancedParts points={points} geo={LAMP_GLOW} y={2.3}><meshBasicMaterial color="#ffd36b" transparent opacity={.22} depthWrite={false}/></InstancedParts>}</group>;
 }
 function Well({flowing}:{flowing:boolean}){
@@ -122,7 +123,7 @@ function CitadelSigns(){
    <mesh position={[0,2.78,0]}><sphereGeometry args={[.13,10,8]}/>{std('#d6b06a',{metalness:.6,roughness:.4})}</mesh>
    {CITADEL_SECTORS.slice(0,4).map((sec,i)=>{const turn=Math.atan2(-(sec.z-SIGNPOST[1]),sec.x-SIGNPOST[0]);
     return <group key={sec.name} position={[0,2.35-i*.38,0]} rotation={[0,turn,0]}><mesh position={[.55,0,0]}><boxGeometry args={[1.1,.3,.06]}/>{std('#1d2a4a')}</mesh><mesh position={[1.14,0,0]} rotation={[0,0,Math.PI/4]}><boxGeometry args={[.21,.21,.06]}/>{std('#1d2a4a')}</mesh></group>;})}
-   {near&&<Html zIndexRange={[5,0]} position={[0,3.1,0]} center style={{pointerEvents:'none'}}><div className="citadel-signpost">{CITADEL_SECTORS.slice(0,4).map(sec=><span key={sec.name}><i>{SECTOR_ICON[sec.short]}</i>{sec.short}</span>)}</div></Html>}
+   {/* placas de texto removidas: cobriam NPCs (a Mira); os nomes ficam nas plaquinhas dos prédios */}
   </group>
   {near&&CITADEL_SECTORS.map(sec=><Html key={sec.name} zIndexRange={[4,0]} position={[sec.x,4.3,sec.z]} center style={{pointerEvents:'none'}}><span className="citadel-plaque"><i>{SECTOR_ICON[sec.short]}</i>{sec.short.toUpperCase()}</span></Html>)}
  </group>;

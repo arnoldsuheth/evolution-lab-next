@@ -1,0 +1,75 @@
+/* ==========================================================
+   HUD padrão: o celular usa a mesma barra de habilidades e a
+   mesma barra de menu/mochila do computador. No computador
+   (mouse) a bolinha de movimento some: anda com WASD/setas.
+   ========================================================== */
+
+/* computador com mouse: sem joystick na tela */
+@media (hover:hover) and (pointer:fine){
+  :root body .movement-pad{display:none!important}
+}
+
+@media (pointer:coarse), (max-width:960px){
+  /* a roda de toque sai; ficam só Correr, Sentar e Lobo, pequenos */
+  :root body .radial-hud{width:auto;height:auto;right:calc(env(safe-area-inset-right,0px) + 8px);bottom:calc(env(safe-area-inset-bottom,0px) + 74px)}
+  :root body .radial-hud>button{display:none!important}
+  :root body .radial-hud>:is(.radial-run,.radial-sit,.radial-wolf){
+    display:grid!important;position:static!important;width:40px!important;height:40px!important;margin-top:6px;font-size:15px;
+  }
+  :root body .radial-hud{display:flex!important;flex-direction:column;align-items:flex-end}
+
+  /* barra de habilidades embaixo, no centro */
+  :root body .combat-console,
+  :root body .combat-console.combat-pad.without-target{
+    display:block!important;position:fixed!important;pointer-events:auto;
+    left:calc(env(safe-area-inset-left,0px) + clamp(170px,30vw,250px))!important;right:auto!important;margin:0!important;top:auto!important;
+    bottom:calc(env(safe-area-inset-bottom,0px) + 22px)!important;transform:none!important;
+    width:max-content!important;max-width:calc(100vw - clamp(170px,30vw,250px) - 215px);overflow:visible;
+    padding:5px 8px!important;z-index:20;
+    --combat-control-size:40px;--combat-gap:5px;
+  }
+  :root body .combat-console>.combat-console-head{display:none!important}
+  :root body .combat-console>.combat-console-grid{
+    display:flex!important;align-items:center;gap:var(--combat-gap);
+    overflow-x:auto;scrollbar-width:none;max-width:100%;
+  }
+  :root body .combat-console>.combat-console-grid::-webkit-scrollbar{display:none}
+  :root body .combat-console :is(.desktop-attack,.console-skill,.auto-attack,.class-power,.quick-use){
+    flex:0 0 auto;display:grid;place-content:center;position:relative;
+    width:var(--combat-control-size);height:var(--combat-control-size);min-height:0;padding:0;
+    font-size:15px;touch-action:manipulation;
+  }
+  :root body .combat-console .desktop-attack{
+    width:50px;height:50px;font-size:20px;order:-1;
+  }
+  :root body .combat-console .auto-attack{order:1}
+  :root body .combat-console :is(.desktop-attack,.console-skill) kbd{display:none}
+  :root body .combat-console .auto-attack small{font-size:7px}
+  :root body .combat-console .auto-attack svg{width:16px;height:16px}
+  :root body .combat-console .quick-item{width:var(--combat-control-size);flex:0 0 auto;display:grid}
+  :root body .combat-console .quick-item select{display:none}
+
+  /* barra de menu (Herói, Talentos, Diário, Códice, Mochila) à direita */
+  :root body .desktop-game-menu{
+    display:flex!important;position:fixed;z-index:20;gap:4px;
+    right:calc(env(safe-area-inset-right,0px) + 8px);
+    bottom:calc(env(safe-area-inset-bottom,0px) + 22px);
+    padding:4px 6px;border:1px solid var(--lk-gold,#c9a55a);border-radius:6px;
+    background:linear-gradient(180deg,#1b2630f2,#0e151cf2);box-shadow:0 6px 18px #0009;
+  }
+  :root body .desktop-game-menu>button{
+    width:34px;height:34px;min-width:0;padding:0;border-radius:50%;display:grid;place-items:center;
+    font-size:0;color:transparent;
+  }
+  :root body .desktop-game-menu>button span{font-size:15px!important;color:var(--lk-gold-hi,#ecd08c)}
+  :root body .desktop-game-menu .desktop-bags{display:none!important}
+
+  /* o "Menu" de cima continua; o resto do HUD sobe um pouco */
+  :root body .action-log{bottom:80px!important}
+}
+
+/* tela de celular bem estreita: só 4 atalhos para caber */
+@media (pointer:coarse) and (max-width:700px), (max-width:700px){
+  :root body .desktop-game-menu>button:nth-of-type(4){display:none}
+  :root body .combat-console,:root body .combat-console.combat-pad.without-target{max-width:calc(100vw - 170px - 180px)}
+}
