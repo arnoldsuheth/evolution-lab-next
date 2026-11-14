@@ -1,0 +1,300 @@
+/* ==========================================================
+   Lovelace Kingdom — Kit de identidade visual (protótipo 2.0)
+   Cores: ardósia escura, moldura dourada, texto pergaminho,
+   destaque turquesa. Títulos em Cinzel.
+   Este arquivo é importado por último e só "veste" a interface.
+   ========================================================== */
+:root{
+  --lk-ink:#0e151c;
+  --lk-panel:#141c24;
+  --lk-panel-2:#1b2630;
+  --lk-box:#25333d;
+  --lk-box-hi:#2f414c;
+  --lk-gold:#c9a55a;
+  --lk-gold-hi:#ecd08c;
+  --lk-gold-lo:#8a6b32;
+  --lk-cream:#efe3c8;
+  --lk-cream-dim:#b9ad94;
+  --lk-teal:#3fd6cf;
+  --lk-teal-deep:#0f6a6a;
+  --lk-teal-mid:#1a9a95;
+  --lk-red:#c3312c;
+  --lk-display:"Cinzel","Cinzel Decorative","Trajan Pro",Georgia,serif;
+  /* cantos dourados (8 traços) + fundo do painel */
+  --lk-corner:linear-gradient(var(--lk-gold),var(--lk-gold));
+  --lk-corners:
+    var(--lk-corner) left 6px top 6px/16px 2px no-repeat,
+    var(--lk-corner) left 6px top 6px/2px 16px no-repeat,
+    var(--lk-corner) right 6px top 6px/16px 2px no-repeat,
+    var(--lk-corner) right 6px top 6px/2px 16px no-repeat,
+    var(--lk-corner) left 6px bottom 6px/16px 2px no-repeat,
+    var(--lk-corner) left 6px bottom 6px/2px 16px no-repeat,
+    var(--lk-corner) right 6px bottom 6px/16px 2px no-repeat,
+    var(--lk-corner) right 6px bottom 6px/2px 16px no-repeat;
+  --lk-panel-bg:radial-gradient(120% 90% at 50% 0%,#1d2a34 0%,var(--lk-panel) 55%,var(--lk-ink) 100%);
+  --lk-hex:polygon(14px 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,14px 100%,0 50%);
+}
+
+/* ---------- peças reutilizáveis ---------- */
+:root body .lk-frame,
+:root body .modal,
+:root body .lk-roster,
+:root body .lk-hero-info,
+:root body .left-hud .hero-card,
+:root body .quest-tracker .hud-content{
+  background:var(--lk-corners),var(--lk-panel-bg)!important;
+  border:1px solid var(--lk-gold)!important;
+  box-shadow:inset 0 0 0 3px var(--lk-ink),inset 0 0 0 4px #c9a55a55,0 14px 40px #0009;
+  color:var(--lk-cream);
+}
+
+/* botão principal: hexágono turquesa com borda dourada */
+:root body .lk-btn,
+:root body .lk-hero-info .lk-enter,
+:root body .modal .item-detail-panel button.primary,
+:root body .modal .item-detail-panel .buy-button,
+:root body .pro-gate .pro-play{
+  position:relative;isolation:isolate;border:0;border-radius:0;
+  clip-path:var(--lk-hex);
+  background:linear-gradient(180deg,var(--lk-gold-hi),var(--lk-gold) 45%,var(--lk-gold-lo));
+  color:var(--lk-cream);font-family:var(--lk-display);font-weight:700;letter-spacing:.06em;
+  text-shadow:0 1px 2px #0009;padding:14px 34px;box-shadow:none;
+}
+:root body .lk-btn::before,
+:root body .lk-hero-info .lk-enter::before,
+:root body .modal .item-detail-panel button.primary::before,
+:root body .modal .item-detail-panel .buy-button::before,
+:root body .pro-gate .pro-play::before{
+  content:"";position:absolute;inset:2px;z-index:-1;clip-path:var(--lk-hex);
+  background:radial-gradient(90% 120% at 50% 0%,#57efe6 0%,var(--lk-teal-mid) 40%,var(--lk-teal-deep) 100%);
+}
+:root body .lk-btn:hover::before,
+:root body .lk-hero-info .lk-enter:hover::before,
+:root body .pro-gate .pro-play:hover::before{filter:brightness(1.18)}
+
+/* botão secundário: escuro com borda dourada */
+:root body .lk-btn-ghost,
+:root body .modal .tabs button,
+:root body .modal .category-chips button,
+:root body .modal .catalogue-pagination button{
+  background:linear-gradient(180deg,var(--lk-box-hi),var(--lk-box))!important;
+  border:1px solid #c9a55a88!important;border-radius:4px!important;color:var(--lk-cream)!important;
+  box-shadow:inset 0 1px 0 #ffffff12;
+}
+:root body .modal .tabs button.active,
+:root body .modal .tabs button[aria-pressed="true"],
+:root body .modal .category-chips button.active{
+  background:linear-gradient(180deg,#1fb5ae,var(--lk-teal-deep))!important;
+  border-color:var(--lk-gold)!important;color:#fff!important;
+  box-shadow:0 0 14px #3fd6cf66,inset 0 1px 0 #ffffff40;
+}
+
+/* títulos */
+:root body .modal .modal-head h2,
+:root body .lk-select-top h1,
+:root body .lk-roster h2,
+:root body .lk-hero-info h2,
+:root body .quest-tracker h3,
+:root body .desktop-quest-title,
+:root body .left-hud .hero-card strong,
+:root body .pro-gate h2{
+  font-family:var(--lk-display);letter-spacing:.04em;color:var(--lk-cream);
+}
+
+/* divisor com losango */
+:root body .lk-divider,
+:root body .modal .modal-head::after{
+  content:"";display:block;height:1px;
+  background:linear-gradient(90deg,transparent,var(--lk-gold) 20%,var(--lk-gold-hi) 50%,var(--lk-gold) 80%,transparent);
+}
+
+/* ==========================================================
+   1) TELA INICIAL
+   ========================================================== */
+:root body .lk-select{background:var(--lk-ink)}
+:root body .lk-start-fx .lk-start-art{
+  display:block!important;position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;max-width:none;transform:none;opacity:1;animation:none;
+}
+:root body .lk-start-fx .lk-start-shade{
+  display:block!important;inset:0;
+  background:radial-gradient(48% 75% at 50% 45%,#0e151cd9 0%,#0e151c99 60%,transparent 100%),linear-gradient(180deg,transparent 60%,#0e151ccc);
+}
+:root body .lk-start-fx .lk-aurora,:root body .lk-start-fx .lk-rune{display:none}
+:root body .lovelace-brand-banner{
+  background:none!important;border:0!important;box-shadow:none!important;
+  width:min(230px,36vw)!important;height:auto!important;aspect-ratio:auto!important;overflow:visible!important;
+  margin:0 auto;padding:0;border-radius:0!important;
+}
+:root body .lovelace-brand-banner img{
+  width:100%!important;height:auto!important;object-fit:contain!important;
+  filter:drop-shadow(0 6px 24px #000c);animation:none!important;border-radius:0!important;
+}
+:root body .lovelace-brand-banner .lk-sweep{display:none}
+:root body .lk-select-top .eyebrow{color:var(--lk-gold);font-family:var(--lk-display)}
+:root body .lk-select-top h1{color:var(--lk-gold-hi);text-shadow:0 2px 12px #000}
+:root body .lk-select-top p{color:var(--lk-cream-dim)}
+:root body .lk-roster,:root body .lk-hero-info{border-radius:6px;backdrop-filter:blur(6px)}
+:root body .lk-roster h2{color:var(--lk-gold-hi);font-size:1.05rem}
+:root body .character-slot>button{
+  background:linear-gradient(180deg,var(--lk-box-hi),var(--lk-box))!important;
+  border:1px solid #c9a55a55!important;border-radius:4px!important;color:var(--lk-cream)!important;
+}
+:root body .character-slot.chosen>button{
+  border-color:var(--lk-teal)!important;
+  box-shadow:0 0 0 1px var(--lk-gold),0 0 18px #3fd6cf66,inset 0 0 18px #3fd6cf33!important;
+}
+:root body .character-slot .empty-character{color:var(--lk-gold);border-color:var(--lk-gold)}
+:root body .lk-hero-stage{background:none!important;border:0!important;box-shadow:none!important}
+:root body .lk-hero-info h2 i{color:var(--lk-teal)}
+:root body .lk-hero-info .lk-class{color:var(--lk-gold)}
+:root body .lk-hero-info .lk-progress b{color:var(--lk-teal)}
+:root body .lk-hero-info .lk-enter{width:100%;font-size:1.05rem;animation:none}
+
+/* prólogo (porta de entrada) */
+:root body .pro-gate h2{font-family:var(--lk-display);color:var(--lk-gold-hi)}
+:root body .pro-gate .pro-kicker{color:var(--lk-teal);font-family:var(--lk-display)}
+
+/* ==========================================================
+   2) HUD DO JOGO
+   ========================================================== */
+:root body .left-hud .hero-card{border-radius:6px}
+:root body .left-hud .portrait{
+  border:2px solid var(--lk-gold);
+  box-shadow:0 0 0 3px var(--lk-ink),0 0 0 4px #c9a55a88,0 0 14px #3fd6cf44;
+}
+:root body .left-hud .portrait b{
+  background:linear-gradient(180deg,var(--lk-gold-hi),var(--lk-gold-lo));color:var(--lk-ink);
+  border:1px solid var(--lk-ink);font-family:var(--lk-display);
+}
+:root body .left-hud .hero-card small{color:var(--lk-cream-dim)}
+:root body .left-hud .meter{
+  background:#0b1117;border:1px solid #c9a55a99;border-radius:3px;
+  box-shadow:inset 0 2px 4px #000a;
+}
+:root body .left-hud .meter:nth-of-type(1) .meter-fill{background:linear-gradient(180deg,#e2524a,var(--lk-red) 55%,#7c1714)!important}
+:root body .left-hud .meter:nth-of-type(2) .meter-fill{background:linear-gradient(180deg,#56b8f0,#2672b5 55%,#173f6b)!important}
+:root body .left-hud .meter:nth-of-type(3) .meter-fill{background:linear-gradient(180deg,#58e3d8,var(--lk-teal-mid) 55%,var(--lk-teal-deep))!important}
+:root body .left-hud .meter span,:root body .left-hud .meter b{color:#fff;text-shadow:0 1px 2px #000}
+:root body .left-hud .meter:nth-of-type(1) span{font-size:0}
+:root body .left-hud .meter:nth-of-type(1) span::before{content:"❤";font-size:12px;color:#ffd1cc}
+
+/* minimapa: anel dourado de bússola */
+:root body .minimap{
+  border:3px solid var(--lk-gold)!important;
+  box-shadow:0 0 0 3px var(--lk-ink),0 0 0 5px var(--lk-gold-lo),0 0 24px #000a,inset 0 0 22px #000c!important;
+}
+:root body .minimap .map-north{
+  background:var(--lk-ink);color:var(--lk-gold-hi);border:1px solid var(--lk-gold);font-family:var(--lk-display);
+}
+:root body .map-hud .region-label,:root body .map-hud>.hud-content>span{font-family:var(--lk-display)}
+
+/* missões */
+:root body .quest-tracker .hud-content{border-radius:6px}
+:root body .quest-tracker h3{color:var(--lk-gold-hi)}
+:root body .quest-tracker .quest-route-button{
+  clip-path:var(--lk-hex);border:0!important;border-radius:0!important;
+  background:linear-gradient(180deg,#1fb5ae,var(--lk-teal-deep))!important;color:#fff!important;font-weight:700;
+}
+
+/* barra de habilidades */
+:root body .combat-console{
+  background:var(--lk-corners),linear-gradient(180deg,#1b2630f2,#0e151cf2)!important;
+  border:1px solid var(--lk-gold)!important;border-radius:6px!important;
+  box-shadow:inset 0 0 0 3px var(--lk-ink),inset 0 0 0 4px #c9a55a44,0 10px 30px #0009!important;
+}
+:root body .combat-console .console-skill,
+:root body .combat-console .desktop-attack,
+:root body .combat-console .auto-attack,
+:root body .combat-console .quick-use{
+  border-radius:50%!important;border:2px solid var(--lk-gold)!important;
+  background:radial-gradient(circle at 50% 35%,#1c4d55,#0d2329 70%)!important;
+  box-shadow:0 0 0 2px var(--lk-ink),0 0 12px #3fd6cf55,inset 0 0 10px #3fd6cf44!important;
+  color:var(--lk-teal)!important;
+}
+:root body .combat-console .console-skill.empty-skill{
+  background:radial-gradient(circle,#1b2630,#0e151c)!important;box-shadow:0 0 0 2px var(--lk-ink)!important;
+  border-color:#c9a55a66!important;color:#c9a55a66!important;
+}
+:root body .combat-console .desktop-attack{
+  background:radial-gradient(circle at 50% 35%,#2b3a44,#0e151c 75%)!important;
+  border-width:3px!important;color:var(--lk-gold-hi)!important;
+  box-shadow:0 0 0 2px var(--lk-ink),0 0 16px #c9a55a66!important;
+}
+:root body .desktop-game-menu button{
+  border:1px solid #c9a55a99!important;
+  background:radial-gradient(circle at 50% 35%,var(--lk-box-hi),var(--lk-panel))!important;
+}
+/* botões redondos do celular */
+:root body .radial-hud .radial-skill,
+:root body .radial-hud button{
+  border:2px solid var(--lk-gold)!important;
+  background:radial-gradient(circle at 50% 35%,#1c4d55,#0d2329 70%)!important;
+  box-shadow:0 0 0 2px var(--lk-ink),0 0 14px #3fd6cf55!important;
+}
+:root body .radial-hud .radial-attack{
+  border-width:3px!important;
+  background:radial-gradient(circle at 50% 35%,#2b3a44,#0e151c 75%)!important;
+  box-shadow:0 0 0 3px var(--lk-ink),0 0 20px #c9a55a77!important;
+}
+:root body .game-menu-toggle{
+  font-family:var(--lk-display);border:1px solid var(--lk-gold)!important;
+  background:linear-gradient(180deg,var(--lk-box-hi),var(--lk-panel))!important;color:var(--lk-cream)!important;
+}
+
+/* ==========================================================
+   3) LOJA (e todos os painéis)
+   ========================================================== */
+:root body .modal{border-radius:8px;padding-top:4px}
+:root body .modal .modal-head{border-bottom:0;flex-wrap:wrap}
+:root body .modal .modal-head::after{flex-basis:100%;margin-top:6px}
+:root body .modal .modal-head h2{color:var(--lk-cream);font-size:1.45rem;font-weight:600}
+:root body .modal .modal-head .eyebrow{color:var(--lk-gold);font-family:var(--lk-display)}
+:root body .modal .modal-head .icon-button{
+  border-radius:4px!important;border:1px solid var(--lk-gold)!important;color:var(--lk-gold-hi)!important;
+  background:linear-gradient(180deg,var(--lk-box-hi),var(--lk-panel))!important;
+}
+:root body .modal .inventory-toolbar .tabs button{
+  clip-path:var(--lk-hex);border-radius:0!important;padding-inline:22px;border:0!important;
+  background:linear-gradient(180deg,var(--lk-box-hi),var(--lk-box))!important;
+}
+:root body .modal .inventory-toolbar .tabs button.active{
+  background:linear-gradient(180deg,#22c0b8,var(--lk-teal-deep))!important;box-shadow:none!important;color:#fff!important;
+}
+:root body .modal .currency,:root body .modal .aurora-currency{
+  border:1px solid var(--lk-gold);border-radius:999px;background:var(--lk-ink);padding:3px 12px;color:var(--lk-cream);
+}
+/* itens: linhas escuras, destaque turquesa ao selecionar */
+:root body .modal .item-icon{
+  background:linear-gradient(180deg,var(--lk-box),#1a252e)!important;
+  border:1px solid #c9a55a55!important;border-radius:4px!important;
+}
+:root body .modal .item-icon:hover{border-color:var(--lk-gold)!important}
+:root body .modal .item-icon.is-inspected{
+  border-color:var(--lk-teal)!important;
+  box-shadow:0 0 0 1px var(--lk-teal),0 0 18px #3fd6cf77,inset 0 0 22px #3fd6cf22!important;
+}
+:root body .modal .item-detail-panel{
+  background:var(--lk-corners),linear-gradient(180deg,var(--lk-panel-2),var(--lk-ink))!important;
+  border:1px solid var(--lk-gold)!important;border-radius:6px!important;color:var(--lk-cream);
+}
+:root body .modal .item-detail-panel h3{font-family:var(--lk-display);color:var(--lk-gold-hi)}
+:root body .modal .item-price strong{color:var(--lk-gold-hi)}
+:root body .modal .inventory-loadout{
+  background:var(--lk-corners),linear-gradient(180deg,var(--lk-panel-2),var(--lk-ink))!important;
+  border:1px solid var(--lk-gold)!important;border-radius:6px!important;
+}
+:root body .modal .inventory-loadout strong{font-family:var(--lk-display);color:var(--lk-gold-hi)}
+:root body .modal .loadout-slots>*{border-color:#c9a55a66!important;background:var(--lk-box)!important}
+:root body .modal .empty-state{border-color:#c9a55a55;color:var(--lk-cream-dim)}
+
+@media (max-width:900px){
+  :root body .modal .modal-head h2{font-size:1.1rem}
+  :root body .lovelace-brand-banner{width:min(170px,40vw)!important}
+}
+:root body .lk-hero-stage>*{background:radial-gradient(circle at 50% 72%,#1f5157,#16222b 58%,#0e151c 100%)!important}
+:root body .modal .item-icon,:root body .modal .item-icon *{color:var(--lk-cream)!important}
+:root body .modal .item-icon small,:root body .modal .item-icon em{color:var(--lk-cream-dim)!important}
+@media (max-height:520px){
+  :root body .lk-select .lovelace-brand-banner{display:none!important}
+}

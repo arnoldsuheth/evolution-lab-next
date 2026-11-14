@@ -144,7 +144,9 @@ function weaponMesh(kind: Weapon, props: Record<string, THREE.Group>, gem = '#6f
   return g;
 }
 
-function ClassHero({ look, x, z, turn, move }: { look: ClassLook; x: number; z: number; turn: number; move: Move }) {
+export type Tier = 0 | 1 | 2;
+export const TIER_NAMES = ['Comum', 'Raro', 'Épico'];
+function ClassHero({ look, x, z, turn, move, tier }: { look: ClassLook; x: number; z: number; turn: number; move: Move; tier: Tier }) {
   const mr = useGLTF(C(MR)), mp = useGLTF(C(MP)), fr = useGLTF(C(FR)), fp = useGLTF(C(FP));
   const body = useGLTF(C(look.body ?? (look.female ? 'Superhero_Female_FullBody' : 'Superhero_Male_FullBody')));
   const hair = useGLTF(C(look.hair ?? 'Hair_Buzzed')), brows = useGLTF(C(look.female ? 'Eyebrows_Female' : 'Eyebrows_Regular')), beard = useGLTF(C('Hair_Beard')), anims = useGLTF(C('UAL1'));
@@ -155,7 +157,7 @@ function ClassHero({ look, x, z, turn, move }: { look: ClassLook; x: number; z: 
     const scene = cloneSkinned(outfits[look.parts[0][0]]) as THREE.Group, bones: Record<string, THREE.Bone> = {};
     scene.traverse(o => { if ((o as THREE.Bone).isBone) bones[o.name] = o as THREE.Bone; });
     const drop: THREE.Object3D[] = []; scene.traverse(o => { if ((o as THREE.Mesh).isMesh) drop.push(o); }); drop.forEach(o => o.removeFromParent());
-    const paint = (m: THREE.SkinnedMesh) => { const mats = (Array.isArray(m.material) ? m.material : [m.material]).map(mt => /Regular/.test(mt.name) ? (look.skin ? tintMaterial(mt, look.skin) : mt) : lighter(mt, look.tint)); m.material = Array.isArray(m.material) ? mats : mats[0]; };
+    const paint = (m: THREE.SkinnedMesh) => { const mats = (Array.isArray(m.material) ? m.material : [m.material]).map(mt => { if (/Regular/.test(mt.name)) return look.skin ? tintMaterial(mt, look.skin) : mt; const c = lighter(mt, look.tint) as THREE.MeshStandardMaterial; if (tier > 0) { c.metalness = tier === 2 ? .55 : .3; c.roughness = tier === 2 ? .35 : .5; c.emissive = new THREE.Color(look.gem ?? look.tint); c.emissiveIntensity = tier === 2 ? .18 : .06; } return c; }); m.material = Array.isArray(m.material) ? mats : mats[0]; };
     const attach = (src: THREE.Object3D, keep: (m: THREE.SkinnedMesh) => boolean, edit?: (m: THREE.SkinnedMesh) => void) => {
       cloneSkinned(src).traverse(o => { const m = o as THREE.SkinnedMesh; if (!m.isSkinnedMesh || !keep(m)) return; edit?.(m);
         const mesh = new THREE.SkinnedMesh(m.geometry, m.material); mesh.name = m.name; mesh.frustumCulled = false; mesh.castShadow = true;
@@ -170,11 +172,24 @@ function ClassHero({ look, x, z, turn, move }: { look: ClassLook; x: number; z: 
     const hold = (kind: Weapon, bone: string, side: number) => { const hand = bones[bone]; if (!hand) return; const holder = new THREE.Group(); holder.position.set(side * .09, side * .03, 0); const r = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('rot')?.split(',').map(Number) : null; if (r) holder.rotation.set(r[0], r[1] * side, r[2] * side); else holder.rotation.set(0, 0, Math.PI); holder.add(weaponMesh(kind, props, look.gem)); hand.add(holder); };
     if (look.right) hold(look.right, 'hand_r', 1);
     if (look.left) hold(look.left, 'hand_l', -1);
+    // Peças extras por nível: Raro ganha ombreiras de metal e capa; Épico ganha gema brilhante no peito, coroa/elmo e aura.
+    const accent = look.gem ?? look.tint, metal = new THREE.MeshStandardMaterial({ color: tier === 2 ? '#e8c76a' : '#b8c0cc', metalness: .85, roughness: .3, emissive: tier === 2 ? '#7a5a10' : '#000000', emissiveIntensity: .4 });
+    if (tier >= 1) {
+      for (const [bone, side] of [['upperarm_r', 1], ['upperarm_l', -1]] as const) { const plate = new THREE.Mesh(new THREE.SphereGeometry(.11, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), metal); plate.scale.set(1, .7, 1.1); plate.rotation.z = -side * Math.PI / 2; plate.position.set(.05, 0, 0); bones[bone]?.add(plate); }
+      const cape = new THREE.Mesh(new THREE.PlaneGeometry(.5, 1.05, 1, 6), new THREE.MeshStandardMaterial({ color: new THREE.Color(look.tint).multiplyScalar(.8), side: THREE.DoubleSide, roughness: .8, emissive: tier === 2 ? accent : '#000000', emissiveIntensity: tier === 2 ? .12 : 0 }));
+      const pos = cape.geometry.attributes.position; for (let i = 0; i < pos.count; i++) { const y = pos.getY(i); pos.setZ(i, -Math.pow((.52 - y) / 1.05, 2) * .25); } pos.needsUpdate = true;
+      const capeHolder = new THREE.Group(); capeHolder.add(cape); cape.position.y = -.5; bones.spine_03?.add(capeHolder); capeHolder.position.set(.05, -.12, 0); capeHolder.rotation.set(0, Math.PI / 2, Math.PI / 2);
+    }
+    if (tier === 2) {
+      const gemMesh = new THREE.Mesh(new THREE.OctahedronGeometry(.05), new THREE.MeshStandardMaterial({ color: accent, emissive: accent, emissiveIntensity: 2.2 })); gemMesh.position.set(.08, .12, 0); bones.spine_03?.add(gemMesh);
+      const crown = new THREE.Mesh(new THREE.TorusGeometry(.115, .02, 6, 24), metal); crown.rotation.x = Math.PI / 2; crown.position.set(0, .2, 0); if (!look.halo) bones.Head?.add(crown);
+      const aura = new THREE.Mesh(new THREE.RingGeometry(.45, .62, 40), new THREE.MeshBasicMaterial({ color: accent, transparent: true, opacity: .45, depthWrite: false, blending: THREE.AdditiveBlending })); aura.rotation.x = -Math.PI / 2; aura.position.y = .03; aura.name = 'aura'; scene.add(aura);
+    }
     if (look.halo) { const ring = new THREE.Mesh(new THREE.TorusGeometry(.17, .016, 8, 32), new THREE.MeshStandardMaterial({ color: '#ffe7a3', emissive: '#ffc94a', emissiveIntensity: 1.5 })); ring.rotation.x = Math.PI / 2; ring.position.set(0, .3, 0); bones.Head?.add(ring); }
     scene.traverse(o => { o.castShadow = true; if ((o as THREE.Mesh).isMesh) o.frustumCulled = false; });
     if (look.scale) scene.scale.setScalar(look.scale);
     return scene;
-  }, [mr.scene, mp.scene, fr.scene, fp.scene, body.scene, hair.scene, brows.scene, beard.scene, sword.scene, axe.scene, shield.scene, pick.scene, look]);
+  }, [mr.scene, mp.scene, fr.scene, fp.scene, body.scene, hair.scene, brows.scene, beard.scene, sword.scene, axe.scene, shield.scene, pick.scene, look, tier]);
   const mixer = useMemo(() => new THREE.AnimationMixer(root), [root]);
   useEffect(() => { const clip = anims.animations.find(a => a.name === move); if (!clip) return; const a = mixer.clipAction(clip); a.reset().fadeIn(.25).play(); return () => { a.fadeOut(.25); }; }, [mixer, anims.animations, move]);
   useFrame((_, dt) => mixer.update(dt));
@@ -195,7 +210,7 @@ function Plant({ name, x, z, s, r }: { name: string; x: number; z: number; s: nu
   return <primitive object={obj} position={[x, 0, z]} scale={s} rotation={[0, r * 2.1, 0]} />;
 }
 
-export default function PreviewScene({ move, classes = false }: { move: Move; classes?: boolean }) {
+export default function PreviewScene({ move, classes = false, tier = 0 }: { move: Move; classes?: boolean; tier?: Tier }) {
   return <Canvas shadows camera={{ position: [0, 3.6, 10.5], fov: 44 }} dpr={[1, 2]} gl={{ antialias: true }}>
     <color attach="background" args={['#a9d4ef']} />
     <fog attach="fog" args={['#a9d4ef', 14, 30]} />
@@ -205,7 +220,7 @@ export default function PreviewScene({ move, classes = false }: { move: Move; cl
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, .01, .4]} receiveShadow><planeGeometry args={[7.5, 7.5]} /><meshStandardMaterial color="#c9a774" roughness={1} /></mesh>
     <Suspense fallback={null}>
       {PLANTS.map(([n, x, z, s, r], i) => <Plant key={i} name={n} x={x} z={z} s={s} r={r} />)}
-      {classes ? <>{PREVIEW_CLASSES.map((c, i) => <ClassHero key={c.name} look={c} move={move} x={(i % 5 - 2) * 1.5 + (i >= 5 ? .75 : 0)} z={i >= 5 ? 1.8 : 0} turn={-(i % 5 - 2) * .12} />)}{PREVIEW_MONSTERS.map(m => <Ready key={m.name} {...m} move={move} />)}</> : <>
+      {classes ? <>{PREVIEW_CLASSES.map((c, i) => <ClassHero key={c.name} look={c} move={move} tier={tier} x={(i % 5 - 2) * 1.5 + (i >= 5 ? .75 : 0)} z={i >= 5 ? 1.8 : 0} turn={-(i % 5 - 2) * .12} />)}{PREVIEW_MONSTERS.map(m => <Ready key={m.name} {...m} move={move} />)}</> : <>
       {PREVIEW_HEROES.map(h => <Character key={h.name} hero={h} move={move} />)}
       {PREVIEW_RACES.map(r => <Ready key={r.name} {...r} move={move} />)}
       {PREVIEW_LOWPOLY.map(r => <Ready key={r.name} {...r} move={move} own />)}</>}

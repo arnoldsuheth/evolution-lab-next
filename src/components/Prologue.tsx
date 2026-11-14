@@ -105,7 +105,7 @@ export default function Prologue({ onClose }: { onClose: () => void }) {
 
   return <div className="prologue" role="dialog" aria-modal="true" aria-label="Prólogo do Lovelace Kingdom">
     {!started ? <div className="pro-gate">
-      <Image src={base + '/lovelace-identidade.jpeg'} width={1536} height={1024} alt="" aria-hidden="true" unoptimized priority />
+      <Image src={base + '/ui/start-bg.webp'} width={1672} height={941} alt="" aria-hidden="true" unoptimized priority />
       <p className="pro-kicker">PRÓLOGO</p><h2>O Código Perdido</h2>
       <button className="pro-play" onClick={begin}><span aria-hidden="true">{"\u25B6\uFE0E"}</span> Assistir</button>
       <p className="pro-tip">Narrado e legendado · cerca de 2 minutos</p>
